@@ -32,10 +32,7 @@ use function substr;
 final class Path extends Component implements PathInterface
 {
     private const DOT_SEGMENTS = ['.' => 1, '..' => 1];
-    private const REGEXP_PATH_ENCODING = '/
-        (?:[^A-Za-z0-9_\-\.\!\$&\'\(\)\*\+,;\=%\:\/@]+|
-        %(?![A-Fa-f0-9]{2}))
-    /x';
+    private const REGEXP_PATH_ENCODING = '/[^A-Za-z0-9_\-.!$&\'()*+,;=%:\/@]+|%(?![A-Fa-f0-9]{2})/';
     private const SEPARATOR = '/';
 
     private readonly string $path;
@@ -43,7 +40,7 @@ final class Path extends Component implements PathInterface
     /**
      * New instance.
      */
-    public function __construct(Stringable|float|int|string|bool $path = '')
+    public function __construct(UriComponentInterface|Stringable|float|int|string|bool|null $path = '')
     {
         $this->path = $this->validate($path);
     }
@@ -56,13 +53,18 @@ final class Path extends Component implements PathInterface
     /**
      * Validate the component content.
      */
-    private function validate(Stringable|float|int|string|bool $path): string
+    private function validate(UriComponentInterface|Stringable|float|int|string|bool|null $path): string
     {
-        return (string) $this->validateComponent($path);
+        $path = $this->validateComponent($path);
+        if (null === $path) {
+            throw new SyntaxError('The path can not be null.');
+        }
+
+        return $path;
     }
 
     /**
-     * Returns a new instance from an string or a stringable object.
+     * Returns a new instance from a string or a stringable object.
      */
     public static function createFromString(Stringable|string $path = ''): self
     {
@@ -83,14 +85,14 @@ final class Path extends Component implements PathInterface
         return new self('/'.$path);
     }
 
-    public function getContent(): ?string
+    public function value(): ?string
     {
         return $this->encodeComponent($this->path, self::REGEXP_PATH_ENCODING);
     }
 
     public function getUriComponent(): string
     {
-        return (string) $this->getContent();
+        return (string) $this->value();
     }
 
     public function decoded(): string
@@ -106,20 +108,6 @@ final class Path extends Component implements PathInterface
     public function hasTrailingSlash(): bool
     {
         return '' !== $this->path && self::SEPARATOR === substr($this->path, -1);
-    }
-
-    public function withContent($content): UriComponentInterface
-    {
-        $content = self::filterComponent($content);
-        if (null === $content) {
-            throw new SyntaxError('The path component can not be `null`.');
-        }
-
-        if ($content === $this->getContent()) {
-            return $this;
-        }
-
-        return new self($content);
     }
 
     public function withoutDotSegments(): PathInterface

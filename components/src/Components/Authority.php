@@ -41,7 +41,7 @@ final class Authority extends Component implements AuthorityInterface
      *
      * @throws SyntaxError If the component contains invalid HostInterface part.
      */
-    public function __construct(Stringable|float|int|string|bool|null $authority = null)
+    public function __construct(UriComponentInterface|Stringable|float|int|string|bool|null $authority = null)
     {
         $components = $this->parse(self::filterComponent($authority));
         $this->host = new Host($components['host']);
@@ -87,7 +87,7 @@ final class Authority extends Component implements AuthorityInterface
      */
     private function validate(): void
     {
-        if (null === $this->host->getContent() && null !== $this->getContent()) {
+        if (null === $this->host->value() && null !== $this->value()) {
             throw new SyntaxError('A non-empty authority must contains a non null host.');
         }
     }
@@ -162,7 +162,7 @@ final class Authority extends Component implements AuthorityInterface
         return new self($authority);
     }
 
-    public function getContent(): ?string
+    public function value(): ?string
     {
         return self::getAuthorityValue($this->userInfo, $this->host, $this->port);
     }
@@ -172,13 +172,13 @@ final class Authority extends Component implements AuthorityInterface
         HostInterface $host,
         PortInterface $port
     ): ?string {
-        $auth = $host->getContent();
-        $port = $port->getContent();
+        $auth = $host->value();
+        $port = $port->value();
         if (null !== $port) {
             $auth .= ':'.$port;
         }
 
-        $userInfo = $userInfo->getContent();
+        $userInfo = $userInfo->value();
         if (null === $userInfo) {
             return $auth;
         }
@@ -188,12 +188,12 @@ final class Authority extends Component implements AuthorityInterface
 
     public function getUriComponent(): string
     {
-        return (null === $this->host->getContent() ? '' : '//').$this->getContent();
+        return (null === $this->host->value() ? '' : '//').$this->value();
     }
 
     public function getHost(): ?string
     {
-        return $this->host->getContent();
+        return $this->host->value();
     }
 
     public function getPort(): ?int
@@ -203,20 +203,7 @@ final class Authority extends Component implements AuthorityInterface
 
     public function getUserInfo(): ?string
     {
-        return $this->userInfo->getContent();
-    }
-
-    /**
-     * @param UriComponentInterface|Stringable|float|int|string|bool|null $content
-     */
-    public function withContent($content): UriComponentInterface
-    {
-        $content = self::filterComponent($content);
-        if ($content === $this->getContent()) {
-            return $this;
-        }
-
-        return new self($content);
+        return $this->userInfo->value();
     }
 
     /**
@@ -228,7 +215,7 @@ final class Authority extends Component implements AuthorityInterface
             $host = new Host($host);
         }
 
-        if ($host->getContent() === $this->host->getContent()) {
+        if ($host->value() === $this->host->value()) {
             return $this;
         }
 
@@ -244,7 +231,7 @@ final class Authority extends Component implements AuthorityInterface
             $port = new Port($port);
         }
 
-        if ($port->getContent() === $this->port->getContent()) {
+        if ($port->value() === $this->port->value()) {
             return $this;
         }
 
@@ -258,7 +245,7 @@ final class Authority extends Component implements AuthorityInterface
     public function withUserInfo($user, $password = null): AuthorityInterface
     {
         $userInfo = new UserInfo($user, $password);
-        if ($userInfo->getContent() === $this->userInfo->getContent()) {
+        if ($userInfo->value() === $this->userInfo->value()) {
             return $this;
         }
 
@@ -268,7 +255,7 @@ final class Authority extends Component implements AuthorityInterface
     private function newInstance(UserInfoInterface $userInfo, HostInterface $host, PortInterface $port): self
     {
         $value = self::getAuthorityValue($userInfo, $host, $port);
-        if (null === $host->getContent() && null !== $value) {
+        if (null === $host->value() && null !== $value) {
             throw new SyntaxError('A non-empty authority must contains a non null host.');
         }
 

@@ -64,12 +64,10 @@ final class HostTest extends TestCase
      *
      * @covers ::__construct
      * @covers ::isValidIpv6Hostname
-     * @covers ::getContent
+     * @covers ::value
      * @covers ::getUriComponent
      * @covers ::toAscii
      * @covers ::toUnicode
-     * @param ?string $uri
-     * @param ?string $iri
      */
     public function testValidHost(UriComponentInterface|Stringable|float|int|string|bool|null $host, ?string $uri, ?string $iri): void
     {
@@ -242,13 +240,12 @@ final class HostTest extends TestCase
     /**
      * @dataProvider getURIProvider
      * @covers ::createFromUri
-     * @param ?string $expected
      */
     public function testCreateFromUri(Psr7UriInterface|UriInterface $uri, ?string $expected): void
     {
         $host = Host::createFromUri($uri);
 
-        self::assertSame($expected, $host->getContent());
+        self::assertSame($expected, $host->value());
     }
 
     public function getURIProvider(): iterable
@@ -285,7 +282,6 @@ final class HostTest extends TestCase
      * @dataProvider getIsDomainProvider
      * @covers ::isDomain
      * @covers ::isValidDomain
-     * @param ?string $host
      */
     public function test_host_is_domain(?string $host, bool $expectedIsDomain): void
     {

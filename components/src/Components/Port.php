@@ -82,14 +82,14 @@ final class Port extends Component implements PortInterface
     }
 
     /**
-     * Create a new instance from a Authority object.
+     * Create a new instance from an Authority object.
      */
     public static function createFromAuthority(AuthorityInterface $authority): self
     {
         return new self($authority->getPort());
     }
 
-    public function getContent(): ?string
+    public function value(): ?string
     {
         if (null === $this->port) {
             return $this->port;
@@ -100,21 +100,11 @@ final class Port extends Component implements PortInterface
 
     public function getUriComponent(): string
     {
-        return (null === $this->port ? '' : ':').$this->getContent();
+        return (null === $this->port ? '' : ':').$this->value();
     }
 
     public function toInt(): ?int
     {
         return $this->port;
-    }
-
-    public function withContent($content): UriComponentInterface
-    {
-        $content = $this->validate(self::filterComponent($content));
-        if ($content === $this->port) {
-            return $this;
-        }
-
-        return new self($content);
     }
 }

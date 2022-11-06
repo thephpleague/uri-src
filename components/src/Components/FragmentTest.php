@@ -36,8 +36,6 @@ final class FragmentTest extends TestCase
      * @covers ::validateComponent
      * @covers ::filterComponent
      * @covers ::__toString
-     *
-     * @param ?string $str
      */
     public function testStringRepresentation(?string $str, string $encoded): void
     {
@@ -76,7 +74,6 @@ final class FragmentTest extends TestCase
      * @covers ::encodeComponent
      * @covers ::encodeMatches
      * @covers ::decodeMatches
-     * @param ?string $expected
      */
     public function testGetValue(Stringable|float|int|string|bool|null $str, ?string $expected): void
     {
@@ -108,13 +105,13 @@ final class FragmentTest extends TestCase
      * @covers ::__construct
      * @covers ::validateComponent
      * @covers ::filterComponent
-     * @covers ::getContent
+     * @covers ::value
      * @covers ::encodeMatches
      * @covers ::decodeMatches
      */
     public function testGetContent(string $input, string $expected): void
     {
-        self::assertSame($expected, (new Fragment($input))->getContent());
+        self::assertSame($expected, (new Fragment($input))->value());
     }
 
     public function getContentProvider(): array
@@ -174,7 +171,7 @@ final class FragmentTest extends TestCase
         $fragment = new Fragment();
         $altFragment = $fragment->withContent(null);
         self::assertSame($fragment, $altFragment);
-        self::assertNull($altFragment->getContent());
+        self::assertNull($altFragment->value());
         self::assertSame('', $altFragment->__toString());
     }
 
@@ -193,13 +190,12 @@ final class FragmentTest extends TestCase
     /**
      * @dataProvider getURIProvider
      * @covers ::createFromUri
-     * @param ?string $expected
      */
     public function testCreateFromUri(Psr7UriInterface|UriInterface $uri, ?string $expected): void
     {
         $fragment = Fragment::createFromUri($uri);
 
-        self::assertSame($expected, $fragment->getContent());
+        self::assertSame($expected, $fragment->value());
     }
 
     public function getURIProvider(): iterable

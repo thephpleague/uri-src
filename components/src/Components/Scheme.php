@@ -31,7 +31,7 @@ final class Scheme extends Component
 
     private readonly ?string $scheme;
 
-    public function __construct(float|int|Stringable|string|bool|null $scheme = null)
+    public function __construct(UriComponentInterface|Stringable|float|int|string|bool|null $scheme = null)
     {
         $this->scheme = $this->validate($scheme);
     }
@@ -86,23 +86,30 @@ final class Scheme extends Component
         return new self($component);
     }
 
-    public function getContent(): ?string
+    public function value(): ?string
     {
         return $this->scheme;
     }
 
     public function getUriComponent(): string
     {
-        return $this->getContent().(null === $this->scheme ? '' : ':');
+        return $this->value().(null === $this->scheme ? '' : ':');
     }
 
-    public function withContent($content): UriComponentInterface
+
+
+    /**
+     * Filter the input component.
+     *
+     * @throws SyntaxError If the component can not be converted to a string or null
+     */
+    protected static function filterComponent(UriComponentInterface|Stringable|float|int|string|bool|null $component): ?string
     {
-        $content = $this->validate(self::filterComponent($content));
-        if ($content === $this->scheme) {
-            return $this;
+        $component = parent::filterComponent($component);
+        if (null !== $component) {
+            return strtolower($component);
         }
 
-        return new self($content);
+        return $component;
     }
 }

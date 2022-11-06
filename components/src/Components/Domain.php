@@ -50,14 +50,14 @@ final class Domain extends Component implements DomainHostInterface
      *
      * @throws SyntaxError
      */
-    public function __construct(UriComponentInterface|HostInterface|Stringable|float|int|string|bool|null $host)
+    public function __construct(UriComponentInterface|HostInterface|Stringable|float|int|string|bool|null $host = null)
     {
         if (!$host instanceof HostInterface) {
             $host = new Host($host);
         }
 
         if (!$host->isDomain()) {
-            throw new SyntaxError(sprintf('`%s` is an invalid domain name.', $host->getContent() ?? 'null'));
+            throw new SyntaxError(sprintf('`%s` is an invalid domain name.', $host->value() ?? 'null'));
         }
 
         $this->host = $host;
@@ -70,7 +70,7 @@ final class Domain extends Component implements DomainHostInterface
     private function setLabels(): array
     {
         /** @var string $host */
-        $host = $this->host->getContent();
+        $host = $this->host->value();
 
         return array_reverse(explode(self::SEPARATOR, $host));
     }
@@ -81,7 +81,7 @@ final class Domain extends Component implements DomainHostInterface
     }
 
     /**
-     * Returns a new instance from an string or a stringable object.
+     * Returns a new instance from a string or a stringable object.
      */
     public static function createFromString(Stringable|string $host = ''): self
     {
@@ -116,7 +116,7 @@ final class Domain extends Component implements DomainHostInterface
     }
 
     /**
-     * Create a new instance from a Authority object.
+     * Create a new instance from an Authority object.
      */
     public static function createFromAuthority(AuthorityInterface $authority): self
     {
@@ -131,14 +131,14 @@ final class Domain extends Component implements DomainHostInterface
         return new self($host);
     }
 
-    public function getContent(): ?string
+    public function value(): ?string
     {
-        return $this->host->getContent();
+        return $this->host->value();
     }
 
     public function getUriComponent(): string
     {
-        return (string) $this->getContent();
+        return (string) $this->value();
     }
 
     public function toAscii(): ?string
@@ -219,7 +219,7 @@ final class Domain extends Component implements DomainHostInterface
             return $this;
         }
 
-        return new self($label.self::SEPARATOR.$this->getContent());
+        return new self($label.self::SEPARATOR.$this->value());
     }
 
     /**
@@ -232,17 +232,7 @@ final class Domain extends Component implements DomainHostInterface
             return $this;
         }
 
-        return new self($this->getContent().self::SEPARATOR.$label);
-    }
-
-    public function withContent($content): UriComponentInterface
-    {
-        $content = self::filterComponent($content);
-        if ($content === $this->host->getContent()) {
-            return $this;
-        }
-
-        return new self($content);
+        return new self($this->value().self::SEPARATOR.$label);
     }
 
     public function withRootLabel(): DomainHostInterface
@@ -296,7 +286,7 @@ final class Domain extends Component implements DomainHostInterface
             $label = new Host($label);
         }
 
-        $label = $label->getContent();
+        $label = $label->value();
         if ($label === $this->labels[$key]) {
             return $this;
         }

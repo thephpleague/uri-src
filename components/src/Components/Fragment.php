@@ -24,17 +24,14 @@ use Stringable;
 
 final class Fragment extends Component implements FragmentInterface
 {
-    private const REGEXP_FRAGMENT_ENCODING = '/
-        (?:[^A-Za-z0-9_\-\.~\!\$&\'\(\)\*\+,;\=%\:\/@\?]+|
-        %(?![A-Fa-f0-9]{2}))
-    /x';
+    private const REGEXP_FRAGMENT_ENCODING = '/[^A-Za-z0-9_\-.~!$&\'()*+,;=%:\/@?]+|%(?![A-Fa-f0-9]{2})/';
 
     private readonly ?string $fragment;
 
     /**
      * New instance.
      */
-    public function __construct(Stringable|float|int|string|bool|null $fragment = null)
+    public function __construct(UriComponentInterface|Stringable|float|int|string|bool|null  $fragment = null)
     {
         $this->fragment = $this->validateComponent($fragment);
     }
@@ -61,14 +58,14 @@ final class Fragment extends Component implements FragmentInterface
         return new self($component);
     }
 
-    public function getContent(): ?string
+    public function value(): ?string
     {
         return $this->encodeComponent($this->fragment, self::REGEXP_FRAGMENT_ENCODING);
     }
 
     public function getUriComponent(): string
     {
-        return (null === $this->fragment ? '' : '#').$this->getContent();
+        return (null === $this->fragment ? '' : '#').$this->value();
     }
 
     /**
@@ -77,15 +74,5 @@ final class Fragment extends Component implements FragmentInterface
     public function decoded(): ?string
     {
         return $this->fragment;
-    }
-
-    public function withContent($content): UriComponentInterface
-    {
-        $content = self::filterComponent($content);
-        if ($content === $this->getContent()) {
-            return $this;
-        }
-
-        return new self($content);
     }
 }

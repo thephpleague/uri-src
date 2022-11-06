@@ -36,7 +36,7 @@ final class PathTest extends TestCase
      * @covers ::validate
      * @covers ::decodeMatches
      * @covers ::decoded
-     * @covers ::getContent
+     * @covers ::value
      * @covers ::encodeComponent
      */
     public function testGetUriComponent(string $decoded, string $encoded): void
@@ -44,7 +44,7 @@ final class PathTest extends TestCase
         $path = Path::createFromString($decoded);
 
         self::assertSame($decoded, $path->decoded());
-        self::assertSame($encoded, $path->getContent());
+        self::assertSame($encoded, $path->value());
     }
 
     public function validPathEncoding(): array
@@ -258,13 +258,12 @@ final class PathTest extends TestCase
     /**
      * @dataProvider getURIProvider
      * @covers ::createFromUri
-     * @param ?string $expected
      */
     public function testCreateFromUri(Psr7UriInterface|UriInterface $uri, ?string $expected): void
     {
         $path = Path::createFromUri($uri);
 
-        self::assertSame($expected, $path->getContent());
+        self::assertSame($expected, $path->value());
     }
 
     public function getURIProvider(): iterable

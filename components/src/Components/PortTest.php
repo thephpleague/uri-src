@@ -53,11 +53,9 @@ final class PortTest extends TestCase
      * @dataProvider getToIntProvider
      *
      * @covers ::toInt
-     * @covers ::getContent
+     * @covers ::value
      * @covers ::getUriComponent
      * @covers ::validate
-     * @param ?int    $expected
-     * @param ?string $string_expected
      */
     public function testToInt(
         UriComponentInterface|Stringable|float|int|string|bool|null $input,
@@ -66,7 +64,7 @@ final class PortTest extends TestCase
         string $uri_expected
     ): void {
         self::assertSame($expected, (new Port($input))->toInt());
-        self::assertSame($string_expected, (new Port($input))->getContent());
+        self::assertSame($string_expected, (new Port($input))->value());
         self::assertSame($uri_expected, (new Port($input))->getUriComponent());
     }
 
@@ -106,13 +104,12 @@ final class PortTest extends TestCase
     /**
      * @dataProvider getURIProvider
      * @covers ::createFromUri
-     * @param ?string $expected
      */
     public function testCreateFromUri(UriInterface|Psr7UriInterface $uri, ?string $expected): void
     {
         $port = Port::createFromUri($uri);
 
-        self::assertSame($expected, $port->getContent());
+        self::assertSame($expected, $port->value());
     }
 
     public function getURIProvider(): iterable

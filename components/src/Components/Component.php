@@ -30,7 +30,7 @@ abstract class Component implements UriComponentInterface
 {
     protected const REGEXP_ENCODED_CHARS = ',%[A-Fa-f0-9]{2},';
     protected const REGEXP_INVALID_URI_CHARS = '/[\x00-\x1f\x7f]/';
-    protected const REGEXP_NO_ENCODING = '/[^A-Za-z0-9_\-\.~]/';
+    protected const REGEXP_NO_ENCODING = '/[^A-Za-z0-9_\-.~]/';
     protected const REGEXP_NON_ASCII_PATTERN = '/[^\x20-\x7f]/';
     protected const REGEXP_PREVENTS_DECODING = ',%
      	2[A-F|1-2|4-9]|
@@ -44,11 +44,11 @@ abstract class Component implements UriComponentInterface
     /**
      * Validate the component content.
      */
-    protected function validateComponent(Stringable|float|int|string|bool|null $component): ?string
+    protected function validateComponent(UriComponentInterface|Stringable|float|int|string|bool|null $component): ?string
     {
         $component = self::filterComponent($component);
         if (null === $component) {
-            return $component;
+            return null;
         }
 
         return $this->decodeComponent($component);
@@ -62,11 +62,11 @@ abstract class Component implements UriComponentInterface
     protected static function filterComponent(Stringable|float|int|string|bool|null $component): ?string
     {
         if ($component instanceof UriComponentInterface) {
-            return $component->getContent();
+            return $component->value();
         }
 
         if (null === $component) {
-            return $component;
+            return null;
         }
 
         $component = (string) $component;
@@ -119,16 +119,21 @@ abstract class Component implements UriComponentInterface
 
     public function jsonSerialize(): ?string
     {
-        return $this->getContent();
+        return $this->value();
     }
+
+    abstract public function value(): ?string;
 
     abstract public function getUriComponent(): string;
 
-    abstract public function getContent(): ?string;
+    public function getContent(): ?string
+    {
+        return $this->value();
+    }
 
     public function toString(): string
     {
-        return (string) $this->getContent();
+        return (string) $this->value();
     }
 
     public function __toString(): string
@@ -136,5 +141,15 @@ abstract class Component implements UriComponentInterface
         return $this->toString();
     }
 
-    abstract public function withContent($content): UriComponentInterface;
+    public function withContent($content): UriComponentInterface
+    {
+        $content = static::filterComponent($content);
+        if ($content === $this->value()) {
+            return $this;
+        }
+
+        return new static($content);
+    }
+
+    abstract public function __construct(UriComponentInterface|Stringable|float|int|string|bool|null $value);
 }

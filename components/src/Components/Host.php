@@ -307,19 +307,19 @@ final class Host extends Component implements IpHostInterface
         return new self($authority->getHost());
     }
 
-    public function getContent(): ?string
+    public function value(): ?string
     {
         return $this->host;
     }
 
     public function getUriComponent(): string
     {
-        return (string) $this->getContent();
+        return (string) $this->value();
     }
 
     public function toAscii(): ?string
     {
-        return $this->getContent();
+        return $this->value();
     }
 
     public function toUnicode(): ?string
@@ -398,15 +398,5 @@ final class Host extends Component implements IpHostInterface
         [$ipv6] = explode('%', substr((string) $this->host, 1, -1));
 
         return self::createFromIp($ipv6);
-    }
-
-    public function withContent($content): UriComponentInterface
-    {
-        $content = self::filterComponent($content);
-        if ($content === $this->getContent()) {
-            return $this;
-        }
-
-        return new self($content);
     }
 }

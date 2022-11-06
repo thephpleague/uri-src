@@ -58,7 +58,7 @@ final class HierarchicalPathTest extends TestCase
      *
      * @covers ::__toString
      * @covers ::__construct
-     * @covers ::getContent
+     * @covers ::value
      */
     public function testValidPath(string $raw, string $expected): void
     {
@@ -129,7 +129,6 @@ final class HierarchicalPathTest extends TestCase
      * @dataProvider getProvider
      *
      * @covers ::get
-     * @param ?string $expected
      */
     public function testget(string $raw, int $key, ?string $expected): void
     {
@@ -780,13 +779,12 @@ final class HierarchicalPathTest extends TestCase
     /**
      * @dataProvider getURIProvider
      * @covers ::createFromUri
-     * @param ?string $expected
      */
     public function testCreateFromUri(Psr7UriInterface|UriInterface $uri, ?string $expected): void
     {
         $path = HierarchicalPath::createFromUri($uri);
 
-        self::assertSame($expected, $path->getContent());
+        self::assertSame($expected, $path->value());
     }
 
     public function getURIProvider(): iterable
@@ -896,14 +894,14 @@ final class HierarchicalPathTest extends TestCase
      * @dataProvider validPathEncoding
      *
      * @covers ::decoded
-     * @covers ::getContent
+     * @covers ::value
      */
     public function testGetUriComponent(string $decoded, string $encoded): void
     {
         $path = HierarchicalPath::createFromString($decoded);
 
         self::assertSame($decoded, $path->decoded());
-        self::assertSame($encoded, $path->getContent());
+        self::assertSame($encoded, $path->value());
     }
 
     public function validPathEncoding(): array

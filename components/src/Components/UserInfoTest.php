@@ -35,7 +35,7 @@ final class UserInfoTest extends TestCase
      *
      * @covers ::__construct
      * @covers ::validateComponent
-     * @covers ::getContent
+     * @covers ::value
      * @covers ::__toString
      * @covers ::decodeMatches
      * @covers ::encodeMatches
@@ -43,8 +43,6 @@ final class UserInfoTest extends TestCase
      * @covers ::getUser
      * @covers ::encodeComponent
      * @covers ::getUriComponent
-     * @param ?string $expected_user
-     * @param ?string $expected_pass
      */
     public function testConstructor(
         Stringable|float|int|string|bool|null $user,
@@ -156,9 +154,6 @@ final class UserInfoTest extends TestCase
      * @covers ::getPass
      * @covers ::decode
      * @covers ::decodeMatches
-     * @param ?string $user
-     * @param ?string $expected_user
-     * @param ?string $expected_pass
      */
     public function testWithContent(
         ?string $user,
@@ -169,7 +164,7 @@ final class UserInfoTest extends TestCase
     ): void {
         $conn = (new UserInfo($user))->withContent($str);
         self::assertSame($expected_str, (string) $conn);
-        self::assertSame((new UserInfo($expected_user, $expected_pass))->getContent(), $conn->getContent());
+        self::assertSame((new UserInfo($expected_user, $expected_pass))->value(), $conn->value());
     }
 
     public function createFromStringProvider(): array
@@ -219,7 +214,6 @@ final class UserInfoTest extends TestCase
      * @covers ::withUserInfo
      * @covers ::decodeMatches
      * @covers ::decode
-     * @param ?string $pass
      */
     public function testWithUserInfo(string $user, ?string $pass, string $expected): void
     {
@@ -248,13 +242,12 @@ final class UserInfoTest extends TestCase
      * @dataProvider getURIProvider
      * @covers ::createFromUri
      * @covers ::decode
-     * @param ?string $expected
      */
     public function testCreateFromUri(UriInterface|Psr7UriInterface $uri, ?string $expected): void
     {
         $userInfo = UserInfo::createFromUri($uri);
 
-        self::assertSame($expected, $userInfo->getContent());
+        self::assertSame($expected, $userInfo->value());
     }
 
     public function getURIProvider(): iterable
