@@ -1,0 +1,9 @@
+.idea
+.php_cs.cache
+.php-cs-fixer.cache
+.phpunit.result.cache
+vendor
+build
+docs/_site
+composer.lock
+/nbproject/private/

@@ -1,0 +1,93 @@
+{
+    "name": "league/uri-components",
+    "type": "library",
+    "description" : "URI components manipulation library",
+    "keywords": [
+        "url",
+        "uri",
+        "rfc3986",
+        "components",
+        "scheme",
+        "userinfo",
+        "host",
+        "port",
+        "authority",
+        "path",
+        "query",
+        "fragment"
+    ],
+    "license": "MIT",
+    "homepage": "http://uri.thephpleague.com",
+    "authors": [
+        {
+            "name" : "Ignace Nyamagana Butera",
+            "email" : "nyamsprod@gmail.com",
+            "homepage" : "https://nyamsprod.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "ext-json": "*",
+        "league/uri-interfaces": "dev-master",
+        "psr/http-message": "^1.0.1"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^v3.13.0",
+        "guzzlehttp/psr7": "^2.4.3",
+        "laminas/laminas-diactoros": "^2.20",
+        "league/uri": "^6.8.0",
+        "phpbench/phpbench": "^1.2.7",
+        "phpstan/phpstan": "^1.9.1",
+        "phpstan/phpstan-deprecation-rules": "^1.0",
+        "phpstan/phpstan-phpunit": "^1.2.2",
+        "phpstan/phpstan-strict-rules": "^1.4.4",
+        "phpunit/phpunit": "^9.5.26"
+    },
+    "suggest": {
+        "ext-intl": "to handle IDN host",
+        "ext-gmp": "to improve handle IPV4 parsing",
+        "ext-fileinfo": "Needed to create Data URI from a filepath",
+        "php-64bit": "to improve handle IPV4 parsing",
+        "jeremykendall/php-domain-parser": "Public Suffix and Top Level Domain parsing implemented in PHP",
+        "league/uri": "to allow manipulating URI objects",
+        "psr/http-message-implementation": "to allow manipulating PSR-7 Uri objects"
+    },
+    "autoload": {
+        "psr-4": {
+            "League\\Uri\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LeagueTest\\Uri\\": "tests"
+        }
+    },
+    "scripts": {
+        "benchmark": "phpbench run src --report=default",
+        "phpcs": "php-cs-fixer fix -v --diff --dry-run --allow-risky=yes --ansi",
+        "phpcs:fix": "php-cs-fixer fix -vvv --allow-risky=yes --ansi",
+        "phpstan": "phpstan analyse -l max -c phpstan.neon src --xdebug --ansi --memory-limit=256M",
+        "phpunit": "XDEBUG_MODE=coverage phpunit --coverage-text",
+        "test": [
+            "@phpunit",
+            "@phpstan",
+            "@phpcs:fix"
+        ]
+    },
+    "scripts-descriptions": {
+        "benchmark": "Runs benchmarks for the query string parser and builder",
+        "phpcs": "Runs coding style test suite",
+        "phpcs:fix": "Fix coding style",
+        "phpstan": "Runs complete codebase static analysis",
+        "phpunit": "Runs unit and functional testing",
+        "test": "Runs full test suite"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.x-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
