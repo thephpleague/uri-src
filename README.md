@@ -1,78 +1,23 @@
-URI
+uri-src
 =======
 
-[![Build](https://github.com/thephpleague/uri/workflows/build/badge.svg)](https://github.com/thephpleague/uri/actions?query=workflow%3A%22build%22)
+[![Build](https://github.com/thephpleague/uri-src/workflows/build/badge.svg)](https://github.com/thephpleague/uri-src/actions?query=workflow%3A%22build%22)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
-[![Latest Version](https://img.shields.io/github/release/thephpleague/uri.svg?style=flat-square)](https://github.com/thephpleague/uri/releases)
-[![Total Downloads](https://img.shields.io/packagist/dt/league/uri.svg?style=flat-square)](https://packagist.org/packages/league/uri)
 
-The `Uri` package provides simple and intuitive classes to manage URIs in PHP. You will be able to
+The `uri-src` is the monorepo which enables the development of the differnt league `uri` related packages:
 
-- parse, build and resolve URIs
-- create URIs from different sources (string, PHP environment, base URI, URI template, ...);
-- handle internalisation;
-- infer properties and features from URIs;
-
-````php
-<?php
-
-use League\Uri\UriTemplate;
-
-$template = 'https://api.twitter.com:443/{version}/search/{term:1}/{term}/{?q*,limit}#title';
-$defaultVariables = ['version' => '1.1'];
-$params = [
-    'term' => 'john',
-    'q' => ['a', 'b'],
-    'limit' => '10',
-];
-
-$uriTemplate = new UriTemplate($template, $defaultVariables);
-$uri = $uriTemplate->expand($params);
-// $uri is a League\Uri\Uri object
-
-echo $uri->getScheme();    //displays "https"
-echo $uri->getAuthority(); //displays "api.twitter.com:443"
-echo $uri->getPath();      //displays "/1.1/search/j/john/"
-echo $uri->getQuery();     //displays "q=a&q=b&limit=10"
-echo $uri->getFragment();  //displays "title"
-echo $uri;
-//displays "https://api.twitter.com:443/1.1/search/j/john/?q=a&q=b&limit=10#title"
-echo json_encode($uri);
-//displays "https:\/\/api.twitter.com:443\/1.1\/search\/j\/john\/?q=a&q=b&limit=10#title"
-````
-
-Highlights
-------
-
-- Simple API
-- [RFC3986][], [RFC3987][] and [RFC6570][] compliant
-- Implements the `UriInterface` from [PSR-7][]
-- Fully documented
-- Framework Agnostic
+- URI
+- URI Components
+- URI Interfaces
 
 System Requirements
 -------
 
-- You require **PHP >= 7.3** but the latest stable version of PHP is recommended
-- You will need the **ext-intl** to handle i18n URI.
-- Since version 6.2.0 you will need the **ext-fileinfo** to handle Data URI creation from a filepath.
+To contribute to the package development you are required to have your code tested with the following requirements:
 
-Dependencies
--------
-
-- [League URI Interfaces](https://github.com/thephpleague/uri-interfaces)
-- [PSR-7][]
-
-In order to handle IDN host you are required to also install the `intl` extension otherwise an exception will be thrown when attempting to validate such host.
-
-In order to create Data URI from a filepath, since version `6.2`, you are required to also install the `fileinfo` extension otherwise an exception will be thrown.
-
-Installation
---------
-
-```
-$ composer require league/uri
-```
+- **PHP >= 8.1** but the latest stable version of PHP is recommended
+- The **ext-intl**
+- The **ext-fileinfo**
 
 Documentation
 --------
@@ -108,7 +53,7 @@ Credits
 -------
 
 - [ignace nyamagana butera](https://github.com/nyamsprod)
-- [All Contributors](https://github.com/thephpleague/uri/contributors)
+- [All Contributors](https://github.com/thephpleague/uri-src/contributors)
 
 Attribution
 -------
