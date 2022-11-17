@@ -1,0 +1,19 @@
+{
+    "sub-splits": [
+        {
+            "name": "uri",
+            "directory": "uri",
+            "target": "git@github.com:thephpleague/uri.git"
+        },
+        {
+            "name": "uri-components",
+            "directory": "components",
+            "target": "git@github.com:thephpleague/uri-components.git"
+        },
+        {
+            "name": "uri-interfaces",
+            "directory": "interfaces",
+            "target": "git@github.com:thephpleague/uri-interfaces.git"
+        }
+    ]
+}

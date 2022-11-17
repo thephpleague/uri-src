@@ -1,0 +1,71 @@
+{
+    "name": "league/uri-src",
+    "type": "library",
+    "description" : "URI manipulation library monorepo",
+    "license": "MIT",
+    "homepage": "https://uri.thephpleague.com",
+    "authors": [
+        {
+            "name" : "Ignace Nyamagana Butera",
+            "email" : "nyamsprod@gmail.com",
+            "homepage" : "https://nyamsprod.com"
+        }
+    ],
+    "support": {
+        "forum": "https://thephpleague.slack.com",
+        "docs": "https://uri.thephpleague.com",
+        "issues": "https://github.com/thephpleague/uri/issues"
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/nyamsprod"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "ext-intl": "*",
+        "ext-json": "*",
+        "ext-fileinfo": "*",
+        "psr/http-message": "^1.0.1",
+        "nyholm/psr7": "^1.5.1",
+        "php-http/psr7-integration-tests": "^1.1.1",
+        "psr/http-factory": "^1.0.1",
+        "friendsofphp/php-cs-fixer": "^v3.13.0",
+        "guzzlehttp/psr7": "^2.4.3",
+        "laminas/laminas-diactoros": "^2.20",
+        "phpbench/phpbench": "^1.2.7",
+        "phpstan/phpstan": "^1.9.1",
+        "phpstan/phpstan-deprecation-rules": "^1.0",
+        "phpstan/phpstan-phpunit": "^1.2.2",
+        "phpstan/phpstan-strict-rules": "^1.4.4",
+        "phpunit/phpunit": "^9.5.26"
+    },
+    "autoload": {
+        "psr-4": {
+            "League\\Uri\\": ["uri/src", "components/src", "interfaces/src"]
+        }
+    },
+    "scripts": {
+        "benchmark": "phpbench run --report=default",
+        "phpcs": "php-cs-fixer fix -v --diff --dry-run --allow-risky=yes --ansi",
+        "phpcs:fix": "php-cs-fixer fix -vvv --allow-risky=yes --ansi",
+        "phpstan": "phpstan analyse -l max -c phpstan.neon --xdebug --ansi --memory-limit=256M",
+        "phpunit": "XDEBUG_MODE=coverage phpunit --coverage-text",
+        "test": [
+            "@phpunit",
+            "@phpstan",
+            "@phpcs"
+        ]
+    },
+    "scripts-descriptions": {
+        "phpcs": "Runs coding style test suite",
+        "phpstan": "Runs complete codebase static analysis",
+        "phpunit": "Runs unit and functional testing",
+        "benchmark": "Runs performance benchmark on several key classes of the library",
+        "test": "Runs full test suite except for the benchmark"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
