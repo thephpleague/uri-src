@@ -43,7 +43,7 @@
     },
     "autoload": {
         "psr-4": {
-            "League\\Uri\\": ["uri/src", "components/src", "interfaces/src"]
+            "League\\Uri\\": ["uri", "components", "interfaces"]
         }
     },
     "scripts": {

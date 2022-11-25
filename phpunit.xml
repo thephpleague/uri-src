@@ -14,17 +14,17 @@
     stopOnFailure="false">
     <coverage>
         <include>
-            <directory suffix=".php">uri/src</directory>
-            <directory suffix=".php">components/src</directory>
-            <directory suffix=".php">interfaces/src</directory>
+            <directory suffix=".php">uri</directory>
+            <directory suffix=".php">components</directory>
+            <directory suffix=".php">interfaces</directory>
         </include>
         <exclude>
-            <directory suffix="Bench.php">uri/src</directory>
-            <directory suffix="Test.php">uri/src</directory>
-            <directory suffix="Bench.php">components/src</directory>
-            <directory suffix="Test.php">components/src</directory>
-            <directory suffix="Bench.php">interfaces/src</directory>
-            <directory suffix="Test.php">interfaces/src</directory>
+            <directory suffix="Bench.php">uri</directory>
+            <directory suffix="Test.php">uri</directory>
+            <directory suffix="Bench.php">components</directory>
+            <directory suffix="Test.php">components</directory>
+            <directory suffix="Bench.php">interfaces</directory>
+            <directory suffix="Test.php">interfaces</directory>
         </exclude>
         <report>
             <clover outputFile="build/clover.xml"/>
@@ -34,9 +34,9 @@
     </coverage>
     <testsuites>
         <testsuite name="URI Test Suite">
-            <directory suffix="Test.php">uri/src</directory>
-            <directory suffix="Test.php">components/src</directory>
-            <directory suffix="Test.php">interfaces/src</directory>
+            <directory suffix="Test.php">uri</directory>
+            <directory suffix="Test.php">components</directory>
+            <directory suffix="Test.php">interfaces</directory>
         </testsuite>
     </testsuites>
     <logging>
