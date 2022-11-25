@@ -7,7 +7,7 @@ parameters:
 	paths:
 		- uri/src
 		- components/src
-		- interfaces/src
+		- interfaces
 	ignoreErrors:
 		- '#Parameter \#1 \$pairs of static method League\\Uri\\Components\\Query::createFromPairs\(\) expects iterable.*#'
 		- '#^Call to deprecated method withContent\(\) of#'
