@@ -14,13 +14,13 @@
     stopOnFailure="false">
     <coverage>
         <include>
-            <directory suffix=".php">uri/src</directory>
+            <directory suffix=".php">uri</directory>
             <directory suffix=".php">components</directory>
             <directory suffix=".php">interfaces</directory>
         </include>
         <exclude>
-            <directory suffix="Bench.php">uri/src</directory>
-            <directory suffix="Test.php">uri/src</directory>
+            <directory suffix="Bench.php">uri</directory>
+            <directory suffix="Test.php">uri</directory>
             <directory suffix="Bench.php">components</directory>
             <directory suffix="Test.php">components</directory>
             <directory suffix="Bench.php">interfaces</directory>
@@ -34,7 +34,7 @@
     </coverage>
     <testsuites>
         <testsuite name="URI Test Suite">
-            <directory suffix="Test.php">uri/src</directory>
+            <directory suffix="Test.php">uri</directory>
             <directory suffix="Test.php">components</directory>
             <directory suffix="Test.php">interfaces</directory>
         </testsuite>

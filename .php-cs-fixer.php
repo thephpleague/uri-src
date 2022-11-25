@@ -10,7 +10,7 @@ file that was distributed with this source code.
 EOF;
 
 $finder = PhpCsFixer\Finder::create()
-    ->in(__DIR__.'/uri/src')
+    ->in(__DIR__.'/uri')
     ->in(__DIR__.'/components')
     ->in(__DIR__.'/interfaces');
 
