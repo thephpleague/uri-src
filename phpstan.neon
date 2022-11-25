@@ -6,20 +6,20 @@ includes:
 parameters:
 	paths:
 		- uri/src
-		- components/src
+		- components
 		- interfaces
 	ignoreErrors:
 		- '#Parameter \#1 \$pairs of static method League\\Uri\\Components\\Query::createFromPairs\(\) expects iterable.*#'
 		- '#^Call to deprecated method withContent\(\) of#'
 		- message: '#Parameter \#2 \$value of method League\\Uri\\Contracts\\QueryInterface::appendTo\(\) expects string\|null, int given\.#'
-		  path: components/src/Components/QueryTest.php
+		  path: components/Components/QueryTest.php
 		- message: '#Cannot cast mixed to string.#'
-		  path: components/src/IPv4Calculators/BCMathCalculator.php
+		  path: components/IPv4Calculators/BCMathCalculator.php
 		- message: '#Cannot cast mixed to string.#'
-		  path: components/src/IPv4Calculators/NativeCalculator.php
+		  path: components/IPv4Calculators/NativeCalculator.php
 		- message: '#function gmp_(.*)? expects (GMP|int)#'
-		  path: components/src/IPv4Calculators/GMPCalculator.php
+		  path: components/IPv4Calculators/GMPCalculator.php
 		- message : "#Strict comparison using === between '' and non-empty-string will always evaluate to false.#"
-		  path: components/src/QueryString.php
+		  path: components/QueryString.php
 	reportUnmatchedIgnoredErrors: true
 	checkMissingIterableValueType: false

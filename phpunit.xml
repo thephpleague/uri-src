@@ -15,14 +15,14 @@
     <coverage>
         <include>
             <directory suffix=".php">uri/src</directory>
-            <directory suffix=".php">components/src</directory>
+            <directory suffix=".php">components</directory>
             <directory suffix=".php">interfaces</directory>
         </include>
         <exclude>
             <directory suffix="Bench.php">uri/src</directory>
             <directory suffix="Test.php">uri/src</directory>
-            <directory suffix="Bench.php">components/src</directory>
-            <directory suffix="Test.php">components/src</directory>
+            <directory suffix="Bench.php">components</directory>
+            <directory suffix="Test.php">components</directory>
             <directory suffix="Bench.php">interfaces</directory>
             <directory suffix="Test.php">interfaces</directory>
         </exclude>
@@ -35,7 +35,7 @@
     <testsuites>
         <testsuite name="URI Test Suite">
             <directory suffix="Test.php">uri/src</directory>
-            <directory suffix="Test.php">components/src</directory>
+            <directory suffix="Test.php">components</directory>
             <directory suffix="Test.php">interfaces</directory>
         </testsuite>
     </testsuites>

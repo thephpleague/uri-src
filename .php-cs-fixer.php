@@ -11,7 +11,7 @@ EOF;
 
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__.'/uri/src')
-    ->in(__DIR__.'/components/src')
+    ->in(__DIR__.'/components')
     ->in(__DIR__.'/interfaces');
 
 $config = new PhpCsFixer\Config();
