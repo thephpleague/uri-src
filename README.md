@@ -4,11 +4,11 @@ uri-src
 [![Build](https://github.com/thephpleague/uri-src/workflows/build/badge.svg)](https://github.com/thephpleague/uri-src/actions?query=workflow%3A%22build%22)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
-The `uri-src` is the monorepo which enables the development of the differnt league `uri` related packages:
+The `uri-src` is the monorepo which enables the development of the different league `uri` related packages:
 
-- URI
-- URI Components
-- URI Interfaces
+- [URI](https://github.com/thephpleague/uri)
+- [URI Components](https://github.com/thephpleague/uri-components)
+- [URI Interfaces](https://github.com/thephpleague/uri-interfaces)
 
 System Requirements
 -------
