@@ -19,7 +19,7 @@ parameters:
 		  path: components/IPv4Calculators/NativeCalculator.php
 		- message: '#function gmp_(.*)? expects (GMP|int)#'
 		  path: components/IPv4Calculators/GMPCalculator.php
-		- message : "#Strict comparison using === between '' and non-empty-string will always evaluate to false.#"
-		  path: components/QueryString.php
+		- message: '#Parameter \#1 \$separator of function explode expects non-empty-string, string given.#'
+		  path: uri/UriTemplate/Operator.php
 	reportUnmatchedIgnoredErrors: true
 	checkMissingIterableValueType: false
