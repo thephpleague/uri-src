@@ -29,17 +29,17 @@
         "ext-fileinfo": "*",
         "psr/http-message": "^1.0.1",
         "nyholm/psr7": "^1.5.1",
-        "php-http/psr7-integration-tests": "^1.1.1",
+        "php-http/psr7-integration-tests": "^1.2.0",
         "psr/http-factory": "^1.0.1",
-        "friendsofphp/php-cs-fixer": "^v3.13.0",
+        "friendsofphp/php-cs-fixer": "^v3.13.2",
         "guzzlehttp/psr7": "^2.4.3",
-        "laminas/laminas-diactoros": "^2.20",
+        "laminas/laminas-diactoros": "^2.24",
         "phpbench/phpbench": "^1.2.7",
-        "phpstan/phpstan": "^1.9.1",
-        "phpstan/phpstan-deprecation-rules": "^1.0",
-        "phpstan/phpstan-phpunit": "^1.2.2",
+        "phpstan/phpstan": "^1.9.6",
+        "phpstan/phpstan-deprecation-rules": "^1.1.1",
+        "phpstan/phpstan-phpunit": "^1.3.3",
         "phpstan/phpstan-strict-rules": "^1.4.4",
-        "phpunit/phpunit": "^9.5.26"
+        "phpunit/phpunit": "^9.5.27"
     },
     "autoload": {
         "psr-4": {
@@ -48,7 +48,7 @@
     },
     "scripts": {
         "benchmark": "phpbench run --report=default",
-        "phpcs": "php-cs-fixer fix -v --diff --dry-run --allow-risky=yes --ansi",
+        "phpcs": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff --dry-run --allow-risky=yes --ansi",
         "phpcs:fix": "php-cs-fixer fix -vvv --allow-risky=yes --ansi",
         "phpstan": "phpstan analyse -l max -c phpstan.neon --xdebug --ansi --memory-limit=256M",
         "phpunit": "XDEBUG_MODE=coverage phpunit --coverage-text",
