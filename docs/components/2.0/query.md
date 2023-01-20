@@ -223,10 +223,10 @@ If your query string is created with `http_build_query` or the `Query::createFro
 The `Query::withoutNumericIndices` removes any numeric index found in the query string as shown below:
 
 ~~~php
-$query = Query::createFromParms('foo[]=bar&foo[]=baz');
+$query = Query::createFromParams(['foo' => ['bar', 'baz']]);
 echo $query->getContent(); //return 'foo[0]=bar&foo[1]=baz'
 $new_query = $query->withoutNumericIndices();
-echo $new_query->getContent(Query::NO_ENCODING); //return 'foo[]=bar&foo[]=baz'
+echo $new_query->getContent(); //return 'foo[]=bar&foo[]=baz'
 //of note both objects returns the same PHP's variables but differs regarding the pairs
 $query->params(); //return ['foo' => ['bar', 'baz']]
 $new_query->params(); //return ['foo' => ['bar', 'baz']]
@@ -272,16 +272,16 @@ Returns a new `Query` object from an `array` or a `Traversable` object.
 
 ~~~php
 $query =  Query::createFromPairs([
-    'foo' => 'bar',
-    'p' => 'yolo',
-    'z' => ''
+    ['foo', 'bar'],
+    ['p', 'yolo'],
+    ['z', ''],
 ]);
 echo $query; //display 'foo=bar&p=yolo&z='
 
 $query =  Query::createFromPairs([
-    'foo' => 'bar',
-    'p' => null,
-    'z' => ''
+    ['foo', 'bar'],
+    ['p', null],
+    ['z', ''],
 ]);
 echo $query; //display 'foo=bar&p&z='
 ~~~
@@ -322,7 +322,7 @@ foreach ($query->pairs() as $name => $value) {
 
 ### Query::has
 
-Because a pair value can be `null` the `Query::has` method is used to remove the possible `Query::get` result ambiguity.
+Because a query pair value can be `null` the `Query::has` method is used to remove the possible `Query::get` result ambiguity.
 
 ~~~php
 $query = Query::createFromRFC3986('foo=bar&p&z=');
