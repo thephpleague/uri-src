@@ -34,8 +34,23 @@
         "phpstan/phpstan-strict-rules": "^1.5.1",
         "phpunit/phpunit": "^9.6.8",
         "psr/http-factory": "^1.0.2",
-        "psr/http-message": "^2.0"
+        "psr/http-message": "^2.0",
+        "uri-templates/uritemplate-test": "*@dev"
     },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "uri-templates/uritemplate-test",
+                "version": "dev-master",
+                "source": {
+                    "url": "https://github.com/uri-templates/uritemplate-test.git",
+                    "type": "git",
+                    "reference": "master"
+                }
+            }
+        }
+    ],
     "autoload": {
         "psr-4": {
             "League\\Uri\\": ["uri", "components", "interfaces"]
