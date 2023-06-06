@@ -2,12 +2,17 @@
 
 All Notable changes to `League\Uri\Components` will be documented in this file
 
-## [2.5.0](https://github.com/thephpleague/uri-components/compare/2.4.1...2.5.0) - TBD
+## [Next](https://github.com/thephpleague/uri-components/compare/2.4.1...master) - TBD
 
 ### Added
 
-- `value` method to replace deprecated `getContent` method.
+- `value` method to replace the removed `getContent` method.
 - requires `League\Uri` package.
+- `UserInfo::createFromString` named constructor
+- `Fragment::createFromString` named constructor
+- `Scheme::createFromString` named constructor
+- `Fragment::createFromNull` named constructor
+- `Scheme::createFromNull` named constructor
 
 ### Fixed
 
@@ -16,11 +21,14 @@ All Notable changes to `League\Uri\Components` will be documented in this file
 
 ### Deprecated
 
-- `withContent` and `getContent` methods
+- None
 
 ### Removed
 
 - PHP7 and PHP8.0 support
+- `withContent` and `getContent` methods
+- Support for `__set_state`
+- Support for `float` type as possible argument for components
 
 ## [2.4.1](https://github.com/thephpleague/uri-components/compare/2.4.0...2.4.1) - 2022-05-26
 

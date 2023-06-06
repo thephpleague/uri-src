@@ -21,10 +21,8 @@ use League\Uri\Uri;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use Stringable;
-use TypeError;
 use function is_array;
 use function json_encode;
-use function var_export;
 
 /**
  * @group query
@@ -37,15 +35,6 @@ final class QueryTest extends TestCase
     protected function setUp(): void
     {
         $this->query = Query::createFromRFC3986('kingkong=toto');
-    }
-
-    /**
-     * @covers ::__set_state
-     */
-    public function testSetState(): void
-    {
-        $generateComponent = eval('return '.var_export($this->query, true).';');
-        self::assertEquals($this->query, $generateComponent);
     }
 
     /**
@@ -62,15 +51,6 @@ final class QueryTest extends TestCase
 
         $this->expectException(SyntaxError::class);
         $new_query->withSeparator('');
-    }
-
-    /**
-     * @covers ::withContent
-     */
-    public function testWithContent(): void
-    {
-        self::assertSame($this->query, $this->query->withContent('kingkong=toto'));
-        self::assertNotSame($this->query, $this->query->withContent('kingkong=tata'));
     }
 
     /**
@@ -223,7 +203,7 @@ final class QueryTest extends TestCase
      * @covers ::value
      * @covers ::filterEmptyValue
      */
-    public function testAppend(?string $query, Stringable|string|int|float|bool|null $append_data, ?string $expected): void
+    public function testAppend(?string $query, Stringable|string|int|bool|null $append_data, ?string $expected): void
     {
         $base = Query::createFromRFC3986($query);
 
@@ -699,7 +679,7 @@ final class QueryTest extends TestCase
      * @covers ::addPair
      * @covers ::filterPair
      */
-    public function testMergeBasic(string $src, UriComponentInterface|Stringable|float|int|string|bool|null $dest, string $expected): void
+    public function testMergeBasic(string $src, UriComponentInterface|Stringable|int|string|bool|null $dest, string $expected): void
     {
         self::assertSame($expected, (string) (Query::createFromRFC3986($src))->merge($dest));
     }
@@ -781,16 +761,6 @@ final class QueryTest extends TestCase
 
         $query = $query->merge(Query::createFromPairs([['q', $query->value()]]));
         self::assertSame('a=4&first=4', $query->get('q'));
-    }
-
-    /**
-     * @covers ::withPair
-     * @covers ::filterPair
-     */
-    public function testWithPairThrowsException(): void
-    {
-        $this->expectException(TypeError::class);
-        Query::createFromRFC3986()->withPair('foo', (object) ['data']);
     }
 
     /**

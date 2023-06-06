@@ -17,7 +17,6 @@ use League\Uri\Http;
 use League\Uri\Uri;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
-use function var_export;
 
 /**
  * @group path
@@ -106,27 +105,11 @@ final class PathTest extends TestCase
         ];
     }
 
-    public function testWithContent(): void
-    {
-        $component = Path::createFromString('this is a normal path');
-
-        self::assertSame($component, $component->withContent($component));
-        self::assertNotSame($component, $component->withContent('new/path'));
-    }
-
     public function testConstructorThrowsExceptionWithInvalidData(): void
     {
         $this->expectException(SyntaxError::class);
 
         Path::createFromString("\0");
-    }
-
-    public function testSetState(): void
-    {
-        $component = Path::createFromString('42');
-
-        $generateComponent = eval('return '.var_export($component, true).';');
-        self::assertEquals($component, $generateComponent);
     }
 
     /**

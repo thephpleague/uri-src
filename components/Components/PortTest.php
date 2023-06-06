@@ -19,7 +19,6 @@ use League\Uri\Uri;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use Stringable;
-use function var_export;
 
 /**
  * @group port
@@ -36,17 +35,6 @@ final class PortTest extends TestCase
     }
 
     /**
-     * @covers ::__set_state
-     * @covers ::__construct
-     */
-    public function testSetState(): void
-    {
-        $component = new Port(42);
-        $generateComponent = eval('return '.var_export($component, true).';');
-        self::assertEquals($component, $generateComponent);
-    }
-
-    /**
      * @dataProvider getToIntProvider
      *
      * @covers ::toInt
@@ -55,7 +43,7 @@ final class PortTest extends TestCase
      * @covers ::validate
      */
     public function testToInt(
-        UriComponentInterface|Stringable|float|int|string|bool|null $input,
+        UriComponentInterface|Stringable|int|string|null $input,
         ?int $expected,
         ?string $string_expected,
         string $uri_expected
@@ -86,16 +74,6 @@ final class PortTest extends TestCase
         $this->expectException(SyntaxError::class);
 
         new Port(-1);
-    }
-
-    /**
-     * @covers ::withContent
-     */
-    public function testWithContent(): void
-    {
-        $port = new Port(23);
-        self::assertSame($port, $port->withContent('23'));
-        self::assertNotSame($port, $port->withContent('42'));
     }
 
     /**

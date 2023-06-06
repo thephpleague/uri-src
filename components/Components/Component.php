@@ -38,10 +38,27 @@ abstract class Component implements UriComponentInterface
         7[0-9|E]
     ,ix';
 
+    abstract public function value(): ?string;
+
+    public function jsonSerialize(): ?string
+    {
+        return $this->value();
+    }
+
+    public function toString(): string
+    {
+        return (string) $this->value();
+    }
+
+    public function __toString(): string
+    {
+        return $this->toString();
+    }
+
     /**
      * Validate the component content.
      */
-    protected function validateComponent(UriComponentInterface|Stringable|float|int|string|bool|null $component): ?string
+    protected function validateComponent(UriComponentInterface|Stringable|int|string|bool|null $component): ?string
     {
         $component = self::filterComponent($component);
         if (null === $component) {
@@ -56,7 +73,7 @@ abstract class Component implements UriComponentInterface
      *
      * @throws SyntaxError If the component can not be converted to a string or null
      */
-    protected static function filterComponent(Stringable|float|int|string|bool|null $component): ?string
+    protected static function filterComponent(Stringable|int|string|bool|null $component): ?string
     {
         if ($component instanceof UriComponentInterface) {
             return $component->value();
@@ -113,40 +130,4 @@ abstract class Component implements UriComponentInterface
     {
         return rawurlencode($matches[0]);
     }
-
-    public function jsonSerialize(): ?string
-    {
-        return $this->value();
-    }
-
-    abstract public function value(): ?string;
-
-    abstract public function getUriComponent(): string;
-
-    public function getContent(): ?string
-    {
-        return $this->value();
-    }
-
-    public function toString(): string
-    {
-        return (string) $this->value();
-    }
-
-    public function __toString(): string
-    {
-        return $this->toString();
-    }
-
-    public function withContent($content): UriComponentInterface
-    {
-        $content = static::filterComponent($content);
-        if ($content === $this->value()) {
-            return $this;
-        }
-
-        return new static($content);
-    }
-
-    abstract public function __construct(UriComponentInterface|Stringable|float|int|string|bool|null $value);
 }

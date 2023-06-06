@@ -19,7 +19,6 @@ use League\Uri\Uri;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use Stringable;
-use function var_export;
 
 /**
  * @group scheme
@@ -28,41 +27,12 @@ use function var_export;
 final class SchemeTest extends TestCase
 {
     /**
-     * @covers ::__set_state
-     * @covers ::__construct
-     */
-    public function testSetState(): void
-    {
-        $component = new Scheme('ignace');
-        $generateComponent = eval('return '.var_export($component, true).';');
-        self::assertEquals($component, $generateComponent);
-    }
-
-    /**
-     * @covers ::withContent
-     * @covers ::value
-     * @covers ::__toString
-     * @covers ::validate
-     */
-    public function testWithValue(): void
-    {
-        $scheme = new Scheme('ftp');
-        $http_scheme = $scheme->withContent('HTTP');
-        self::assertSame('http', $http_scheme->value());
-        self::assertSame('http', (string) $http_scheme);
-    }
-
-    /**
-     * @covers ::withContent
      * @covers ::validate
      */
     public function testWithContent(): void
     {
-        $scheme = new Scheme('ftp');
-        self::assertSame($scheme, $scheme->withContent('FtP'));
-        self::assertNotSame($scheme, $scheme->withContent('Http'));
+        self::assertEquals(Scheme::createFromString('ftp'), Scheme::createFromString('FtP'));
     }
-
 
     /**
      * @dataProvider validSchemeProvider
@@ -73,11 +43,12 @@ final class SchemeTest extends TestCase
      * @covers ::getUriComponent
      */
     public function testValidScheme(
-        UriComponentInterface|Stringable|float|int|string|bool|null $scheme,
+        UriComponentInterface|Stringable|string|null $scheme,
         string $toString,
         string $uriComponent
     ): void {
-        $scheme = new Scheme($scheme);
+        $scheme = null !== $scheme ? Scheme::createFromString($scheme) : Scheme::createFromNull();
+
         self::assertSame($toString, (string) $scheme);
         self::assertSame($uriComponent, $scheme->getUriComponent());
     }
@@ -86,7 +57,7 @@ final class SchemeTest extends TestCase
     {
         return [
             [null, '', ''],
-            [new Scheme('foo'), 'foo', 'foo:'],
+            [Scheme::createFromString('foo'), 'foo', 'foo:'],
             [new class() {
                 public function __toString()
                 {
@@ -110,7 +81,8 @@ final class SchemeTest extends TestCase
     public function testInvalidScheme(string $scheme): void
     {
         $this->expectException(SyntaxError::class);
-        new Scheme($scheme);
+
+        Scheme::createFromString($scheme);
     }
 
     public static function invalidSchemeProvider(): array
@@ -128,9 +100,7 @@ final class SchemeTest extends TestCase
      */
     public function testCreateFromUri(UriInterface|Psr7UriInterface $uri, ?string $expected): void
     {
-        $scheme = Scheme::createFromUri($uri);
-
-        self::assertSame($expected, $scheme->value());
+        self::assertSame($expected, Scheme::createFromUri($uri)->value());
     }
 
     public static function getURIProvider(): iterable

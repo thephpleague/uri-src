@@ -14,33 +14,31 @@ declare(strict_types=1);
 namespace League\Uri\Contracts;
 
 use JsonSerializable;
-use League\Uri\Exceptions\IdnSupportMissing;
-use League\Uri\Exceptions\SyntaxError;
+use Stringable;
 
-/**
- * @method string      toString() Returns the instance string representation of its value.
- * @method string|null value()    Returns the instance value.
- */
-interface UriComponentInterface extends JsonSerializable
+interface UriComponentInterface extends JsonSerializable, Stringable
 {
     /**
-     * DEPRECATION WARNING! This method will be removed in the next major point release.
+     * Returns the instance string representation.
      *
-     * @deprecated since version 2.4.0
-     * @see ::value
-     *
-     * Returns the instance content.
-     *
-     * If the instance is defined, the value returned MUST be encoded according to the
-     * selected encoding algorithm. In any case, the value MUST NOT double-encode any character
-     * depending on the selected encoding algorithm.
-     *
-     * To determine what characters to encode, please refer to RFC 3986, Sections 2 and 3.
-     * or RFC 3987 Section 3. By default, the content is encoded according to RFC3986
+     * If the instance is defined, the value returned MUST be percent-encoded,
+     * but MUST NOT double-encode any characters. To determine what characters
+     * to encode, please refer to RFC 3986, Sections 2 and 3.
      *
      * If the instance is not defined null is returned
      */
-    public function getContent(): ?string;
+    public function value(): ?string;
+
+    /**
+     * Returns the instance string representation.
+     *
+     * If the instance is defined, the value returned MUST be percent-encoded,
+     * but MUST NOT double-encode any characters. To determine what characters
+     * to encode, please refer to RFC 3986, Sections 2 and 3.
+     *
+     * If the instance is not defined an empty string is returned
+     */
+    public function toString(): string;
 
     /**
      * Returns the instance string representation.
@@ -74,29 +72,4 @@ interface UriComponentInterface extends JsonSerializable
      * If the instance is not defined an empty string is returned
      */
     public function getUriComponent(): string;
-
-    /**
-     * DEPRECATION WARNING! This method will be removed in the next major point release.
-     *
-     * @deprecated since version 2.4.0
-     *
-     * Returns an instance with the specified content.
-     *
-     * This method MUST retain the state of the current instance, and return
-     * an instance that contains the specified content.
-     *
-     * Users can provide both encoded and decoded content characters.
-     *
-     * A null value is equivalent to removing the component content.
-     *
-     *
-     * @param ?string $content
-     *
-     * @throws SyntaxError       for invalid component or transformations
-     *                           that would result in a object in invalid state.
-     * @throws IdnSupportMissing for component or transformations
-     *                           requiring IDN support when IDN support is not present
-     *                           or misconfigured.
-     */
-    public function withContent(?string $content): self;
 }

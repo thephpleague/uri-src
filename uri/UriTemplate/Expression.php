@@ -47,18 +47,6 @@ final class Expression
     }
 
     /**
-     * @param array{operator:string|Operator, varSpecifiers:array<VarSpecifier>} $properties
-     */
-    public static function __set_state(array $properties): self
-    {
-        if (is_string($properties['operator'])) {
-            $properties['operator'] = Operator::from($properties['operator']);
-        }
-
-        return new self($properties['operator'], ...$properties['varSpecifiers']);
-    }
-
-    /**
      * @throws SyntaxError if the expression is invalid
      */
     public static function createFromString(string $expression): self
@@ -69,28 +57,6 @@ final class Expression
             static fn (string $varSpec): VarSpecifier => VarSpecifier::createFromString($varSpec),
             explode(',', $parts['variables'])
         ));
-    }
-
-    /**
-     * Returns the expression string representation.
-     *
-     * @deprecated since version 6.6.0 use the readonly property instead
-     * @codeCoverageIgnore
-     */
-    public function toString(): string
-    {
-        return $this->value;
-    }
-
-    /**
-     * @deprecated since version 6.6.0 use the readonly property instead
-     * @codeCoverageIgnore
-     *
-     * @return array<string>
-     */
-    public function variableNames(): array
-    {
-        return $this->variableNames;
     }
 
     public function expand(VariableBag $variables): string
@@ -111,11 +77,5 @@ final class Expression
         }
 
         return $this->operator->first().$expanded;
-    }
-
-    public function extract(string $uri): VariableBag
-    {
-        // @todo implementation
-        return new VariableBag();
     }
 }

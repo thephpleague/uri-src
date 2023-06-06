@@ -23,20 +23,6 @@ use Stringable;
 final class IpAddressTest extends TestCase
 {
     /**
-     * @covers ::__construct
-     * @covers ::withContent
-     * @covers ::isValidIpv6Hostname
-     */
-    public function testWithContent(): void
-    {
-        $host = new Host('127.0.0.1');
-
-        self::assertSame($host, $host->withContent('127.0.0.1'));
-        self::assertSame($host, $host->withContent($host));
-        self::assertNotSame($host, $host->withContent('[::1]'));
-    }
-
-    /**
      * Test valid IpAddress.
      *
      * @dataProvider validIpAddressProvider
@@ -51,7 +37,7 @@ final class IpAddressTest extends TestCase
      * @covers ::getIpVersion
      */
     public function testValidIpAddress(
-        UriComponentInterface|Stringable|float|int|string|bool|null $host,
+        UriComponentInterface|Stringable|int|string|null $host,
         bool $isDomain,
         bool $isIp,
         bool $isIpv4,

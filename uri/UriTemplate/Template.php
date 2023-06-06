@@ -48,14 +48,6 @@ final class Template
     }
 
     /**
-     * @param array{value:string, template?:string, expressions:array<string, Expression>} $properties
-     */
-    public static function __set_state(array $properties): self
-    {
-        return new self($properties['template'] ?? $properties['value'], ...array_values($properties['expressions']));
-    }
-
-    /**
      * @throws SyntaxError if the template contains invalid expressions
      * @throws SyntaxError if the template contains invalid variable specification
      */
@@ -79,26 +71,6 @@ final class Template
         }
 
         return new self($template, ...$expressions);
-    }
-
-    /**
-     * @deprecated since version 6.6.0 use the readonly property instead
-     * @codeCoverageIgnore
-     */
-    public function toString(): string
-    {
-        return $this->value;
-    }
-
-    /**
-     * @deprecated since version 6.6.0 use the readonly property instead
-     * @codeCoverageIgnore
-     *
-     * @return array<string>
-     */
-    public function variableNames(): array
-    {
-        return $this->variableNames;
     }
 
     /**

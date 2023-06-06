@@ -19,7 +19,6 @@ use League\Uri\UriString;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use function parse_url;
-use function var_export;
 
 /**
  * @group userinfo
@@ -28,23 +27,11 @@ use function var_export;
 final class AuthorityTest extends TestCase
 {
     /**
-     * @covers ::__set_state
-     * @covers ::validate
-     */
-    public function testSetState(): void
-    {
-        $authority = Authority::createFromString('foo:bar@example.com:443');
-        $generatedAuthority = eval('return '.var_export($authority, true).';');
-        self::assertEquals($authority, $generatedAuthority);
-    }
-
-    /**
      * @dataProvider validAuthorityDataProvider
      *
      * @covers ::createFromNull
      * @covers ::createFromString
      * @covers ::parse
-     * @covers ::validate
      * @covers ::getHost
      * @covers ::getPort
      * @covers ::getUserInfo
@@ -120,7 +107,6 @@ final class AuthorityTest extends TestCase
      *
      * @covers ::__construct
      * @covers ::parse
-     * @covers ::validate
      */
     public function testConstructorFails(string $authority): void
     {
@@ -139,19 +125,7 @@ final class AuthorityTest extends TestCase
     }
 
     /**
-     * @covers ::withContent
-     * @covers ::validate
-     */
-    public function testWithContent(): void
-    {
-        $authority = Authority::createFromString('foo:bar@example.com:443');
-        self::assertSame($authority, $authority->withContent('foo:bar@example.com:443'));
-        self::assertNotEquals($authority, $authority->withContent('example.com:443'));
-    }
-
-    /**
      * @covers ::withHost
-     * @covers ::validate
      */
     public function testWithHost(): void
     {
@@ -164,8 +138,6 @@ final class AuthorityTest extends TestCase
      * @dataProvider invalidHostDataProvider
      *
      * @covers ::withHost
-     * @covers ::validate
-     * @param ?string $host
      */
     public function testWithHostFails(?string $host): void
     {
@@ -184,7 +156,6 @@ final class AuthorityTest extends TestCase
 
     /**
      * @covers ::withPort
-     * @covers ::validate
      */
     public function testWithPort(): void
     {
@@ -206,7 +177,6 @@ final class AuthorityTest extends TestCase
 
     /**
      * @covers ::withUserInfo
-     * @covers ::validate
      */
     public function testWithUserInfo(): void
     {

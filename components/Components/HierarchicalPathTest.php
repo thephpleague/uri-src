@@ -12,7 +12,6 @@
 namespace League\Uri\Components;
 
 use ArrayIterator;
-use GuzzleHttp\Psr7\Utils;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\Exceptions\OffsetOutOfBounds;
 use League\Uri\Exceptions\SyntaxError;
@@ -23,7 +22,6 @@ use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use TypeError;
 use function date_create;
 use function iterator_to_array;
-use function var_export;
 
 /**
  * @group path
@@ -32,14 +30,6 @@ use function var_export;
  */
 final class HierarchicalPathTest extends TestCase
 {
-    public function testSetState(): void
-    {
-        $component = HierarchicalPath::createFromString('yolo');
-        $generateComponent = eval('return '.var_export($component, true).';');
-
-        self::assertEquals($component, $generateComponent);
-    }
-
     /**
      * @covers ::getIterator
      */
@@ -85,19 +75,6 @@ final class HierarchicalPathTest extends TestCase
             "Don't encode unreserved chars or sub-delimiters" => ["/$unreserved", "/$unreserved"],
             'Encoded unreserved chars are not decoded' => ['/p%61th', '/p%61th'],
         ];
-    }
-
-    /**
-     * @covers ::createFromPath
-     * @covers ::withContent
-     */
-    public function testWithContent(): void
-    {
-        $str = '/path/to/the/sky';
-        $path = HierarchicalPath::createFromPath(new Path($str));
-
-        self::assertSame($path, $path->withContent($str));
-        self::assertNotEquals($path, $path->withContent('foo/bar'));
     }
 
     /**
@@ -824,7 +801,7 @@ final class HierarchicalPathTest extends TestCase
      */
     public function testCreateFromUriWithPSR7Implementation(): void
     {
-        $uri = Utils::uriFor('http://example.com')
+        $uri = Uri::createFromString('http://example.com')
             ->withPath('/path');
 
         self::assertSame('/path', $uri->getPath());

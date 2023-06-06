@@ -107,7 +107,7 @@ final class Host extends Component implements IpHostInterface
     private readonly ?string $ip_version;
     private readonly bool $has_zone_identifier;
 
-    public function __construct(UriComponentInterface|Stringable|float|int|string|bool|null $host = null)
+    public function __construct(UriComponentInterface|Stringable|int|string|null $host = null)
     {
         [
             'host' => $this->host,
@@ -121,7 +121,7 @@ final class Host extends Component implements IpHostInterface
      *
      * @return array{host:string|null, is_domain:bool, ip_version:string|null, has_zone_identifier:bool}
      */
-    private function parse(float|UriComponentInterface|Stringable|bool|int|string|null $host): array
+    private function parse(UriComponentInterface|Stringable|int|string|null $host): array
     {
         $host = self::filterComponent($host);
         $is_domain = false;
@@ -232,11 +232,6 @@ final class Host extends Component implements IpHostInterface
             && str_starts_with((string)inet_pton((string)$ipv6), self::ADDRESS_BLOCK);
     }
 
-    public static function __set_state(array $properties): self
-    {
-        return new self($properties['host']);
-    }
-
     public static function createFromNull(): self
     {
         return new self(null);
@@ -282,8 +277,12 @@ final class Host extends Component implements IpHostInterface
     /**
      * Create a new instance from a URI object.
      */
-    public static function createFromUri(Psr7UriInterface|UriInterface $uri): self
+    public static function createFromUri(Psr7UriInterface|UriInterface|UriComponentInterface $uri): self
     {
+        if ($uri instanceof UriComponentInterface) {
+            return new self($uri->value());
+        }
+
         if ($uri instanceof UriInterface) {
             return new self($uri->getHost());
         }

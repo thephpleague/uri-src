@@ -11,18 +11,18 @@
 
 namespace League\Uri;
 
-use Http\Psr7Test\UriIntegrationTest;
 use InvalidArgumentException;
 use League\Uri\Exceptions\SyntaxError;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UriInterface;
 
 /**
  * @group http
  * @coversDefaultClass \League\Uri\Http
  */
-final class HttpTest extends UriIntegrationTest
+final class HttpTest extends TestCase
 {
-    public function createUri($uri): UriInterface
+    public function createUri(string $uri): UriInterface
     {
         return (new HttpFactory())->createUri($uri);
     }
@@ -51,16 +51,6 @@ final class HttpTest extends UriIntegrationTest
         self::expectException(InvalidArgumentException::class);
 
         Http::createFromString('https://example.com:-1');
-    }
-
-    /**
-     * @covers ::filterInput
-     */
-    public function testThrowTypeErrorOnWrongType(): void
-    {
-        self::expectException(InvalidArgumentException::class);
-
-        Http::createFromString('https://example.com')->withFragment([]); /* @phpstan-ignore-line */
     }
 
     /**
@@ -141,16 +131,6 @@ final class HttpTest extends UriIntegrationTest
             Http::createFromString('http://0:0@0/0?0#0'),
             Http::createFromUri(Http::createFromString('http://0:0@0/0?0#0'))
         );
-    }
-
-    /**
-     * @dataProvider setStateDataProvider
-     *
-     * @covers ::__set_state
-     */
-    public function testSetState(Http $uri): void
-    {
-        self::assertEquals($uri, eval('return '.var_export($uri, true).';'));
     }
 
     public static function setStateDataProvider(): array

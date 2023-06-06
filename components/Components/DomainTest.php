@@ -22,7 +22,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use TypeError;
 use function date_create;
-use function var_export;
 
 /**
  * @group host
@@ -30,16 +29,6 @@ use function var_export;
  */
 final class DomainTest extends TestCase
 {
-    /**
-     * @covers ::__set_state
-     */
-    public function testSetState(): void
-    {
-        $host = Domain::createFromString('uri.thephpleague.com');
-
-        self::assertEquals($host, eval('return '.var_export($host, true).';'));
-    }
-
     public function testItCanBeInstantiatedWithAHostInterfaceImplementingObject(): void
     {
         $host = new Host('uri.thephpleague.com');
@@ -59,7 +48,7 @@ final class DomainTest extends TestCase
     {
         $this->expectException(UriException::class);
 
-        Domain::createFromHost(new Domain('127.0.0.1'));
+        Domain::createFromHost(Domain::createFromString('127.0.0.1'));
     }
 
     /**
@@ -77,24 +66,10 @@ final class DomainTest extends TestCase
     }
 
     /**
-     * @covers ::createFromString
-     * @covers ::withContent
-     */
-    public function testWithContent(): void
-    {
-        $host = Domain::createFromString('uri.thephpleague.com');
-
-        self::assertSame($host, $host->withContent('uri.thephpleague.com'));
-        self::assertSame($host, $host->withContent($host));
-        self::assertNotSame($host, $host->withContent('csv.thephpleague.com'));
-    }
-
-    /**
      * Test valid Domain.
      * @dataProvider validDomainProvider
      *
      * @covers ::createFromString
-     * @covers ::setLabels
      * @covers ::value
      * @covers ::toUnicode
      */
@@ -299,7 +274,7 @@ final class DomainTest extends TestCase
             'array' => [['com', 'example', 'www'], 'www.example.com'],
             'iterator' => [new ArrayIterator(['com', 'example', 'www']), 'www.example.com'],
             'FQDN' => [['', 'com', 'example', 'www'], 'www.example.com.'],
-            'another host object' => [new Domain('example.com.'), 'example.com.'],
+            'another host object' => [Domain::createFromString('example.com.'), 'example.com.'],
         ];
     }
 
@@ -368,7 +343,7 @@ final class DomainTest extends TestCase
     {
         $host = Domain::createFromString('master.example.com');
         self::assertSame(['com', 'example', 'master'], $host->labels());
-        self::assertSame(['', 'localhost'], (new Domain('localhost.'))->labels());
+        self::assertSame(['', 'localhost'], Domain::createFromString('localhost.')->labels());
     }
 
     /**
@@ -434,7 +409,7 @@ final class DomainTest extends TestCase
     {
         $this->expectException(SyntaxError::class);
 
-        Domain::createFromString('secure.example.com')->prepend(new Domain('master.'));
+        Domain::createFromString('secure.example.com')->prepend(Domain::createFromString('master.'));
     }
 
     /**

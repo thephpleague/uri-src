@@ -14,14 +14,19 @@ declare(strict_types=1);
 namespace League\Uri\UriTemplate;
 
 use League\Uri\Exceptions\SyntaxError;
-use PHPUnit\Framework\TestCase;
-use function var_export;
+use League\Uri\UriTemplateSpecificationTestCase;
 
 /**
  * @coversDefaultClass \League\Uri\UriTemplate\Template
  */
-final class TemplateTest extends TestCase
+final class TemplateTest extends UriTemplateSpecificationTestCase
 {
+    protected static array $testFilenames = [
+        'spec-examples.json',
+        'negative-tests.json',
+        'extended-tests.json',
+    ];
+
     /**
      * @covers ::createFromString
      * @covers ::__construct
@@ -64,18 +69,6 @@ final class TemplateTest extends TestCase
             ['{foo{bar'],
             ['{foo}}bar'],
         ];
-    }
-
-    /**
-     * @covers ::__set_state
-     */
-    public function testSetState(): void
-    {
-        $notation = '{foo}{bar}';
-
-        $template = Template::createFromString($notation);
-
-        self::assertEquals($template, eval('return '.var_export($template, true).';'));
     }
 
     /**

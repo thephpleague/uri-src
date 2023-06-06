@@ -11,7 +11,6 @@
 
 namespace League\Uri\Components;
 
-use League\Uri\Contracts\UriComponentInterface;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\Exceptions\SyntaxError;
 use League\Uri\Http;
@@ -19,7 +18,6 @@ use League\Uri\Uri;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use Stringable;
-use function var_export;
 
 /**
  * @group userinfo
@@ -42,8 +40,8 @@ final class UserInfoTest extends TestCase
      * @covers ::getUriComponent
      */
     public function testConstructor(
-        Stringable|float|int|string|bool|null $user,
-        Stringable|float|int|string|bool|null $pass,
+        Stringable|int|string|bool|null $user,
+        Stringable|int|string|bool|null $pass,
         ?string $expected_user,
         ?string $expected_pass,
         string $expected_str,
@@ -143,27 +141,6 @@ final class UserInfoTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider createFromStringProvider
-     *
-     * @covers ::withContent
-     * @covers ::getUser
-     * @covers ::getPass
-     * @covers ::decode
-     * @covers ::decodeMatches
-     */
-    public function testWithContent(
-        ?string $user,
-        UriComponentInterface|string|null $str,
-        ?string $expected_user,
-        ?string $expected_pass,
-        string $expected_str
-    ): void {
-        $conn = (new UserInfo($user))->withContent($str);
-        self::assertSame($expected_str, (string) $conn);
-        self::assertSame((new UserInfo($expected_user, $expected_pass))->value(), $conn->value());
-    }
-
     public static function createFromStringProvider(): array
     {
         return [
@@ -182,27 +159,18 @@ final class UserInfoTest extends TestCase
     }
 
     /**
-     * @covers ::withContent
+     * @covers ::createFromString
      * @covers ::decode
      * @covers ::decodeMatches
      */
     public function testWithContentReturnSameInstance(): void
     {
-        $conn = new UserInfo();
-        self::assertEquals($conn, $conn->withContent(':pass'));
+        self::assertEquals(new UserInfo(), new UserInfo(null, ':pass'));
 
-        $conn = new UserInfo('user', 'pass');
-        self::assertSame($conn, $conn->withContent('user:pass'));
-    }
-
-    /**
-     * @covers ::__set_state
-     */
-    public function testSetState(): void
-    {
-        $conn = new UserInfo('user', 'pass');
-        $generateConn = eval('return '.var_export($conn, true).';');
-        self::assertEquals($conn, $generateConn);
+        self::assertEquals(
+            new UserInfo('user', 'pass'),
+            UserInfo::createFromString('user:pass')
+        );
     }
 
     /**

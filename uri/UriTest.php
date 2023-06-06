@@ -11,7 +11,6 @@
 
 namespace League\Uri;
 
-use InvalidArgumentException;
 use League\Uri\Exceptions\SyntaxError;
 use PHPUnit\Framework\TestCase;
 use TypeError;
@@ -247,16 +246,6 @@ class UriTest extends TestCase
     }
 
     /**
-     * @covers ::filterString
-     */
-    public function testWithInvalidCharacters(): void
-    {
-        self::expectException(InvalidArgumentException::class);
-
-        Uri::createFromString()->withPath(date_create()); /* @phpstan-ignore-line */
-    }
-
-    /**
      * @covers ::assertValidState
      */
     public function testWithPathFailedWithInvalidChars(): void
@@ -337,16 +326,6 @@ class UriTest extends TestCase
         self::expectException(TypeError::class);
 
         Uri::createFromString('https://example.com')->withPath(null); /* @phpstan-ignore-line */
-    }
-
-    /**
-     * @dataProvider setStateDataProvider
-     *
-     * @covers ::__set_state
-     */
-    public function testSetState(Uri $uri): void
-    {
-        self::assertEquals($uri, eval('return '.var_export($uri, true).';'));
     }
 
     public static function setStateDataProvider(): array
