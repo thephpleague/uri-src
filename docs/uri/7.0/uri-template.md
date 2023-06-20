@@ -6,8 +6,6 @@ title: URI template
 URI Template
 =======
 
-<p class="message-notice"><code>League\Uri\UriTemplate</code> is available since version <code>6.1.0</code></p>
-
 The `League\Uri\UriTemplate` class enables expanding a URI object based on a URI template and its submitted parameters 
 following [RFC 6570 URI Template](http://tools.ietf.org/html/rfc6570).
 
