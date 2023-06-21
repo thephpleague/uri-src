@@ -10,7 +10,7 @@ The `League\Uri\Http` class implements:
 - PSR-7 [UriInterface](https://www.php-fig.org/psr/psr-7/#35-psrhttpmessageuriinterface)
 - PHP's [JsonSerializable](https://php.net/jsonserializable) interfaces.
 
-Following the PSR-7 interfaces the class handles all URI schemes but default to processing them as HTTP(s) URI if the scheme is not defined.
+Following the PSR-7 interfaces **version 2** the class handles all URI schemes but default to processing them as HTTP(s) URI if the scheme is not defined.
 
 ## Instantiation
 

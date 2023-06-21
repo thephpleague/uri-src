@@ -6,8 +6,10 @@ title: URI information
 URI information
 =======
 
-The `League\Uri\UriInfo` contains a list of public static methods which returns a list of information regarding the URI object submitted.
-All the methods accepts string or Stringable objects like the PSR-7 UriInterface or League own UriInterface implementing class.
+The `League\Uri\UriInfo` contains a list of public static methods which returns a list of
+information regarding the URI submitted.
+
+<p class="message-notice">All the methods accepts string or Stringable objects like the PSR-7 or League own <code>UriInterface</code> implementing class.</p>
 
 ## UriInfo::isAbsolute
 
@@ -16,12 +18,11 @@ This public static method tells whether the given URI object represents an absol
 ~~~php
 <?php
 
-use League\Uri\Http;
 use League\Uri\Uri;
 use League\Uri\UriInfo;
 
 UriInfo::isAbsolute(Uri::fromServer($_SERVER)); //returns true
-UriInfo::isAbsolute(Http::new("/🍣🍺"));       //returns false
+UriInfo::isAbsolute("/🍣🍺");       //returns false
 ~~~
 
 ## UriInfo::isAbsolutePath
@@ -38,7 +39,7 @@ UriInfo::isAbsolutePath(Http::new("/🍣🍺"));       //returns true
 This public static method tells whether the given URI object represents an network path URI.
 
 ~~~php
-UriInfo::isNetworkPath(Http::new("//example.com/toto")); //returns true
+UriInfo::isNetworkPath("//example.com/toto"); //returns true
 UriInfo::isNetworkPath(Uri::new("/🍣🍺")); //returns false
 ~~~
 
@@ -47,8 +48,8 @@ UriInfo::isNetworkPath(Uri::new("/🍣🍺")); //returns false
 This public static method tells whether the given URI object represents a relative path.
 
 ~~~php
-UriInfo::isRelativePath(Http::new("🏳️‍🌈")); //returns true
-UriInfo::isRelativePath(Http::new("/🍣🍺")); //returns false
+UriInfo::isRelativePath("🏳️‍🌈"); //returns true
+UriInfo::isRelativePath("/🍣🍺"); //returns false
 ~~~
 
 ## UriInfo::isSameDocument
@@ -58,7 +59,7 @@ This public static method tells whether the given URI object represents the same
 ~~~php
 UriInfo::isSameDocument(
     Http::new("example.com?foo=bar#🏳️‍🌈"),
-    Http::new("exAMpLE.com?foo=bar#🍣🍺")
+    "exAMpLE.com?foo=bar#🍣🍺"
 ); //returns true
 ~~~
 

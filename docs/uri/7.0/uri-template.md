@@ -37,14 +37,15 @@ echo $uri, PHP_EOL;
 
 ## Variables
 
-<p class="message-notice">For maximum interoperability you should make sure your variables are strings or objects that expose 
-the <code>__toString</code> method otherwise the value will be cast to string following PHP rules except 
-for boolean values <code>true</code> and <code>false</code> which will be converted to <code>1</code> and 
-<code>0</code> respectively.</p>
+<p class="message-notice">For maximum interoperability you should make sure your variables are 
+strings or stringable objects otherwise the value will be cast to string following PHP rules 
+except for boolean values <code>true</code> and <code>false</code> which will be converted 
+to <code>1</code> and <code>0</code> respectively.</p>
 
 ### Default variables can be set using the constructor
 
-The constructor takes a optional set of default variables that can be applied by default when expanding the URI template.
+The constructor takes a optional set of default variables that can be applied by default when
+expanding the URI template.
 
 ~~~php
 <?php
@@ -87,8 +88,9 @@ echo $uriTemplate->expand($params), PHP_EOL;
 
 ### Updating the default variables
 
-At any given time you may update your default variables but since the `UriTemplate` is an immutable object instead
-of modifying the current instance, a new instance with the modified default variables will be returned.
+At any given time you may update your default variables but since the `UriTemplate`
+is an immutable object instead of modifying the current instance, a new
+instance with the modified default variables will be returned.
 
 ~~~php
 <?php
@@ -104,14 +106,15 @@ $params = [
 ];
 
 $uriTemplate = new UriTemplate($template, ['version' => '1.0', 'foo' => 'bar']);
-$uriTemplate->defaultVariables; //returns ['version' => '1.0']
+$uriTemplate->defaultVariables; //returns new VariableBag(['version' => '1.0'])
 $newUriTemplate = $uriTemplate->withDefaultVariables(['version' => '1.1']);
-$newUriTemplate->defaultVariables; //returns  ['version' => '1.1']
+$newUriTemplate->defaultVariables; //returns  new VariableBag(['version' => '1.1'])
 ~~~
 
 ### Nested array are disallowed
 
-<p class="message-warning">This class follows only the RFC6570 requirements and thus, does not support nested array like the one used with <code>http_build_query</code></p>
+<p class="message-warning">This class follows only the RFC6570 requirements and thus, does
+not support nested array like the one used with <code>http_build_query</code></p>
 
 ~~~php
 <?php
@@ -137,9 +140,10 @@ $uriTemplate->expand($params);
 ### Using the prefix modifier on a list will trigger an exception.
 
 While this is not forbidden by the RFC, the `UriTemplate` class will throw an exception 
-if an attempt is made to use the prefix modifier with a list of value. Other implementations
-will silently ignore the modifier **but** this package will trigger the exception to alert 
-the user that something might be wrong and that the generated URI might not be the one expected.
+if an attempt is made to use the prefix modifier with a list of value. Other 
+implementations will silently ignore the modifier **but** this package will
+trigger the exception to alert the user that something might be wrong and 
+that the generated URI might not be the one expected.
 
 ~~~php
 <?php
@@ -159,11 +163,12 @@ echo $uriTemplate->expand($params), PHP_EOL;
 // throw a League\Uri\Exceptions\TemplateCanNotBeExpanded because the term variable is a list and not a string.
 ~~~
 
-### Strict expansion
+### Strict expansion with expandOrFail
 
-By default, if variables are missing or are not provided an empty string is used as replacement string. If you want 
-to force correct expansion you can use the `expandOrFail` method. It behaves exactly has the `expand` method but will
-throw an exception if there are missing variables.
+By default, if variables are missing or are not provided an empty string is used as replacement
+string as per the RFC. If you want to force correct expansion you can use the `expandOrFail` 
+method. It behaves exactly like the `expand` method but will additionnally throw an
+exception if there are missing required variables.
 
 ~~~php
 <?php
@@ -190,8 +195,9 @@ echo $uriTemplate->expandOrFail($params);
 
 ### Using braces in your template
 
-The following implementation disallow the use of braces `{` or  `}` outside of being URI template expression delimiters.
-If not used as the boundary of an expression an exception will be triggered. 
+The following implementation disallow the use of braces `{` or  `}` outside of being URI
+template expression delimiters. If not used as the boundary of an expression an
+exception will be triggered. 
 
 ~~~php
 <?php
