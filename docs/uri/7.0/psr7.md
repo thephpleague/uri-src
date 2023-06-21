@@ -73,6 +73,24 @@ When a base URI is given the URI is resolved against that base URI just like a b
 
 <p class="message-info">The method supports parameter widening, scalar values and objects implementing the <code>__toString</code> or other URI objects are accepted.</p>
 
+### Using a URI Template
+
+Resolves a URI using the rules from RFC6570:
+
+~~~php
+
+$template = 'https://example.com/hotels/{hotel}/bookings/{booking}';
+$variables = ['booking' => '42', 'hotel' => 'Rest & Relax'];
+
+$uri = Http::fromTemplate($template, $variables);
+
+echo $uri; //displays "https://example.com/hotels/Rest%20%26%20Relax/bookings/42"
+~~~
+
+This method expect at most two variables. The URI template to resolve and the variables use for resolution.
+You can get more in-depth understanding of [URI Template](/7.0/uri-template) in its dedicated section of
+the documentation.
+
 ## Validation
 
 If no scheme is present, the URI is treated as a HTTP(s) URI and must follow the scheme rules as explained in RFC3986 and PSR-7 documentation.
