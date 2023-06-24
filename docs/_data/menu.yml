@@ -24,7 +24,7 @@ packages:
         '7.0':
             Documentation:
                 Getting Started: '/components/7.0/'
-                From 1.x to 2.x: '/components/7.0/upgrading/'
+                From 2.x to 7.x: '/components/7.0/upgrading/'
         '2.0':
             Documentation:
                 Getting Started: '/components/2.0/'
