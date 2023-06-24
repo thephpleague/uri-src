@@ -18,7 +18,17 @@ Following the PSR-7 interfaces **version 2** the class handles all URI schemes b
 
 The `League\Uri\Http` class comes with the following named constructor to ease instantiation.
 
-### Using an URI
+~~~php
+<?php
+
+public static function Http::new(Stringable|string $uri = ''): self
+public static function Http::fromComponents(array $components): self
+public static function Http::fromBaseUri(Stringable|string $uri, Stringable|string|null $baseUri = null): self
+public static function Http::fromTemplate(Stringable|string $template, iterable $variables = []): self
+public static function Http::fromServer(array $server): self
+~~~
+
+### Using a URI
 
 ~~~php
 <?php
@@ -90,55 +100,6 @@ echo $uri; //displays "https://example.com/hotels/Rest%20%26%20Relax/bookings/42
 This method expect at most two variables. The URI template to resolve and the variables use for resolution.
 You can get more in-depth understanding of [URI Template](/7.0/uri-template) in its dedicated section of
 the documentation.
-
-## Validation
-
-If no scheme is present, the URI is treated as a HTTP(s) URI and must follow the scheme rules as explained in RFC3986 and PSR-7 documentation.
-
-### Authority presence
-
-If a scheme is present and the scheme specific part of a Http URI is not empty the URI can not contain an empty authority. Thus, some Http URI modifications must be applied in a specific order to preserve the URI validation.
-
-~~~php
-$uri = Http::new('http://uri.thephpleague.com/');
-echo $uri->withHost('')->withScheme('');
-// will throw a League\Uri\UriException
-// you can not remove the Host if a scheme is present
-~~~
-
-Instead you are required to proceed as below
-
-~~~php
-$uri = Http::new('http://uri.thephpleague.com/');
-echo $uri->withScheme('')->withHost(''); //displays "/"
-~~~
-
-<p class="message-notice">When an invalid URI object is created an <code>UriException</code> exception is thrown</p>
-
-
-### Path validity
-
-According to RFC3986, if an HTTP URI contains a non empty authority part, the URI path must be the empty string or absolute. Thus, some modification may trigger an <code>UriException</code>.
-
-~~~php
-$uri = Http::new('http://uri.thephpleague.com/');
-echo $uri->withPath('uri/schemes/http');
-// will throw an League\Uri\UriException
-~~~
-
-Instead you are required to submit a absolute path
-
-~~~php
-$uri = Http::new('http://uri.thephpleague.com/');
-echo $uri->withPath('/uri/schemes/http'); // displays 'http://uri.thephpleague.com/uri/schemes/http'
-~~~
-
-Of note this does not mean that rootless path are forbidden, the following code is fine.
-
-~~~php
-$uri = Http::new('?foo=bar');
-echo $uri->withPath('uri/schemes/http'); // displays 'uri/schemes/http?foo=bar'
-~~~
 
 ## Json representation
 
