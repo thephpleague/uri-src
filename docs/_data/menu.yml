@@ -64,7 +64,6 @@ packages:
                 DataPath: '/components/1.0/data-path/'
                 Query: '/components/1.0/query/'
                 Fragment: '/components/1.0/fragment/'
-
     'manipulations':
         '1.0':
             Documentation:

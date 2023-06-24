@@ -8,7 +8,6 @@ redirect_from:
 Uri Components
 =======
 
-[![Build Status](https://img.shields.io/travis/thephpleague/uri/master.svg?style=flat-square)](https://travis-ci.org/thephpleague/uri-components)
 [![Latest Version](https://img.shields.io/github/release/thephpleague/uri-components.svg?style=flat-square)](https://github.com/thephpleague/uri-components/releases)
 
 This package contains classes to help parsing and modifying URI components.
