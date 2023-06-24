@@ -21,6 +21,10 @@ packages:
             Documentation:
                 Getting Started: '/query-parser/1.0/'
     'components':
+        '7.0':
+            Documentation:
+                Getting Started: '/components/7.0/'
+                From 1.x to 2.x: '/components/7.0/upgrading/'
         '2.0':
             Documentation:
                 Getting Started: '/components/2.0/'
