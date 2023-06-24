@@ -36,14 +36,14 @@ public static function Http::fromServer(array $server): self
 use League\Uri\Http;
 use League\Uri\Uri;
 
-
 $uriFromString = Http::new('http://example.com/path/to?q=foo%20bar#section-42');
 $urifromObject = Http::new(Uri::new('http://example.com/path/to?q=foo%20bar#section-42'));
 ~~~
 
-<p class="message-info">The method supports scalar values and objects implementing the <code>__toString</code> are accepted.</p>
-
 ### Using Uri components
+
+This named constructor expects an array similar to the result of PHP's `parse_url` function
+or .`UriString::parse` static method.
 
 ~~~php
 $uri = Http::fromComponents(parse_url("http://uri.thephpleague/5.0/uri/api"));
@@ -67,21 +67,14 @@ $uri = Http::fromBaseUri('./p#~toto', 'http://thephpleague.com/uri/5.0/uri/');
 echo $uri; //returns 'http://thephpleague.com/uri/5.0/uri/p#~toto'
 ~~~
 
-The `fromBaseUri` named constructor instantiates an absolute URI or resolves a relative URI against another absolute URI. If present the absolute URI can be:
+This method expect at most two parameters:
 
-- a League `UriInterface` object
-- a `PSR-7` `UriInterface` object
-- an object implementing the `__toString` method
-- a scalar
+- The URI to resolve
+- and the base URI to use for context resolution
 
-Exceptions are thrown if:
-
-- the provided base URI is not absolute;
-- the provided URI is not absolute in absence of a base URI;
-
-When a base URI is given the URI is resolved against that base URI just like a browser would for a relative URI.
-
-<p class="message-info">The method supports parameter widening, scalar values and objects implementing the <code>__toString</code> or other URI objects are accepted.</p>
+If no base URI is provided, the URI to resolve **MUST** be absolute. Otherwise,
+the base URI **MUST** be absolute. [This is inline with how the Javascript](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) `URL`
+construnctor works.
 
 ### Using a URI Template
 
@@ -98,7 +91,7 @@ echo $uri; //displays "https://example.com/hotels/Rest%20%26%20Relax/bookings/42
 ~~~
 
 This method expect at most two variables. The URI template to resolve and the variables use for resolution.
-You can get more in-depth understanding of [URI Template](/7.0/uri-template) in its dedicated section of
+You can get more in-depth understanding of [URI Template](/uri/7.0/uri-template) in its dedicated section of
 the documentation.
 
 ## Json representation
@@ -113,4 +106,4 @@ echo json_encode($uri);
 
 ## Relation with PSR-7
 
-The `Http` class implements the PSR-7 `UriInterface` interface **version 2**. This means that you can use this class anytime you need a PSR-7 compliant URI object.
+The `Http` class implements the PSR-7 `UriInterface` interface **version 2**. This means that you can use this class anytime you need a PSR-7 version 2 compliant URI object.
