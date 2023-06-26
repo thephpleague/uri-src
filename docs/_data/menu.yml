@@ -25,6 +25,27 @@ packages:
             Documentation:
                 Getting Started: '/components/7.0/'
                 From 2.x to 7.x: '/components/7.0/upgrading/'
+            URI Modifiers:
+                Overview: '/components/7.0/modifiers/'
+                Query Modifiers: '/components/7.0/modifiers/query/'
+                Path Modifiers: '/components/7.0/modifiers/path/'
+                Host Modifiers: '/components/7.0/modifiers/host/'
+            Utility classes:
+                QueryString: '/components/7.0/query-parser-builder/'
+                IPv4 Normalizer: '/components/7.0/ipv4-normalizer/'
+            URI components:
+                Overview: '/components/7.0/api/'
+                Scheme: '/components/7.0/scheme/'
+                Authority: '/components/7.0/authority/'
+                UserInfo: '/components/7.0/userinfo/'
+                Host: '/components/7.0/host/'
+                Domain: '/components/7.0/domain/'
+                Port: '/components/7.0/port/'
+                Path: '/components/7.0/path/'
+                DataPath: '/components/7.0/data-path/'
+                HierarchicalPath: '/components/7.0/hierarchical-path/'
+                Query: '/components/7.0/query/'
+                Fragment: '/components/7.0/fragment/'
         '2.0':
             Documentation:
                 Getting Started: '/components/2.0/'
@@ -87,7 +108,7 @@ packages:
                 Parse & Build URI: '/uri/7.0/parser-builder/'
                 Resolve & Relativize: '/uri/7.0/resolver-relativizer/'
                 URI template: '/uri/7.0/uri-template/'
-                From 5.x to 6.x: '/uri/7.0/upgrading/'
+                From 6.x to 7.x: '/uri/7.0/upgrading/'
         '6.0':
             Documentation:
                 Getting Started: '/uri/6.0/'

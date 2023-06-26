@@ -17,12 +17,10 @@ This package contains classes to help parsing and modifying URI components.
 
 ~~~php
 use League\Uri\Components\Query;
-use League\Uri\Uri;
 use League\Uri\UriModifier;
 
-$uri = Uri::new('http://example.com?q=value#fragment');
-$newUri = UriModifier::appendQuery($uri, 'q=new.Value');
-echo $newUri; // 'http://example.com?q=value&q=new.Value#fragment';
+$newUri = UriModifier::appendQuery('http://example.com?q=value#fragment', 'q=new.Value');
+echo $newUri->toString(); // 'http://example.com?q=value&q=new.Value#fragment';
 
 $query = Query::fromUri($newUri);
 $query->get('q');    // returns 'value'

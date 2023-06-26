@@ -8,7 +8,7 @@ The Authority part
 
 The `League\Uri\Components\Authority` class ease URI authority part creation and manipulation. This object exposes:
                                        
-- the [package common API](/components/2.0/api/), 
+- the [package common API](/components/7.0/api/), 
 
 but also provide specific methods to work with a URI authority part.
 
@@ -24,20 +24,20 @@ but also provide specific methods to work with a URI authority part.
 
 ~~~php
 <?php
-public Authority::__construct($authority = null): void
+public static Authority::new(Stringable|string|null $value = null): self
+public static Authority::fromUri(Stringable|string $uri): self
 ~~~
 
 <p class="message-notice">submitted string is normalized to be <code>RFC3986</code> compliant.</p>
-
-### Using a string
 
 ~~~php
 <?php
 
 use League\Uri\Components\Authority;
 
-$authority = Authority::createFromString('user:pass@example.com:42');
-$authority->getContent(); //returns 'user:pass@example.com:42'
+Authority::new('user:pass@example.com:42')->value(); //returns 'user:pass@example.com:42'
+Authority::fromUri("http://www.example.com/path/to/the/sky")->getPort(); //return null;
+Authority::new()->value(); //return null;
 ~~~
 
 <p class="message-notice">if no string is given a instance is returns using the empty string.</p>
@@ -53,48 +53,10 @@ use League\Uri\UriString;
 $authority = Authority::createFromComponents(
 	UriString::parse("http://user:pass@example.com:42/5.0/uri/api")
 );
-$authority->getContent(); //returns 'user:pass@example.com:42'
+$authority->value(); //returns 'user:pass@example.com:42'
 ~~~
 
 <p class="message-warning">If you supply your own hash to <code>createFromComponents</code>, you are responsible for providing well parsed components without their URI delimiters.</p>
-
-### Using an URI object
-
-The URI must implements League `UriInterface` or PSR-7  `UriInterface`.
-
-~~~php
-<?php
-
-use Laminas\Diactoros\Uri as LaminasUri;
-use League\Uri\Components\Authority;
-
-$psr7Uri = new LaminasUri("http://www.example.com/path/to/the/sky");
-
-$authority = Authority::createFromUri($psr7Uri);
-$authority->getPort(); //return null;
-~~~
-
-### Using null
-
-~~~php
-<?php
-
-use League\Uri\Components\Authority;
-
-$authority = Authority::createFromNull();
-$authority->getContent(); //return null;
-~~~
-
-Authority validation
--------
-
-A `League\Uri\Contracts\UriException` exception is triggered if an invalid Authority value is given.
-
-~~~php
-$uri = Authority::createFromString(':80');
-// throws a League\Uri\Exceptions\SyntaxError
-// because the URI string is invalid
-~~~
 
 Accessing properties
 -------
@@ -102,15 +64,15 @@ Accessing properties
 The Authority object exposes the following specific methods.
 
 ~~~php
-public function Authority::getUserInfo(void): ?string
-public function Authority::getHost(void): ?string
-public function Authority::getPort(void): ?int
+public function Authority::getUserInfo(): ?string
+public function Authority::getHost(): ?string
+public function Authority::getPort(): ?int
 ~~~
 
 You can access the authority string, its individual parts and components using their respective getter methods. This lead to the following result for a simple HTTP URI:
 
 ~~~php
-$uri = Authority::createFromString("foo:bar@www.example.com:81");
+$uri = Authority::new("foo:bar@www.example.com:81");
 echo $uri->getUserInfo();  //displays "foo:bar"
 echo $uri->getHost();      //displays "www.example.com"
 echo $uri->getPort();      //displays 81 as an integer
@@ -138,12 +100,11 @@ public function Authority::withPort(?int $port): self
 Since All URI object are immutable you can chain each modifying methods to simplify URI creation and/or modification.
 
 ~~~php
-$uri = Authority::createFromString("thephpleague.com")
+echo Authority::new("thephpleague.com")
     ->withUserInfo("foo", "bar")
     ->withHost("www.example.com")
-    ->withPort(81);
-
-echo $uri->getUriComponent(); //displays "//foo:bar@www.example.com:81"
+    ->withPort(81)
+    ->toString(); //displays "//foo:bar@www.example.com:81"
 ~~~
 
 Normalization
@@ -157,8 +118,7 @@ These non-destructive rules are:
 - the host is converted to its ascii representation using punycode if needed
 
 ~~~php
-$uri = new Uri("www.ExAmPLE.com:80");
-echo $uri; //displays www.example.com:80
+echo Authority::new("www.ExAmPLE.com:80"); //displays www.example.com:80
 ~~~
 
 <p class="message-info">Host conversion depends on the presence of the <code>ext-intl</code> extension. Otherwise the code will trigger a <code>IdnSupportMissing</code> exception</p>
