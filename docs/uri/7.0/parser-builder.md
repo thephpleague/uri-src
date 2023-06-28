@@ -11,8 +11,8 @@ The `League\Uri\UriString` class is a userland PHP URI parser and builder compli
 ## URI parsing
 
 ~~~php
-UriString::parse(array $components): string
-UriString::parseAuthority(array $components): string
+UriString::parse(string $uri): array
+UriString::parseAuthority(string $autority): array
 ~~~
 
 The parser is:
