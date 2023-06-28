@@ -32,14 +32,11 @@ use League\Uri\Components\DataPath;
 DataPath::new()->value(); //returns 'text/plain;charset=us-ascii,'
 ~~~
 
-## Instantiation using a file path
-
-<p class="message-warning">The named constructor <code>createFromPath</code> is deprecated starting with version <code>2.3.0</code>. You should use the <code>createFromFilePath</code> named constructor instead.</p>
+## Instantiation using file contents
 
 ~~~php
 <?php
-public static function DataPath::fromFilePath(Stringable|string $path): self
-public static function DataPath::fromPath(Stringable|string $path): self
+public static function DataPath::fromFileContents(Stringable|string $path): self
 ~~~
 
 Because data URI represents files you can also instantiate a new data URI object from a file path using the `createFromPath` named constructor.
@@ -49,7 +46,7 @@ Because data URI represents files you can also instantiate a new data URI object
 
 use League\Uri\Components\DataPath;
 
-$path = DataPath::fromFilePath('path/to/my/png/image.png');
+$path = DataPath::fromFileContents('path/to/my/png/image.png');
 echo $uri; //returns 'image/png;charset=binary;base64,...'
 //where '...' represent the base64 representation of the file
 ~~~
@@ -80,7 +77,7 @@ echo $path->getParameters(); //returns 'charset=us-ascii'
 echo $path->getData(); //returns 'Hello%20World%21'
 $path->isBinaryData(); //returns false
 
-$binary_path = DataPath::fromFilePath('path/to/my/png/image.png');
+$binary_path = DataPath::fromFileContents('path/to/my/png/image.png');
 $binary_path->isBinaryData(); //returns true
 ~~~
 
@@ -127,7 +124,7 @@ Since the path can be interpreted as a file, it is possible to save it to a spec
 - the file path;
 - the open mode (à la PHP `fopen`);
 
-By default the open mode is set to `w`. If for any reason the file is not accessible a `RuntimeException` will be thrown.
+By default, the open mode is set to `w`. If for any reason the file is not accessible a `RuntimeException` will be thrown.
 
 The method returns the `SplFileObject` object used to save the data-uri data for further analysis/manipulation if you want.
 
@@ -136,7 +133,7 @@ The method returns the `SplFileObject` object used to save the data-uri data for
 
 use League\Uri\Components\DataPath;
 
-$path = DataPath::fromFilePath('path/to/my/file.png');
+$path = DataPath::fromFileContents('path/to/my/file.png');
 $file = $uri->save('path/where/to/save/my/image.png');
 //$file is a SplFileObject which point to the newly created file;
 ~~~

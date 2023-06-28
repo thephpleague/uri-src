@@ -11,7 +11,7 @@ This guide will help you migrate from a 6.x version to 7.0. It will only explain
 
 ## Installation
 
-If you are using composer then you should update the require section of your `composer.json` file.
+If you are using composer then you should update the `require` section of your `composer.json` file.
 
 ~~~
 composer require league/uri:^7.0
@@ -32,23 +32,23 @@ The `League\Uri\Http` implements the PSR-7 `UriInterface` v2 and PHP's `JsonSeri
 The following methods are marked as deprecated. They will stay to allow eaiser upgrade path
 to version `7.0`, but it is recommended not to use them for new projects.
 
-| Deprecated methods           | New stable methods     |
-|------------------------------|------------------------|
-| `Uri::createFromString`      | `Uri::new`             |
-| `Uri::createFromUri`         | `Uri::new`             |
-| `Uri::createFromServer`      | `Uri::fromServer`      |
-| `Uri::createFromComponents`  | `Uri::fromComponents`  |
-| `Uri::createFromBaseUri`     | `Uri::fromBaseUri`     |
-| `Uri::createFromDataPath`    | `Uri::fromDataPath`    |
-| `Uri::createFromUnixPath`    | `Uri::fromUnixPath`    |
-| `Uri::createFromWindowsPath` | `Uri::fromWindowsPath` |
-| `Http::createFromString`     | `Http::new`            |
-| `Http::createFromUri`        | `Http::new`            |
-| `Http::createFromServer`     | `Http::fromServer`     |
-| `Http::createFromComponents` | `Http::fromComponents` |
-| `Http::createFromBaseUri`    | `Http::fromBaseUri`    |
+| Deprecated methods           | New stable methods      |
+|------------------------------|-------------------------|
+| `Uri::createFromString`      | `Uri::new`              |
+| `Uri::createFromUri`         | `Uri::new`              |
+| `Uri::createFromComponents`  | `Uri::fromComponents`   |
+| `Uri::createFromServer`      | `Uri::fromServer`       |
+| `Uri::createFromBaseUri`     | `Uri::fromClient`       |
+| `Uri::createFromDataPath`    | `Uri::fromFileContents` |
+| `Uri::createFromUnixPath`    | `Uri::fromUnixPath`     |
+| `Uri::createFromWindowsPath` | `Uri::fromWindowsPath`  |
+| `Http::createFromString`     | `Http::new`             |
+| `Http::createFromUri`        | `Http::new`             |
+| `Http::createFromComponents` | `Http::fromComponents`  |
+| `Http::createFromServer`     | `Http::fromServer`      |
+| `Http::createFromBaseUri`    | `Http::fromClient`      |
 
-## Removed functionnalities
+## Removed functionalities
 
 - `__set_state` named constructors is removed without replacements.
 - Support for `PSR-7` v1
