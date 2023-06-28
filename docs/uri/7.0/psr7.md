@@ -3,7 +3,7 @@ layout: default
 title: PSR-7 compliant URI Object API
 ---
 
-HTTP URI
+PSR-7 URI
 =======
 
 The package provides an expressive and efficient API around building and manipulating URI compliant
