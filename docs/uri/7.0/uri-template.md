@@ -6,18 +6,29 @@ title: URI template
 URI Template
 =======
 
-The `League\Uri\UriTemplate` class enables expanding a URI object based on a URI template and its submitted parameters 
-following [RFC 6570 URI Template](http://tools.ietf.org/html/rfc6570).
+The `League\Uri\UriTemplate` class enables expanding a URI object based on a URI template and its 
+submitted parameters following [RFC 6570 URI Template](http://tools.ietf.org/html/rfc6570).
 
-## The parser is RFC6570 compliant
+~~~php
+<?php
 
-Don't feel like reading RFC 6570? Here are a quick refresher to understand its rules:
+use League\Uri\UriTemplate;
+use League\Uri\UriTemplate\Template;
+use League\Uri\UriTemplate\VariableBag;
+use League\Uri\Contracts\UriInterface;
 
-- template are made of expressions consisting of an **operator** and a **variable specification**;
-- a **variable specification** consists at least of one **variable name** and an optional **modifier**;
-- the RFC defines 4 levels of interpolation and all 4 are supported by the given class.
+public UriTemplate::__construct(Stringable|string $template, iterable $defaultVariables);
+public UriTemplate::expand(iterable $variables = []): UriInterface;
+public UriTemplate::expandOrFail(iterable $variables = []): UriInterface;
+public UriTemplate::withDefaultVariables(iterable $defaultVariables): self;
+public readonly VariableBag UriTemplate::$defaultVariables;
+public readonly Template UriTemplate::$template;
+~~~
 
-The `UriTemplate::expand` public method provides the mean for expanding a URI template to generate a valid URI conforming to RFC3986 if given a supplied set of data.
+## Template expansion
+
+The `UriTemplate::expand` public method expands a URI template to generate a valid URI conforming
+to RFC3986 if given a supplied set of data.
 
 ~~~php
 <?php
@@ -35,7 +46,7 @@ echo $uri, PHP_EOL;
 // https://example.com/hotels/Rest%20%26%20Relax/bookings/42
 ~~~
 
-## Variables
+## Template variables
 
 <p class="message-notice">For maximum interoperability you should make sure your variables are 
 strings or stringable objects otherwise the value will be cast to string following PHP rules 
@@ -111,10 +122,8 @@ $newUriTemplate = $uriTemplate->withDefaultVariables(['version' => '1.1']);
 $newUriTemplate->defaultVariables; //returns  new VariableBag(['version' => '1.1'])
 ~~~
 
-### Nested array are disallowed
-
-<p class="message-warning">This class follows only the RFC6570 requirements and thus, does
-not support nested array like the one used with <code>http_build_query</code></p>
+<p class="message-warning">Following  RFC6570 requirements means not support for
+nested array like the one used with <code>http_build_query</code></p>
 
 ~~~php
 <?php

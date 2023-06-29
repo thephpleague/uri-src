@@ -38,7 +38,7 @@ to version `7.0`, but it is recommended not to use them for new projects.
 | `Uri::createFromUri`         | `Uri::new`              |
 | `Uri::createFromComponents`  | `Uri::fromComponents`   |
 | `Uri::createFromServer`      | `Uri::fromServer`       |
-| `Uri::createFromBaseUri`     | `Uri::fromBaseUri`       |
+| `Uri::createFromBaseUri`     | `Uri::fromBaseUri`      |
 | `Uri::createFromDataPath`    | `Uri::fromFileContents` |
 | `Uri::createFromUnixPath`    | `Uri::fromUnixPath`     |
 | `Uri::createFromWindowsPath` | `Uri::fromWindowsPath`  |
@@ -46,7 +46,7 @@ to version `7.0`, but it is recommended not to use them for new projects.
 | `Http::createFromUri`        | `Http::new`             |
 | `Http::createFromComponents` | `Http::fromComponents`  |
 | `Http::createFromServer`     | `Http::fromServer`      |
-| `Http::createFromBaseUri`    | `Http::fromBaseUri`      |
+| `Http::createFromBaseUri`    | `Http::fromBaseUri`     |
 
 ## Deprecated Classes
 
