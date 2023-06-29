@@ -15,17 +15,17 @@ Overview
 [![Build](https://github.com/thephpleague/uri/workflows/build/badge.svg)](https://github.com/thephpleague/uri/actions?query=workflow%3A%22build%22)
 [![Total Downloads](//img.shields.io/packagist/dt/league/uri.svg?style=flat-square)](https://packagist.org/packages/league/uri)
 
-This package contains concrete objects to ease creating and manipulating URI objects represented as immutable value objects. 
+This package contains features and capabilities to ease manipulating URIs. 
 
-The following URI objects are defined (order alphabetically):
+The following classes are defined (order alphabetically):
 
-- [Http](/uri/7.0/psr7/) : represents an URI object implementing PSR-7 `UriInterface`
-- [URI](/uri/7.0/rfc3986/) : represents a generic RFC3986 URI object
+- [Http](/uri/7.0/psr7/) : represents a PSR-7 `UriInterface` URI compliant object
+- [URI](/uri/7.0/rfc3986/) : represents a generic RFC3986 compliant URI object
 
-To ease URI objects creation and manipulation, the following helper classes are added (order alphabetically):
+The following helper classes are added (order alphabetically) to complement the offer:
 
+- the [BaseUri](/uri/7.0/base-uri) : resolves or relativizes a URI against a base URI;
 - the [UriInfo](/uri/7.0/info) : retrieves RFC3986 related info from an URI object;
-- the [UriResolver](/uri/7.0/resolver-relativizer) : resolves or relativizes an URI against a base URI;
 - the [UriString](/uri/7.0/parser-builder) : parses or builds an URI string into or from its components;
 - the [UriTemplate](/uri/7.0/uri-template) : expands an URI template string into an URI object;
 

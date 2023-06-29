@@ -24,7 +24,7 @@ the `League\Uri\Http` class comes with the following named constructors to ease 
 public static function Http::new(Stringable|string $uri = ''): self
 public static function Http::fromComponents(array $components): self
 public static function Http::fromServer(array $server): self
-public static function Http::fromClient(Stringable|string $uri, Stringable|string|null $baseUri = null): self
+public static function Http::fromBaseUri(Stringable|string $uri, Stringable|string|null $baseUri = null): self
 public static function Http::fromTemplate(Stringable|string $template, iterable $variables = []): self
 ~~~
 
@@ -70,7 +70,7 @@ You can also return a URI based on standard specifications:
 
 use League\Uri\Http;
 
-$uri = Http::fromClient("./p#~toto", "http://www.example.com/path/to/the/sky/");
+$uri = Http::fromBaseUri("./p#~toto", "http://www.example.com/path/to/the/sky/");
 echo $uri; //displays "http://www.example.com/path/to/the/sky/p#~toto"
 
 $template = 'https://example.com/hotels/{hotel}/bookings/{booking}';
@@ -79,7 +79,7 @@ echo Http::fromTemplate($template, $variables)->toString();
 //displays "https://example.com/hotels/Rest%20%26%20Relax/bookings/42"
 ~~~
 
-The `fromClient` method resolves URI using the same logic behind URL construction
+The `fromBaseUri` method resolves URI using the same logic behind URL construction
 in a browser and [is inline with how the Javascript](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) `URL` object constructor works.
 If no base URI is provided, the URI to resolve **MUST** be absolute. Otherwise, the base URI **MUST** be absolute.
 

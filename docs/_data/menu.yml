@@ -106,7 +106,7 @@ packages:
                 PSR-7 URI: '/uri/7.0/psr7/'
                 URI info: '/uri/7.0/info/'
                 Parse & Build URI: '/uri/7.0/parser-builder/'
-                Resolve & Relativize: '/uri/7.0/resolver-relativizer/'
+                Base URI: '/uri/7.0/base-uri/'
                 URI template: '/uri/7.0/uri-template/'
                 From 6.x to 7.x: '/uri/7.0/upgrading/'
         '6.0':

@@ -38,7 +38,7 @@ to version `7.0`, but it is recommended not to use them for new projects.
 | `Uri::createFromUri`         | `Uri::new`              |
 | `Uri::createFromComponents`  | `Uri::fromComponents`   |
 | `Uri::createFromServer`      | `Uri::fromServer`       |
-| `Uri::createFromBaseUri`     | `Uri::fromClient`       |
+| `Uri::createFromBaseUri`     | `Uri::fromBaseUri`       |
 | `Uri::createFromDataPath`    | `Uri::fromFileContents` |
 | `Uri::createFromUnixPath`    | `Uri::fromUnixPath`     |
 | `Uri::createFromWindowsPath` | `Uri::fromWindowsPath`  |
@@ -46,7 +46,47 @@ to version `7.0`, but it is recommended not to use them for new projects.
 | `Http::createFromUri`        | `Http::new`             |
 | `Http::createFromComponents` | `Http::fromComponents`  |
 | `Http::createFromServer`     | `Http::fromServer`      |
-| `Http::createFromBaseUri`    | `Http::fromClient`      |
+| `Http::createFromBaseUri`    | `Http::fromBaseUri`      |
+
+## Deprecated Classes
+
+The `League\Uri\UriResolver` class is deprecated in favor of the `League\Uri\BaseUri` class:
+
+Before:
+
+~~~php
+<?php
+
+use League\Uri\Uri;
+use League\Uri\UriResolver;
+
+$uri = Uri::createFromString('http://www.example.com/?foo=toto#~typo');
+$baseUri = Uri::createFromString('http://www.example.com');
+
+$relativeUri = UriResolver::relativize($uri, $baseUri);
+echo $relativeUri; // display "/?foo=toto#~typo
+echo UriResolver::resolve($relativeUri, $baseUri);
+// display 'http://www.example.com/?foo=toto#~typo'
+~~~
+
+After:
+
+~~~php
+<?php
+
+use League\Uri\BaseUri;
+
+$uri = 'http://www.example.com/?foo=toto#~typo';
+$baseUri = BaseUri::new('http://www.example.com');
+
+$relativeUri = $baseUri->relativize($uri);
+echo $relativeUri; // display "/?foo=toto#~typo
+echo $baseUri->resolve($relativeUri);
+// display 'http://www.example.com/?foo=toto#~typo'
+~~~
+
+While the class is deprecated and will still work, the new `BaseUri` should be
+favor for any new development.
 
 ## Removed functionalities
 
