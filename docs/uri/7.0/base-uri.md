@@ -21,6 +21,8 @@ use Psr\Http\Message\UriInterface as Psr7UriInterface;
 public static function BaseUri::new(Stringable|string $baseUri): self
 public function BaseUri::resolve(Stringable|string $uri): UriInterface|Psr7UriInterface
 public function BaseUri::relativize(Stringable|string $uri): UriInterface|Psr7UriInterface
+public function BaseUri::isCrossOrigin(Stringable|string $uri): bool
+public function BaseUri::origin(): ?UriInterface;
 public readonly UriInterface BaseUri::$value;
 ~~~
 
