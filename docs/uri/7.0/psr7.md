@@ -7,7 +7,7 @@ PSR-7 URI
 =======
 
 The package provides an expressive and efficient API around building and manipulating URI compliant
-with [version 2 of PSR-7](https://www.php-fig.org/psr/psr-7/). It allows the easy creation of URI in multiple contexts 
+with [PSR-7](https://www.php-fig.org/psr/psr-7/). It allows the easy creation of URI in multiple contexts 
 to increase your DX while working with URI.
 
 <p class="message-notice">The class handles all URI schemes and default to HTTP(s) rules if the
@@ -91,8 +91,8 @@ for resolution. You can get a more in-depth understanding of
 
 ## Relation with PSR-7
 
-The `Http` class implements the PSR-7 `UriInterface` interface **version 2**. This means that you can 
-use this class anytime you need a PSR-7 version 2 compliant URI object.
+The `Http` class implements the PSR-7 `UriInterface` interface. This means that you can 
+use this class anytime you need a PSR-7 compliant URI object.
 
 ## URI normalization
 

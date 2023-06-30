@@ -25,7 +25,7 @@ This will edit (or create) your `composer.json` file.
 
 ## Interfaces
 
-The `League\Uri\Http` implements the PSR-7 `UriInterface` v2 and PHP's `JsonSerializable` interfaces.
+The `League\Uri\Http` implements the PSR-7 `UriInterface` and PHP's `JsonSerializable` interfaces.
 
 ## Deprecated methods
 
@@ -91,4 +91,7 @@ favor for any new development.
 ## Removed functionalities
 
 - `__set_state` named constructors is removed without replacements.
-- Support for `PSR-7` v1
+
+| Removed Classes                                  | New Classes                                       |
+|--------------------------------------------------|---------------------------------------------------|
+| `League\Uri\Exceptions\TemplateCanNotBeExpanded` | `League\Uri\UriTemplate\TemplateCanNotBeExpanded` |

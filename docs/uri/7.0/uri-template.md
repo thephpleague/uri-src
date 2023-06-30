@@ -17,7 +17,7 @@ use League\Uri\UriTemplate\Template;
 use League\Uri\UriTemplate\VariableBag;
 use League\Uri\Contracts\UriInterface;
 
-public UriTemplate::__construct(Stringable|string $template, iterable $defaultVariables);
+public UriTemplate::__construct(Stringable|string $template, iterable $defaultVariables = []);
 public UriTemplate::expand(iterable $variables = []): UriInterface;
 public UriTemplate::expandOrFail(iterable $variables = []): UriInterface;
 public UriTemplate::withDefaultVariables(iterable $defaultVariables): self;
@@ -143,7 +143,7 @@ $params = [
 
 $uriTemplate = new UriTemplate($template);
 $uriTemplate->expand($params);
-// will throw a League\Uri\Exceptions\TemplateCanNotBeExpanded when trying to expand the `period` value.
+// will throw a League\Uri\UriTemplate\TemplateCanNotBeExpanded when trying to expand the `period` value.
 ~~~
 
 ### Using the prefix modifier on a list will trigger an exception.
@@ -169,7 +169,7 @@ $params = [
 
 $uriTemplate = new UriTemplate($template);
 echo $uriTemplate->expand($params), PHP_EOL;
-// throw a League\Uri\Exceptions\TemplateCanNotBeExpanded because the term variable is a list and not a string.
+// throw a League\Uri\UriTemplate\TemplateCanNotBeExpanded because the term variable is a list and not a string.
 ~~~
 
 ### Strict expansion with expandOrFail
