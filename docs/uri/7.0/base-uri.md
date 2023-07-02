@@ -21,10 +21,15 @@ use Psr\Http\Message\UriInterface as Psr7UriInterface;
 public static function BaseUri::new(Stringable|string $baseUri): self
 public function BaseUri::resolve(Stringable|string $uri): self
 public function BaseUri::relativize(Stringable|string $uri): self
+public function BaseUri::isAbsolute(): bool
+public function BaseUri::isNetworkPath(): bool
+public function BaseUri::isAbsolutePath(): bool
+public function BaseUri::isRelativePath(): bool
+public function BaseUri::isSameDocument(Stringable|string $uri): bool
 public function BaseUri::isCrossOrigin(Stringable|string $uri): bool
 public function BaseUri::__toString(): string
 public readonly ?string BaseUri::$origin;
-public readonly Psr7UriInterface|UriInterface BaseUri::$value;
+public readonly Psr7UriInterface|UriInterface BaseUri::$origin;
 ~~~
 
 <p class="message-notice">All the methods accepts string or Stringable objects like the PSR-7 or League own <code>UriInterface</code> implementing class.</p>

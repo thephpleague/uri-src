@@ -85,8 +85,38 @@ echo $baseUri->resolve($relativeUri);
 // display 'http://www.example.com/?foo=toto#~typo'
 ~~~
 
-While the class is deprecated and will still work, the new `BaseUri` should be
-favor for any new development.
+The `League\Uri\UriInfo` class is deprecated in favor of the `League\Uri\BaseUri` class:
+
+Before:
+
+~~~php
+<?php
+
+use League\Uri\Http;
+use League\Uri\Uri;
+use League\Uri\UriIfo;
+
+UriInfo::isNetworkPath(Http::createFromString("//example.com/toto")); //returns true
+UriInfo::isNetworkPath(Uri::createFromString("/🍣🍺")); //returns false
+UriInfo::isSameDocument(
+    Http::createFromString("example.com?foo=bar#🏳️‍🌈"),
+    Http::createFromString("exAMpLE.com?foo=bar#🍣🍺")
+); //returns true
+~~~
+
+After:
+
+~~~php
+<?php
+
+use League\Uri\BaseUri;
+
+BaseUri::new("//example.com/toto")->isNetworkPath(); //returns true
+BaseUri::new("/🍣🍺")->isNetworkPath(); //returns false
+BaseUri::new("example.com?foo=bar#🏳️‍🌈")->isSameDocument("exAMpLE.com?foo=bar#🍣🍺"); //returns true
+~~~
+
+All the static public methods are now attached to the `BaseUri` as method to the instantiated object.
 
 ## Removed functionalities
 
