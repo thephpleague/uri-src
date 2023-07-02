@@ -39,7 +39,7 @@ DataPath::new()->value(); //returns 'text/plain;charset=us-ascii,'
 public static function DataPath::fromFileContents(Stringable|string $path): self
 ~~~
 
-Because data URI represents files you can also instantiate a new data URI object from a file path using the `createFromPath` named constructor.
+Because data URI represents files you can also instantiate a new data URI object from a file path using the `fromFileContents` named constructor.
 
 ~~~php
 <?php

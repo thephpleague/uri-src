@@ -50,13 +50,13 @@ Authority::new()->value(); //return null;
 use League\Uri\Components\Authority;
 use League\Uri\UriString;
 
-$authority = Authority::createFromComponents(
+$authority = Authority::fromComponents(
 	UriString::parse("http://user:pass@example.com:42/5.0/uri/api")
 );
 $authority->value(); //returns 'user:pass@example.com:42'
 ~~~
 
-<p class="message-warning">If you supply your own hash to <code>createFromComponents</code>, you are responsible for providing well parsed components without their URI delimiters.</p>
+<p class="message-warning">If you supply your own hash to <code>fromComponents</code>, you are responsible for providing well parsed components without their URI delimiters.</p>
 
 Accessing properties
 -------

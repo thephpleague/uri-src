@@ -19,11 +19,12 @@ use League\Uri\Contracts\UriInterface;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 
 public static function BaseUri::new(Stringable|string $baseUri): self
-public function BaseUri::resolve(Stringable|string $uri): UriInterface|Psr7UriInterface
-public function BaseUri::relativize(Stringable|string $uri): UriInterface|Psr7UriInterface
+public function BaseUri::resolve(Stringable|string $uri): self
+public function BaseUri::relativize(Stringable|string $uri): self
 public function BaseUri::isCrossOrigin(Stringable|string $uri): bool
-public function BaseUri::origin(): ?UriInterface;
-public readonly UriInterface BaseUri::$value;
+public function BaseUri::__toString(): string
+public readonly ?string BaseUri::$origin;
+public readonly Psr7UriInterface|UriInterface BaseUri::$value;
 ~~~
 
 <p class="message-notice">All the methods accepts string or Stringable objects like the PSR-7 or League own <code>UriInterface</code> implementing class.</p>
@@ -44,6 +45,6 @@ $uri = 'http://www.example.com/?foo=toto#~typo';
 $relativeUri = $baseUri->relativize($uri);
 echo $relativeUri; // display "/?foo=toto#~typo
 echo $baseUri->resolve($relativeUri);
-echo $baseUri->value->toString(); // display 'http://www.example.com'
+echo $baseUri; // display 'http://www.example.com'
 // display 'http://www.example.com/?foo=toto#~typo'
 ~~~

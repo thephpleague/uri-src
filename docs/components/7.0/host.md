@@ -119,7 +119,7 @@ The method can also infer the IPv4 from its hexadecimal or octal representation.
 use League\Uri\Components\Host;
 use League\Uri\Ipv4Calculators\GMPCalculator;
 
-Host::createFromIp('999999999', '', new GMPCalculator())->toString(); //display '59.154.201.255'
+Host::fromIp('999999999', '', new GMPCalculator())->toString(); //display '59.154.201.255'
 ~~~
 
 This normalization works using:

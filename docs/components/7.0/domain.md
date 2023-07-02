@@ -55,7 +55,7 @@ Domain::fromAuthority("user:pass@www.example.com:82")->value(); //return 'www.ex
 
 ### Using a collection of domain labels.
 
-A host is a collection of labels delimited by the host separator `.`. So it is possible to create a `Host` object using a collection of labels with the `Domain::createFromLabels` method.
+A host is a collection of labels delimited by the host separator `.`. So it is possible to create a `Host` object using a collection of labels with the `Domain::fromLabels` method.
 The method expects a single arguments, a collection of label. **The labels must be ordered hierarchically, this mean that the array should have the top-level domain in its first entry**.
 
 <p class="message-warning">Since an IP is not a hostname, the class will throw an <code>League\Uri\Exceptions\SyntaxError</code> if you try to create an fully qualified domain name with a valid IP address.</p>

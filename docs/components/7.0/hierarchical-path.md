@@ -71,8 +71,6 @@ $end_slash = HierarchicalPath::fromAbsolute('shop', 'example', 'com', '');
 echo $end_slash; //display '/shop/example/com/'
 ~~~
 
-<p class="message-info">To force the end slash when using the <code>Path::createFromSegments</code> method you need to add an empty string as the last member of the submitted array.</p>
-
 ## Manipulating the path as a filesystem path
 
 The `HierarchicalPath` allows you to access and manipulate the path as if it was a filesystem path.
