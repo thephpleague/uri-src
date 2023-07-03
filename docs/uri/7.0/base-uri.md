@@ -20,6 +20,7 @@ use League\Uri\Contracts\UriInterface;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 
 public static function BaseUri::new(Stringable|string $baseUri): self
+public function BaseUri::uri(): Psr7UriInterface|UriInterface
 public function BaseUri::origin(): ?self
 public function BaseUri::resolve(Stringable|string $uri): self
 public function BaseUri::relativize(Stringable|string $uri): self
@@ -31,7 +32,6 @@ public function BaseUri::isSameDocument(Stringable|string $uri): bool
 public function BaseUri::isCrossOrigin(Stringable|string $uri): bool
 public function BaseUri::jsonSerialize(): string
 public function BaseUri::__toString(): string
-public readonly Psr7UriInterface|UriInterface BaseUri::$value;
 ~~~
 
 <p class="message-notice">All the methods accepts string or Stringable objects like the PSR-7 or League own <code>UriInterface</code> implementing class.</p>
@@ -41,7 +41,7 @@ a URI object from the same class, otherwise it will be a League <code>Uri</code>
 
 ## Usage
 
-Once instantiated you can get access to its underlying URI instance via the public readonly property `BaseUri::$value`.
+Once instantiated you can get access to its underlying URI instance via the public method `BaseUri::uri()`.
 if a Psr7 implementing object was use for instantiation, the same instance
 will be return by the property.
 
@@ -52,10 +52,10 @@ use League\Uri\BaseUri;
 use GuzzleHttp\Psr7\Utils;
 
 $baseUri = BaseUri::new('http://www.ExaMPle.com');
-$baseUri->value; // return Uri::new('http://www.ExaMPle.com');
+$baseUri->uri(); // return Uri::new('http://www.ExaMPle.com');
 
 $baseUriPsr7 = BaseUri::new(Utils::uriFor('http://www.ExaMPle.com'));
-$baseUri->value; // return new GuzzleHttp\Psr7\Uri('http://www.example.com/?foo=toto#~typo');
+$baseUri->uri(); // return new GuzzleHttp\Psr7\Uri('http://www.example.com/?foo=toto#~typo');
 ~~~
 
 ### URI resolution
