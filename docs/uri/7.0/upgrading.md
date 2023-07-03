@@ -102,6 +102,8 @@ UriInfo::isSameDocument(
     Http::createFromString("example.com?foo=bar#🏳️‍🌈"),
     Http::createFromString("exAMpLE.com?foo=bar#🍣🍺")
 ); //returns true
+UriInfo::getOrigin(Uri::createFromString('blob:https://mozilla.org:443')); //returns 'https://mozilla.org'
+UriInfo::getOrigin(Http::createFromString('file:///usr/bin/php')); //returns null
 ~~~
 
 After:
@@ -114,6 +116,8 @@ use League\Uri\BaseUri;
 BaseUri::new("//example.com/toto")->isNetworkPath(); //returns true
 BaseUri::new("/🍣🍺")->isNetworkPath(); //returns false
 BaseUri::new("example.com?foo=bar#🏳️‍🌈")->isSameDocument("exAMpLE.com?foo=bar#🍣🍺"); //returns true
+BaseUri::new(Uri::new('blob:https://mozilla.org:443'))->origin(); //returns BaseUri::new(Uri::new('https://mozilla.org'))
+BaseUri::new(Http::new('file:///usr/bin/php'))->origin(); //returns null
 ~~~
 
 All the static public methods are now attached to the `BaseUri` as method to the instantiated object.
