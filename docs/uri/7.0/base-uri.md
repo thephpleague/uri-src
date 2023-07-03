@@ -1,6 +1,6 @@
 ---
 layout: default
-title: URI resolver - relativizer
+title: URI context aware wrapper
 ---
 
 BaseUri

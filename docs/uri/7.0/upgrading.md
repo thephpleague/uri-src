@@ -23,13 +23,9 @@ This will edit (or create) your `composer.json` file.
 
 `League\Uri 7.0` requires a PHP version greater or equal than 8.1.0 (was previously 7.2.0).
 
-## Interfaces
-
-The `League\Uri\Http` implements the PSR-7 `UriInterface` and PHP's `JsonSerializable` interfaces.
-
 ## Deprecated methods
 
-The following methods are marked as deprecated. They will stay to allow eaiser upgrade path
+The following methods are marked as deprecated. They are still present to allow an easier upgrade path
 to version `7.0`, but it is recommended not to use them for new projects.
 
 | Deprecated methods           | New stable methods      |

@@ -46,8 +46,7 @@ var_export(UriString::parse('http://foo.com?@bar.com/#'));
 parses and extracts from the URI its components. Validating against scheme specific rules is still a requirement.</p>
 
 ~~~php
-$uri = 'http:www.example.com';
-var_export(UriString::parse($uri));
+var_export(UriString::parse('http:www.example.com'));
 //returns the following array
 //array(
 //  'scheme' => 'http',
@@ -76,8 +75,7 @@ You can rebuild a URI from its hash representation returned by the `UriString::p
 <p class="message-notice">If you supply your own hash you are responsible for providing valid encoded components without their URI delimiters.</p>
 
 ~~~php
-$base_uri = 'http://hello:world@foo.com?@bar.com/';
-$components = UriString::parse($base_uri);
+$components = UriString::parse('http://hello:world@foo.com?@bar.com/');
 //returns the following array
 //array(
 //  'scheme' => 'http',
