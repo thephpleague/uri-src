@@ -154,7 +154,7 @@ To determine what type of host you are dealing with the `Host` class provides th
 ~~~php
 $host = Host::new('example.com');
 $host->isIp(); //return false;
-$ip_host = $host->withContent('127.0.0.1');
+$ip_host = Host::new('127.0.0.1');
 $ip_host->isIp(); //return true;
 ~~~
 
@@ -226,7 +226,7 @@ You can retrieve the IP string representation from the Host object using the `ge
 $host = Host::new('[fe80::1%25eth0-1]');
 $host->getIp(); //returns 'fe80::1%eth0-1'
 
-$newHost = $host->withContent('uri.thephpleague.com');
+$newHost = Host::new('uri.thephpleague.com');
 $newHost->getIp();        //returns null
 $newHost->getIpVersion(); //returns null
 ~~~

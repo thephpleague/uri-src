@@ -20,12 +20,11 @@ but also provide specific methods to work with a URI authority part.
 
 ### Using the default constructor
 
-<p class="message-warning">The default constructor is deprecated starting with version <code>2.3.0</code>. It should be replaced by one of the several new named constructors.</p>
-
 ~~~php
 <?php
 public static Authority::new(Stringable|string|null $value = null): self
 public static Authority::fromUri(Stringable|string $uri): self
+public static Authority::fromComponents(array $components): self
 ~~~
 
 <p class="message-notice">submitted string is normalized to be <code>RFC3986</code> compliant.</p>
@@ -34,28 +33,17 @@ public static Authority::fromUri(Stringable|string $uri): self
 <?php
 
 use League\Uri\Components\Authority;
+use League\Uri\UriString;
 
 Authority::new('user:pass@example.com:42')->value(); //returns 'user:pass@example.com:42'
 Authority::fromUri("http://www.example.com/path/to/the/sky")->getPort(); //return null;
 Authority::new()->value(); //return null;
+Authority::fromComponents(
+	UriString::parse("http://user:pass@example.com:42/5.0/uri/api")
+)->value(); //returns 'user:pass@example.com:42'
 ~~~
 
 <p class="message-notice">if no string is given a instance is returns using the empty string.</p>
-
-### Using Uri components
- 
-~~~php
-<?php
-
-use League\Uri\Components\Authority;
-use League\Uri\UriString;
-
-$authority = Authority::fromComponents(
-	UriString::parse("http://user:pass@example.com:42/5.0/uri/api")
-);
-$authority->value(); //returns 'user:pass@example.com:42'
-~~~
-
 <p class="message-warning">If you supply your own hash to <code>fromComponents</code>, you are responsible for providing well parsed components without their URI delimiters.</p>
 
 Accessing properties

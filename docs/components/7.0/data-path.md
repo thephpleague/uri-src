@@ -16,8 +16,9 @@ but also provide specific methods to work with Data URI paths.
 
 ~~~php
 <?php
-public static DataPath::new(Stringable|string $value = ''): self
-public static DataPath::fromUri(Stringable|string $uri): self
+public static function DataPath::new(Stringable|string $value = ''): self
+public static function DataPath::fromUri(Stringable|string $uri): self
+public static function DataPath::fromFileContents(Stringable|string $path): self
 ~~~
 
 <p class="message-notice">submitted string is normalized to be <code>RFC3986</code> compliant.</p>
@@ -30,13 +31,6 @@ public static DataPath::fromUri(Stringable|string $uri): self
 use League\Uri\Components\DataPath;
 
 DataPath::new()->value(); //returns 'text/plain;charset=us-ascii,'
-~~~
-
-## Instantiation using file contents
-
-~~~php
-<?php
-public static function DataPath::fromFileContents(Stringable|string $path): self
 ~~~
 
 Because data URI represents files you can also instantiate a new data URI object from a file path using the `fromFileContents` named constructor.

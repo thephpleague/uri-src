@@ -32,7 +32,7 @@ but also provide specific methods to work with a URI domain host component.
 public static Domain::new(Stringable|string|null $value = null): self
 public static Domain::fromUri(Stringable|string $uri): self
 public static Domain::fromAuthority(Stringable|string $authority): self
-public static Domain::fromALabels(Stringable|string ...$labels): self
+public static Domain::fromLabels(Stringable|string ...$labels): self
 ~~~
 
 <p class="message-notice">submitted string is normalized to be <code>RFC3986</code> compliant.</p>

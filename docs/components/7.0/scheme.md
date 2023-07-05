@@ -38,7 +38,7 @@ echo $new_scheme->toString();        //display ''
 echo $new_scheme;                    //display ''
 echo $new_scheme->getUriComponent(); //display ''
 
-$alt_scheme = Scheme::new('email:toto@example.com');
+$alt_scheme = Scheme::fromUri('email:toto@example.com');
 echo $alt_scheme->value();           //display 'email'
 echo $alt_scheme->toString();        //display 'email'
 echo $alt_scheme;                    //display 'email'
