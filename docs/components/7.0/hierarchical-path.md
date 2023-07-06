@@ -134,14 +134,14 @@ echo $alt_path; // display /path/to/the/paradise.html
 <?php
 public HierarchicalPath::isAbsolute(void): bool
 public HierarchicalPath::segments(void): array
-public HierarchicalPath::get(int $offset, $default = null): mixed
+public HierarchicalPath::get(int $offset): ?string
 public HierarchicalPath::keys([string $segment]): array
 public HierarchicalPath::count(void): int
 public HierarchicalPath::getIterator(void): ArrayIterator
 public HierarchicalPath::prepend(string $path): self
 public HierarchicalPath::append(string $path): self
 public HierarchicalPath::withSegment(int $offset, string $path): self
-public HierarchicalPath::withoutSegment(int $offsets, int ...$offsets): self
+public HierarchicalPath::withoutSegment(int ...$offsets): self
 public HierarchicalPath::withoutEmptySegment(): self
 ~~~
 
@@ -209,9 +209,8 @@ If you are only interested in a given segment you can access it directly using t
 use League\Uri\Components\HierarchicalPath;
 
 $path = HierarchicalPath::new('/path/to/the/sky');
-$path->get(0);         //return 'path'
-$path->get(23);        //return null
-$path->get(23, 'now'); //return 'now'
+$path->get(0);  //return 'path'
+$path->get(23); //return null
 ~~~
 
 <p class="message-notice"><code>HierarchicalPath::getSegment</code> always returns the decoded representation.</p>

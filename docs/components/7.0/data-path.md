@@ -21,9 +21,10 @@ public static function DataPath::fromUri(Stringable|string $uri): self
 public static function DataPath::fromFileContents(Stringable|string $path): self
 ~~~
 
-<p class="message-notice">submitted string is normalized to be <code>RFC3986</code> compliant.</p>
+Since data URI represents files content you can also instantiate a new data URI object from a file path using the `fromFileContents` named constructor.
+If the file or the submitted string is invalid, not readable or accessible a `League\Uri\Contracts\UriException` exception will be thrown. The class uses PHP's `finfo` class to detect the required mediatype as defined in `RFC2045`.
 
-<p class="message-warning">If the submitted value is not valid a <code>League\Uri\Contracts\UriException</code> exception is thrown.</p>
+<p class="message-notice">submitted string is normalized to be <code>RFC3986</code> compliant.</p>
 
 ~~~php
 <?php
@@ -31,21 +32,11 @@ public static function DataPath::fromFileContents(Stringable|string $path): self
 use League\Uri\Components\DataPath;
 
 DataPath::new()->value(); //returns 'text/plain;charset=us-ascii,'
-~~~
-
-Because data URI represents files you can also instantiate a new data URI object from a file path using the `fromFileContents` named constructor.
-
-~~~php
-<?php
-
-use League\Uri\Components\DataPath;
 
 $path = DataPath::fromFileContents('path/to/my/png/image.png');
 echo $uri; //returns 'image/png;charset=binary;base64,...'
 //where '...' represent the base64 representation of the file
 ~~~
-
-If the file is not readable or accessible a `League\Uri\Components\Exception` exception will be thrown. The class uses PHP's `finfo` class to detect the required mediatype as defined in `RFC2045`.
 
 ## Accessing the path properties
 
