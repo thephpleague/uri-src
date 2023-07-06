@@ -144,3 +144,4 @@ To modify such component you are now required to create a new instance.
 - Support for `__set_state` with no replacement;
 - Support for `float` type as possible argument for components;
 - Support for `int` type on `UriModifier` methods argument MUST be converted to string;
+- `Domain` value can be `null` previously it would trigger an exception.

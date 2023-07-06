@@ -58,7 +58,7 @@ Domain::fromAuthority("user:pass@www.example.com:82")->value(); //return 'www.ex
 A host is a collection of labels delimited by the host separator `.`. So it is possible to create a `Host` object using a collection of labels with the `Domain::fromLabels` method.
 The method expects a single arguments, a collection of label. **The labels must be ordered hierarchically, this mean that the array should have the top-level domain in its first entry**.
 
-<p class="message-warning">Since an IP is not a hostname, the class will throw an <code>League\Uri\Exceptions\SyntaxError</code> if you try to create an fully qualified domain name with a valid IP address.</p>
+<p class="message-warning">Since an IP is not a hostname, the class will throw an <code>League\Uri\Exceptions\SyntaxError</code> if you try to create a fully qualified domain name with a valid IP address.</p>
 
 ~~~php
 $host = Domain::fromLabels('com', 'example', 'shop');
@@ -87,7 +87,7 @@ public Domain::withoutRootLabel(): self
 public Domain::prepend(string $host): self
 public Domain::append(string $host): self
 public Domain::replaceLabel(int $offset, string $host): self
-public Domain::withoutLabels(array $offsets): self
+public Domain::withoutLabels(int ...$offsets): self
 ~~~
 
 ### Partial or fully qualified domain name
@@ -184,24 +184,17 @@ The method returns all the label keys, but if you supply an argument, only the k
 #### Accessing Host label value
 
 If you are only interested in a given label you can access it directly using the `Domain::get` method as show below:
+If the offset does not exist it will return `null`, the method supports negative offsets</p>
 
 ~~~php
 $host = Domain::new('example.co.uk');
-$host->get(0);  //return 'uk'
-$host->get(23); //return null
+$host->get(0);   //return 'uk'
+$host->get(23);  //return null
+$host->get(-1);  //return 'uk'
+$host->get(-23); //return null
 ~~~
 
 <p class="message-notice"><code>Domain::get</code> always returns the <code>RFC3987</code> label representation.</p>
-
-If the offset does not exists it will return `null`.
-
-<p class="message-info"><code>Domain::get</code> supports negative offsets</p>
-
-~~~php
-$host = Domain::new('example.co.uk');
-$host->get(-1);         //return 'uk'
-$host->get(-23);        //return null
-~~~
 
 ### Manipulating the host labels
 
@@ -227,7 +220,7 @@ echo $host; //return toto.example.com
 
 To replace a label you must use the `Domain::replaceLabel` method with two arguments:
 
-- The label's key to replace if it exists **MUST BE** an integer.
+- The label's key to replace if it exists **MUST BE** an integer (supports negative offsets).
 - The data to replace the key with. This data must be a string or `null`.
 
 ~~~php
@@ -236,13 +229,14 @@ $newHost = $host->replaceLabel(2, 'bar.baz');
 echo $newHost; //return bar.baz.example.com
 ~~~
 
-<p class="message-info">Just like the <code>Domain::get</code> this method supports negative offset.</p>
-
 <p class="message-warning">if the specified offset does not exist, no modification is performed and the current object is returned.</p>
 
 #### Removing labels
 
-To remove labels from the current object you can use the `Domain::withoutLabels` method. This method expects variadic integer offset representing the labals offset to remove and will returns a new `Host` object without the selected labels.
+To remove labels from the current object you can use the `Domain::withoutLabels` method.
+This method expects variadic integer offset representing the labels offset to remove
+and will returns a new `Host` object without the selected labels. Negative offsets are
+supported.
 
 ~~~php
 $host    = Domain::new('toto.example.com');
@@ -250,5 +244,4 @@ $newHost = $host->withoutLabels(0, 2);
 $newHost->__toString(); //return example
 ~~~
 
-<p class="message-info">Just like the <code>Domain::get</code> this method supports negative offset.</p>
 <p class="message-warning">if the specified offsets do not exist, no modification is performed and the current object is returned.</p>
