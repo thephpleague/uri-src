@@ -14,43 +14,33 @@ The library provides a `League\Uri\Components\Query` class to ease query string 
 
 ## Standard instantiation
 
-<p class="message-warning">The default constructor is private and can not be accessed to instantiate a new object.</p>
+### Using a RFC compliant algorithm
 
-<p class="message-info">The <code>$query</code> paramater supports parameter widening. Apart from strings, scalar values and objects implementing the <code>__toString</code> method can be used.</p>
-
-## Instantiation
 
 ~~~php
 <?php
-public static Query::new(): self
+public static Query::new(Stringable|string|null $value = null): self
 public static Query::fromUri(): self
 public static Query::fromRFC3986(Stringable|string $value, string $separator = '&'): self
 public static Query::fromRFC1738(Stringable|string $value, string $separator = '&'): self
 ~~~
 
-### Using a RFC3986 query string
+- `new` and `fromRFC3986` instantiate a query string encoded using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) query component rules;
+- `fromRFC1738` instantiate a query string encoded using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
 
 ~~~php
 <?php
 
 use League\Uri\Components\Query;
 
+$query = Query::new('foo=bar&bar=baz%20bar');
+//or
 $query = Query::fromRFC3986('foo=bar&bar=baz%20bar', '&');
 $query->params('bar'); // returns 'baz bar'
-~~~
 
-This named constructor is capable to instantiate a query string encoded using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) query component rules.
-
-### Using a RFC1738 query string
-
-~~~php
 $query = Query::fromRFC1738('foo=bar&bar=baz+bar', '&');
 $query->params('bar'); // returns 'baz bar'
 ~~~
-
-This named constructor is capable to instantiate a query string encoded using using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
-
-In addition to the string representation methods from the [package common API](/components/7.0/api/), the following methods are available.
 
 ### Query separator
 
@@ -72,6 +62,8 @@ $newQuery->__toString(); //return foo=bar|baz=toto
 
 ## Component representations
 
+In addition to the common methods from the [package common API](/components/7.0/api/), the following methods are available.
+
 ### RFC3986 representation
 
 The `Query` object can return the query encoded using the [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) query component rules
@@ -84,7 +76,7 @@ $query->value(); //returns 'foo=bar&bar=baz%20bar'
 
 If the query is undefined, this method returns `null`.
 
-<p class="message-info"><code>Query::value()</code> is a alias of <code>Query::toRFC3986()</code></p>
+<p class="message-info"><code>Query::toRFC3986()</code> is a alias of <code>Query::value()</code></p>
 
 ### RFC1738 representation
 
