@@ -5,7 +5,7 @@ title: The Fragment component
 
 # The Fragment component
 
-The `Fragment` class represents the URI fragment component. Apart from the [package common API](/components/7.0/api/),
+The `Fragment` class represents the URI fragment component. Apart from the [package common API](/components/7.0/),
 the class exposes an additional `decoded` method to return the component value safely decoded.
 
 ~~~php

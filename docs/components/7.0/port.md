@@ -11,7 +11,6 @@ The library provides a `Port` class to ease port manipulation.
 
 ~~~php
 public static Port::new(Stringable|string|int|null $content = null): self
-public static Port::fromUri(Stringable|string $uri): self
 public static Port::fromAuthority(Stringable|string $authority): self
 ~~~
 
@@ -19,7 +18,7 @@ public static Port::fromAuthority(Stringable|string $authority): self
 
 ## Properties and methods
 
-This URI component object exposes the [package common API](/components/7.0/api/).
+This URI component object exposes the [package common API](/components/7.0/).
 
 An additional `toInt` method returns the component value as an integer or `null` if the component is not defined.
 

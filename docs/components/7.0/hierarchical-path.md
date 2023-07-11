@@ -7,7 +7,7 @@ title: The Hierarchical Path component
 
 The library provides a `HierarchicalPath` class to ease HTTP like path creation and manipulation. This URI component object exposes :
 
-- the [package common API](/components/7.0/api/)
+- the [package common API](/components/7.0/)
 - the [path common API](/components/7.0/path)
 
 It also provides specific methods to work with segments-type URI path components.

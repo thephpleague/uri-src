@@ -6,7 +6,7 @@ title: The Query component
 The Query
 =======
 
-The library provides a `League\Uri\Components\Query` class to ease query string creation and manipulation. This URI component object exposes the [package common API](/components/7.0/api/), but also provide specific methods to work with the URI query component.
+The library provides a `League\Uri\Components\Query` class to ease query string creation and manipulation. This URI component object exposes the [package common API](/components/7.0/), but also provide specific methods to work with the URI query component.
 
 <p class="message-notice">If the modifications do not change the current object, it is returned as is, otherwise, a new modified object is returned.</p>
 
@@ -62,7 +62,7 @@ $newQuery->__toString(); //return foo=bar|baz=toto
 
 ## Component representations
 
-In addition to the common methods from the [package common API](/components/7.0/api/), the following methods are available.
+In addition to the common methods from the [package common API](/components/7.0/), the following methods are available.
 
 ### RFC3986 representation
 

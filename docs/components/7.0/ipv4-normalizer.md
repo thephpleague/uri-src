@@ -6,7 +6,7 @@ title: IPv4 Normalizer
 IPv4 Normalizer
 =======
 
-The `League\Uri\IPv4Normalizer` is a userland PHP IPv4 Host Normalizer.
+The `League\Uri\IPv4Normalizer` is a PHP IPv4 Host Normalizer.
 
 ```php
 <?php
@@ -14,11 +14,8 @@ The `League\Uri\IPv4Normalizer` is a userland PHP IPv4 Host Normalizer.
 use League\Uri\IPv4Normalizer;
 use League\Uri\Components\Host;
 
-$host = Host::new('0');
 $normalizer = new IPv4Normalizer();
-$normalizedHost = $normalizer->normalizeHost($host);
-echo $host; // returns 0
-echo $normalizedHost; // returns 0.0.0.0
+echo $normalizer->normalizeHost('0')->toString(); // returns 0.0.0.0
 ```
 
 Usage

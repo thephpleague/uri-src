@@ -7,7 +7,7 @@ title: The Data Uri Path component
 
 The library provides a `DataPath` class to ease complex path manipulation on a Data URI object. This URI component object exposes :
 
-- the [package common API](/components/7.0/api/)
+- the [package common API](/components/7.0/)
 - the [path common API](/components/7.0/path)
 
 but also provide specific methods to work with Data URI paths.

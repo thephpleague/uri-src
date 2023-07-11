@@ -6,7 +6,8 @@ title: URI Query string parser
 Parse & Build a Query
 =======
 
-The `League\Uri\Components\QueryString` is a userland PHP URI query parser and builder.
+The `League\Uri\Components\QueryString` is a PHP URI query parser and builder.
+<p class="message-notice">The parsing/building algorithms preserve pairs order and uses the same algorithm used by JavaScript <a href="https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/URLSearchParams">UrlSearchParams</a></p>
 
 ```php
 <?php
@@ -23,11 +24,6 @@ $pairs = QueryString::parse('module=home&action=show&page=😓');
 $str = QueryString::build($pairs, '|');
 // returns 'module=home|action=show|page=😓'
 ```
-
-Usage
---------
-
-<p class="message-notice">The parsing/building algorithms preserve pairs order and uses the same algorithm used by JavaScript <a href="https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/URLSearchParams">UrlSearchParams</a></p>
 
 ## Parsing the URI query string
 

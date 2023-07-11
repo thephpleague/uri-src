@@ -6,7 +6,7 @@ title: The Host component
 The Host
 =======
 
-The library provides a `Host` class to represent a generic URI host component. The class exposes the [URI component common API](/components/7.0/api/),
+The library provides a `Host` class to represent a generic URI host component. The class exposes the [URI component common API](/components/7.0/),
 and also provide specific methods to work with the URI host component.
 
 <p class="message-notice">If the modifications do not change the current object, it is returned as is, otherwise, a new modified object is returned.</p>

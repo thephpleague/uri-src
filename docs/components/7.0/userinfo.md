@@ -7,7 +7,7 @@ The UserInfo
 =======
 
 The `League\Uri\Components\UserInfo` class eases user information creation and manipulation.
-This URI component object exposes the [package common API](/components/7.0/api/),
+This URI component object exposes the [package common API](/components/7.0/),
 but also provide specific methods to work with the URI user information part.
 
 ## Creating a new object

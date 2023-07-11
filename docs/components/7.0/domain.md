@@ -12,7 +12,7 @@ The class validates domain names according to [RFC952](https://tools.ietf.org/ht
 
 In addition it exposes:
  
-- the [package common API](/components/7.0/api/), 
+- the [package common API](/components/7.0/), 
 - the [Host common API](/components/7.0/host/),
 
 but also provide specific methods to work with a URI domain host component.

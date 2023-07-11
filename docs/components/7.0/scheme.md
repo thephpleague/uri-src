@@ -5,7 +5,7 @@ title: The Scheme component
 
 # The Scheme component
 
-The `Scheme` class represents the URI scheme component and only exposes the [package common API](/components/7.0/api/).
+The `Scheme` class represents the URI scheme component and only exposes the [package common API](/components/7.0/).
 
 ~~~php
 <?php

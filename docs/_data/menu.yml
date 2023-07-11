@@ -22,19 +22,11 @@ packages:
                 Getting Started: '/query-parser/1.0/'
     'components':
         '7.0':
-            Documentation:
-                Getting Started: '/components/7.0/'
+            Getting Started:
+                Introduction: '/components/7.0/'
+                Installation: '/components/7.0/installation/'
                 From 2.x to 7.x: '/components/7.0/upgrading/'
-            URI Modifiers:
-                Overview: '/components/7.0/modifiers/'
-                Query Modifiers: '/components/7.0/modifiers/query/'
-                Path Modifiers: '/components/7.0/modifiers/path/'
-                Host Modifiers: '/components/7.0/modifiers/host/'
-            Utility classes:
-                QueryString: '/components/7.0/query-parser-builder/'
-                IPv4 Normalizer: '/components/7.0/ipv4-normalizer/'
             URI components:
-                Overview: '/components/7.0/api/'
                 Scheme: '/components/7.0/scheme/'
                 Authority: '/components/7.0/authority/'
                 UserInfo: '/components/7.0/userinfo/'
@@ -46,6 +38,10 @@ packages:
                 HierarchicalPath: '/components/7.0/hierarchical-path/'
                 Query: '/components/7.0/query/'
                 Fragment: '/components/7.0/fragment/'
+            Utility classes:
+                URI Modifier: '/components/7.0/modifiers/'
+                QueryString: '/components/7.0/query-parser-builder/'
+                IPv4 Normalizer: '/components/7.0/ipv4-normalizer/'
         '2.0':
             Documentation:
                 Getting Started: '/components/2.0/'

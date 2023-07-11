@@ -8,7 +8,7 @@ The Authority part
 
 The `League\Uri\Components\Authority` class ease URI authority part creation and manipulation. This object exposes:
                                        
-- the [package common API](/components/7.0/api/), 
+- the [package common API](/components/7.0/), 
 - provides specific methods to work with a URI authority part.
 
 <p class="message-notice">If the modifications do not change the current object, it is returned as is, otherwise, a new modified object is returned.</p>
