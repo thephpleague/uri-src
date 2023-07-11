@@ -6,16 +6,18 @@ title: URI components
 Components common API
 =======
 
-## Instantiation
-
-Each URI component objects can be instantiated from a URI object using the `fromUri` named constructor.
+Each URI component object can be instantiated from a URI object using the `fromUri` named constructor.
 
 ~~~php
 public static function UriComponent::fromUri(Stringable|string $uri): UriComponentInterface;
 ~~~
 
-This method accepts a single `$uri` parameter which can be an object implementing the `Stringable` interface
-or  string.
+This method accepts a single `$uri` parameter which represent a URI:
+
+- as an object implementing the `Stringable` interface or
+- as a string.
+
+In both case, the URI is expected to be RFC3986 compliant.
 
 ~~~php
 use League\Uri\Components\Host;
@@ -28,11 +30,7 @@ $host = Host::fromUri($uri)->value();   //displays 'example.com'
 $query = Query::fromUri($uri)->value(); //displays 'q=value'
 $port = Port::fromInt($uri)->value();   //displays null
 $path = Path::fromUri($uri)->value();   //displays ''
-~~~
-
-<p class="message-info">Depending on the URI component the default constructor and other named constructors can be use for instantiation.</p> 
-
-## Accessing URI component representation
+~~~ 
 
 Once instantiated, all URI component objects expose the following methods.
 
@@ -67,11 +65,12 @@ $port = Port::new(23);
 echo $port->value(); //displays '23';
 ~~~
 
-- `__toString` returns the normalized and RFC3986 encoded string version of the component.
-- `getUriComponent` returns the same output as `__toString` with the component optional delimiter.
+- `value` returns the normalized and RFC3986 encoded string version of the component or `null` if not value exists.
+- `toString` returns the normalized and RFC3986 encoded string version of the component or  the empty strin if not value exists.
+- `getUriComponent` returns the same output as `toString` with the component optional delimiter if it exists.
+- `__toString` returns the same value as `toString`
 - `jsonSerialize` returns the normalized and RFC1738 encoded string version of the component for better interoperability with JavaScript URL standard.
 
-<p class="message-info">For a more generalized representation you must use the <code>value</code> method. If the component is undefined, the method returns <code>null</code>.</p>
 <p class="message-notice">Normalization and encoding are component specific.</p>
 
 ## Modifying URI component object
@@ -94,5 +93,3 @@ The following URI component objects are defined (order alphabetically):
 - [Query](/components/7.0/query/) : the Query component
 - [Scheme](/components/7.0/scheme/) : the Scheme component
 - [UserInfo](/components/7.0/userinfo/) : the User Info component
-
-<p class="message-info">In addition to the common API, the classes expose specific methods to improve URI component manipulation.</p>

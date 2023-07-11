@@ -6,10 +6,10 @@ title: The Host component
 The Host
 =======
 
-The library provides a `Host` class to ease host creation and manipulation. This URI component object exposes the [package common API](/components/7.0/api/), but also provide specific methods to work with the URI host component.
+The library provides a `Host` class to represent a generic URI host component. The class exposes the [URI component common API](/components/7.0/api/),
+and also provide specific methods to work with the URI host component.
 
 <p class="message-notice">If the modifications do not change the current object, it is returned as is, otherwise, a new modified object is returned.</p>
-
 <p class="message-warning">If the submitted value is not valid a <code>League\Uri\Exceptions\SyntaxError</code> exception is thrown.</p>
 
 ## Creating a new object using the default constructor
@@ -31,6 +31,7 @@ The following methods will always be available independently of the Host type. T
 public Host::getIp(): string
 public Host::getIpVersion(): ?string
 public Host::isIp(): bool
+public Host::isRegisteredName(): bool
 public Host::isDomain(): bool
 public Host::toAscii(): ?string
 public Host::toUnicode(): ?string
@@ -44,7 +45,13 @@ Hosts can be:
 
 ## Host represented by a registered name
 
-If you don't have a IP then you are dealing with a registered name. A registered name can be a [domain name](http://tools.ietf.org/html/rfc1034) subset if it follows [RFC1123](http://tools.ietf.org/html/rfc1123#section-2.1) but it is not a requirement as stated in [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.2.2)
+~~~php
+public Host::isRegisteredName(): bool
+~~~
+
+If you don't have an IP then you are dealing with a registered name. A registered name can be a [domain name](http://tools.ietf.org/html/rfc1034) subset
+if it follows [RFC1123](http://tools.ietf.org/html/rfc1123#section-2.1), but it is not a requirement as stated
+in [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.2.2)
 
 > (...) URI producers should use names that conform to the DNS syntax, even when use of DNS is not immediately apparent, and should limit these names to no more than 255 characters in length.
 
@@ -64,9 +71,9 @@ $reg_name->isDomain();  //return false
 
 ### Normalization
 
-Whenever you create a new host your submitted data is normalized using non destructive operations:
+Whenever you create a new host your submitted data is normalized using non-destructive operations:
 
-- the host is lowercased;
+- the host is lower-cased;
 - the host is converted to its ascii representation;
 
 ~~~php
@@ -74,7 +81,7 @@ echo Host::new('ShOp.ExAmPle.COM')->value(); //display 'shop.example.com'
 echo Host::new('BéBé.be')->toString(); //display 'xn--bb-bjab.be'
 ~~~
 
-<p class="message-warning">The last example depends on the presence of the <code>ext-intl</code> extension. Otherwise the code will trigger a <code>IdnSupportMissing</code> exception</p>
+<p class="message-warning">The last example depends on the presence of the <code>ext-intl</code> extension, otherwise the code will trigger a <code>IdnSupportMissing</code> exception</p>
 
 At any given time you can access the ascii or unicode Host representation using the two (2) following methods:
 
@@ -84,8 +91,6 @@ echo $host; //display 'xn--bb-bjab.be'
 echo $host->toUnicode();  //displays bébé.be
 echo $host->toAscii();  //displays 'xn--bb-bjab.be'
 ~~~
-
-<p class="message-warning">Both methods depends on the presence of the <code>ext-intl</code> extension. Otherwise the code will trigger a <code>IdnSupportMissing</code> exception</p>
 
 ## Host represented by an IP
 
@@ -100,7 +105,7 @@ public Host::withoutZoneIdentifier(): self
 
 ### Host::fromIp
 
-This method allows creating an Host object from an IP.
+This method allows creating a Host object from an IP.
 
 ~~~php
 $ipv4 = Host::fromIp('127.0.0.1');
@@ -210,7 +215,7 @@ According to [RFC6874](http://tools.ietf.org/html/rfc6874#section-4):
 
 > You **must** remove any ZoneID attached to an outgoing URI, as it has only local significance at the sending host.
 
-To fullfill this requirement, the `Host::withoutZoneIdentifier` method is provided. The method takes not parameter and return a new host instance without its zone identifier. If the host has not zone identifier, the current instance is returned unchanged.
+To fulfill this requirement, the `Host::withoutZoneIdentifier` method is provided. The method takes not parameter and return a new host instance without its zone identifier. If the host has not zone identifier, the current instance is returned unchanged.
 
 ~~~php
 $host    = Host::new('[fe80::1%25eth0-1]');

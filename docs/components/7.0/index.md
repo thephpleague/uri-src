@@ -10,10 +10,14 @@ Uri Components
 
 [![Latest Version](https://img.shields.io/github/release/thephpleague/uri-components.svg?style=flat-square)](https://github.com/thephpleague/uri-components/releases)
 
-This package contains classes to help parsing and modifying URI components.
+While working with URI, you may stumble on some tasks, such as parsing its query string or updating its host,
+that are not covered by the URI package.
+Thankfully, the URI component package allows you to easily parse, create, manipulate URI component as well as partially
+update URIs. By using the package, your application can safely perform tasks around your URIs and provide a better 
+user experience to your developers.
 
-- Simple interface for building and parsing URI components;
-- Interact with implementing PSR-7 `UriInterface` objects;
+The League URI components provides at the same time a unified way to access all URI components while exposing more
+specific methods to regularly used components like URI queries, URI domains and URI paths.
 
 ~~~php
 use League\Uri\Components\Query;
@@ -35,6 +39,7 @@ You need **PHP >= 8.1.0** but the latest stable version of PHP is recommended
 
 If you want to handle:
 
+- Data URI creation from a file content **requires** the `fileinfo` extension.
 - IDN host you are **required** to install the `intl` extension;
 - IPv4 host in octal or hexadecimal form, out of the box, you **need** at least one of the following extension:
 
@@ -45,8 +50,7 @@ If you want to handle:
    
     - a `64-bits` PHP version
 
-Trying to process such hosts without meeting those minimal requirements will trigger a `RuntimeException`.
-- Data URI creation from a filepath, Since version `2.2.0`, the `fileinfo` extension is **required**.
+Trying to process such URI components without meeting those minimal requirements will trigger a `RuntimeException`.
 
 Installation
 --------

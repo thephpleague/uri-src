@@ -5,21 +5,7 @@ title: The Scheme component
 
 # The Scheme component
 
-The `Scheme` class eases scheme creation and manipulation. This URI component object only exposes the [package common API](/components/7.0/api/).
-
-## Creating a new object
-
-~~~php
-<?php
-public static Scheme::new(Stringable|string|null $content = null): self
-public static Scheme::fromUri(Stringable|string $uri): self
-~~~
-
-## Properties and methods
-
-This URI component object only exposes the [package common API](/components/7.0/api/).
-
-## Usage
+The `Scheme` class represents the URI scheme component and only exposes the [package common API](/components/7.0/api/).
 
 ~~~php
 <?php
