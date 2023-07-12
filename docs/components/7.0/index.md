@@ -13,8 +13,8 @@ Uri Components
 [![Latest Version](https://img.shields.io/github/release/thephpleague/uri-components.svg?style=flat-square)](https://github.com/thephpleague/uri-components/releases)
 
 While working with URI, you may stumble on some tasks, such as parsing its query string or updating its host,
-that are not covered by the URI package.
-Thankfully, the URI component package allows you to easily parse, create, manipulate URI component as well as partially
+that are not covered by the [URI package](/uri/7.0/).
+Thankfully, the URI component package allows you to easily parse, create, manipulate URI components as well as partially
 update URIs. By using the package, your application can safely perform tasks around your URIs and provide a better 
 user experience to your developers.
 
@@ -33,30 +33,12 @@ $query->params('q'); // returns 'new.Value'
 
 ## Common API
 
-The League URI components provides at the same time a unified way to access all URI components while exposing more
-specific methods to regularly used components like URI queries, URI domains and URI paths.
+The League URI components provides at the same time a unified way to access all URI
+components while exposing more specific methods to regularly used components like 
+URI queries, URI domains and URI paths.
 
-To start, each URI component object can be instantiated from a URI object using the `fromUri` named constructor,
-or from a RFC3986 compliant string.
-
-~~~php
-public static function UriComponent::fromUri(Stringable|string $uri): UriComponentInterface;
-public static function UriComponent::fromAuthority(Stringable|string $authority): UriComponentInterface;
-public static function UriComponent::new(Stringable|string|null $value = null): UriComponentInterface;
-~~~
-
-This `fromUri` method accepts a single `$uri` parameter which represent a URI:
-
-- as an object implementing the `Stringable` interface or
-- as a string.
-
-This `fromAuthority` method accepts a single `$authority` parameter which represent a
-URI authority component:
-
-- as an object implementing the `Stringable` interface or
-- as a string.
-
-In both case, the URI is expected to be RFC3986 compliant.
+To start, each URI component object can be instantiated from, its value without its delimiter, a URI or an authority,
+if the component is part of the authority string, which leads to the following:
 
 ~~~php
 use League\Uri\Components\Host;
@@ -64,36 +46,16 @@ use League\Uri\Components\Path;
 use League\Uri\Components\Port;
 use League\Uri\Components\Query;
 
-$uri = 'http://example.com?q=value#fragment';
-$host = Host::fromUri($uri)->value();   //displays 'example.com'
-$query = Query::fromUri($uri)->value(); //displays 'q=value'
-$port = Port::fromInt($uri)->value();   //displays null
-$path = Path::fromUri($uri)->value();   //displays ''
+$uri = 'http://EXamPLe.com?q=value#fragment';
+
+Query::new('q=value')->value();              // displays 'q=value'
+Host::fromUri($uri)->value();                // displays 'example.com'
+Port::fromAuthority('example.com')->value(); // displays null
+Path::new()->value();                        // displays ''
 ~~~ 
 
-Last but not least, the `new` method accept at least a string or a stringable object.
-Depending on the URI component, the method **MAY** also support 
-
-- integers (ie: the `Port` component) and/or
-- the `null` value (except for the `Path` component)
-
-Once instantiated, all URI component objects expose the following methods.
-
-~~~php
-public function UriComponent::value(): ?string;
-public function UriComponent::toString(): string;
-public function UriComponent::getUriComponent(): string;
-public function UriComponent::__toString(): string;
-public function UriComponent::jsonSerialize(): ?string;
-~~~
-
-- `value` returns the normalized and RFC3986 encoded string version of the component or `null` if not value exists.
-- `toString` returns the normalized and RFC3986 encoded string version of the component or  the empty strin if not value exists.
-- `getUriComponent` returns the same output as `toString` with the component optional delimiter if it exists.
-- `__toString` returns the same value as `toString`
-- `jsonSerialize` returns the normalized and RFC1738 encoded string version of the component for better interoperability with JavaScript URL standard.
-
-Which will lead to the following results:
+Because URI component car be formatted differently depending on the context, each objects exposes
+different representations:
 
 ~~~php
 use League\Uri\Components\Scheme;
@@ -102,46 +64,65 @@ use League\Uri\Components\Port;
 use League\Uri\Components\Query;
 use League\Uri\Components\Domain;
 
-$uri = 'HtTp://john@bébé.be:23#fragment';
+$uri = 'HtTp://john@bébé.be:23?#fragment';
 
 $scheme = Scheme::fromUri($uri);
-echo $scheme; //displays 'http'
+echo $scheme->value();           //displays 'http'
+echo $scheme->toString();        //displays 'http'
 echo $scheme->getUriComponent(); //displays 'http:'
 
 $userinfo = UserInfo::fromUri('john');
-echo $userinfo->toString();  //displays 'john'
+echo $userinfo->value();           //displays 'john'
+echo $userinfo->toString();        //displays 'john'
 echo $userinfo->getUriComponent(); //displays 'john@'
 
 $host = Domain::fromUri($uri);
-echo $host; //displays 'xn--bb-bjab.be'
-echo $host->value(); //displays 'xn--bb-bjab.be'
+echo $host->value();           //displays 'xn--bb-bjab.be'
+echo $host->toString();        //displays 'xn--bb-bjab.be'
+echo $host->getUriComponent(); //displays 'xn--bb-bjab.be'
 
 $query = Query::fromUri($uri);
-echo $query; //displays ''
-echo $query->value(); //displays null
+echo $query->value();           //displays ''
+echo $query->toString();        //displays ''
+echo $query->getUriComponent(); //displays '?'
 
 $port = Port::fromUri($uri);
-echo $port->value(); //displays '23';
+echo $port->value();           //displays '23'
+echo $port->toString();        //displays '23'
+echo $port->getUriComponent(); //displays ':23'
 ~~~
 
+The `value()` method returns the normalized and RFC3986 encoded string version of the component or `null` if not value exists
+while the `toString()` cast that returned value to string. finally, the `getUriComponent()` returns the same output 
+as `toString()` with the component optional delimiter if it exists.
+
+To allow better interoperability all objects implements PHP's `Stringable` and `JsonSerializable` interface.
+
 <p class="message-notice">Normalization and encoding are component specific.</p>
-
-## Modifying URI component object
-
-Because each component modification is specific there is no generic way of changing the component content.
+<p class="message-notice"><code>JsonSerializable</code> encoding <strong>may</strong> differ to improve interoperability with <code>JavaScript</code>.</p>
 
 ## List of URI component objects
 
-The following URI component objects are defined (order alphabetically):
+Because each component modification is specific there is no generic way of changing 
+the component content. However, the package provides the following URI 
+component objects with modifying capabilities.
 
-- [Authority](/components/7.0/authority/) : the Data Path component
-- [DataPath](/components/7.0/path/data/) : the Data Path component
-- [Domain](/components/7.0/host/domain/) : the Host component
-- [Fragment](/components/7.0/fragment/) : the Fragment component
-- [HierarchicalPath](/components/7.0/path/segmented/) : the Segmented Path component
-- [Host](/components/7.0/host/) : the Host component
-- [Path](/components/7.0/path/) : the generic Path component
-- [Port](/components/7.0/port/) : the Port component
-- [Query](/components/7.0/query/) : the Query component
-- [Scheme](/components/7.0/scheme/) : the Scheme component
-- [UserInfo](/components/7.0/userinfo/) : the User Info component
+For Paths:
+
+- [Path](/components/7.0/path/)
+- [DataPath](/components/7.0/path/data/)
+- [HierarchicalPath](/components/7.0/path/segmented/)
+
+For Hosts:
+
+- [Host](/components/7.0/host/)
+- [Domain](/components/7.0/host/domain/)
+
+Other URI Components:
+
+- [Query](/components/7.0/query/)
+- [Scheme](/components/7.0/scheme/)
+- [Fragment](/components/7.0/fragment/)
+- [Port](/components/7.0/port/)
+- [Authority](/components/7.0/authority/)
+- [UserInfo](/components/7.0/userinfo/)
