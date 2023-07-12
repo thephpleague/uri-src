@@ -23,12 +23,12 @@ use League\Uri\Components\Query;
 use League\Uri\UriModifier;
 
 $newUri = UriModifier::appendQuery('http://example.com?q=value#fragment', 'q=new.Value');
-echo $newUri->toString(); // 'http://example.com?q=value&q=new.Value#fragment';
+echo $newUri; // 'http://example.com?q=value&q=new.Value#fragment';
 
 $query = Query::fromUri($newUri);
-$query->get('q');    // returns 'value'
-$query->getAll('q'); // returns ['value', 'new.Value']
-$query->params('q'); // returns 'new.Value'
+$query->get('q');       // returns 'value'
+$query->getAll('q');    // returns ['value', 'new.Value']
+$query->parameter('q'); // returns 'new.Value'
 ~~~
 
 ## Common API
@@ -37,8 +37,11 @@ The League URI components provides at the same time a unified way to access all 
 components while exposing more specific methods to regularly used components like 
 URI queries, URI domains and URI paths.
 
-To start, each URI component object can be instantiated from, its value without its delimiter, a URI or an authority,
-if the component is part of the authority string, which leads to the following:
+To start, each URI component object can be instantiated from:
+
+- its value without its delimiter;
+- a URI or;
+- an authority, if the component is part of the authority string;
 
 ~~~php
 use League\Uri\Components\Host;
@@ -58,48 +61,48 @@ Because URI component car be formatted differently depending on the context, eac
 different representations:
 
 ~~~php
-use League\Uri\Components\Scheme;
-use League\Uri\Components\UserInfo;
+use League\Uri\Components\Domain;
+use League\Uri\Components\Path;
 use League\Uri\Components\Port;
 use League\Uri\Components\Query;
-use League\Uri\Components\Domain;
+use League\Uri\Components\Scheme;
+use League\Uri\Components\UserInfo;
 
-$uri = 'HtTp://john@bébé.be:23?#fragment';
+$uri = 'HtTp://john@bébé.be:23#fragment';
 
 $scheme = Scheme::fromUri($uri);
 echo $scheme->value();           //displays 'http'
-echo $scheme->toString();        //displays 'http'
 echo $scheme->getUriComponent(); //displays 'http:'
 
 $userinfo = UserInfo::fromUri('john');
 echo $userinfo->value();           //displays 'john'
-echo $userinfo->toString();        //displays 'john'
 echo $userinfo->getUriComponent(); //displays 'john@'
 
 $host = Domain::fromUri($uri);
 echo $host->value();           //displays 'xn--bb-bjab.be'
-echo $host->toString();        //displays 'xn--bb-bjab.be'
 echo $host->getUriComponent(); //displays 'xn--bb-bjab.be'
 
+$path = Path::fromUri($uri);
+echo $path->value();           //displays ''
+echo $path->getUriComponent(); //displays ''
+
 $query = Query::fromUri($uri);
-echo $query->value();           //displays ''
-echo $query->toString();        //displays ''
-echo $query->getUriComponent(); //displays '?'
+echo $query->value();           //displays null
+echo $query->getUriComponent(); //displays ''
 
 $port = Port::fromUri($uri);
 echo $port->value();           //displays '23'
-echo $port->toString();        //displays '23'
 echo $port->getUriComponent(); //displays ':23'
 ~~~
 
 The `value()` method returns the normalized and RFC3986 encoded string version of the component or `null` if not value exists
-while the `toString()` cast that returned value to string. finally, the `getUriComponent()` returns the same output 
-as `toString()` with the component optional delimiter if it exists.
+while the `getUriComponent()` returns the URI component value cast as a string with its optional delimiter if it exists.
 
-To allow better interoperability all objects implements PHP's `Stringable` and `JsonSerializable` interface.
+To allow better interoperability all objects implements PHP's `Stringable` and `JsonSerializable` interface and provide
+an explicit `toString()` method to cast the URI component to a string.
 
 <p class="message-notice">Normalization and encoding are component specific.</p>
-<p class="message-notice"><code>JsonSerializable</code> encoding <strong>may</strong> differ to improve interoperability with <code>JavaScript</code>.</p>
+<p class="message-notice"><code>JsonSerializable</code> encoding <strong>may</strong> differ to improve interoperability with current specification.</p>
 
 ## List of URI component objects
 
