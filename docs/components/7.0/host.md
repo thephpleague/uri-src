@@ -6,48 +6,15 @@ title: The Host component
 The Host
 =======
 
-The library provides a `Host` class to represent a generic URI host component. The class exposes the [URI component common API](/components/7.0/),
-and also provide specific methods to work with the URI host component.
+The `Host` class represents a generic host component. Apart from the [package common API](/components/7.0/) the class
+exposes basic properties and method to manipulate any type of host whether it is a registered name or an IP address.
 
 <p class="message-notice">If the modifications do not change the current object, it is returned as is, otherwise, a new modified object is returned.</p>
 <p class="message-warning">If the submitted value is not valid a <code>League\Uri\Exceptions\SyntaxError</code> exception is thrown.</p>
 
-## Creating a new object using the default constructor
+## Host types
 
-~~~php
-<?php
-public static Host::new(Stringable|string|null $value = null): self
-public static Host::fromUri(Stringable|string $uri): self
-public static Host::fromAuthority(Stringable|string $authority): self
-~~~
-
-<p class="message-notice">submitted string is normalized to be <code>RFC3986</code> compliant.</p>
-
-## Basic properties and methods
-
-The following methods will always be available independently of the Host type. They define the host main features and properties.
-
-~~~php
-public Host::getIp(): string
-public Host::getIpVersion(): ?string
-public Host::isIp(): bool
-public Host::isRegisteredName(): bool
-public Host::isDomain(): bool
-public Host::toAscii(): ?string
-public Host::toUnicode(): ?string
-~~~
-
-Hosts can be:
- 
-- a registered name;
-- a domain name;
-- an IP address;
-
-## Host represented by a registered name
-
-~~~php
-public Host::isRegisteredName(): bool
-~~~
+The `Host` allows use to know its type using 3 methods `isRegisteredName`, `isDomain` and `isIp`.
 
 If you don't have an IP then you are dealing with a registered name. A registered name can be a [domain name](http://tools.ietf.org/html/rfc1034) subset
 if it follows [RFC1123](http://tools.ietf.org/html/rfc1123#section-2.1), but it is not a requirement as stated
@@ -56,17 +23,22 @@ in [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.2.2)
 > (...) URI producers should use names that conform to the DNS syntax, even when use of DNS is not immediately apparent, and should limit these names to no more than 255 characters in length.
 
 ~~~php
-public Host::isDomain(): bool
-~~~
+use League\Uri\Components\Host;
 
-To determine if a host is a domain name and not a general registered name or an IP address, you just need to use the `Host::isDomain` method.
-
-~~~php
 $domain = Host::new('www.example.co.uk');
-$domain->isDomain();  //return true
+$domain->isRegisteredName();  //return true
+$domain->isDomain();          //return true
+$domain->isIp();              //return false
 
-$reg_name = Host::new('...test.com');
-$reg_name->isDomain();  //return false
+$ipAddress = Host::new('127.0.0.1');
+$ipAddress->isRegisteredName();  //return false
+$ipAddress->isDomain();          //return false
+$ipAddress->isIp();              //return true
+
+$registeredName = Host::new('...test.com');
+$registeredName->isRegisteredName();  //return true
+$registeredName->isDomain();          //return false
+$registeredName->isIp();              //return false
 ~~~
 
 ### Normalization
@@ -78,7 +50,7 @@ Whenever you create a new host your submitted data is normalized using non-destr
 
 ~~~php
 echo Host::new('ShOp.ExAmPle.COM')->value(); //display 'shop.example.com'
-echo Host::new('BéBé.be')->toString(); //display 'xn--bb-bjab.be'
+echo Host::fromUri('https://BéBé.be')->toString(); //display 'xn--bb-bjab.be'
 ~~~
 
 <p class="message-warning">The last example depends on the presence of the <code>ext-intl</code> extension, otherwise the code will trigger a <code>IdnSupportMissing</code> exception</p>
@@ -89,10 +61,10 @@ At any given time you can access the ascii or unicode Host representation using 
 $host = Host::new('BéBé.be');
 echo $host; //display 'xn--bb-bjab.be'
 echo $host->toUnicode();  //displays bébé.be
-echo $host->toAscii();  //displays 'xn--bb-bjab.be'
+echo $host->toAscii();    //displays 'xn--bb-bjab.be'
 ~~~
 
-## Host represented by an IP
+## Host as IP address
 
 ~~~php
 public static Host::fromIp(string $ip, string $version = '', ?IPv4Normalizer $ipV4Normalizer = null): self
@@ -167,31 +139,31 @@ Knowing that you are dealing with an IP is good, knowing its version is better.
 
 ~~~php
 $ipv6 = Host::fromIp('::1');
-$ipv6->isIp();       //return true
-$ipv6->isIpv4();     //return false
-$ipv6->isIpv6();     //return true
-$ipv6->isIpFuture(); //return false
+$ipv6->isIp();         //return true
+$ipv6->isIpv4();       //return false
+$ipv6->isIpv6();       //return true
+$ipv6->isIpFuture();   //return false
 $ipv6->getIpVersion(); //return '6'
 
 $ipv4 = Host::new('127.0.0.1');
-$ipv4->isIp();       //return true
-$ipv4->isIpv4();     //return true
-$ipv4->isIpv6();     //return false
-$ipv4->isIpFuture(); //return false
+$ipv4->isIp();         //return true
+$ipv4->isIpv4();       //return true
+$ipv4->isIpv6();       //return false
+$ipv4->isIpFuture();   //return false
 $ipv4->getIpVersion(); //return '4'
 
 $ipfuture = Host::new('v32.1.2.3.4');
-$ipfuture->isIp();       //return true
-$ipfuture->isIpv4();     //return false
-$ipfuture->isIpv6();     //return false
-$ipfuture->isIpFuture(); //return true
+$ipfuture->isIp();         //return true
+$ipfuture->isIpv4();       //return false
+$ipfuture->isIpv6();       //return false
+$ipfuture->isIpFuture();   //return true
 $ipfuture->getIpVersion(); //return '32'
 
 $domain = Host::new('thephpleague.com'):
-$domain->isIp();       //return false
-$domain->isIpv4();     //return false
-$domain->isIpv6();     //return false
-$domain->isIpFuture(); //return false
+$domain->isIp();         //return false
+$domain->isIpv4();       //return false
+$domain->isIpv6();       //return false
+$domain->isIpFuture();   //return false
 $domain->getIpVersion(); //return null
 ~~~
 

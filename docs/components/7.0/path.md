@@ -6,84 +6,33 @@ title: Path Component
 Path Component
 =======
 
-URI path component objects modelling depends on the URI as such each URI scheme specific must implement its own path object. To ease usage, the package comes with a generic `Path` object as well as two more specialized Path objects. All Path objects expose the following methods:
+The `Path` class represents a generic path component. Apart from the [package common API](/components/7.0/) the class
+exposes basic properties and method to manipulate any type of path.
 
-<p class="message-warning">Because path are scheme specific, some methods may trigger an <code>League\Uri\Contracts\UriException</code> if for a given scheme the path does not support the given modification</p>
+## Path leading and trailing slash statuses
 
-## Creating a new object
-
-### Using the default constructor
-
-<p class="message-warning">The default constructor is deprecated starting with version <code>2.3.0</code>. It should be replaced by one of the several new named constructors.</p>
-
-~~~php
-<?php
-public static Path::new(Stringable|string $content = ''): self
-public static Path::fromUri(Stringable|string $uri): self
-~~~
-
-<p class="message-notice">submitted string is normalized to be <code>RFC3986</code> compliant.</p>
-
-<p class="message-warning">If the submitted value is not valid a <code>League\Uri\Contracts\UriException</code> exception is thrown.</p>
-
-The `League\Uri\Components\Exception` extends PHP's SPL `InvalidArgumentException`.
-
-### Using a string
-
-A string or an PHP object exposing a `__toString` method can be used to instantiate a new object with the following named constructor.
+Most of the time, regardless of the type of Path, you will want to get information around the nature of your path. Is it
+absolute or relative ? Does it expose a trailing slash or not ? To answer those question you can at any given time
+test your path status with two methods `Path::isAbsolute` and `Path::hasTrailingSlash`
 
 ~~~php
 <?php
 
 use League\Uri\Components\Path;
 
-Path::new('example.com')->value(); //returns 'example.com'
-~~~
-
-## Path properties
-
-### Absolute, rootless or empty
-
-- A path is absolute only if it starts with the path separator `/`, otherwise it is considered as being relative or rootless. At any given time you can test your path status using the `Path::isAbsolute` method.
-
-~~~php
-<?php
-
-use League\Uri\Components\Path;
-
-$relative_path = Path::new('bar/baz');
-echo $relative_path; //displays 'bar/baz'
-$relative_path->isAbsolute(); //return false;
-
-$absolute_path = Path::new('/bar/baz');
-echo $absolute_path; //displays '/bar/baz'
-$absolute_path->isAbsolute(); //return true;
-
-$empty_path = Path::new();
-echo $absolute_path; //displays ''
-$empty_path->isAbsolute(); //return false;
-~~~
-
-### Path with or without a trailing slash
-
-The `Path` object can tell you whether the current path ends with a slash or not using the `Path::hasTrailingSlash` method. This method takes no argument and return a boolean.
-
-~~~php
-<?php
-
-use League\Uri\Components\Path;
-
+Path::new('bar/baz')->isAbsolute(); //return false;
+Path::new('/bar/baz')->isAbsolute(); //return true;
+Path::new()->isAbsolute(); //return false;
 Path::new('/path/to/the/sky.txt')->hasTrailingSlash(); //return false
-Path::new('/path/')->hasTrailingSlash(); //return true
+Path::new('/path/')->hasTrailingSlash();               //return true
 ~~~
 
 ## Path modifications
 
 <p class="message-notice">If the modifications do not change the current object, it is returned as is, otherwise, a new modified object is returned.</p>
-
 <p class="message-warning">When a modification fails a <code>League\Uri\Contracts\UriException</code> exception is thrown.</p>
 
-Out of the box, the `Path` object operates a number of non destructive normalizations. For instance, the path is correctly URI encoded against the RFC3986 rules.
+Out of the box, the `Path` object operates a number of non-destructive normalizations. For instance, the path is correctly URI encoded against the RFC3986 rules.
 
 ### Removing dot segments
 
@@ -165,7 +114,7 @@ echo $path;    //displays 'path/to/the/sky/'
 echo $newPath; //displays 'path/to/the/sky'
 ~~~
 
-`Path::withLeadingSlash` will convert an relative path into a absolute one by prepending the path with a slash if none is present.
+`Path::withLeadingSlash` will convert a relative path into a absolute one by prepending the path with a slash if none is present.
 
 ~~~php
 <?php
@@ -181,7 +130,10 @@ echo $newPath;  //displays '/path/to/the/sky/'
 
 ## Specialized Path Object
 
-What makes an URI specific apart from the scheme is how the path is parse and manipulated. This simple path class although functional will not ease parsing a Data URI path or a FTP Uri path. That's why the library comes bundles with two specialized Path objects that extend the current object by adding more specific methods in accordance to the path usage:
+What makes a URI specific apart from the scheme is how the path is parse and manipulated. This simple path class
+although functional will not ease parsing a Data URI path or an HTTP Uri path. That's why the library comes bundles
+with two specialized Path objects that decorates the current object and adds more specific methods in accordance
+to the path usage:
 
 - the [HierarchicalPath](/components/7.0/hierarchical-path/) object to work with Hierarchical paths component
 - the [DataPath](/components/7.0/data-path/) object to work with the Data URIs path

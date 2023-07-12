@@ -17,22 +17,22 @@ $fragment = Fragment::new('%E2%82%AC');
 echo $fragment->value();           //display '%E2%82%AC'
 echo $fragment->decoded();         //display '€'
 echo $fragment->toString();        //display '%E2%82%AC'
-echo $fragment;                    //display '%E2%82%AC'
 echo $fragment->getUriComponent(); //display '#%E2%82%AC'
+echo $fragment;                    //display '%E2%82%AC'
 
-$new_fragment = Fragment::new();
-echo $new_fragment->value();           //display null
-echo $new_fragment->decoded();         //display ''
-echo $new_fragment->toString();        //display ''
-echo $new_fragmen;                     //display ''
-echo $new_fragment->getUriComponent(); //display ''
+$newFragment = Fragment::new();
+echo $newFragment->value();           //display null
+echo $newFragment->decoded();         //display ''
+echo $newFragment->toString();        //display ''
+echo $newFragment->getUriComponent(); //display ''
+echo $newFragment;                    //display ''
 
-$alt_fragment = Fragment::fromUri('https://thephpleague.com#');
-echo $alt_fragment->value();           //display ''
-echo $alt_fragment->decoded();         //display ''
-echo $alt_fragment->toString();        //display ''
-echo $alt_fragment;                    //display ''
-echo $alt_fragment->getUriComponent(); //display '#'
+$altFragment = Fragment::fromUri('https://thephpleague.com#');
+echo $altFragment->value();           //display ''
+echo $altFragment->decoded();         //display ''
+echo $altFragment->toString();        //display ''
+echo $altFragment->getUriComponent(); //display '#'
+echo $altFragment;                    //display ''
 ~~~
 
 <p class="message-notice">The object can not be modified, you are required to instantiate a new object.</p>

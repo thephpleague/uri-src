@@ -6,22 +6,18 @@ title: Authority URI part Object API
 The Authority part
 =======
 
-The `League\Uri\Components\Authority` class ease URI authority part creation and manipulation. This object exposes:
-                                       
-- the [package common API](/components/7.0/), 
-- provides specific methods to work with a URI authority part.
+The `Authority` class represents a URI authority component. Apart from the [package common API](/components/7.0/) the class
+exposes basic properties and method to manipulate its different component.
 
 <p class="message-notice">If the modifications do not change the current object, it is returned as is, otherwise, a new modified object is returned.</p>
 <p class="message-warning">If the submitted value is not valid a <code>League\Uri\Exceptions\SyntaxError</code> exception is thrown.</p>
 
 ## Instantiation
 
-### Using the default constructor
+Just like with the URI object it is possible to instantiate a new instance from the hash result of URI parsing.
 
 ~~~php
 <?php
-public static Authority::new(Stringable|string|null $value = null): self
-public static Authority::fromUri(Stringable|string $uri): self
 public static Authority::fromComponents(array $components): self
 ~~~
 
@@ -47,14 +43,6 @@ Authority::fromComponents(
 Accessing properties
 -------
 
-The Authority object exposes the following specific methods.
-
-~~~php
-public function Authority::getUserInfo(): ?string
-public function Authority::getHost(): ?string
-public function Authority::getPort(): ?int
-~~~
-
 You can access the authority string, its individual parts and components using their respective getter methods. This lead to the following result for a simple HTTP URI:
 
 ~~~php
@@ -75,14 +63,6 @@ To replace one of the URI component you can use the modifying methods exposed by
 
 <p class="message-notice">Any modification method can trigger a <code>League\Uri\Contracts\UriException</code> exception if the resulting URI is not valid. Just like with the instantiation methods, validition is scheme dependant.</p>
 
-~~~php
-<?php
-
-public function Authority::withUserInfo(?string $user, ?string $password = null): self
-public function Authority::withHost(?string $host): self
-public function Authority::withPort(?int $port): self
-~~~
-
 Since All URI object are immutable you can chain each modifying methods to simplify URI creation and/or modification.
 
 ~~~php
@@ -96,7 +76,7 @@ echo Authority::new("thephpleague.com")
 Normalization
 -------
 
-Out of the box the package normalizes the URI part according to the non destructive rules of RFC3986.
+Out of the box the package normalizes the URI part according to the non-destructive rules of RFC3986.
 
 These non-destructive rules are:
 
@@ -107,4 +87,4 @@ These non-destructive rules are:
 echo Authority::new("www.ExAmPLE.com:80"); //displays www.example.com:80
 ~~~
 
-<p class="message-info">Host conversion depends on the presence of the <code>ext-intl</code> extension. Otherwise the code will trigger a <code>IdnSupportMissing</code> exception</p>
+<p class="message-info">Host conversion depends on the presence of the <code>ext-intl</code> extension, if missing the code will trigger a <code>IdnSupportMissing</code> exception</p>

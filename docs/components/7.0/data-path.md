@@ -5,24 +5,22 @@ title: The Data Uri Path component
 
 # Data URI Path
 
-The library provides a `DataPath` class to ease complex path manipulation on a Data URI object. This URI component object exposes :
-
-- the [package common API](/components/7.0/)
-- the [path common API](/components/7.0/path)
-
-but also provide specific methods to work with Data URI paths.
+The `DataPath` class represents a data path component. Apart from the [package common API](/components/7.0/)
+and the [path common API](/components/7.0/path), the class exposes specific properties and methods to 
+work with Data URI paths.
 
 ## Instantiation
 
 ~~~php
 <?php
-public static function DataPath::new(Stringable|string $value = ''): self
-public static function DataPath::fromUri(Stringable|string $uri): self
 public static function DataPath::fromFileContents(Stringable|string $path): self
 ~~~
 
-Since data URI represents files content you can also instantiate a new data URI object from a file path using the `fromFileContents` named constructor.
-If the file or the submitted string is invalid, not readable or accessible a `League\Uri\Contracts\UriException` exception will be thrown. The class uses PHP's `finfo` class to detect the required mediatype as defined in `RFC2045`.
+Since data URI represents files content you can also instantiate a new data URI object from a file path
+using the `fromFileContents` named constructor. If the file or the submitted string is invalid,
+not readable or accessible a `League\Uri\Contracts\UriException` exception will be thrown.
+
+The class uses PHP's `finfo` class to detect the required mediatype as defined in `RFC2045`.
 
 <p class="message-notice">submitted string is normalized to be <code>RFC3986</code> compliant.</p>
 
@@ -56,14 +54,14 @@ Each of these methods return a string. This string can be empty if the data wher
 use League\Uri\Components\DataPath ;
 
 $path = DataPath::new('text/plain;charset=us-ascii,Hello%20World%21');
-echo $path->getMediaType(); //returns 'text/plain;charset=us-ascii'
-echo $path->getMimeType(); //returns 'text/plain'
+echo $path->getMediaType();  //returns 'text/plain;charset=us-ascii'
+echo $path->getMimeType();   //returns 'text/plain'
 echo $path->getParameters(); //returns 'charset=us-ascii'
-echo $path->getData(); //returns 'Hello%20World%21'
-$path->isBinaryData(); //returns false
+echo $path->getData();       //returns 'Hello%20World%21'
+$path->isBinaryData();       //returns false
 
-$binary_path = DataPath::fromFileContents('path/to/my/png/image.png');
-$binary_path->isBinaryData(); //returns true
+$binaryPath = DataPath::fromFileContents('path/to/my/png/image.png');
+$binaryPath->isBinaryData(); //returns true
 ~~~
 
 ## Modifying the path properties
@@ -98,8 +96,9 @@ use League\Uri\Components\DataPath;
 $path = DataPath::new('text/plain;charset=us-ascii,Hello%20World%21');
 $path->isBinaryData(); // return false;
 $newPath = $path->toBinary();
+echo $newPath; // display 'text/plain;charset=us-ascii;base64,SGVsbG8gV29ybGQh'
 $newPath->isBinaryData(); //return true;
-$newPath->toAscii() == $path; //return true;
+$newPath->toAscii()->toString() === $path->toString(); //return true;
 ~~~
 
 ## Saving the data path
