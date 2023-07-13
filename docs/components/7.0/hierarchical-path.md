@@ -101,11 +101,6 @@ $path->get(-23, 'now'); //return 'now'
 <p class="message-notice">If the offset does not exist <code>get</code> will return <code>null</code>.</p>
 <p class="message-info"><code>get</code> supports negative offsets</p>
 
-## Manipulating the path segments
-
-As an ordered list it is possible to append, prepend new segments but also to replace and remove segments based on their
-offsets.
-
 ### Append and prepend segments
 
 To append segments to the current object you need to use the `HierarchicalPath::append` method. This method accept a single argument which represents the data to be appended:
