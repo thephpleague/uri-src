@@ -9,9 +9,6 @@ parameters:
 		- components
 		- interfaces
 	ignoreErrors:
-		- '#Parameter \#1 \$pairs of static method League\\Uri\\Components\\Query::fromPairs\(\) expects iterable.*#'
-		- message: '#Parameter \#2 \$value of method League\\Uri\\Contracts\\QueryInterface::appendTo\(\) expects string\|null, int given\.#'
-		  path: components/Components/QueryTest.php
 		- message: '#Cannot cast mixed to string.#'
 		  path: components/IPv4Calculators/BCMathCalculator.php
 		- message: '#Cannot cast mixed to string.#'
