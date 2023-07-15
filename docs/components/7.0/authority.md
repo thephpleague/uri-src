@@ -14,12 +14,8 @@ exposes basic properties and method to manipulate its different component.
 
 ## Instantiation
 
-Just like with the URI object it is possible to instantiate a new instance from the hash result of URI parsing.
-
-~~~php
-<?php
-public static Authority::fromComponents(array $components): self
-~~~
+The `Authority` class comes with named constructors to ease instantiation. The following examples show
+how to instantiate the class:
 
 <p class="message-notice">submitted string is normalized to be <code>RFC3986</code> compliant.</p>
 
@@ -28,6 +24,9 @@ public static Authority::fromComponents(array $components): self
 
 use League\Uri\Components\Authority;
 use League\Uri\UriString;
+
+$authority = new Authority('eXamPle.cOm', 42, 'user:pass');
+$authority->toString(); //returns 'user:pass@example.com:42'
 
 Authority::new('user:pass@example.com:42')->value(); //returns 'user:pass@example.com:42'
 Authority::fromUri("http://www.example.com/path/to/the/sky")->getPort(); //return null;
