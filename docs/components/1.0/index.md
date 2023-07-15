@@ -1,9 +1,6 @@
 ---
 layout: default
 title: URI components
-redirect_from:
-    - /5.0/components/
-    - /5.0/components/installation/
 ---
 
 Uri Components

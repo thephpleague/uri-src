@@ -1,8 +1,6 @@
 ---
 layout: default
 title: Uri
-redirect_from:
-    - /4.0/
 ---
 
 # Overview

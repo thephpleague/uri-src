@@ -1,8 +1,6 @@
 ---
 layout: default
 title: URI components
-redirect_from:
-    - /components/
 ---
 
 Uri Components
