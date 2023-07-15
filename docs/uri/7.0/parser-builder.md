@@ -6,7 +6,9 @@ title: RFC3986 - RFC3987 Parser
 URI parser and builder
 =======
 
-The `League\Uri\UriString` class is a userland PHP URI parser and builder compliant with [RFC 3986](http://tools.ietf.org/html/rfc3986) and [RFC 3987](http://tools.ietf.org/html/rfc3987) to replace PHP's `parse_url` function.
+The `League\Uri\UriString` class is a user-land PHP URI parser and builder compliant with
+[RFC 3986](http://tools.ietf.org/html/rfc3986) and [RFC 3987](http://tools.ietf.org/html/rfc3987)
+. This class is a drop-in replacement for PHP's `parse_url` function.
 
 ## URI parsing
 

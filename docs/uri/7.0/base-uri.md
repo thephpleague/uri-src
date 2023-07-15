@@ -10,40 +10,15 @@ The `League\Uri\BaseUri` class is build to ease gathering information regarding 
 The class makes it easier to transform and crawl pages containing URIs (ie: a web page, or an HTTP client for instance).
 
 <p class="message-warning">While the class does manipulate URI it does not implement any URI related interface.</p>
+<p class="message-notice">All the methods accepts string or Stringable objects.</p>
+<p class="message-notice">If a PSR-7 <code>UriInterface</code> implementing instance is given then the return value
+will be of the same class, otherwise it will be a League <code>Uri</code> instance.</p>
 
-## Public API
+## Instantiation
 
-~~~php
-<?php
-
-use League\Uri\Contracts\UriInterface;
-use Psr\Http\Message\UriInterface as Psr7UriInterface;
-
-public static function BaseUri::new(Stringable|string $baseUri): self
-public function BaseUri::uri(): Psr7UriInterface|UriInterface
-public function BaseUri::origin(): ?self
-public function BaseUri::resolve(Stringable|string $uri): self
-public function BaseUri::relativize(Stringable|string $uri): self
-public function BaseUri::isAbsolute(): bool
-public function BaseUri::isNetworkPath(): bool
-public function BaseUri::isAbsolutePath(): bool
-public function BaseUri::isRelativePath(): bool
-public function BaseUri::isSameDocument(Stringable|string $uri): bool
-public function BaseUri::isCrossOrigin(Stringable|string $uri): bool
-public function BaseUri::jsonSerialize(): string
-public function BaseUri::__toString(): string
-~~~
-
-<p class="message-notice">All the methods accepts string or Stringable objects like the PSR-7 or League own <code>UriInterface</code> implementing class.</p>
-
-<p class="message-notice">If a PSR-7 <code>UriInterface</code> is given then the return value will also be
-a URI object from the same class, otherwise it will be a League <code>Uri</code> instance.</p>
-
-## Usage
-
+Instantiation is done via the `BaseUri::new` named constructor which accepts string and stringable objects alike.
 Once instantiated you can get access to its underlying URI instance via the public method `BaseUri::uri()`.
-if a Psr7 implementing object was use for instantiation, the same instance
-will be return by the property.
+if a Psr7 implementing object was use for instantiation, the same instance will be return by the method.
 
 ~~~php
 <?php
@@ -58,10 +33,9 @@ $baseUriPsr7 = BaseUri::new(Utils::uriFor('http://www.ExaMPle.com'));
 $baseUri->uri(); // return new GuzzleHttp\Psr7\Uri('http://www.example.com/?foo=toto#~typo');
 ~~~
 
-### URI resolution
+## URI resolution
 
-The `BaseUri::resolve` resolves a URI as a browser would for a relative URI while the
-`BaseUri::relativize` does the inverse.
+The `BaseUri::resolve` resolves a URI as a browser would for a relative URI while the `BaseUri::relativize` does the opposite.
 
 ~~~php
 <?php
@@ -77,6 +51,8 @@ echo $baseUri->resolve($relativeUri);
 echo $baseUri; // display 'http://www.example.com'
 // display 'http://www.example.com/?foo=toto#~typo'
 ~~~
+
+## URI informations
 
 The class contains a list of public methods which returns the URI state.
 
@@ -129,38 +105,6 @@ Tells whether the given URI object represents the same document.
 BaseUri::new(Http::new("example.com?foo=bar#🏳️‍🌈"))->isSameDocument("exAMpLE.com?foo=bar#🍣🍺"); //returns true
 ~~~
 
-### BaseUri::origin
-
-Returns the URI origin as defined by the [WHATWG URL Living standard](https://url.spec.whatwg.org/#origin)
-
-~~~php
-<?php
-
-use League\Uri\Http;
-use League\Uri\Uri;
-use League\Uri\BaseUri;
-
-BaseUri::new(Http::new('https://uri.thephpleague.com/uri/6.0/info/'))->origin(); //returns BaseUri::new(Http::new('https://uri.thephpleague.com'));
-BaseUri::new('blob:https://mozilla.org:443')->origin(); //returns  BaseUri::new('https://mozilla.org')
-BaseUri::new(Uri::new('file:///usr/bin/php'))->origin(); //returns null
-BaseUri::new('data:text/plain,Bonjour%20le%20monde%21')->origin(); //returns null
-~~~
-
-<p class="message-info">For absolute URI with the <code>file</code> scheme the method will return <code>null</code> (as this is left to the implementation decision)</p>
-
-Because the origin property does not exist in the RFC3986 specification this additional steps is implemented:
-
-- For non-absolute URI the method will return `null`
-
-~~~php
-<?php
-
-use League\Uri\Http;
-use League\Uri\BaseUri;
-
-BaseUri::new((Http::new('/path/to/endpoint'))->origin(); //returns null
-~~~
-
 ### BaseUri::isCrossOrigin
 
 Tells whether the given URI object represents different origins.
@@ -184,3 +128,35 @@ BaseUri::new('https://example.com/123')
 ~~~
 
 The method takes into account i18n while comparing both URI if the `intl-extension` is installed.
+
+### BaseUri::origin
+
+Returns the URI origin used for comparison when calling the `isCrossOrigin` method. The algorithm used is defined by
+the [WHATWG URL Living standard](https://url.spec.whatwg.org/#origin)
+
+~~~php
+<?php
+
+use League\Uri\Http;
+use League\Uri\Uri;
+use League\Uri\BaseUri;
+
+echo BaseUri::new(Http::new('https://uri.thephpleague.com/uri/6.0/info/'))->origin(); //display 'https://uri.thephpleague.com';
+echo BaseUri::new('blob:https://mozilla.org:443')->origin();       //display 'https://mozilla.org'
+BaseUri::new(Uri::new('file:///usr/bin/php'))->origin();           //returns null
+BaseUri::new('data:text/plain,Bonjour%20le%20monde%21')->origin(); //returns null
+~~~
+
+<p class="message-info">For absolute URI with the <code>file</code> scheme the method will return <code>null</code> (as this is left to the implementation decision)</p>
+Because the origin property does not exist in the RFC3986 specification this additional steps is implemented:
+
+- For non-absolute URI the method will return `null`
+
+~~~php
+<?php
+
+use League\Uri\Http;
+use League\Uri\BaseUri;
+
+BaseUri::new((Http::new('/path/to/endpoint'))->origin(); //returns null
+~~~

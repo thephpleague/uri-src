@@ -16,17 +16,7 @@ scheme is not present and not recognized as special.</p>
 ## Instantiation
 
 While the default constructor is private and can not be accessed to instantiate a new object,
-the `League\Uri\Http` class comes with the following named constructors to ease instantiation.
-
-~~~php
-<?php
-
-public static function Http::new(Stringable|string $uri = ''): self
-public static function Http::fromComponents(array $components): self
-public static function Http::fromServer(array $server): self
-public static function Http::fromBaseUri(Stringable|string $uri, Stringable|string|null $baseUri = null): self
-public static function Http::fromTemplate(Stringable|string $template, iterable $variables = []): self
-~~~
+the `League\Uri\Http` class comes with named constructors to ease instantiation.
 
 The following examples show how to use the different named constructors:
 
