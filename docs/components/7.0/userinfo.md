@@ -6,52 +6,63 @@ title: The User information component
 The UserInfo
 =======
 
-The `League\Uri\Components\UserInfo` class eases user information creation and manipulation.
-This URI component object exposes the [package common API](/components/7.0/),
-but also provide specific methods to work with the URI user information part.
+The `UserInfo` class represents a URI authority component. Apart from the [package common API](/components/7.0/) the class
+exposes basic properties and method to manipulate its different component.
+
+<p class="message-notice">If the modifications do not change the current object, it is returned as is, otherwise, a new modified object is returned.</p>
+<p class="message-warning">If the submitted value is not valid a <code>League\Uri\Exceptions\SyntaxError</code> exception is thrown.</p>
 
 ## Creating a new object
 
-~~~php
-public UserInfo::__construct(Stringable|string|null $user, Stringable|string|null $pass = null): void
-public static UserInfo::new(Stringable|string|null $value = null): self
-public static UserInfo::fromUri(Stringable|string|null $uri): self
-public static UserInfo::fromAuthority(Stringable|string|null $authority): self
-~~~
+The `UserInfo` class comes with named constructors to ease instantiation. The following examples show
+how to instantiate the class:
 
 <p class="message-notice">submitted string is normalized to be <code>RFC3986</code> compliant.</p>
 
+~~~php
+<?php
+
+use League\Uri\Components\UserInfo;
+use League\Uri\UriString;
+
+$authority = new UserInfo('user', 'pass');
+$authority->toString(); //returns 'user:pass'
+
+UserInfo::new('user:pass')->value(); //returns 'user:pass'
+UserInfo::fromUri("http://www.example.com/path/to/the/sky")->getPort(); //return null;
+UserInfo::new()->value(); //return null;
+UserInfo::fromComponents(
+	UriString::parse("http://user:pass@example.com:42/5.0/uri/api")
+)->value(); //returns 'user:pass'
+~~~
+
+<p class="message-notice">submitted string is normalized to be <code>RFC3986</code> compliant.</p>
 <p class="message-warning">If the submitted value is not valid a <code>League\Uri\Exceptions\SyntaxError</code> exception is thrown.</p>
 
 ## Accessing User information content
 
-~~~php
-public UserInfo::getUser(): ?string
-public UserInfo::getPass(): ?string
-~~~
-
-To access the user login and password information you need to call the respective `UserInfo::getUser` and `UserInfo::getPass` methods like shown below.
+To access the user login and password information you need to call the respective `UserInfo::getUser`
+and `UserInfo::getPass` methods like shown below.
 
 ~~~php
+use League\Uri\Components\UserInfo;
+
 $info = new UserInfo('foo', 'bar');
-$info->getUser(); //return 'foo'
-$info->getPass(); //return 'bar'
+$info->getUser();    //returns 'foo'
+$info->getPass();    //returns 'bar'
+$info->components(); //returns array {"user" => "foo", "pass" => "bar"}
 ~~~
 
 ## Modifying the user information
 
-~~~php
-public UserInfo::withUser(Stringable|string|null $user): self
-public UserInfo::withPass(Stringable|string|null $pass): self
-~~~
-
 <p class="message-notice">If the modifications do not change the current object, it is returned as is, otherwise, a new modified object is returned.</p>
 
 ~~~php
+use League\Uri\Components\UserInfo;
+
 $info = UserInfo::fromUri('https://login:pass@thephpleague.com/path/to/heaven');
-$new_info = $info->withUser('john')->withPass('doe');
-echo $new_info; //displays john:doe
-echo $info;     //displays login:pass
+echo $info;  //displays login:pass
+echo $info->withUser('john')->withPass('doe'); //displays john:doe
 ~~~
 
 <p class="message-warning">If the user part is `null`, trying to give the password any other value than the `null` value with throw an Exception.</p>

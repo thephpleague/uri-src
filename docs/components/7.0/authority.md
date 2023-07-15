@@ -45,23 +45,30 @@ Accessing properties
 You can access the authority string, its individual parts and components using their respective getter methods. This lead to the following result for a simple HTTP URI:
 
 ~~~php
-$uri = Authority::new("foo:bar@www.example.com:81");
-echo $uri->getUserInfo();  //displays "foo:bar"
-echo $uri->getHost();      //displays "www.example.com"
-echo $uri->getPort();      //displays 81 as an integer
-echo $uri;
+use League\Uri\Components\Authority;
+
+$authority = Authority::new("foo:bar@www.example.com:81");
+echo $authority->getUserInfo();  //displays "foo:bar"
+echo $authority->getHost();      //displays "www.example.com"
+echo $authority->getPort();      //displays 81 as an integer
+echo $authority;
 //displays "foo:bar@www.example.com:81"
-echo json_encode($uri);
+echo json_encode($authority);
 //displays "foo:bar@www.example.com:81"
+$authority->components(); 
+// returns array {
+//   "user" => "foo",
+//   "pass" => "bar",
+//   "host" => "www.example.com",
+//   "port" => 81,
+// }
 ~~~
 
 Modifying properties
 -------
 
 To replace one of the URI component you can use the modifying methods exposed by all URI object. If the modifications do not alter the current object, it is returned as is, otherwise, a new modified object is returned.
-
-<p class="message-notice">Any modification method can trigger a <code>League\Uri\Contracts\UriException</code> exception if the resulting URI is not valid. Just like with the instantiation methods, validition is scheme dependant.</p>
-
+<p class="message-notice">Any modification method can trigger a <code>League\Uri\Contracts\UriException</code> exception if the resulting URI is not valid. Just like with the instantiation methods, validation is scheme dependant.</p>
 Since All URI object are immutable you can chain each modifying methods to simplify URI creation and/or modification.
 
 ~~~php
