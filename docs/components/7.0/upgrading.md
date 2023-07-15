@@ -38,15 +38,55 @@ package was required.
 Deprecated methods
 --------
 
-- All named constructors `createFromString` and `createFromNull` are replaced by the new named constructor `new`
-- The `Domain::createFromHost` is also replaced by the `Domain::new` method
+The following methods are marked as deprecated. They are still present to allow an easier upgrade path
+to version `7.0`, but it is recommended not to use them for new projects.
 
-Depending on the component the method will accept either 
-
-- a string and a stringable object;
-- `null` (except for the `Path` related classes);
-- an integer (for the `Port` class);
-- or no argument at all (for the `Query` class);
+| Deprecated methods                             | New stable methods                |
+|------------------------------------------------|-----------------------------------|
+| `IPv4Calculator::createFromGMP`                | `IPv4Calculator::fromGMP`         |
+| `IPv4Calculator::createFromBCMath`             | `IPv4Calculator::fromBCMath`      |
+| `IPv4Calculator::createFromNative`             | `IPv4Calculator::fromNative`      |
+| `IPv4Calculator::createFromServer`             | `IPv4Calculator::fromEnvironment` |
+| `Authority::createFromString`                  | `Authority::new`                  |
+| `Authority::createFromUri`                     | `Authority::new`                  |
+| `Authority::createFromNull`                    | `Authority::new`                  |
+| `Authority::createFromServer`                  | `Authority::fromServer`           |
+| `Authority::createFromComponents`              | `Authority::fromComponents`       |
+| `DataPath::createFromString`                   | `DataPath::new`                   |
+| `DataPath::createFromUri`                      | `DataPath::fromUri`               |
+| `DataPath::createFromFilePath`                 | `DataPath::fromFileContents`      |
+| `Domain::createFromHost`                       | `Domain::new`                     |
+| `Domain::createFromString`                     | `Domain::new`                     |
+| `Domain::createFromLabels`                     | `Domain::fromLabels`              |
+| `Domain::createFromUri`                        | `Domain::fromUri`                 |
+| `Domain::createFromAuthority`                  | `Domain::fromAuthority`           |
+| `Fragment::createFromString`                   | `Fragment::new`                   |
+| `Fragment::createFromUri`                      | `Fragment::fromUri`               |
+| `Scheme::createFromString`                     | `Scheme::new`                     |
+| `Scheme::createFromUri`                        | `Scheme::fromUri`                 |
+| `Path::createFromString`                       | `Path::new`                       |
+| `Path::createFromUri`                          | `Path::fromUri`                   |
+| `Port::fromInt`                                | `Port::new`                       |
+| `Port::createFromUri`                          | `Port::fromUri`                   |
+| `Port::createFromAuthority`                    | `Port::fromAuthority`             |
+| `Host::createFromString`                       | `Host::new`                       |
+| `Host::createFromUri`                          | `Host::new`                       |
+| `Host::createFromNull`                         | `Host::new`                       |
+| `Host::createFromIp`                           | `Host::fromIp`                    |
+| `HierarchicalPath::createFromString`           | `HierarchicalPath::new`           |
+| `HierarchicalPath::createFromUri`              | `HierarchicalPath::new`           |
+| `HierarchicalPath::createFromPath`             | `HierarchicalPath::new`           |
+| `HierarchicalPath::createRelativeFromSegments` | `HierarchicalPath::fromRelative`  |
+| `HierarchicalPath::createAbsoluteFromSegments` | `HierarchicalPath::fromAbsolute`  |
+| `Query::createFromParams`                      | `Query::fromParameters`           |
+| `Query::createFromPairs`                       | `Query::fromPirs`                 |
+| `Query::createFromUri`                         | `Query::new`                      |
+| `Query::createFromRFC3986`                     | `Query::fromRFC3986`              |
+| `Query::createFromRFC1738`                     | `Query::fromRFC1738`              |
+| `Query::params`                                | `Query::parameter`                |
+| `Query::params`                                | `Query::parameters`               |
+| `Query::withoutParams`                         | `Query::withoutParameters`        |
+| `Query::toRFC3986`                             | `Query::value`                    |
 
 ````diff
 <?php
@@ -59,9 +99,20 @@ use League\Uri\Components\Host;
 - Host::createFromNull()->value(); //returns null
 + Host::new()->value(); //returns null
 ````
+For the `Domain`, the `createFromLabels` named constructor is being replaced by `fromLabels`.
+The signature is also updated from `iterable` to `string` as variadic to allow easier validation of input.
+
+````diff
+<?php
+
+use League\Uri\Components\Domain;
+
+- Domain::createFromLabels(['who', 'are', 'you'])->value(); //returns 'you.are.who'
++ Domain::fromLabels('who', 'are', 'you')->value(); //returns 'you.are.who'
+````
 
 For the `HierarchicalPath`, the `createAbsoluteFromSegments` and `createRelativeFromSegments` named constructors
-are being replaced by `fromRalative` and `fromAbsolute`. The signature is also updated
+are being replaced by `fromRelative` and `fromAbsolute`. The signature is also updated
 from `iterable` to `string` as variadic to allow easier validation of input.
 
 ````diff
@@ -86,9 +137,9 @@ will be thrown.
 use League\Uri\Components\Query;
 
 - Query::createFromRFC1738()->value(); //returns ''
++ Query::fromRFC1738()->value();       //returns null
 + Query::fromRFC1738('')->value();     //returns ''
 + Query::new()->value();               //returns null
-+ Query::fromRFC1738();                //will throw
 ````
 
 All remaining named constructors which starts with `createFrom*` are replaced by the same method starting with `from*`.
