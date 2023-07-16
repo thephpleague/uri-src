@@ -9,26 +9,11 @@ URI Template
 The `League\Uri\UriTemplate` class enables expanding a URI object based on a URI template and its 
 submitted parameters following [RFC 6570 URI Template](http://tools.ietf.org/html/rfc6570).
 
-~~~php
-<?php
-
-use League\Uri\UriTemplate;
-use League\Uri\UriTemplate\Template;
-use League\Uri\UriTemplate\VariableBag;
-use League\Uri\Contracts\UriInterface;
-
-public UriTemplate::__construct(Stringable|string $template, iterable $defaultVariables = []);
-public UriTemplate::expand(iterable $variables = []): UriInterface;
-public UriTemplate::expandOrFail(iterable $variables = []): UriInterface;
-public UriTemplate::withDefaultVariables(iterable $defaultVariables): self;
-public readonly VariableBag UriTemplate::$defaultVariables;
-public readonly Template UriTemplate::$template;
-~~~
 
 ## Template expansion
 
-The `UriTemplate::expand` public method expands a URI template to generate a valid URI conforming
-to RFC3986 if given a supplied set of data.
+The `UriTemplate::expand` public method expands a URI template to generate a valid URI string conforming
+to RFC3986.
 
 ~~~php
 <?php
@@ -39,11 +24,7 @@ $template = 'https://example.com/hotels/{hotel}/bookings/{booking}';
 $params = ['booking' => '42', 'hotel' => 'Rest & Relax'];
 
 $uriTemplate = new UriTemplate($template);
-$uri = $uriTemplate->expand($params);
-// $uri is a League\Uri\Uri instance.
-
-echo $uri, PHP_EOL;
-// https://example.com/hotels/Rest%20%26%20Relax/bookings/42
+echo $uriTemplate->expand($params); //display https://example.com/hotels/Rest%20%26%20Relax/bookings/42"
 ~~~
 
 ## Template variables
@@ -71,8 +52,8 @@ $params = [
 ];
 
 $uriTemplate = new UriTemplate($template, ['version' => 1.1]);
-echo $uriTemplate->expand($params), PHP_EOL;
-// https://api.twitter.com/1.1/search/j/john/?q=a&q=b&limit=10
+echo $uriTemplate->expand($params);
+//displays https://api.twitter.com/1.1/search/j/john/?q=a&q=b&limit=10
 ~~~
 
 ### Applying variables with the expand method
@@ -94,7 +75,7 @@ $params = [
 
 $uriTemplate = new UriTemplate($template, ['version' => '1.1']);
 echo $uriTemplate->expand($params), PHP_EOL;
-// https://api.twitter.com/2.0/search/j/john/?q=a&q=b&limit=10
+//displays https://api.twitter.com/2.0/search/j/john/?q=a&q=b&limit=10
 ~~~
 
 ### Updating the default variables
@@ -117,9 +98,9 @@ $params = [
 ];
 
 $uriTemplate = new UriTemplate($template, ['version' => '1.0', 'foo' => 'bar']);
-$uriTemplate->defaultVariables; //returns new VariableBag(['version' => '1.0'])
+$uriTemplate->getDefaultVariables(); //returns new VariableBag(['version' => '1.0'])
 $newUriTemplate = $uriTemplate->withDefaultVariables(['version' => '1.1']);
-$newUriTemplate->defaultVariables; //returns  new VariableBag(['version' => '1.1'])
+$newUriTemplate->getDefaultVariables(); //returns  new VariableBag(['version' => '1.1'])
 ~~~
 
 <p class="message-warning">Following  RFC6570 requirements means not support for
