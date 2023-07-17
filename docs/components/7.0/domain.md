@@ -27,7 +27,7 @@ $fqdn = $host->withRootLabel(); //display 'www.11.be.'
 $fqdn->isAbsolute(); // return true
 
 $pqdn = $fqdn->withoutRootLabel(); //display 'www.11.be'
-$fqdn->isAbsolute(); // return false
+$pqdn->isAbsolute(); // return false
 ~~~
 
 ## Manipulating the domain name as an ordered list of labels

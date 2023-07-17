@@ -31,8 +31,8 @@ use League\Uri\Components\DataPath;
 
 DataPath::new()->value(); //returns 'text/plain;charset=us-ascii,'
 
-$path = DataPath::fromFileContents('path/to/my/png/image.png');
-echo $uri; //returns 'image/png;charset=binary;base64,...'
+echo DataPath::fromFileContents('path/to/my/png/image.png');
+//displays 'image/png;charset=binary;base64,...'
 //where '...' represent the base64 representation of the file
 ~~~
 
@@ -97,8 +97,8 @@ $path = DataPath::new('text/plain;charset=us-ascii,Hello%20World%21');
 $path->isBinaryData(); // return false;
 $newPath = $path->toBinary();
 echo $newPath; // display 'text/plain;charset=us-ascii;base64,SGVsbG8gV29ybGQh'
-$newPath->isBinaryData(); //return true;
-$newPath->toAscii()->toString() === $path->toString(); //return true;
+$newPath->isBinaryData(); // return true;
+$newPath->toAscii()->toString() === $path->toString(); // return true;
 ~~~
 
 ## Saving the data path
@@ -118,6 +118,6 @@ The method returns the `SplFileObject` object used to save the data-uri data for
 use League\Uri\Components\DataPath;
 
 $path = DataPath::fromFileContents('path/to/my/file.png');
-$file = $uri->save('path/where/to/save/my/image.png');
+$file = $path->save('path/where/to/save/my/image.png');
 //$file is a SplFileObject which point to the newly created file;
 ~~~
