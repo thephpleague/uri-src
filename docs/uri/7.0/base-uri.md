@@ -12,7 +12,7 @@ The class makes it easier to transform and crawl pages containing URIs (ie: a we
 <p class="message-warning">While the class does manipulate URI it does not implement any URI related interface.</p>
 <p class="message-notice">All the methods accepts string or Stringable objects.</p>
 <p class="message-notice">If a PSR-7 <code>UriInterface</code> implementing instance is given then the return value
-will be of the same class, otherwise it will be a League <code>Uri</code> instance.</p>
+will also be a PSR-7 <code>UriInterface</code> implementing instance.</p>
 
 ## Instantiation
 
@@ -50,9 +50,33 @@ echo $relativeUri; // display "/?foo=toto#~typo
 echo $baseUri->resolve($relativeUri);
 echo $baseUri; // display 'http://www.example.com'
 // display 'http://www.example.com/?foo=toto#~typo'
+echo $baseUri::class; //display \League\Uri\Uri
 ~~~
 
-## URI informations
+If you prefer working with `Psr-7 UriInterface` by default you need to register your `UriFactoryInterface`
+to the `BaseUri` as follow:
+
+~~~php
+<?php
+
+use League\Uri\BaseUri;
+use GuzzleHttp\Psr7\HttpFactory;
+
+BaseUri::registerUriFactory(new HttpFactory());
+$baseUri = BaseUri::new('http://www.ExaMPle.com');
+$uri = 'http://www.example.com/?foo=toto#~typo';
+
+$relativeUri = $baseUri->relativize($uri);
+echo $relativeUri; // display "/?foo=toto#~typo
+echo $baseUri->resolve($relativeUri);
+echo $baseUri; // display 'http://www.example.com'
+// display 'http://www.example.com/?foo=toto#~typo'
+echo $baseUri::class; //display \GuzzleHttp\Psr7\Uri
+~~~
+
+You can always switch back to using the `Uri` object by unregistering the factory.
+
+## URI information
 
 The class contains a list of public methods which returns the URI state.
 

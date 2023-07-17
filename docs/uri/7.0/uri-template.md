@@ -12,7 +12,7 @@ submitted parameters following [RFC 6570 URI Template](http://tools.ietf.org/htm
 
 ## Template expansion
 
-The `UriTemplate::expand` public method expands a URI template to generate a valid URI string conforming
+The `UriTemplate::expand` public method expands a URI template to generate a valid URI conforming
 to RFC3986.
 
 ~~~php
@@ -24,7 +24,8 @@ $template = 'https://example.com/hotels/{hotel}/bookings/{booking}';
 $params = ['booking' => '42', 'hotel' => 'Rest & Relax'];
 
 $uriTemplate = new UriTemplate($template);
-echo $uriTemplate->expand($params); //display https://example.com/hotels/Rest%20%26%20Relax/bookings/42"
+$uri = $uriTemplate->expand($params); // instance of League\Uri\Uri
+echo $uri; //display https://example.com/hotels/Rest%20%26%20Relax/bookings/42"
 ~~~
 
 ## Template variables
