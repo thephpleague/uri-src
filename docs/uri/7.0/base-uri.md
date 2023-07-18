@@ -55,7 +55,7 @@ echo $baseUri::class; //display \League\Uri\Uri
 
 Out of the box when submitting an object other than a `PSR-7 UriInterface`
 the returned URI object will be a `League\Uri\Uri` instance. You can control this behaviour by registering
-a `PSR-7 UriFactoryInterface` to the `BaseUri` as show below:
+a `PSR-7 UriFactoryInterface` on `BaseUri` instantiation
 
 ~~~php
 <?php
@@ -63,8 +63,7 @@ a `PSR-7 UriFactoryInterface` to the `BaseUri` as show below:
 use League\Uri\BaseUri;
 use GuzzleHttp\Psr7\HttpFactory;
 
-BaseUri::registerUriFactory(new HttpFactory());
-$baseUri = BaseUri::new('http://www.ExaMPle.com');
+$baseUri = BaseUri::new('http://www.ExaMPle.com', new HttpFactory());
 $uri = 'http://www.example.com/?foo=toto#~typo';
 
 $relativeUri = $baseUri->relativize($uri);
@@ -72,14 +71,13 @@ echo $relativeUri;               // display "/?foo=toto#~typo"
 echo $relativeUri::class;        // display '\Leage\Uri\BaseUri'
 echo $relativeUri->uri()::class; //display \GuzzleHttp\Psr7\Uri
 
-BaseUri::unregisterUriFactory();
-$resolvedUri = $baseUri->resolve("/?foo=toto#~typo");
+$resolvedUri = $baseUri->withoutUriFactory()->resolve("/?foo=toto#~typo");
 echo $resolvedUri;               // display 'http://www.example.com/?foo=toto#~typo'
 echo $resolvedUri::class;        // display '\Leage\Uri\BaseUri'
 echo $resolvedUri->uri()::class; // display \League\Uri\Uri
 ~~~
 
-You can always switch back to using the `Uri` object by unregistering the factory.
+You can always switch back to using the `Uri` object by unregistering the factory using `BaseUri::withoutUriFactory`.
 
 ## URI information
 
