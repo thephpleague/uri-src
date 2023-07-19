@@ -54,9 +54,11 @@ In addition to merging the query to the URI, `mergeQuery` has:
 - returned a valid URI object;
 
 The `UriModifier` also provides the ability to pipe multiple methods to easy writing your code.
-So instead of writing the following:
+The following snippet
 
 ~~~php
+<?php
+
 use League\Uri\UriModifier;
 use GuzzleHttp\Psr7\Uri as GuzzleUri;
 
@@ -67,6 +69,15 @@ $uri = UriModifier::hostToUnicode($uri);
 $uri = UriModifier::appendQuery($uri, 'foo=toto&foo=tata');
 echo $uri::class;   // returns GuzzleHttp\Psr7\Uri
 echo $uri, PHP_EOL; // returns http://shop.bébé.be./toto?foo=toto&foo=tata
+~~~
+
+is equivalent to this following one:
+
+~~~php
+<?php
+
+use League\Uri\UriModifier;
+use GuzzleHttp\Psr7\Uri as GuzzleUri;
 
 $uri = UriModifier::from(new GuzzleUri('http://bébé.be'))
     ->pipe('appendSegment', 'toto')
