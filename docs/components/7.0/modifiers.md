@@ -53,9 +53,35 @@ In addition to merging the query to the URI, `mergeQuery` has:
 - not mangle your data during merging;
 - returned a valid URI object;
 
+The `UriModifier` also provides the ability to pipe multiple methods to easy writing your code.
+So instead of writing the following:
+
+~~~php
+use League\Uri\UriModifier;
+use GuzzleHttp\Psr7\Uri as GuzzleUri;
+
+$uri = UriModifier::appendSegment(new GuzzleUri('http://bébé.be'), 'toto');
+$uri = UriModifier::addRootLabel($uri);
+$uri = UriModifier::prependLabel($uri, 'shop');
+$uri = UriModifier::hostToUnicode($uri);
+$uri = UriModifier::appendQuery($uri, 'foo=toto&foo=tata');
+echo $uri::class;   // returns GuzzleHttp\Psr7\Uri
+echo $uri, PHP_EOL; // returns http://shop.bébé.be./toto?foo=toto&foo=tata
+
+$uri = UriModifier::from(new GuzzleUri('http://bébé.be'))
+    ->pipe('appendSegment', 'toto')
+    ->pipe('addRootLabel')
+    ->pipe('prependLabel', 'shop')
+    ->pipe('hostToUnicode')
+    ->pipe('appendQuery', 'foo=toto&foo=tata')
+    ->get();
+echo $uri::class;   // returns GuzzleHttp\Psr7\Uri
+echo $uri, PHP_EOL; // returns http://shop.bébé.be./toto?foo=toto&foo=tata
+~~~
+
 ## Definition
 
-Using the same logic the pacackage introduces a set of URI modifier as a method or
+Using the same logic the package introduces a set of URI modifier as a method or
 a function which provides a convenient mechanism for partially manipulating a URI.
 
 The only **hard** requirement is on the type of the returned instance and accepted
@@ -63,7 +89,7 @@ parameters.
 
 All modifiers first argument is the URI on which to operate on.
 
-- if that URI is a PSR-7 implementing object, then the result will be of the same instance as the submitted class.
+- if that URI is a PSR-7 implementing object, then the result will be a PSR-7 implementing object.
 - Otherwise, a `League\Uri\Uri` instance will be returned.
 
 Under the hood the `UriModifier` class uses the [URI components objects](/components/7.0/)

@@ -16,7 +16,7 @@ will also be a PSR-7 <code>UriInterface</code> implementing instance.</p>
 
 ## Instantiation
 
-Instantiation is done via the `BaseUri::new` named constructor which accepts string and stringable objects alike.
+Instantiation is done via the `BaseUri::from` named constructor which accepts string and stringable objects alike.
 Once instantiated you can get access to its underlying URI instance via the public method `BaseUri::uri()`.
 if a Psr7 implementing object was use for instantiation, the same instance will be return by the method.
 
@@ -26,10 +26,10 @@ if a Psr7 implementing object was use for instantiation, the same instance will 
 use League\Uri\BaseUri;
 use GuzzleHttp\Psr7\Utils;
 
-$baseUri = BaseUri::new('http://www.ExaMPle.com');
+$baseUri = BaseUri::from('http://www.ExaMPle.com');
 $baseUri->uri(); // return Uri::new('http://www.ExaMPle.com');
 
-$baseUriPsr7 = BaseUri::new(Utils::uriFor('http://www.ExaMPle.com'));
+$baseUriPsr7 = BaseUri::from(Utils::uriFor('http://www.ExaMPle.com'));
 $baseUri->uri(); // return new GuzzleHttp\Psr7\Uri('http://www.example.com/?foo=toto#~typo');
 ~~~
 
@@ -42,7 +42,7 @@ The `BaseUri::resolve` resolves a URI as a browser would for a relative URI whil
 
 use League\Uri\BaseUri;
 
-$baseUri = BaseUri::new('http://www.ExaMPle.com');
+$baseUri = BaseUri::from('http://www.ExaMPle.com');
 $uri = 'http://www.example.com/?foo=toto#~typo';
 
 $relativeUri = $baseUri->relativize($uri);
@@ -63,7 +63,7 @@ a `PSR-7 UriFactoryInterface` on `BaseUri` instantiation
 use League\Uri\BaseUri;
 use GuzzleHttp\Psr7\HttpFactory;
 
-$baseUri = BaseUri::new('http://www.ExaMPle.com', new HttpFactory());
+$baseUri = BaseUri::from('http://www.ExaMPle.com', new HttpFactory());
 $uri = 'http://www.example.com/?foo=toto#~typo';
 
 $relativeUri = $baseUri->relativize($uri);
@@ -93,8 +93,8 @@ Tells whether the URI represents an absolute URI.
 use League\Uri\Uri;
 use League\Uri\BaseUri;
 
-BaseUri::new(Uri::fromServer($_SERVER))->isAbsoulte(); //returns true
-BaseUri::new("/🍣🍺")->isAbsolute(); //returns false
+BaseUri::from(Uri::fromServer($_SERVER))->isAbsoulte(); //returns true
+BaseUri::from("/🍣🍺")->isAbsolute(); //returns false
 ~~~
 
 ### BaseUri::isAbsolutePath
@@ -102,8 +102,8 @@ BaseUri::new("/🍣🍺")->isAbsolute(); //returns false
 Tells whether the URI represents an absolute URI path.
 
 ~~~php
-BaseUri::new(Uri::fromServer($_SERVER))->isAbsolutePath(); //returns false
-BaseUri::new(Http::new("/🍣🍺"))->isAbsolutePath(); //returns true
+BaseUri::from(Uri::fromServer($_SERVER))->isAbsolutePath(); //returns false
+BaseUri::from(Http::new("/🍣🍺"))->isAbsolutePath(); //returns true
 ~~~
 
 ### BaseUri::isNetworkPath
@@ -111,8 +111,8 @@ BaseUri::new(Http::new("/🍣🍺"))->isAbsolutePath(); //returns true
 Tells whether the URI represents a network path URI.
 
 ~~~php
-BaseUri::new("//example.com/toto")->isNetworkPath(); //returns true
-BaseUri::new("/🍣🍺")->isNetworkPath(); //returns false
+BaseUri::from("//example.com/toto")->isNetworkPath(); //returns true
+BaseUri::from("/🍣🍺")->isNetworkPath(); //returns false
 ~~~
 
 ### BaseUri::isRelativePath
@@ -120,8 +120,8 @@ BaseUri::new("/🍣🍺")->isNetworkPath(); //returns false
 Tells whether the given URI object represents a relative path.
 
 ~~~php
-BaseUri::new("🏳️‍🌈")->isRelativePath(); //returns true
-BaseUri::new("/🍣🍺")->isRelativePath(); //returns false
+BaseUri::from("🏳️‍🌈")->isRelativePath(); //returns true
+BaseUri::from("/🍣🍺")->isRelativePath(); //returns false
 ~~~
 
 ### BaseUri::isSameDocument
@@ -129,7 +129,7 @@ BaseUri::new("/🍣🍺")->isRelativePath(); //returns false
 Tells whether the given URI object represents the same document.
 
 ~~~php
-BaseUri::new(Http::new("example.com?foo=bar#🏳️‍🌈"))->isSameDocument("exAMpLE.com?foo=bar#🍣🍺"); //returns true
+BaseUri::from(Http::new("example.com?foo=bar#🏳️‍🌈"))->isSameDocument("exAMpLE.com?foo=bar#🍣🍺"); //returns true
 ~~~
 
 ### BaseUri::isCrossOrigin
@@ -147,10 +147,10 @@ use GuzzleHttp\Psr7\Utils;
 use League\Uri\BaseUri;
 use Nyholm\Psr7\Uri;
 
-BaseUri::new(Utils::uriFor('blob:http://xn--bb-bjab.be./path'))
+BaseUri::from(Utils::uriFor('blob:http://xn--bb-bjab.be./path'))
     ->isCrossOrigin(new Uri('http://Bébé.BE./path')); // returns false
 
-BaseUri::new('https://example.com/123')
+BaseUri::from('https://example.com/123')
     ->isCrossOrigin(new Uri('https://www.example.com/')); // returns true
 ~~~
 
@@ -168,10 +168,10 @@ use League\Uri\Http;
 use League\Uri\Uri;
 use League\Uri\BaseUri;
 
-echo BaseUri::new(Http::new('https://uri.thephpleague.com/uri/6.0/info/'))->origin(); //display 'https://uri.thephpleague.com';
-echo BaseUri::new('blob:https://mozilla.org:443')->origin();       //display 'https://mozilla.org'
-BaseUri::new(Uri::new('file:///usr/bin/php'))->origin();           //returns null
-BaseUri::new('data:text/plain,Bonjour%20le%20monde%21')->origin(); //returns null
+echo BaseUri::from(Http::new('https://uri.thephpleague.com/uri/6.0/info/'))->origin(); //display 'https://uri.thephpleague.com';
+echo BaseUri::from('blob:https://mozilla.org:443')->origin();       //display 'https://mozilla.org'
+BaseUri::from(Uri::new('file:///usr/bin/php'))->origin();           //returns null
+BaseUri::from('data:text/plain,Bonjour%20le%20monde%21')->origin(); //returns null
 ~~~
 
 <p class="message-info">For absolute URI with the <code>file</code> scheme the method will return <code>null</code> (as this is left to the implementation decision)</p>
@@ -185,5 +185,5 @@ Because the origin property does not exist in the RFC3986 specification this add
 use League\Uri\Http;
 use League\Uri\BaseUri;
 
-BaseUri::new((Http::new('/path/to/endpoint'))->origin(); //returns null
+BaseUri::from((Http::new('/path/to/endpoint'))->origin(); //returns null
 ~~~

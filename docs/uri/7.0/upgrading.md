@@ -109,7 +109,7 @@ After:
 use League\Uri\BaseUri;
 
 $uri = 'http://www.example.com/?foo=toto#~typo';
-$baseUri = BaseUri::new('http://www.example.com');
+$baseUri = BaseUri::from('http://www.example.com');
 
 $relativeUri = $baseUri->relativize($uri);
 echo $relativeUri; // display "/?foo=toto#~typo
@@ -145,11 +145,11 @@ After:
 
 use League\Uri\BaseUri;
 
-BaseUri::new("//example.com/toto")->isNetworkPath(); //returns true
-BaseUri::new("/🍣🍺")->isNetworkPath(); //returns false
-BaseUri::new("example.com?foo=bar#🏳️‍🌈")->isSameDocument("exAMpLE.com?foo=bar#🍣🍺"); //returns true
-BaseUri::new(Uri::new('blob:https://mozilla.org:443'))->origin(); //returns BaseUri::new(Uri::new('https://mozilla.org'))
-BaseUri::new(Http::new('file:///usr/bin/php'))->origin(); //returns null
+BaseUri::from("//example.com/toto")->isNetworkPath(); //returns true
+BaseUri::from("/🍣🍺")->isNetworkPath(); //returns false
+BaseUri::from("example.com?foo=bar#🏳️‍🌈")->isSameDocument("exAMpLE.com?foo=bar#🍣🍺"); //returns true
+BaseUri::from(Uri::new('blob:https://mozilla.org:443'))->origin(); //returns BaseUri::from(Uri::new('https://mozilla.org'))
+BaseUri::from(Http::new('file:///usr/bin/php'))->origin(); //returns null
 ~~~
 
 All the static public methods are now attached to the `BaseUri` as method to the instantiated object.
