@@ -27,10 +27,10 @@ use League\Uri\BaseUri;
 use GuzzleHttp\Psr7\Utils;
 
 $baseUri = BaseUri::from('http://www.ExaMPle.com');
-$baseUri->get(); // return Uri::new('http://www.ExaMPle.com');
+$baseUri->getUri(); // return Uri::new('http://www.ExaMPle.com');
 
 $baseUriPsr7 = BaseUri::from(Utils::uriFor('http://www.ExaMPle.com'));
-$baseUri->get(); // return new GuzzleHttp\Psr7\Uri('http://www.example.com/?foo=toto#~typo');
+$baseUri->getUri(); // return new GuzzleHttp\Psr7\Uri('http://www.example.com/?foo=toto#~typo');
 ~~~
 
 ## URI resolution
@@ -69,12 +69,12 @@ $uri = 'http://www.example.com/?foo=toto#~typo';
 $relativeUri = $baseUri->relativize($uri);
 echo $relativeUri;               // display "/?foo=toto#~typo"
 echo $relativeUri::class;        // display '\Leage\Uri\BaseUri'
-echo $relativeUri->get()::class; //display \GuzzleHttp\Psr7\Uri
+echo $relativeUri->getUri()::class; //display \GuzzleHttp\Psr7\Uri
 
 $resolvedUri = $baseUri->withoutUriFactory()->resolve("/?foo=toto#~typo");
 echo $resolvedUri;               // display 'http://www.example.com/?foo=toto#~typo'
 echo $resolvedUri::class;        // display '\Leage\Uri\BaseUri'
-echo $resolvedUri->get()::class; // display \League\Uri\Uri
+echo $resolvedUri->getUri()::class; // display \League\Uri\Uri
 ~~~
 
 You can always switch back to using the `Uri` object by unregistering the factory using `BaseUri::withoutUriFactory`.
