@@ -33,18 +33,18 @@ $newUri = $uri->withQuery($query);
 echo $newUri; // display http://www.example.com?fo_o=bar&taz=#~typo
 ~~~
 
-In contrast, using the provided `League\Uri\UriModifier::mergeQuery` modifier the code becomes
+In contrast, using the provided `League\Uri\Modifier::mergeQuery` modifier the code becomes
 
 ~~~php
 <?php
 
-use League\Uri\UriModifier;
+use League\Uri\Modifier;
 
 $uriString = "http://www.example.com?fo.o=toto#~typo";
 $queryToMerge = 'fo.o=bar&taz=';
 
-echo UriModifier::mergeQuery($uriString, $queryToMerge);
-echo $newUri; // display http://www.example.com?fo.o=bar&taz=#~typo
+echo Modifier::from($uriString)->mergeQuery($queryToMerge);
+// display http://www.example.com?fo.o=bar&taz=#~typo
 ~~~
 
 In addition to merging the query to the URI, `mergeQuery` has:
@@ -53,57 +53,35 @@ In addition to merging the query to the URI, `mergeQuery` has:
 - not mangle your data during merging;
 - returned a valid URI object;
 
-The `UriModifier` also provides the ability to pipe multiple methods to easy writing your code.
-The following snippet
+Because the `Modifier` is immutable and the modifying methods return a new instance of the class
+we can the class supports out of the box piping multiple methods to improve your code.
 
 ~~~php
 <?php
 
-use League\Uri\UriModifier;
+use League\Uri\Modifier;
 use GuzzleHttp\Psr7\Uri as GuzzleUri;
 
-$uri = UriModifier::appendSegment(new GuzzleUri('http://bébé.be'), 'toto');
-$uri = UriModifier::addRootLabel($uri);
-$uri = UriModifier::prependLabel($uri, 'shop');
-$uri = UriModifier::hostToUnicode($uri);
-$uri = UriModifier::appendQuery($uri, 'foo=toto&foo=tata');
+$uri = Modifier::from(new GuzzleUri('http://bébé.be'))
+    ->appendSegment('toto')
+    ->addRootLabel()
+    ->prependLabel('shop')
+    ->hostToUnicode()
+    ->appendQuery('foo=toto&foo=tata')
+    ->getUri();
 echo $uri::class;   // returns GuzzleHttp\Psr7\Uri
 echo $uri, PHP_EOL; // returns http://shop.bébé.be./toto?foo=toto&foo=tata
 ~~~
 
-is equivalent to this following one:
+<p class="message-warning">While the class does manipulate URI it does not implement any URI related interface.</p>
+<p class="message-notice">If a PSR-7 or a League <code>UriInterface</code> implementing instance is given
+then the return value will also be a PSR-7 <code>UriInterface</code> implementing instance.</p>
 
-~~~php
-<?php
+The `Modifier::getUri` method returns either a `PSR-7` or a League URI `UriInterface`, conversely,
+the `Modifier::getUriString` method returns the URI as a string. Last but not least, the class implements
+the `Stringable` and the `JsonSerializable` interface to improve developer experience.
 
-use League\Uri\UriModifier;
-use GuzzleHttp\Psr7\Uri as GuzzleUri;
-
-$uri = UriModifier::from(new GuzzleUri('http://bébé.be'))
-    ->pipe('appendSegment', 'toto')
-    ->pipe('addRootLabel')
-    ->pipe('prependLabel', 'shop')
-    ->pipe('hostToUnicode')
-    ->pipe('appendQuery', 'foo=toto&foo=tata')
-    ->get();
-echo $uri::class;   // returns GuzzleHttp\Psr7\Uri
-echo $uri, PHP_EOL; // returns http://shop.bébé.be./toto?foo=toto&foo=tata
-~~~
-
-## Definition
-
-Using the same logic the package introduces a set of URI modifier as a method or
-a function which provides a convenient mechanism for partially manipulating a URI.
-
-The only **hard** requirement is on the type of the returned instance and accepted
-parameters.
-
-All modifiers first argument is the URI on which to operate on.
-
-- if that URI is a PSR-7 implementing object, then the result will be a PSR-7 implementing object.
-- Otherwise, a `League\Uri\Uri` instance will be returned.
-
-Under the hood the `UriModifier` class uses the [URI components objects](/components/7.0/)
+Under the hood the `Modifier` class intensively uses the [URI components objects](/components/7.0/)
 to apply changes to the submitted URI object.
 
 ## Query modifiers
@@ -114,61 +92,62 @@ The following modifiers update and normalize the URI query component.
 resulting query string may update the component character encoding. These changes are expected because of 
 the rules governing parsing and building query string.</p>
 
-### UriModifier::sortQuery
+### Modifier::sortQuery
 
 Sorts the query according to its key values. The sorting rules are the same uses by WHATWG `URLSearchParams::sort` method.
 
 ~~~php
-$uri = Http::new("http://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape");
-$newUri = UriModifier::sortQuery($uri);
+use League\Uri\Modifier;
 
-echo $uri->getQuery();    //display "kingkong=toto&foo=bar%20baz&kingkong=ape"
-echo $newUri->getQuery(); //display "kingkong=toto&kingkong=ape&foo=bar%20baz"
+echo Modifier::from("http://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
+    ->sortQuery($uri)
+    ->getUri()
+    ->getQuery(); //display "kingkong=toto&kingkong=ape&foo=bar%20baz"
 ~~~
 
-### UriModifier::mergeQuery
+### Modifier::mergeQuery
 
 Merges a submitted query string to the URI object to be modified. When merging two query strings with the same key value the submitted query string value takes precedence over the URI query string value.
 
 ~~~php
-$uri = Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3");
-$newUri = UriModifier::mergeQuery($uri, 'kingkong=godzilla&toto');
-
-echo $uri->getQuery();    //display "kingkong=toto&foo=bar+baz"
-echo $newUri->getQuery(); //display "kingkong=godzilla&foo=bar%20baz&toto"
+$uri = ;
+echo Modifier::from(Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3"))
+    ->mergeQuery('kingkong=godzilla&toto')
+    ->getUri()
+    ->getQuery(); //display "kingkong=godzilla&foo=bar%20baz&toto"
 ~~~
 
-### UriModifier::appendQuery
+### Modifier::appendQuery
 
 Appends a submitted query string to the URI object to be modified. When appending two query strings with the same key value the submitted query string value is added to the return query string without modifying the URI query string value.
 
 ~~~php
-$uri = Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3");
-$newUri = UriModifier::appendQuery($uri, 'kingkong=godzilla&toto');
 
-echo $uri->getQuery();    //display "kingkong=toto&foo=bar+baz"
-echo $newUri->getQuery(); //display "kingkong=toto&kingkong=godzilla&foo=bar%20baz&toto"
+echo Modifier::from(Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3"))
+    ->appendQuery($uri, 'kingkong=godzilla&toto')
+    ->getUri()
+    ->getQuery(); //display "kingkong=toto&kingkong=godzilla&foo=bar%20baz&toto"
 ~~~
 
-### UriModifier::removePairs
+### Modifier::removePairs
 
 Removes query pairs from the current URI query string by providing the pairs key.
 
 ~~~php
-$uri = Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz&bar=baz#doc3");
-$newUri = UriModifier::removePairs($uri, 'foo', 'bar');
+$uri = "http://example.com/test.php?kingkong=toto&foo=bar+baz&bar=baz#doc3";
+$newUri = Modifier::from($uri)->removePairs('foo', 'bar')->getUri();
 
 echo $uri->getQuery();    //display "kingkong=toto&foo=bar+baz&bar=baz"
 echo $newUri->getQuery(); //display "kingkong=toto"
 ~~~
 
-### UriModifier::removeParams
+### Modifier::removeParams
 
 Removes query params from the current URI query string by providing the param name. The removal preserves mangled key params.
 
 ~~~php
-$uri = Http::new("http://example.com/test.php?kingkong=toto&fo.o=bar&fo_o=bar");
-$newUri = UriModifier::removeParams($uri, 'fo.o');
+$uri = "http://example.com/test.php?kingkong=toto&fo.o=bar&fo_o=bar";
+$newUri = Modifier::removeParams($uri, 'fo.o');
 
 echo $uri->getQuery();    //display "kingkong=toto&fo.o=bar&fo_o=bar"
 echo $newUri->getQuery(); //display "kingkong=toto&fo_o=bar"
@@ -178,7 +157,7 @@ echo $newUri->getQuery(); //display "kingkong=toto&fo_o=bar"
 
 The following modifiers update and normalize the URI host component according to RFC3986 or RFC3987.
 
-### UriModifier::hostToAscii
+### Modifier::hostToAscii
 
 Converts the host into its ascii representation according to RFC3986:
 
@@ -186,10 +165,10 @@ Converts the host into its ascii representation according to RFC3986:
 <?php
 
 use GuzzleHttp\Psr7\Uri;
-use League\Uri\UriModifier;
+use League\Uri\Modifier;
 
 $uri = new Uri("http://스타벅스코리아.com/to/the/sky/");
-$newUri = UriModifier::hostToAscii($uri);
+$newUri = Modifier::from($uri)->hostToAscii()->getUri();
 
 echo get_class($newUri); //display \GuzzleHttp\Psr7\Uri
 echo $newUri; //display "http://xn--oy2b35ckwhba574atvuzkc.com/to/the/sky/"
@@ -197,7 +176,7 @@ echo $newUri; //display "http://xn--oy2b35ckwhba574atvuzkc.com/to/the/sky/"
 
 <p class="message-warning">This method will have no effect on <strong>League URI objects</strong> as this conversion is done by default.</p>
 
-### UriModifier::hostToUnicode
+### Modifier::hostToUnicode
 
 Converts the host into its idn representation according to RFC3986:
 
@@ -209,7 +188,7 @@ use League\Uri\Modifiers\HostToUnicode;
 
 $uriString = "http://xn--oy2b35ckwhba574atvuzkc.com/to/the/./sky/";
 $uri = new Uri($uriString);
-$newUri = UriModifier::hostToUnicode($uri);
+$newUri = Modifier::from($uri)->hostToUnicode();
 
 echo get_class($newUri); //display \GuzzleHttp\Psr7\Uri
 echo $newUri; //display "http://스타벅스코리아.com/to/the/sky/"
@@ -219,7 +198,7 @@ echo $newUri; //display "http://스타벅스코리아.com/to/the/sky/"
 <strong>League URI objects</strong> because the object always transcode the host component
 into its RFC3986/ascii representation.</p>
 
-### UriModifier::removeZoneIdentifier
+### Modifier::removeZoneIdentifier
 
 Removes the host zone identifier if present
 
@@ -227,64 +206,67 @@ Removes the host zone identifier if present
 <?php
 
 use Zend\Diactoros\Uri;
-use League\Uri\Modifiers\RemoveZoneIdentifier;
+use League\Uri\Modifier;
 
 $uri = new Uri('http://[fe80::1234%25eth0-1]/path/to/the/sky.php');
-$newUri = UriModifier::removeZoneIdentifier($uri);
+$newUri = Modifier::from($uri)->removeZoneIdentifier()->getUri();
 echo get_class($newUri); //display \Zend\Diactoros\Uri
 
 echo $newUri; //display 'http://[fe80::1234]/path/to/the/sky.php'
 ~~~
 
-### UriModifier::addRootLabel
+### Modifier::addRootLabel
 
 Adds the root label if not present
 
 ~~~php
-$newUri = UriModifier::addRootLabel('http://example.com:83');
+use League\Uri\Modifier;
 
-echo $newUri; //display 'http://example.com.:83'
+echo Modifier::from('http://example.com:83')->addRootLabel(); //display 'http://example.com.:83'
 ~~~
 
-### UriModifier::removeRootLabel
+### Modifier::removeRootLabel
 
 Removes the root label if present
 
 ~~~php
-$newUri = UriModifier::removeRootLabel('http://example.com.#yes');
+use League\Uri\Modifier;
 
-echo $newUri; //display 'http://example.com#yes'
+echo  Modifier::from('http://example.com.#yes')->removeRootLabel();  //display 'http://example.com#yes'
 ~~~
 
-### UriModifier::appendLabel
+### Modifier::appendLabel
 
 Appends a host to the current URI host.
 
 ~~~php
-$uri = Http::new("http://www.example.com/path/to/the/sky/");
-$newUri = UriModifier::appendLabel($uri, 'fr');
+use League\Uri\Modifier;
 
-echo $newUri; //display "http://www.example.com.fr/path/to/the/sky/"
+echo Modifier::from("http://www.example.com/path/to/the/sky/")->appendLabel('fr'); 
+//display "http://www.example.com.fr/path/to/the/sky/"
 ~~~
 
-### UriModifier::prependLabel
+### Modifier::prependLabel
 
 Prepends a host to the current URI path.
 
 ~~~php
-echo UriModifier::prependLabel("http://www.example.com/path/to/the/sky/", 'shop'); //display "http://shop.www.example.com/path/to/the/sky/and/above"
+use League\Uri\Modifier;
+
+echo Modifier::from("http://www.example.com/path/to/the/sky/")->prependLabel('shop'); //display "http://shop.www.example.com/path/to/the/sky/and/above"
 ~~~
 
-### UriModifier::replaceLabel
+### Modifier::replaceLabel
 
 Replaces a label from the current URI host with a host.
 
 <p class="message-notice">Hosts are hierarchical components whose labels are indexed from right to left.</p>
 
 ~~~php
-$newUri = UriModifier::replaceLabel("http://www.example.com/path/to/the/sky/", 2, 'admin.shop');
+use League\Uri\Modifier;
 
-echo $newUri; //display"http://admin.shop.example.com/path/to/the/sky"
+echo Modifier::from("http://www.example.com/path/to/the/sky/")->replaceLabel(2, 'admin.shop');
+//display"http://admin.shop.example.com/path/to/the/sky"
 ~~~
 
 <p class="message-info">This modifier supports negative offset</p>
@@ -292,21 +274,21 @@ echo $newUri; //display"http://admin.shop.example.com/path/to/the/sky"
 The previous example can be rewritten using negative offset:
 
 ~~~php
-$newUri = UriModifier::replaceLabel("http://www.example.com/path/to/the/sky/", -1, 'admin.shop');
+use League\Uri\Modifier;
 
-echo $newUri; //display"http://admin.shop.example.com/path/to/the/sky"
+echo Modifier::from("http://www.example.com/path/to/the/sky/")->replaceLabel(-1, 'admin.shop');
+//display"http://admin.shop.example.com/path/to/the/sky"
 ~~~
 
-### UriModifier::removeLabels
+### Modifier::removeLabels
 
 Removes selected labels from the current URI host. Labels are indicated using an array containing the labels offsets.
 
 <p class="message-notice">Hosts are hierarchical components whose labels are indexed from right to left.</p>
 
 ~~~php
-$newUri = UriModifier::removeLabels("http://www.localhost.com/path/to/the/sky/", 2, 0);
-
-echo $newUri; //display "http://localhost/path/the/sky/"
+echo Modifier::from("http://www.localhost.com/path/to/the/sky/")->removeLabels(2, 0);
+//display "http://localhost/path/the/sky/"
 ~~~
 
 <p class="message-info">This modifier supports negative offset</p>
@@ -314,9 +296,8 @@ echo $newUri; //display "http://localhost/path/the/sky/"
 The previous example can be rewritten using negative offset:
 
 ~~~php
-$newUri = UriModifier::removeLabels("http://www.example.com/path/to/the/sky/", -1, -3);
-
-echo $newUri->toString(); //display "http://localhost/path/the/sky/"
+Modifier::from("http://www.example.com/path/to/the/sky/")->removeLabels(-1, -3)->getUriString();
+//return "http://localhost/path/the/sky/"
 ~~~
 
 ## Path modifiers
@@ -325,160 +306,157 @@ echo $newUri->toString(); //display "http://localhost/path/the/sky/"
 the resulting path may update the component character encoding. These changes are 
 expected because of the rules governing parsing and building path string.</p>
 
-### UriModifier::removeDotSegments
+### Modifier::removeDotSegments
 
 Removes dot segments according to RFC3986:
 
 ~~~php
-$newUri = UriModifier::removeDotSegments("http://www.example.com/path/../to/the/./sky/");
-
-echo $newUri; //display "http://www.example.com/to/the/sky/"
+echo Modifier::from("http://www.example.com/path/../to/the/./sky/")->removeDotSegments();
+//display "http://www.example.com/to/the/sky/"
 ~~~
 
-### UriModifier::removeEmptySegments
+### Modifier::removeEmptySegments
 
 Removes adjacent separators with empty segment.
 
 ~~~php
-$newUri = UriModifier::removeEmptySegments("http://www.example.com/path//to/the//sky/");
-
-echo $newUri; //display "http://www.example.com/path/to/the/sky/"
+echo Modifier::from("http://www.example.com/path//to/the//sky/")->removeEmptySegments();
+//display "http://www.example.com/path/to/the/sky/"
 ~~~
 
-### UriModifier::removeTrailingSlash
+### Modifier::removeTrailingSlash
 
 Removes the path trailing slash if present
 
 ~~~php
-$newUri = UriModifier::removeTrailingSlash("http://www.example.com/path/?foo=bar");
-
-echo $newUri; //display "http://www.example.com/path?foo=bar"
+echo Modifier::from("http://www.example.com/path/?foo=bar")->removeTrailingSlash();
+//display "http://www.example.com/path?foo=bar"
 ~~~
 
-### UriModifier::addTrailingSlash
+### Modifier::addTrailingSlash
 
 Adds the path trailing slash if not present
 
 ~~~php
-$newUri = UriModifier::addTrailingSlash("http://www.example.com/sky#top");
-
-echo $newUri; //display "http://www.example.com/sky/#top"
+echo Modifier::from("http://www.example.com/sky#top")->addTrailingSlash();
+//display "http://www.example.com/sky/#top"
 ~~~
 
-### UriModifier::removeLeadingSlash
+### Modifier::removeLeadingSlash
 
 Removes the path leading slash if present.
 
 ~~~php
-$newUri = UriModifier::removeLeadingSlash("/path/to/the/sky/");
-
-echo $newUri; //display "path/to/the/sky"
+echo Modifier::from("/path/to/the/sky/")->removeLeadingSlash();
+//display "path/to/the/sky"
 ~~~
 
-### UriModifier::addLeadingSlash
+### Modifier::addLeadingSlash
 
 Adds the path leading slash if not present.
 
 ~~~php
-$newUri = UriModifier::addLeadingSlash("path/to/the/sky/");
-
-echo $newUri; //display "/path/to/the/sky"
+echo Modifier::from("path/to/the/sky/")->addLeadingSlash();
+//display "/path/to/the/sky"
 ~~~
 
-### UriModifier::replaceDirname
+### Modifier::replaceDirname
 
 Adds, updates and or removes the path dirname from the current URI path.
 
 ~~~php
-$uri = Http::new("http://www.example.com/path/to/the/sky");
-$newUri = UriModifier::replaceDirname($uri, '/road/to');
-
-echo $uri->getPath();    //display "/path/to/the/sky"
-echo $newUri->getPath(); //display "/road/to/sky"
+echo Modifier::from("http://www.example.com/path/to/the/sky")
+    ->replaceDirname('/road/to')
+    ->getUri()
+    ->getPath(); //display "/road/to/sky"
 ~~~
 
-### UriModifier::replaceBasename
+### Modifier::replaceBasename
 
 Adds, updates and or removes the path basename from the current URI path.
 
 ~~~php
 $uri = Http::new("http://www.example.com/path/to/the/sky");
-$newUri = UriModifier::replaceBasename($uri, "paradise.xml");
-
-echo $uri->getPath();    //display "/path/to/the/sky"
-echo $newUri->getPath(); //display "/path/to/the/paradise.xml"
+echo Modifier::from($uri)
+    ->replaceBasename("paradise.xml")
+    ->getUri()
+    ->getPath();
+     //display "/path/to/the/paradise.xml"
 ~~~
 
-### UriModifier::replaceExtension
+### Modifier::replaceExtension
 
 Adds, updates and or removes the path extension from the current URI path.
 
 ~~~php
 $uri = Http::new("http://www.example.com/export.html");
-$newUri = UriModifier::replaceExtension($uri, 'csv');
-
-echo $uri->getPath();    //display "/export.html"
-echo $newUri->getPath(); //display "/export.csv"
+echo Modifier::from($uri)->replaceExtension('csv')->getUri()->getPath();
+//display "/export.csv"
 ~~~
 
-### UriModifier::addBasePath
+### Modifier::addBasePath
 
 Adds the basepath to the current URI path.
 
 ~~~php
 $uri = Http::new("http://www.example.com/path/to/the/sky");
-$newUri = UriModifier::addBasePath($uri, '/the/real');
-
-echo $uri->getPath();    //display "/path/to/the/sky"
-echo $newUri->getPath(); //display "/the/real/path/to/the/sky"
+echo Modifier::from($uri)
+    ->addBasePath('/the/real')
+    ->getUri()
+    ->getPath();
+//display "/the/real/path/to/the/sky"
 ~~~
 
-### UriModifier::removeBasePath
+### Modifier::removeBasePath
 
 Removes the basepath from the current URI path.
 
 ~~~php
 $uri = Http::new("http://www.example.com/path/to/the/sky");
-$newUri = UriModifier::removeBasePath($uri, "/path/to/the");
-
-echo $uri->getPath();    //display "/path/to/the/sky"
-echo $newUri->getPath(); //display "/sky"
+echo Modifier::from($uri)
+    ->removeBasePath("/path/to/the")
+    ->getUri()
+    ->getPath();
+//display "/sky"
 ~~~
 
-### UriModifier::appendSegment
+### Modifier::appendSegment
 
 Appends a path to the current URI path.
 
 ~~~php
 $uri = Http::new("http://www.example.com/path/to/the/sky/");
-$newUri = UriModifier::appendSegment($uri, "and/above");
-
-echo $uri->getPath();    //display "/path/to/the/sky"
-echo $newUri->getPath(); //display "/path/to/the/sky/and/above"
+echo Modifier::from($uri)
+    ->appendSegment("and/above")
+    ->getUri()
+    ->getPath();
+ //display "/path/to/the/sky/and/above"
 ~~~
 
-### UriModifier::prependSegment
+### Modifier::prependSegment
 
 Prepends a path to the current URI path.
 
 ~~~php
 $uri = Http::new("http://www.example.com/path/to/the/sky/");
-$newUri = UriModifier::prependSegment($uri, "and/above");
-
-echo $uri->getPath();    //display "/path/to/the/sky"
-echo $newUri->getPath(); //display "/and/above/path/to/the/sky/"
+echo Modifier::from($uri)
+    ->prependSegment("and/above")
+    ->getUri()
+    ->getPath();
+ //display "/and/above/path/to/the/sky/"
 ~~~
 
-### UriModifier::replaceSegment
+### Modifier::replaceSegment
 
 Replaces a segment from the current URI path with a new path.
 
 ~~~php
 $uri = Http::new("http://www.example.com/path/to/the/sky/");
-$newUri = UriModifier::replaceSegment($uri, 3, "sea");
-
-echo $uri->getPath();    //display "/path/to/the/sky/"
-echo $newUri->getPath(); //display "/path/to/the/sea/"
+echo Modifier::from($uri)
+    ->replaceSegment(3, "sea")
+    ->getUri()
+    ->getPath();
+ //display "/path/to/the/sea/"
 ~~~
 
 <p class="message-info">This modifier supports negative offset</p>
@@ -486,68 +464,69 @@ echo $newUri->getPath(); //display "/path/to/the/sea/"
 The previous example can be rewritten using negative offset:
 
 ~~~php
-$uri = Http::new("http://www.example.com/path/to/the/sky/");
-$newUri = UriModifier::replaceSegment($uri, -1, "sea");
-
-echo $uri->getPath();    //display "/path/to/the/sky/"
-echo $newUri->getPath(); //display "/path/to/the/sea/"
+echo Modifier::from("http://www.example.com/path/to/the/sky/")
+    ->replaceSegment(-1, "sea")
+    ->getPath();
+//display "/path/to/the/sea/"
 ~~~
 
-### UriModifier::removeSegments
+### Modifier::removeSegments
 
 Removes selected segments from the current URI path by providing the segments offset.
 
 ~~~php
-$uri = Http::new("http://www.example.com/path/to/the/sky/");
-$newUri = UriModifier::removeSegments($uri, 1, 3);
-
-echo $uri->getPath();    //display "/path/to/the/sky/"
-echo $newUri->getPath(); //display "/path/the/"
+echo Modifier::from("http://www.example.com/path/to/the/sky/")
+    ->removeSegments(1, 3)
+    ->getUri()
+    ->getPath();
+//display "/path/the/"
 ~~~
 
 <p class="message-info">This modifier supports negative offset</p>
 
 ~~~php
-$uri = Http::new("http://www.example.com/path/to/the/sky/");
-$newUri = UriModifier::removeSegments($uri, -1, -2]);
-
-echo $uri->getPath();    //display "/path/to/the/sky/"
-echo $newUri->getPath(); //display "/path/the/"
+echo Modifier::from("http://www.example.com/path/to/the/sky/")
+    ->removeSegments(-1, -2])
+    ->getUri()
+    ->getPath();
+//display "/path/the/"
 ~~~
 
-### UriModifier::replaceDataUriParameters
+### Modifier::replaceDataUriParameters
 
 Update Data URI parameters
 
 ~~~php
-$uri = DataUri::new("data:text/plain;charset=US-ASCII,Hello%20World!");
-$newUri = UriModifier::replaceDataUriParameters($uri, "charset=utf-8");
-
-echo $uri->getPath();    //display "text/plain;charset=US-ASCII,Hello%20World!"
-echo $newUri->getPath(); //display "text/plain;charset=utf-8,Hello%20World!"
+$uri = Uri::new("data:text/plain;charset=US-ASCII,Hello%20World!");
+echo Modifier::from($uri)
+    ->replaceDataUriParameters("charset=utf-8")
+    ->getUri()
+    ->getPath();
+//display "text/plain;charset=utf-8,Hello%20World!"
 ~~~
 
-### UriModifier::dataPathToBinary
+### Modifier::dataPathToBinary
 
 Converts a data URI path from text to its base64 encoded version
 
 ~~~php
-$uri = DataUri::new("data:text/plain;charset=US-ASCII,Hello%20World!");
-$newUri = UriModifier::dataPathToBinary($uri);
-
-echo $uri->getPath();    //display "text/plain;charset=US-ASCII,Hello%20World!"
-echo $newUri->getPath(); //display "text/plain;charset=US-ASCII;base64,SGVsbG8gV29ybGQh"
-
+$uri = Uri::new("data:text/plain;charset=US-ASCII,Hello%20World!");
+echo Modifier::from($uri)
+    ->dataPathToBinary()
+    ->getUri()
+    ->getPath();
+//display "text/plain;charset=US-ASCII;base64,SGVsbG8gV29ybGQh"
 ~~~
 
-### UriModifier::dataPathToAscii
+### Modifier::dataPathToAscii
 
 Converts a data URI path from text to its base64 encoded version
 
 ~~~php
-$uri = DataUri::new("data:text/plain;charset=US-ASCII;base64,SGVsbG8gV29ybGQh");
-$newUri = UriModifier::dataPathToAscii($uri);
-
-echo $uri->getPath();    //display "text/plain;charset=US-ASCII;base64,SGVsbG8gV29ybGQh"
-echo $newUri->getPath(); //display "text/plain;charset=US-ASCII,Hello%20World!"
+$uri = Uri::new("data:text/plain;charset=US-ASCII;base64,SGVsbG8gV29ybGQh");
+echo Modifier::from($uri)
+    ->dataPathToAscii()
+    ->getUri()
+    ->getPath();
+//display "text/plain;charset=US-ASCII,Hello%20World!"
 ~~~

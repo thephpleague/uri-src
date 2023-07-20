@@ -20,9 +20,11 @@ user experience to your developers.
 
 ~~~php
 use League\Uri\Components\Query;
-use League\Uri\UriModifier;
+use League\Uri\Modifier;
 
-$newUri = UriModifier::appendQuery('http://example.com?q=value#fragment', 'q=new.Value');
+$newUri = Modifier::from('http://example.com?q=value#fragment')
+    ->appendQuery('q=new.Value')
+    ->getUri();
 echo $newUri; // 'http://example.com?q=value&q=new.Value#fragment';
 
 $query = Query::fromUri($newUri);

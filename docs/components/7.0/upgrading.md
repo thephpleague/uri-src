@@ -35,6 +35,40 @@ package was required.
 - [League Uri](https://github.com/thephpleague/uri)
 - [PSR-7](http://www.php-fig.org/psr/psr-7/)
 
+Deprecated classes
+--------
+
+The `League\Uri\UriModifer` class is deprecated in favor of the `League\Uri\Modifier` class:
+
+Before:
+
+~~~php
+<?php
+
+use League\Uri\Uri;
+use League\Uri\UriModifier;
+
+$uri = Uri::new('http://example.com?q=value#fragment');
+$newUri = UriModifier::appendQuery($uri, 'q=new.Value');
+echo $newUri::class; // return League\Uri\Uri
+echo $newUri; // 'http://example.com?q=value&q=new.Value#fragment'
+~~~
+
+After:
+
+~~~php
+<?php
+
+use League\Uri\Uri;
+use League\Uri\Modifier;
+
+$uri = Uri::new('http://example.com?q=value#fragment');
+$newUri = Modifier::from($uri)->appendQuery('q=new.Value');
+echo $newUri::class; // return League\Uri\Modifier
+echo $newUri; // 'http://example.com?q=value&q=new.Value#fragment'
+$newUri->getUri()::class // return League\Uri\Uri
+~~~
+
 Deprecated methods
 --------
 
@@ -194,5 +228,4 @@ To modify such component you are now required to create a new instance.
 - `withContent` and `getContent` methods, already deprecated in version 2;
 - Support for `__set_state` with no replacement;
 - Support for `float` type as possible argument for components;
-- Support for `int` type on `UriModifier` methods argument MUST be converted to string;
 - `Domain` value can be `null` previously it would trigger an exception.
