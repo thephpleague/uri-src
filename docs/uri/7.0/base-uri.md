@@ -17,7 +17,7 @@ will also be a PSR-7 <code>UriInterface</code> implementing instance.</p>
 ## Instantiation
 
 Instantiation is done via the `BaseUri::from` named constructor which accepts string and stringable objects alike.
-Once instantiated you can get access to its underlying URI instance via the public method `BaseUri::uri()`.
+Once instantiated you can get access to its underlying URI instance via the public method `BaseUri::get()`.
 if a Psr7 implementing object was use for instantiation, the same instance will be return by the method.
 
 ~~~php
@@ -27,10 +27,10 @@ use League\Uri\BaseUri;
 use GuzzleHttp\Psr7\Utils;
 
 $baseUri = BaseUri::from('http://www.ExaMPle.com');
-$baseUri->uri(); // return Uri::new('http://www.ExaMPle.com');
+$baseUri->get(); // return Uri::new('http://www.ExaMPle.com');
 
 $baseUriPsr7 = BaseUri::from(Utils::uriFor('http://www.ExaMPle.com'));
-$baseUri->uri(); // return new GuzzleHttp\Psr7\Uri('http://www.example.com/?foo=toto#~typo');
+$baseUri->get(); // return new GuzzleHttp\Psr7\Uri('http://www.example.com/?foo=toto#~typo');
 ~~~
 
 ## URI resolution
@@ -69,12 +69,12 @@ $uri = 'http://www.example.com/?foo=toto#~typo';
 $relativeUri = $baseUri->relativize($uri);
 echo $relativeUri;               // display "/?foo=toto#~typo"
 echo $relativeUri::class;        // display '\Leage\Uri\BaseUri'
-echo $relativeUri->uri()::class; //display \GuzzleHttp\Psr7\Uri
+echo $relativeUri->get()::class; //display \GuzzleHttp\Psr7\Uri
 
 $resolvedUri = $baseUri->withoutUriFactory()->resolve("/?foo=toto#~typo");
 echo $resolvedUri;               // display 'http://www.example.com/?foo=toto#~typo'
 echo $resolvedUri::class;        // display '\Leage\Uri\BaseUri'
-echo $resolvedUri->uri()::class; // display \League\Uri\Uri
+echo $resolvedUri->get()::class; // display \League\Uri\Uri
 ~~~
 
 You can always switch back to using the `Uri` object by unregistering the factory using `BaseUri::withoutUriFactory`.
