@@ -53,8 +53,8 @@ In addition to merging the query to the URI, `mergeQuery` has:
 - not mangle your data during merging;
 - returned a valid URI object;
 
-Because the `Modifier` is immutable and the modifying methods return a new instance of the class
-we can the class supports out of the box piping multiple methods to improve your code.
+Because the `Modifier` is immutable and the modifying methods return a new instance of the class,
+out of the box, piping multiple methods to improve your code is supported.
 
 ~~~php
 <?php
@@ -102,7 +102,8 @@ use League\Uri\Modifier;
 echo Modifier::from("http://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
     ->sortQuery($uri)
     ->getUri()
-    ->getQuery(); //display "kingkong=toto&kingkong=ape&foo=bar%20baz"
+    ->getQuery(); 
+//display "kingkong=toto&kingkong=ape&foo=bar%20baz"
 ~~~
 
 ### Modifier::mergeQuery
@@ -110,11 +111,12 @@ echo Modifier::from("http://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ap
 Merges a submitted query string to the URI object to be modified. When merging two query strings with the same key value the submitted query string value takes precedence over the URI query string value.
 
 ~~~php
-$uri = ;
-echo Modifier::from(Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3"))
+$uri = Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3");
+echo Modifier::from($uri)
     ->mergeQuery('kingkong=godzilla&toto')
     ->getUri()
-    ->getQuery(); //display "kingkong=godzilla&foo=bar%20baz&toto"
+    ->getQuery();
+//display "kingkong=godzilla&foo=bar%20baz&toto"
 ~~~
 
 ### Modifier::appendQuery
@@ -122,11 +124,12 @@ echo Modifier::from(Http::new("http://example.com/test.php?kingkong=toto&foo=bar
 Appends a submitted query string to the URI object to be modified. When appending two query strings with the same key value the submitted query string value is added to the return query string without modifying the URI query string value.
 
 ~~~php
-
-echo Modifier::from(Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3"))
+Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3")
+echo Modifier::from($uri)
     ->appendQuery($uri, 'kingkong=godzilla&toto')
     ->getUri()
-    ->getQuery(); //display "kingkong=toto&kingkong=godzilla&foo=bar%20baz&toto"
+    ->getQuery();
+//display "kingkong=toto&kingkong=godzilla&foo=bar%20baz&toto"
 ~~~
 
 ### Modifier::removePairs
@@ -198,6 +201,22 @@ echo $newUri; //display "http://스타벅스코리아.com/to/the/sky/"
 <strong>League URI objects</strong> because the object always transcode the host component
 into its RFC3986/ascii representation.</p>
 
+### Modifier::normalizeIpv4
+
+Normalizes the URI host content to a IPv4 dot-decimal notation if possible
+otherwise returns the uri instance unchanged. See the [IPv4 Normalizer documentation](/components/7.0/ipv4-normalizer/)
+documentation page for more information.
+
+~~~php
+<?php
+
+use League\Uri\Modifier;
+
+$uri = 'http://0300.0250.0000.0001/path/to/the/sky.php';
+echo Modifier::from($uri)->normalizeIp()->getUri();
+//display 'http://192.168.0.1/path/to/the/sky.php'
+~~~
+
 ### Modifier::removeZoneIdentifier
 
 Removes the host zone identifier if present
@@ -265,7 +284,8 @@ Replaces a label from the current URI host with a host.
 ~~~php
 use League\Uri\Modifier;
 
-echo Modifier::from("http://www.example.com/path/to/the/sky/")->replaceLabel(2, 'admin.shop');
+$uri = "http://www.example.com/path/to/the/sky/";
+echo Modifier::from($uri)->replaceLabel(2, 'admin.shop');
 //display"http://admin.shop.example.com/path/to/the/sky"
 ~~~
 
@@ -276,7 +296,8 @@ The previous example can be rewritten using negative offset:
 ~~~php
 use League\Uri\Modifier;
 
-echo Modifier::from("http://www.example.com/path/to/the/sky/")->replaceLabel(-1, 'admin.shop');
+$uri = "http://www.example.com/path/to/the/sky/";
+echo Modifier::from($uri)->replaceLabel(-1, 'admin.shop');
 //display"http://admin.shop.example.com/path/to/the/sky"
 ~~~
 
@@ -287,7 +308,9 @@ Removes selected labels from the current URI host. Labels are indicated using an
 <p class="message-notice">Hosts are hierarchical components whose labels are indexed from right to left.</p>
 
 ~~~php
-echo Modifier::from("http://www.localhost.com/path/to/the/sky/")->removeLabels(2, 0);
+
+$uri = "http://www.localhost.com/path/to/the/sky/";
+echo Modifier::from($uri)->removeLabels(2, 0);
 //display "http://localhost/path/the/sky/"
 ~~~
 
@@ -296,7 +319,8 @@ echo Modifier::from("http://www.localhost.com/path/to/the/sky/")->removeLabels(2
 The previous example can be rewritten using negative offset:
 
 ~~~php
-Modifier::from("http://www.example.com/path/to/the/sky/")->removeLabels(-1, -3)->getUriString();
+$uri = "http://www.example.com/path/to/the/sky/";
+Modifier::from($uri)->removeLabels(-1, -3)->getUriString();
 //return "http://localhost/path/the/sky/"
 ~~~
 
@@ -311,7 +335,8 @@ expected because of the rules governing parsing and building path string.</p>
 Removes dot segments according to RFC3986:
 
 ~~~php
-echo Modifier::from("http://www.example.com/path/../to/the/./sky/")->removeDotSegments();
+$uri = "http://www.example.com/path/../to/the/./sky/";
+echo Modifier::from($uri)->removeDotSegments();
 //display "http://www.example.com/to/the/sky/"
 ~~~
 
@@ -320,7 +345,8 @@ echo Modifier::from("http://www.example.com/path/../to/the/./sky/")->removeDotSe
 Removes adjacent separators with empty segment.
 
 ~~~php
-echo Modifier::from("http://www.example.com/path//to/the//sky/")->removeEmptySegments();
+$uri = "http://www.example.com/path//to/the//sky/";
+echo Modifier::from($uri)->removeEmptySegments();
 //display "http://www.example.com/path/to/the/sky/"
 ~~~
 
@@ -329,7 +355,8 @@ echo Modifier::from("http://www.example.com/path//to/the//sky/")->removeEmptySeg
 Removes the path trailing slash if present
 
 ~~~php
-echo Modifier::from("http://www.example.com/path/?foo=bar")->removeTrailingSlash();
+$uri = Uri::new("http://www.example.com/path/?foo=bar");
+echo Modifier::from($uri)->removeTrailingSlash();
 //display "http://www.example.com/path?foo=bar"
 ~~~
 
@@ -338,7 +365,8 @@ echo Modifier::from("http://www.example.com/path/?foo=bar")->removeTrailingSlash
 Adds the path trailing slash if not present
 
 ~~~php
-echo Modifier::from("http://www.example.com/sky#top")->addTrailingSlash();
+$uri = "http://www.example.com/sky#top";
+echo Modifier::from($uri)->addTrailingSlash();
 //display "http://www.example.com/sky/#top"
 ~~~
 
@@ -347,7 +375,8 @@ echo Modifier::from("http://www.example.com/sky#top")->addTrailingSlash();
 Removes the path leading slash if present.
 
 ~~~php
-echo Modifier::from("/path/to/the/sky/")->removeLeadingSlash();
+$uri = "/path/to/the/sky/";
+echo Modifier::from($uri)->removeLeadingSlash();
 //display "path/to/the/sky"
 ~~~
 
