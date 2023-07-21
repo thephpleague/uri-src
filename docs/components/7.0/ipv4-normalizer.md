@@ -37,11 +37,11 @@ use League\Uri\Contracts\HostInterface;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\IPv4Normalizer;
 use League\Uri\IPv4Calculators\IPv4Calculator;
-use \Psr\Http\Message\UriInterface as Psr7UriInterface;
+use Psr\Http\Message\UriInterface as Psr7UriInterface;
 
 public function IPv4Normalizer::normalizeUri(Stringable|string $uri): UriInterface|Psr7UriInterface ;
 public function IPv4Normalizer::normalizeAuthority(Stringable|string $authority): AuthorityInterface;
-public function IPv4Normalizer::normalizeHost(Stringable|string $host): HostInterface;
+public function IPv4Normalizer::normalizeHost(Stringable|string|null $host): HostInterface;
 ```
 
 The methods only parameters are string or stringable objects that contain or represent a host component.
