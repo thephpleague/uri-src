@@ -26,7 +26,11 @@ packages:
                 Introduction: '/components/7.0/'
                 Installation: '/components/7.0/installation/'
                 From 2.x to 7.x: '/components/7.0/upgrading/'
+            Modifiers:
+                URI Modifier: '/components/7.0/modifiers/'
+                IPv4 Normalizer: '/components/7.0/ipv4-normalizer/'
             URI components:
+                Common API: '/components/7.0/api/'
                 Scheme: '/components/7.0/scheme/'
                 Authority: '/components/7.0/authority/'
                 UserInfo: '/components/7.0/userinfo/'
@@ -38,10 +42,8 @@ packages:
                 HierarchicalPath: '/components/7.0/hierarchical-path/'
                 Query: '/components/7.0/query/'
                 Fragment: '/components/7.0/fragment/'
-            Utility classes:
-                URI Modifier: '/components/7.0/modifiers/'
+            Utility Classes:
                 QueryString: '/components/7.0/query-parser-builder/'
-                IPv4 Normalizer: '/components/7.0/ipv4-normalizer/'
         '2.0':
             Documentation:
                 Getting Started: '/components/2.0/'
@@ -100,9 +102,9 @@ packages:
                 Getting Started: '/uri/7.0/'
                 Parse & Build URI: '/uri/7.0/parser-builder/'
                 RFC3986 URI: '/uri/7.0/rfc3986/'
-                Base URI: '/uri/7.0/base-uri/'
-                URI template: '/uri/7.0/uri-template/'
                 PSR-7 URI: '/uri/7.0/psr7/'
+                URI template: '/uri/7.0/uri-template/'
+                URI Manipulation: '/uri/7.0/base-uri/'
                 From 6.x to 7.x: '/uri/7.0/upgrading/'
         '6.0':
             Documentation:
