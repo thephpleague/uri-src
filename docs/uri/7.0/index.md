@@ -25,7 +25,7 @@ But also expose a complete API around URI creation using the [UriTemplate](/uri/
 and the [URI](/uri/7.0/rfc3986/) class which represents a generic RFC3986 compliant URI
 object.
 
-For interoperability, we also provide [PSR-7 and PSR-17](/uri/7.0/psr7-compliance/)
+For interoperability, we also provide [PSR-7 and PSR-17](/uri/7.0/psr-compliance/)
 compliant implementation around URI access and creation. 
 
 System Requirements
