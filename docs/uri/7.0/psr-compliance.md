@@ -3,17 +3,23 @@ layout: default
 title: PSR-7 compliant URI Object API
 ---
 
-PSR-7 URI
+PSR interoperability
 =======
 
-The package provides an expressive and efficient API around building and manipulating URI compliant
-with [PSR-7](https://www.php-fig.org/psr/psr-7/). It allows the easy creation of URI in multiple contexts 
-to increase your DX while working with URI.
+As we are dealing with URI, the package provides classes compliant
+with [PSR-7](https://www.php-fig.org/psr/psr-7/) and 
+[PSR-17](https://www.php-fig.org/psr/psr-17/). This is done to allow
+more interoperability amongs PHP packages.
 
-<p class="message-notice">The class handles all URI schemes and default to HTTP(s) rules if the
-scheme is not present and not recognized as special.</p>
+## PSR-7 compatibility
 
-## Instantiation
+The `Http` class implements the PSR-7 `UriInterface` interface. This means that you can
+use this class anytime you need a PSR-7 compliant URI object. Behind the scene, the
+implementation uses the [Uri object](/uri/7.0/rfc3986/) and thus presents the same
+features around URI validation, modification and normalization.
+
+<p class="message-notice">The class handles all URI schemes <strong>BUT</strong> default
+to HTTP(s) rules if the scheme is not present and not recognized as special.</p>
 
 While the default constructor is private and can not be accessed to instantiate a new object,
 the `League\Uri\Http` class comes with named constructors to ease instantiation.
@@ -30,7 +36,7 @@ use Laminas\Diactoros\Uri as LaminasUri;
 // using a string or an object which expose the `__toString` method
 
 $uri = Http::new('http://example.com/path/to?q=foo%20bar#section-42');
-$uri->toString(); // display 'http://example.com/path/to?q=foo%20bar#section-4'
+echo $uri; // display 'http://example.com/path/to?q=foo%20bar#section-4'
 
 $laminasUri = new LaminasUri("http://www.example.com/path/to/the/sky");
 $laminasUri->getQuery(); //return '';
@@ -79,42 +85,25 @@ The method expects at most two parameters. The URI template to resolve and the v
 for resolution. You can get a more in-depth understanding of
 [URI Template](/uri/7.0/uri-template) in its dedicated section of the documentation.
 
-## Relation with PSR-7
-
-The `Http` class implements the PSR-7 `UriInterface` interface. This means that you can 
-use this class anytime you need a PSR-7 compliant URI object.
-
-## URI normalization
-
-Out of the box the package normalizes any given URI according to the non-destructive rules
-of [RFC3986](https://tools.ietf.org/html/rfc3986).
-
-These non-destructive rules are:
-
-- scheme and host components are lowercase;
-- the host is converted to its ascii representation using punycode if needed
-- query, path, fragment components are URI encoded if needed;
-- the port number is removed from the URI string representation if the standard port is used;
-
-~~~php
-<?php
-
-use League\Uri\Http;
-
-$uri = Http::new("hTTp://www.ExAmPLE.com:80/hello/./wor ld?who=f 3#title");
-echo $uri; //displays http://www.example.com/hello/./wor%20ld?who=f%203#title
-
-$uri = Http::fromComponent(parse_url("hTTp://www.bébé.be?#"));
-echo $uri; //displays http://xn--bb-bjab.be?#
-~~~
-
-<p class="message-info">The last example depends on the presence of the <code>ext-intl</code> extension, otherwise the code will trigger a <code>IdnSupportMissing</code> exception</p>
-
 In addition to PSR-7 compliance, the class implements PHP's `JsonSerializable` interface.
 
 ~~~php
 <?php
+use League\Uri\Http;
 
-echo json_encode(\League\Uri\Http::new('http://example.com/path/to?q=foo%20bar#section-42'));
+echo json_encode(Http::new('http://example.com/path/to?q=foo%20bar#section-42'));
 // display "http:\/\/example.com\/path\/to?q=foo%20bar#section-42"
+~~~
+
+## PSR-17 compatibility
+
+The package also provides an implementation of the `UriFactoryInterface` from [PSR-17](https://www.php-fig.org/psr/psr-17/)
+
+~~~php
+<?php
+use League\Uri\HttpFactory;
+
+$uriFactory = new HttpFactory();
+$uri = $uriFactory->createUri('http://example.com/path/to?q=foo%20bar#section-42');
+echo $uri::class; // display League\Uri\Http
 ~~~

@@ -101,10 +101,10 @@ packages:
             Documentation:
                 Getting Started: '/uri/7.0/'
                 Parse & Build URI: '/uri/7.0/parser-builder/'
-                RFC3986 URI: '/uri/7.0/rfc3986/'
-                PSR-7 URI: '/uri/7.0/psr7/'
-                URI template: '/uri/7.0/uri-template/'
+                URI Handling: '/uri/7.0/rfc3986/'
+                URI Template: '/uri/7.0/uri-template/'
                 URI Manipulation: '/uri/7.0/base-uri/'
+                PSR Compliance: '/uri/7.0/psr7-compliance/'
                 From 6.x to 7.x: '/uri/7.0/upgrading/'
         '6.0':
             Documentation:
