@@ -17,21 +17,19 @@ will also be a PSR-7 <code>UriInterface</code> implementing instance.</p>
 ## Instantiation
 
 Instantiation is done via the `BaseUri::from` named constructor which accepts string and stringable objects alike.
-Once instantiated you can get access to its underlying URI instance via the public method `BaseUri::get()`.
-if a Psr7 implementing object was use for instantiation, the same instance will be return by the method.
+Once instantiated you can get access to its underlying URI as a string via the `BaseUri::getUriString()` method .
 
 ~~~php
 <?php
 
 use League\Uri\BaseUri;
-use GuzzleHttp\Psr7\Utils;
 
 $baseUri = BaseUri::from('http://www.ExaMPle.com');
-$baseUri->getUri(); // return Uri::new('http://www.ExaMPle.com');
-
-$baseUriPsr7 = BaseUri::from(Utils::uriFor('http://www.ExaMPle.com'));
-$baseUri->getUri(); // return new GuzzleHttp\Psr7\Uri('http://www.example.com/?foo=toto#~typo');
+$baseUri->getUriString(); // return 'http://www.example.com';
+echo $baseUri; // display 'http://www.example.com'
 ~~~
+
+The instance also implements PHP's `Stringable` and `JsonSerializable` interface.
 
 ## URI resolution
 
@@ -50,7 +48,7 @@ echo $relativeUri; // display "/?foo=toto#~typo
 echo $baseUri->resolve($relativeUri);
 echo $baseUri; // display 'http://www.example.com'
 // display 'http://www.example.com/?foo=toto#~typo'
-echo $baseUri::class; //display \League\Uri\Uri
+echo $baseUri->getUri()::class; //display \League\Uri\Uri
 ~~~
 
 Out of the box when submitting an object other than a `PSR-7 UriInterface`

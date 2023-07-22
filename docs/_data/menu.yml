@@ -24,11 +24,12 @@ packages:
         '7.0':
             Getting Started:
                 Introduction: '/components/7.0/'
-                Installation: '/components/7.0/installation/'
                 From 2.x to 7.x: '/components/7.0/upgrading/'
             Modifiers:
                 URI Modifier: '/components/7.0/modifiers/'
                 IPv4 Normalizer: '/components/7.0/ipv4-normalizer/'
+            Parsers:
+                QueryString: '/components/7.0/query-parser-builder/'
             URI components:
                 Common API: '/components/7.0/api/'
                 Scheme: '/components/7.0/scheme/'
@@ -42,8 +43,6 @@ packages:
                 HierarchicalPath: '/components/7.0/hierarchical-path/'
                 Query: '/components/7.0/query/'
                 Fragment: '/components/7.0/fragment/'
-            Utility Classes:
-                QueryString: '/components/7.0/query-parser-builder/'
         '2.0':
             Documentation:
                 Getting Started: '/components/2.0/'
