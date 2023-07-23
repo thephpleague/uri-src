@@ -213,7 +213,7 @@ documentation page for more information.
 use League\Uri\Modifier;
 
 $uri = 'http://0300.0250.0000.0001/path/to/the/sky.php';
-echo Modifier::from($uri)->normalizeIpV4()->getUri();
+echo Modifier::from($uri)->normalizeIPv4()->getUri();
 //display 'http://192.168.0.1/path/to/the/sky.php'
 ~~~
 
