@@ -114,8 +114,12 @@ final class IPv4Normalizer
      */
     public function normalize(Stringable|string|null $host): ?string
     {
-        $originHost = (string) $host;
-        if ('' === $originHost) {
+        $hostString = (string) $host;
+        if ('' === $hostString) {
+            return null;
+        }
+
+        if (1 !== preg_match(self::REGEXP_IPV4_HOST, $hostString)) {
             return null;
         }
 
@@ -123,16 +127,11 @@ final class IPv4Normalizer
             $host = Host::new($host);
         }
 
-        $hostString = $host->toString();
-        if (!$host->isDomain() || 1 !== preg_match(self::REGEXP_IPV4_HOST, $hostString)) {
-            return $originHost;
+        if (!$host->isDomain()) {
+            return null;
         }
 
-        if (str_ends_with($hostString, '.')) {
-            $hostString = substr($hostString, 0, -1);
-        }
-
-        return $this->convertHost($hostString);
+        return $this->convertHost($host->toString());
     }
 
     /**
@@ -160,6 +159,10 @@ final class IPv4Normalizer
      */
     private function convertHost(string $hostString): ?string
     {
+        if (str_ends_with($hostString, '.')) {
+            $hostString = substr($hostString, 0, -1);
+        }
+
         $numbers = [];
         foreach (explode('.', $hostString) as $label) {
             $number = $this->labelToNumber($label);

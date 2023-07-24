@@ -73,6 +73,7 @@ public Host::isIpv6(): bool
 public Host::isIpFuture(): bool
 public Host::hasZoneIdentifier(): bool
 public Host::withoutZoneIdentifier(): self
+public Host::toIpv4(): ?string
 ~~~
 
 ### Host::fromIp
@@ -90,11 +91,11 @@ Host::fromIp('uri.thephpleague.com');
 //throws League\Uri\Exceptions\SyntaxError
 ~~~
 
-The method can also infer the IPv4 from its hexadecimal or octal representation. 
+The method can also infer the IPv4 from its hexadecimal or octal representation.
 
 ~~~php
 use League\Uri\Components\Host;
-use League\Uri\Ipv4Calculators\GMPCalculator;
+use League\Uri\IPv4Calculators\GMPCalculator;
 
 Host::fromIp('999999999', '', new GMPCalculator())->toString(); //display '59.154.201.255'
 ~~~
