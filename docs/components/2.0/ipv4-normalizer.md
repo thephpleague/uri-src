@@ -35,7 +35,7 @@ use League\Uri\Contracts\AuthorityInterface;
 use League\Uri\Contracts\HostInterface;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\IPv4Normalizer;
-use League\Uri\IPv4Calculators\IPv4Calculator;
+use League\Uri\IPv4\IPv4Calculator;
 use \Psr\Http\Message\UriInterface as Psr7UriInterface;
 
 public function IPv4Normalizer::__construct(IPv4Calculator $calculator = null);
@@ -62,7 +62,7 @@ The methods always return an instance of the same type as the submitted one with
 <?php
 
 use League\Uri\Components\Authority;
-use League\Uri\IPv4Calculators\NativeCalculator;
+use League\Uri\IPv4\NativeCalculator;
 use League\Uri\IPv4Normalizer;
 
 $authority = new Authority('hello:world@0300.0250.0000.0001:442');

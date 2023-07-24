@@ -95,7 +95,7 @@ The method can also infer the IPv4 from its hexadecimal or octal representation.
 
 ~~~php
 use League\Uri\Components\Host;
-use League\Uri\IPv4Calculators\GMPCalculator;
+use League\Uri\IPv4\GMPCalculator;
 
 Host::fromIp('999999999')->toString(); //display '59.154.201.255'
 ~~~

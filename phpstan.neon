@@ -10,10 +10,10 @@ parameters:
 		- interfaces
 	ignoreErrors:
 		- message: '#Cannot cast mixed to string.#'
-		  path: interfaces/IPv4Calculators/BCMathCalculator.php
+		  path: interfaces/IPv4/BCMathCalculator.php
 		- message: '#Cannot cast mixed to string.#'
-		  path: interfaces/IPv4Calculators/NativeCalculator.php
+		  path: interfaces/IPv4/NativeCalculator.php
 		- message: '#function gmp_(.*)? expects (GMP|int)#'
-		  path: interfaces/IPv4Calculators/GMPCalculator.php
+		  path: interfaces/IPv4/GMPCalculator.php
 	reportUnmatchedIgnoredErrors: true
 	checkMissingIterableValueType: false
