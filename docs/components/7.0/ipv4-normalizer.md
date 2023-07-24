@@ -17,37 +17,19 @@ to parse and format IPv4 multiple string representations.
 use League\Uri\IPv4Normalizer;
 
 $normalizer = IPv4Normalizer::fromEnvironment();
-echo $normalizer->normalizeHost('0')->toString(); // returns 0.0.0.0
+echo $normalizer->normalize('0'); // returns 0.0.0.0
 ```
 
 Usage
 --------
 
-The class can convert the host if it is contains in:
-
-- a URI using `IPv4Normalizer::normalizeUri`;
-- an Authority `IPv4Normalizer::normalizeAuthority`;
-- a Host `IPv4Normalizer::normalizeHost`;
-
-```php
-<?php
-
-use League\Uri\Contracts\AuthorityInterface;
-use League\Uri\Contracts\HostInterface;
-use League\Uri\Contracts\UriInterface;
-use League\Uri\IPv4Normalizer;
-use League\Uri\IPv4Calculators\IPv4Calculator;
-use Psr\Http\Message\UriInterface as Psr7UriInterface;
-
-public function IPv4Normalizer::normalizeUri(Stringable|string $uri): UriInterface|Psr7UriInterface ;
-public function IPv4Normalizer::normalizeAuthority(Stringable|string $authority): AuthorityInterface;
-public function IPv4Normalizer::normalizeHost(Stringable|string|null $host): HostInterface;
-```
-
-The methods only parameters are string or stringable objects that contain or represent a host component.
+The class convert the host if the conversion is applicable using the `IPv4Normalizer::normalize` method or
+the `IPv4Normalizer::normalizeHost` methods. The methods differs in their return type the former
+returns `null` if the conversion fails or the IP string representation if it succeeds, while
+the latter always returns a `Host` object.
 
 Behind the scene a `League\Uri\IPv4Calculators\IPv4Calculator` implementation is responsible for making
-all the calculation needed to perform the conversion between IPv4 string representation.
+all the calculations needed to perform the conversion between IPv4 string representation.
 
 The package comes bundled with three implementations:
 
@@ -55,23 +37,23 @@ The package comes bundled with three implementations:
 - `League\Uri\IPv4Calculators\BCMathCalculator` which relies on BCMath extension;
 - `League\Uri\IPv4Calculators\NativeCalculator` which relies on PHP build against a x.64 architecture;
 
-The `IPv4Normalizer::fromEnvironment()` will try to load on of these implementation depending on your 
+The `IPv4Normalizer::fromEnvironment()` will try to load one of these implementations depending on your 
 application environment. If it can not, a `League\Uri\Exceptions\Ipv4CalculatorMissing` exception
 will be thrown.
-
-The methods always return an instance of the same type as the submitted one with the host changed if the normalization is applicable or unchanged otherwise.
 
 ```php
 <?php
 
-use League\Uri\Components\Authority;
 use League\Uri\IPv4Calculators\NativeCalculator;
 use League\Uri\IPv4Normalizer;
 
-$authority = Authority::new('hello:world@0300.0250.0000.0001:442');
+$host = Host::new('0300.0250.0000.0001');
 $normalizer = new IPv4Normalizer(new NativeCalculator());
-$normalizedAuthority = $normalizer->normalizeAuthority($authority);
+$ipHost = $normalizer->normalizeHost($host);
+$ipHost::class; // returns \League\Uri\Components\Host
 
-echo $authority->getHost(); // returns '0300.0250.0000.0001'
-echo $normalizedAuthority->getHost(); // returns '192.168.0.1'
+echo $host->value();   // returns '0300.0250.0000.0001'
+echo $ipHost->value(); // returns '192.168.0.1'
+
+echo $normalizer->normalize('0300.0250.0000.0001'); // returns '192.168.0.1'
 ```
