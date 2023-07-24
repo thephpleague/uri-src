@@ -48,7 +48,7 @@ Before:
 use League\Uri\Uri;
 use League\Uri\UriModifier;
 
-$uri = Uri::new('http://example.com?q=value#fragment');
+$uri = Uri::createFromString('http://example.com?q=value#fragment');
 $newUri = UriModifier::appendQuery($uri, 'q=new.Value');
 echo $newUri::class; // return League\Uri\Uri
 echo $newUri; // 'http://example.com?q=value&q=new.Value#fragment'
@@ -123,8 +123,6 @@ to version `7.0`, but it is recommended not to use them for new projects.
 | `Query::toRFC3986`                             | `Query::value`                    |
 
 ````diff
-<?php
-
 use League\Uri\Components\Host;
 
 - Host::createFromString('bébé.be')->value(); //returns 'xn--bb-bjab.be'
@@ -137,8 +135,6 @@ For the `Domain`, the `createFromLabels` named constructor is being replaced by 
 The signature is also updated from `iterable` to `string` as variadic to allow easier validation of input.
 
 ````diff
-<?php
-
 use League\Uri\Components\Domain;
 
 - Domain::createFromLabels(['who', 'are', 'you'])->value(); //returns 'you.are.who'
@@ -150,8 +146,6 @@ are being replaced by `fromRelative` and `fromAbsolute`. The signature is also u
 from `iterable` to `string` as variadic to allow easier validation of input.
 
 ````diff
-<?php
-
 use League\Uri\Components\HierarchicalPath;
 
 - HierarchicalPath::createAbsoluteFromSegments(['who', 'are', 'you'])->value(); //returns '/who/are/you'
@@ -166,8 +160,6 @@ with a change in signature. The query string needs to be explicitly set otherwis
 will be thrown.
 
 ````diff
-<?php
-
 use League\Uri\Components\Query;
 
 - Query::createFromRFC1738()->value(); //returns ''
@@ -179,8 +171,6 @@ use League\Uri\Components\Query;
 All remaining named constructors which starts with `createFrom*` are replaced by the same method starting with `from*`.
 
 ````diff
-<?php
-
 use League\Uri\Components\Port;
 use League\Uri\Uri;
 
@@ -197,8 +187,6 @@ The `UserInfo::withUserInfo` modifier method is removed and can be replaced by c
 new modifier methods introduced `UserInfo::withUser` and/or `UserInfo::withUPass`.
 
 ````diff
-<?php
-
 use League\Uri\Components\UserInfo;
 
 - (new UserInfo('user', 'pass'))->withUserInfo('user', 'newPass')->value(); // returns 'user:newPass'
@@ -212,8 +200,6 @@ Of note, it means that the `Scheme` and `Fragment` objects no longer contain met
 their value once instantiated.
 
 ````diff
-<?php
-
 use League\Uri\Components\Fragment;
 
 - Fragmnt::createFromString('header1')->withContent('header2')->getUriComponent(); // returns '#header2'
