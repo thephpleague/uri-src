@@ -25,10 +25,10 @@ packages:
             Getting Started:
                 Introduction: '/common/7.0/'
             Parsers:
-                URI: '/uri/7.0/uri-parser-builder/'
+                URI: '/common/7.0/uri-parser-builder/'
                 Query: '/common/7.0/query-parser-builder/'
             Tools:
-                IPv4: '/common/7.0/IPv4/'
+                IPv4: '/common/7.0/ipv4/'
                 IDNA: '/common/7.0/idn/'
     'components':
         '7.0':
