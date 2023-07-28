@@ -20,13 +20,21 @@ packages:
         '1.0':
             Documentation:
                 Getting Started: '/query-parser/1.0/'
+    'common':
+        '7.0':
+            Introduction: '/common/7.0/'
+            Parsers:
+                URI: '/uri/7.0/uri-parser-builder/'
+                Query: '/common/7.0/query-parser-builder/'
+            Tools:
+                IPv4: '/common/7.0/IPv4/'
+                IDNA: '/common/7.0/idn/'
     'components':
         '7.0':
             Getting Started:
                 Introduction: '/components/7.0/'
                 From 2.x to 7.x: '/components/7.0/upgrading/'
                 Modifier: '/components/7.0/modifiers/'
-                QueryString: '/components/7.0/query-parser-builder/'
             URI components:
                 Common API: '/components/7.0/api/'
                 Scheme: '/components/7.0/scheme/'
@@ -96,7 +104,6 @@ packages:
         '7.0':
             Documentation:
                 Getting Started: '/uri/7.0/'
-                Parse & Build URI: '/uri/7.0/parser-builder/'
                 URI Handling: '/uri/7.0/rfc3986/'
                 URI Template: '/uri/7.0/uri-template/'
                 URI Manipulation: '/uri/7.0/base-uri/'
