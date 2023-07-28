@@ -22,7 +22,8 @@ packages:
                 Getting Started: '/query-parser/1.0/'
     'common':
         '7.0':
-            Introduction: '/common/7.0/'
+            Getting Started:
+                Introduction: '/common/7.0/'
             Parsers:
                 URI: '/uri/7.0/uri-parser-builder/'
                 Query: '/common/7.0/query-parser-builder/'
