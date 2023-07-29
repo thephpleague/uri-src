@@ -6,13 +6,13 @@ title: URI Query string parser
 Query Parser and Builder
 =======
 
-The `League\Uri\Components\QueryString` is a PHP URI query parser and builder.
+The `League\Uri\QueryString` is a PHP URI query parser and builder.
 <p class="message-notice">The parsing/building algorithms preserve pairs order and uses the same algorithm used by JavaScript <a href="https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/URLSearchParams">UrlSearchParams</a></p>
 
 ```php
 <?php
 
-use League\Uri\Components\QueryString;
+use League\Uri\QueryString;
 
 $pairs = QueryString::parse('module=home&action=show&page=😓');
 // returns [
@@ -168,8 +168,8 @@ All exceptions extend the `League\Uri\Exceptions\UriException` marker class whic
 ```php
 <?php
 
-use League\Uri\Exception\InvalidUriComponent;
-use League\Uri\Parser\QueryString;
+use League\Uri\Exceptions\InvalidUriComponent;
+use League\Uri\QueryString;
 
 try {
     QueryString::extract('foo=bar', '&', 42);

@@ -14,19 +14,20 @@ regarding the conversion.
 <?php
 
 use League\Uri\Idna\Idna;
+use League\Uri\Idna\IdnaError;
 use League\Uri\Idna\IdnaInfo;
+use League\Uri\Idna\IdnaOption;
 
 /** @var IdnaInfo $info */
-$info = Idna::toUnicode('www.xn--85x722f.xn--55qx5d.cn', Idna::IDNA2008_UNICODE);
-$info->result(); // returns 'www.食狮.公司.cn'
-$info->errors();    // returns Idna::ERROR_NONE
+$info = Idna::toUnicode('www.xn--85x722f.xn--55qx5d.cn', IdnaOption::forIDNA2008Unicode());
+$info->result();    // returns 'www.食狮.公司.cn'
+$info->errors();    // returns IdnaERROR::NONE->value
 $info->errorList(); // []
 
-$info = Idna::toAscii('www.食狮.公司.cn', Idna::IDNA2008_ASCII);
-$info->result();                // returns 'www.xn--85x722f.xn--55qx5d.cn'
-$info->errors();                // returns Idna::ERROR_NONE
-$info->error(Idna::ERROR_NONE); // returns "No error has occurred"
-$info->errorList();             // []
+$info = Idna::toAscii('www.食狮.公司.cn', IdnaOption::forIDNA2008Ascii());
+$info->result();    // returns 'www.xn--85x722f.xn--55qx5d.cn'
+$info->errors();    // returns IdnaERROR::NONE->value
+$info->errorList(); // []
 ```
 
 In case of error no exception is thrown but the `errors` and the `errorList` methods get
@@ -36,14 +37,14 @@ populated.
 <?php
 
 use League\Uri\Idna\Idna;
+use League\Uri\Idna\IdnaOption;
 
-$info = Idna::toAscii('aa'.str_repeat('A', 64).'.％００.com', Idna::IDNA2008_ASCII);
-$info->errors();    // Idna::ERROR_LABEL_TOO_LONG | Idna::ERROR_DISALLOWED representing a bitset of the error constants Idna::ERROR_*
+$info = Idna::toAscii('aa'.str_repeat('A', 64).'.％００.com', IdnaOption::forIDNA2008Ascii());
+$info->errors();    // IdnaError::LABEL_TOO_LONG->value | IdnaError::DISALLOWED->value
+                    // representing a bitset of the error constants Idna::ERROR_*
 $info->errorList(); // returns 
 //  array {
-//    Idna::ERROR_LABEL_TOO_LONG => "a domain name label is longer than 63 bytes"
-//    Idna::ERROR_DISALLOWED => "a label or domain name contains disallowed characters"
+//    IdnaError::LABEL_TOO_LONG,
+//    IdnaError::DISALLOWED,
 //  }
-$info->error(Idna::ERROR_LABEL_TOO_LONG); // returns "a domain name label is longer than 63 bytes"
-$info->error(Idna::ERROR_DISALLOWED); // returns "a label or domain name contains disallowed characters"
 ```
