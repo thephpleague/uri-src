@@ -1,3 +1,10 @@
+---
+layout: default
+title: URI comoon interfaces and tools
+redirect_from:
+- /common/
+---
+
 Uri Common tools
 =======
 

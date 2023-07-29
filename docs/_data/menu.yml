@@ -29,6 +29,8 @@ packages:
                 Query Parser: '/common/7.0/query-parser-builder/'
                 IPv4 Converter: '/common/7.0/ipv4/'
                 IDN Converter: '/common/7.0/idn/'
+        '2.0':
+            Getting Started: '/common/2.0/'
     'components':
         '7.0':
             Getting Started:
@@ -104,7 +106,7 @@ packages:
         '7.0':
             Documentation:
                 Getting Started: '/uri/7.0/'
-                URI Handling: '/uri/7.0/rfc3986/'
+                URI Builder: '/uri/7.0/rfc3986/'
                 URI Template: '/uri/7.0/uri-template/'
                 URI Manipulation: '/uri/7.0/base-uri/'
                 PSR Compliance: '/uri/7.0/psr-compliance/'
