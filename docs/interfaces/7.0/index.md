@@ -2,7 +2,7 @@
 layout: default
 title: URI comoon interfaces and tools
 redirect_from:
-- /common/
+- /interfaces/
 ---
 
 Uri Common tools

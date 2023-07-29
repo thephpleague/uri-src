@@ -20,19 +20,19 @@ packages:
         '1.0':
             Documentation:
                 Getting Started: '/query-parser/1.0/'
-    'common':
+    'interfaces':
         '7.0':
             Getting Started:
-                Introduction: '/common/7.0/'
-                Contracts: '/common/7.0/contracts/'
+                Introduction: '/interfaces/7.0/'
+                Contracts: '/interfaces/7.0/contracts/'
             Tools:
-                URI Parser: '/common/7.0/uri-parser-builder/'
-                Query Parser: '/common/7.0/query-parser-builder/'
-                IPv4 Converter: '/common/7.0/ipv4/'
-                IDN Converter: '/common/7.0/idn/'
+                URI Parser: '/interfaces/7.0/uri-parser-builder/'
+                Query Parser: '/interfaces/7.0/query-parser-builder/'
+                IPv4 Converter: '/interfaces/7.0/ipv4/'
+                IDN Converter: '/interfaces/7.0/idn/'
         '2.0':
             Documentation:
-                Contracts: '/common/2.0/'
+                Contracts: '/interfaces/2.0/'
     'components':
         '7.0':
             Getting Started:
