@@ -5,6 +5,7 @@ package:
         latest: '2.3.0'
         documentation:
             - '7.0'
+            - '2.0'
     'uri':
         name: 'uri'
         version: '6.0'
