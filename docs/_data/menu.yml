@@ -30,7 +30,8 @@ packages:
                 IPv4 Converter: '/common/7.0/ipv4/'
                 IDN Converter: '/common/7.0/idn/'
         '2.0':
-            Getting Started: '/common/2.0/'
+            Documentation:
+                Getting Started: '/common/2.0/'
     'components':
         '7.0':
             Getting Started:
