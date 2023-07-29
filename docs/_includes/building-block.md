@@ -1,18 +1,19 @@
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">use</span> <span class="nx">League\Uri\Components\Query</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">League\Uri\Modifier</span><span class="p">;</span>
-<span class="k">use</span> <span class="nx">League\Uri\Uri</span><span class="p">;</span>
+~~~php
+use League\Uri\Components\Query;
+use League\Uri\Modifier;
+use League\Uri\Uri;
 
-<span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Uri</span><span class="o">::</span><span class="na">new</span><span class="p">(</span><span class="s1">'http://example.com?q=value#fragment'</span><span class="p">);</span>
-<span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">getScheme</span><span class="p">();</span> <span class="c1">// returns 'http'</span>
-<span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">getHost</span><span class="p">();</span>   <span class="c1">// returns 'example.com'</span>
+$uri = Uri::new('http://eXamPLe.com?q=value#fragment');
+$uri->getScheme(); // returns 'http'
+$uri->getHost();   // returns 'example.com'
 
-<span class="nv">$newUri</span> <span class="o">=</span> <span class="nx">Modifier</span><span class="o">::</span><span class="na">from</span><span class="p">(</span><span class="nv">$uri</span><span class="p">)</span><span class="o">-&gt;</span><span class="s1"><span class="na">mergeQuery</span><span class="p">(</span>'q=new.Value'</span><span class="p">);</span>
-<span class="k">echo</span> <span class="nv">$newUri</span><span class="p">;</span> <span class="c1">// 'http://example.com?q=value&amp;q=new.Value#fragment'</span>
+$newUri = Modifier::from($uri)->appendQuery('q=new.Value');
+echo $newUri; // 'http://example.com?q=value&q=new.Value#fragment'
 
-<span class="nv">$query</span> <span class="o">=</span> <span class="nx">Query</span><span class="o">::</span><span class="na">fromUri</span><span class="p">(</span><span class="nv">$newUri</span><span class="p">);</span>
-<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'q'</span><span class="p">);</span>    <span class="c1">// returns 'value'</span>
-<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">getAll</span><span class="p">(</span><span class="s1">'q'</span><span class="p">);</span> <span class="c1">// returns ['value', 'new.Value']</span>
-<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">parameter</span><span class="p">(</span><span class="s1">'q'</span><span class="p">);</span> <span class="c1">// returns 'new.Value'</span>
-</code></pre></div></div>
+$query = Query::fromUri($newUri);
+$query->get('q');       // returns 'value'
+$query->getAll('q');    // returns ['value', 'new.Value']
+$query->parameter('q'); // returns 'new.Value'
+~~~
 
-<p>The libraries manipulate URIs and their components using a simple yet expressive code.</p>
+The libraries manipulate URIs and their components using a simple yet expressive code.
