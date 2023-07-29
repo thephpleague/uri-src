@@ -18,7 +18,7 @@ With vanilla PHP you would to the following:
 ```php
 <?php
 
-$flags = IDNA_NONTRANSITIONAL_TO_ASCII | IDNA_CHECK_BIDI | IDNA_USE_STD3_RULES | IDNA_ERROR_CONTEXTJ;
+$flags = IDNA_NONTRANSITIONAL_TO_ASCII | IDNA_CHECK_BIDI | IDNA_USE_STD3_RULES | IDNA_CHECK_CONTEXTJ;
 $res = idn_to_utf8('www.xn--85x722f.xn--55qx5d.cn', $flags, INTL_IDNA_VARIANT_UTS46, $info);
 
 $res;             // returns 'www.食狮.公司.cn'
@@ -78,7 +78,7 @@ the `League\Uri\Idna\IdnaOption` immutable object.
 use League\Uri\Idna\Idna;
 use League\Uri\Idna\IdnaOption;
 
-$option = IDNA_NONTRANSITIONAL_TO_ASCII | IDNA_CHECK_BIDI | IDNA_USE_STD3_RULES | IDNA_ERROR_CONTEXTJ;
+$option = IDNA_NONTRANSITIONAL_TO_ASCII | IDNA_CHECK_BIDI | IDNA_USE_STD3_RULES | IDNA_CHECK_CONTEXTJ;
 
 // returns the same as 
 
