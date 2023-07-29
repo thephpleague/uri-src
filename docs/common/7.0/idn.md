@@ -33,11 +33,9 @@ In contrast, when using the `Idna` class the code becomes:
 <?php
 
 use League\Uri\Idna\Idna;
-use League\Uri\Idna\IdnaError;
-use League\Uri\Idna\IdnaInfo;
 use League\Uri\Idna\IdnaOption;
 
-/** @var IdnaInfo $info */
+/** @var League\Uri\Idna\IdnaInfo $info */
 $info = Idna::toUnicode('www.xn--85x722f.xn--55qx5d.cn', IdnaOption::forIDNA2008Unicode());
 $info->result();                  // returns 'www.食狮.公司.cn'
 $info->isTransitionalDifferent(); // return false
@@ -96,5 +94,5 @@ $altOption1 = IdnaOption::new()
  $altOption2 = IdnaOption::forIDNA2008Ascii()->toBytes();
  ```
 
-If you provide a `IdnaOption` instance, the `toBytes` method will be called inside the conversion
+If you provide a `IdnaOption` instance, the `IdnaOption::toBytes` method will be called inside the conversion
 method when appropriate.
