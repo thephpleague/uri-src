@@ -11,9 +11,7 @@
 
 declare(strict_types=1);
 
-namespace League\Uri\Components;
-
-use League\Uri\Exceptions\SyntaxError;
+namespace League\Uri\Exceptions;
 
 class OffsetOutOfBounds extends SyntaxError
 {
