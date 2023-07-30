@@ -45,7 +45,7 @@ You need **PHP >= 8.1.0** but the latest stable version of PHP is recommended
 If you want to handle:
 
 - Data URI creation from a file content **requires** the `fileinfo` extension.
-- IDN host you are **required** to install the `intl` extension;
+- IDN host you are **required** to install the `intl` extension or a polyfill for PHP's idn function like the `symfony/polyfill-intl-idn` package;
 - IPv4 host in octal or hexadecimal form, out of the box, you **need** at least one of the following extension:
 
     - install the `GMP` extension **or**

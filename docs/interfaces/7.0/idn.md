@@ -55,6 +55,7 @@ using the `errors` method which returns a list of `IdnaError` enum objects.
 
 use League\Uri\Idna\Idna;
 use League\Uri\Idna\IdnaOption;
+use League\Uri\Idna\IdnaError;
 
 $info = Idna::toAscii('aa'.str_repeat('A', 64).'.％００.com', IdnaOption::forIDNA2008Ascii());
 $info->hasErrors(); //return true
@@ -63,6 +64,11 @@ $info->errors(); // returns
 //    IdnaError::LABEL_TOO_LONG,
 //    IdnaError::DISALLOWED,
 //  }
+
+$idnaError = $info->errors()[0];
+$idnaError->value;         // returns the value of IDNA_ERROR_LABEL_TOO_LONG; the enum C value (MAY change and should not be relied upon)
+$idnaError->name;          // returns 'LABEL_TOO_LONG'
+$idnaError->description(); // returns 'a domain name label is longer than 63 bytes'
 ```
 
 The enum `IdnaError` provide the official name of the error as well as its description via
@@ -79,19 +85,16 @@ use League\Uri\Idna\Idna;
 use League\Uri\Idna\IdnaOption;
 
 $option = IDNA_NONTRANSITIONAL_TO_ASCII | IDNA_CHECK_BIDI | IDNA_USE_STD3_RULES | IDNA_CHECK_CONTEXTJ;
-
-// returns the same as 
-
 $altOption1 = IdnaOption::new()
             ->nonTransitionalToAscii()
             ->checkBidi()
             ->useSTD3Rules()
-            ->checkContextJ()
-            ->toBytes();
-            
- // and the same as 
- 
- $altOption2 = IdnaOption::forIDNA2008Ascii()->toBytes();
+            ->checkContextJ();
+$altOption2 = IdnaOption::forIDNA2008Ascii();
+
+echo Idna::toAscii('bébé.be', $option)->result();     // displays 'xn--bb-bjab.be'
+echo Idna::toAscii('bébé.be', $altOption1)->result(); // displays 'xn--bb-bjab.be'
+echo Idna::toAscii('bébé.be', $altOption2)->result(); // displays 'xn--bb-bjab.be'
  ```
 
 If you provide a `IdnaOption` instance, the `IdnaOption::toBytes` method will be called inside the conversion

@@ -16,9 +16,8 @@ use League\Uri\IPv4\NativeCalculator;
 
 $host = '300.0250.0000.0001:442';
 $normalizer = new IPv4Converter(new NativeCalculator());
-$normalizedHost = $normalizer->normalize($authority);
+$normalizedHost = $normalizer($authority);
 
-echo $host; // returns '0300.0250.0000.0001'
 echo $normalizedHost; // returns '192.168.0.1'
 ```
 
@@ -52,6 +51,6 @@ If no normalization is possible `null` is returned.
 use League\Uri\IPV4\IPv4Converter;
 
 $normalizer = IPv4Converter::fromEnvironment();
-$normalizer->normalize('0'); // returns 0.0.0.0
-$normalizer->normalize('toto.be'); // returns null
+$normalizer('0');       // returns 0.0.0.0
+$normalizer('toto.be'); // returns null
 ```

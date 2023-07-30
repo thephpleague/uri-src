@@ -26,9 +26,9 @@ when attempting to validate such host.
 
 To allow IPv4 conversion you will need at least:
 
-- the GMP extension and/or
-- BCMatch extension and/or
-- a PHP installed on a x64 based server
+- the `GMP` extension and/or
+- `BCMatch` extension and/or
+- a `64-bits` PHP version
 
 otherwise an exception will be thrown when attempting to normalize a host
 as an IPv4 address.
@@ -37,5 +37,5 @@ Install
 --------
 
 ```
-$ composer require league/uri-interfaces
+$ composer require league/uri-interfaces:^7.0
 ```
