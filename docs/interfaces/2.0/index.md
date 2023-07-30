@@ -41,17 +41,16 @@ The `UriInterface` interface defines the following methods to access the URI str
 ~~~php
 <?php
 
-public UriInterface::__toString(void): string
-public UriInterface::toString(void): string
-public UriInterface::jsonSerialize(void): string
-public UriInterface::getScheme(void): ?string
-public UriInterface::getUserInfo(void): ?string
-public UriInterface::getHost(void): ?string
-public UriInterface::getPort(void): ?int
-public UriInterface::getAuthority(void): ?string
-public UriInterface::getPath(void): string
-public UriInterface::getQuery(void): ?string
-public UriInterface::getFragment(void): ?string
+public UriInterface::__toString():string
+public UriInterface::jsonSerialize():string
+public UriInterface::getScheme():?string
+public UriInterface::getUserInfo():?string
+public UriInterface::getHost():?string
+public UriInterface::getPort():?int
+public UriInterface::getAuthority():?string
+public UriInterface::getPath():string
+public UriInterface::getQuery():?string
+public UriInterface::getFragment():?string
 ~~~
 
 #### Modifying URI properties
@@ -92,11 +91,12 @@ The `UriComponentInterface` interface defines the following methods to access th
 
 ~~~php
 <?php
-public UriComponentInterface::value(): ?string
+public UriComponentInterface::getContent(): ?string
 public UriComponentInterface::toString(): ?string
 public UriComponentInterface::__toString(): string
 public UriComponentInterface::getUriComponent(): ?string
 public UriComponentInterface::jsonSerialize(): ?string
+public UriComponentInterface::withContent(?string $content): self
 ~~~
 
 ### UriComponentInterface extended interfaces

@@ -25,9 +25,6 @@ The `UriInterface` interface defines the following methods to access the URI str
 ~~~php
 <?php
 
-public UriInterface::__toString(): string
-public UriInterface::toString(): string
-public UriInterface::jsonSerialize(): string
 public UriInterface::getScheme(): ?string
 public UriInterface::getUserInfo(): ?string
 public UriInterface::getHost(): ?string
@@ -36,6 +33,10 @@ public UriInterface::getAuthority(): ?string
 public UriInterface::getPath(): string
 public UriInterface::getQuery(): ?string
 public UriInterface::getFragment(): ?string
+public UriInterface::getComponents(): array
+public UriInterface::toString(): string
+public UriInterface::__toString(): string
+public UriInterface::jsonSerialize(): string
 ~~~
 
 #### Modifying URI properties
@@ -78,9 +79,9 @@ The `UriComponentInterface` interface defines the following methods to access th
 <?php
 public UriComponentInterface::value(): ?string
 public UriComponentInterface::toString(): ?string
-public UriComponentInterface::__toString(): string
 public UriComponentInterface::getUriComponent(): ?string
 public UriComponentInterface::jsonSerialize(): ?string
+public UriComponentInterface::__toString(): string
 ~~~
 
 ### UriComponentInterface extended interfaces

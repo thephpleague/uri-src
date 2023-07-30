@@ -24,8 +24,8 @@ packages:
         '7.0':
             Getting Started:
                 Introduction: '/interfaces/7.0/'
-                Contracts: '/interfaces/7.0/contracts/'
             Tools:
+                Contracts: '/interfaces/7.0/contracts/'
                 URI Parser: '/interfaces/7.0/uri-parser-builder/'
                 Query Parser: '/interfaces/7.0/query-parser-builder/'
                 IPv4 Converter: '/interfaces/7.0/ipv4/'
@@ -108,7 +108,7 @@ packages:
         '7.0':
             Documentation:
                 Getting Started: '/uri/7.0/'
-                URI Builder: '/uri/7.0/rfc3986/'
+                URI Object: '/uri/7.0/rfc3986/'
                 URI Template: '/uri/7.0/uri-template/'
                 URI Manipulation: '/uri/7.0/base-uri/'
                 PSR Compliance: '/uri/7.0/psr-compliance/'
