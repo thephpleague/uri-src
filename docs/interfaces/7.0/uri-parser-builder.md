@@ -1,6 +1,6 @@
 ---
 layout: default
-title: RFC3986 - RFC3987 Parser
+title: RFC3986 - RFC3987 URI Parser
 ---
 
 URI parser and builder

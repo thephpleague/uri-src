@@ -1,6 +1,6 @@
 ---
 layout: default
-title: URI comoon interfaces and tools
+title: URI common interfaces and tools
 redirect_from:
 - /interfaces/
 ---
