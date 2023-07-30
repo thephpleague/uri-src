@@ -10,9 +10,9 @@ Uri Common tools
 
 This package contains:
 
-- interface to represent URI objects and components
-- parsers to parse and build URI and Query strings
-- tools to help in processing URIs (IPv4 Converter and IDNA classes)
+- interface to represent [URI and components objects](/interfaces/0.7/contracts/)
+- parsers to parse and build [URI](/interfaces/0.7/uri-parser-builder/) and [Query](/interfaces/0.7/query-parser-builder/) strings
+- tools to help in processing URIs ([IPv4 Converter](/interfaces/0.7/ipv4/) and [IDN converter](/interfaces/0.7/idn/))
 
 System Requirements
 -------
