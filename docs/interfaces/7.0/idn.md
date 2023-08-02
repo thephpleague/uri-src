@@ -33,16 +33,15 @@ In contrast, when using the `Idna` class the code becomes:
 <?php
 
 use League\Uri\Idna\Idna;
-use League\Uri\Idna\IdnaOption;
 
 /** @var League\Uri\Idna\IdnaInfo $info */
-$info = Idna::toUnicode('www.xn--85x722f.xn--55qx5d.cn', IdnaOption::forIDNA2008Unicode());
-$info->result();                  // returns 'www.食狮.公司.cn'
+$info = Idna::toUnicode('www.xn--85x722f.xn--55qx5d.cn');
+$info->domain();                  // returns 'www.食狮.公司.cn'
 $info->isTransitionalDifferent(); // return false
 $info->hasErrors();               // returns false
  
-$info = Idna::toAscii('www.食狮.公司.cn', IdnaOption::forIDNA2008Ascii());
-$info->result();         // returns 'www.xn--85x722f.xn--55qx5d.cn'
+$info = Idna::toAscii('www.食狮.公司.cn';
+$info->domain();         // returns 'www.xn--85x722f.xn--55qx5d.cn'
 $info->isTransitionalDifferent(); // return false
 $info->hasErrors();      // returns false
 ```
@@ -54,11 +53,11 @@ using the `errors` method which returns a list of `IdnaError` enum objects.
 <?php
 
 use League\Uri\Idna\Idna;
-use League\Uri\Idna\IdnaOption;
 use League\Uri\Idna\IdnaError;
 
-$info = Idna::toAscii('aa'.str_repeat('A', 64).'.％００.com', IdnaOption::forIDNA2008Ascii());
+$info = Idna::toAscii('aa'.str_repeat('A', 64).'.％００.com');
 $info->hasErrors(); //return true
+$info->hasError(IdnaError::LABEL_TOO_LONG); // returns true
 $info->errors(); // returns 
 //  array {
 //    IdnaError::LABEL_TOO_LONG,
@@ -92,10 +91,16 @@ $altOption1 = IdnaOption::new()
             ->checkContextJ();
 $altOption2 = IdnaOption::forIDNA2008Ascii();
 
-echo Idna::toAscii('bébé.be', $option)->result();     // displays 'xn--bb-bjab.be'
-echo Idna::toAscii('bébé.be', $altOption1)->result(); // displays 'xn--bb-bjab.be'
-echo Idna::toAscii('bébé.be', $altOption2)->result(); // displays 'xn--bb-bjab.be'
+echo Idna::toAscii('bébé.be', $option)->domain();     // displays 'xn--bb-bjab.be'
+echo Idna::toAscii('bébé.be', $altOption1)->domain(); // displays 'xn--bb-bjab.be'
+echo Idna::toAscii('bébé.be', $altOption2)->domain(); // displays 'xn--bb-bjab.be'
  ```
 
 If you provide a `IdnaOption` instance, the `IdnaOption::toBytes` method will be called inside the conversion
 method when appropriate.
+
+In contrary to PHP functions, if no option is provided both methods will use the correct basic options to validate
+domain names:
+
+- for `Idna::toAscii` the default will be `IdnaOption::forIDNA2008Ascii()`;
+- for `Idna::toUnicode` the default will be `IdnaOption::forIDNA2008Unicode()`;
