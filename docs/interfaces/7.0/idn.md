@@ -32,15 +32,15 @@ In contrast, when using the `Idna` class the code becomes:
 ```php
 <?php
 
-use League\Uri\Idna\Idna;
+use League\Uri\Idna\Converter;
 
 /** @var League\Uri\Idna\Result $result */
-$result = Idna::toUnicode('www.xn--85x722f.xn--55qx5d.cn');
+$result = Converter::toUnicode('www.xn--85x722f.xn--55qx5d.cn');
 $result->domain();                  // returns 'www.食狮.公司.cn'
 $result->isTransitionalDifferent(); // return false
 $result->hasErrors();               // returns false
  
-$result = Idna::toAscii('www.食狮.公司.cn';
+$result = Converter::toAscii('www.食狮.公司.cn';
 $result->domain();         // returns 'www.xn--85x722f.xn--55qx5d.cn'
 $result->isTransitionalDifferent(); // return false
 $result->hasErrors();      // returns false
@@ -52,10 +52,10 @@ using the `errors` method which returns a list of `IdnaError` enum objects.
 ```php
 <?php
 
-use League\Uri\Idna\Idna;
+use League\Uri\Idna\Converter;
 use League\Uri\Idna\Error;
 
-$result = Idna::toAscii('aa'.str_repeat('A', 64).'.％００.com');
+$result = Converter::toAscii('aa'.str_repeat('A', 64).'.％００.com');
 $result->hasErrors(); //return true
 $result->hasError(Error::LABEL_TOO_LONG); // returns true
 $result->errors(); // returns 
@@ -73,14 +73,14 @@ $error->description(); // returns 'a domain name label is longer than 63 bytes'
 The enum `Error` provide the official name of the error as well as its description via
 the `Error::description` method.
 
-Both static methods `Idna::toAscii` and `Idna::toUnicode` expect a host string and some IDN related options.
+Both static methods `Converter::toAscii` and `Converter::toUnicode` expect a host string and some IDN related options.
 You can provide PHP's own constants or if you want a more readable API you can use 
 the `League\Uri\Idna\Option` immutable object.
 
 ```php
 <?php
 
-use League\Uri\Idna\Idna;
+use League\Uri\Idna\Converter;
 use League\Uri\Idna\Option;
 
 $option = IDNA_NONTRANSITIONAL_TO_ASCII | IDNA_CHECK_BIDI | IDNA_USE_STD3_RULES | IDNA_CHECK_CONTEXTJ;
@@ -104,11 +104,11 @@ $option2 = Option::new()
 
 $option3 = Option::forIDNA2008Ascii();
 
-echo Idna::toAscii('bébé.be')->domain();
-echo Idna::toAscii('bébé.be', $option)->domain();
-echo Idna::toAscii('bébé.be', $option1)->domain();
-echo Idna::toAscii('bébé.be', $option2)->domain();
-echo Idna::toAscii('bébé.be', $option3)->domain();
+echo Converter::toAscii('bébé.be')->domain();
+echo Converter::toAscii('bébé.be', $option)->domain();
+echo Converter::toAscii('bébé.be', $option1)->domain();
+echo Converter::toAscii('bébé.be', $option2)->domain();
+echo Converter::toAscii('bébé.be', $option3)->domain();
 echo idn_to_ascii('bébé.be', $option);
 echo idn_to_ascii('bébé.be', $option1->toBytes());
 echo idn_to_ascii('bébé.be', $option2->toBytes());
@@ -123,5 +123,5 @@ method when appropriate.
 In contrary to PHP functions, if no option is provided both methods will use the correct basic options to validate
 domain names:
 
-- for `Idna::toAscii` the default will be `Option::forIDNA2008Ascii()`;
-- for `Idna::toUnicode` the default will be `Option::forIDNA2008Unicode()`;
+- for `Converter::toAscii` the default will be `Option::forIDNA2008Ascii()`;
+- for `Converter::toUnicode` the default will be `Option::forIDNA2008Unicode()`;
