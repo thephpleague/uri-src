@@ -42,20 +42,22 @@ System Requirements
 
 You need **PHP >= 8.1.0** but the latest stable version of PHP is recommended
 
-If you want to handle:
+Handling of an IDN host requires the presence of the `intl`
+extension or a polyfill for the `intl` IDN functions like the
+`symfony/polyfill-intl-idn` otherwise an exception will be thrown
+when attempting to validate or interact with such a host.
 
-- Data URI creation from a file content **requires** the `fileinfo` extension.
-- IDN host you are **required** to install the `intl` extension or a polyfill for PHP's idn function like the `symfony/polyfill-intl-idn` package;
-- IPv4 host in octal or hexadecimal form, out of the box, you **need** at least one of the following extension:
+IPv4 conversion requires at least one of the following:
 
-    - install the `GMP` extension **or**
-    - install the `BCMath` extension
+- the `GMP` extension,
+- the `BCMatch` extension or
+- a `64-bits` PHP version
 
-  or you should be using
+otherwise an exception will be thrown when attempting to convert a host
+as an IPv4 address.
 
-    - a `64-bits` PHP version
-
-Trying to process such URI components without meeting those minimal requirements will trigger a `RuntimeException`.
+In order to create Data URI from the content of a file you are required to also
+install the `fileinfo` extension otherwise an exception will be thrown.
 
 Installation
 --------
