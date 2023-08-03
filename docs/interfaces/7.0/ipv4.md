@@ -6,16 +6,16 @@ title: IPv4 Converter
 IPv4 Converter
 =======
 
-The `League\Uri\IPv4Converter` is a IPv4 Host Converter.
+The `League\Uri\IPv4\Converter` is a IPv4 Host Converter.
 
 ```php
 <?php
 
-use League\Uri\IPv4\IPv4Converter;
+use League\Uri\IPv4\Converter;
 use League\Uri\IPv4\NativeCalculator;
 
 $host = '300.0250.0000.0001:442';
-$converter = new IPv4Converter(new NativeCalculator());
+$converter = new Converter(new NativeCalculator());
 $convertedHost = $converter($authority);
 
 echo $convertedHost; // returns '192.168.0.1'
@@ -24,7 +24,7 @@ echo $convertedHost; // returns '192.168.0.1'
 Usage
 --------
 
-The `IPv4Normalizer::normalize` method tries to normalize a host based on
+The `Converter::__invoke` method tries to normalize a host based on
 the normalization algorithm used by the <a href="https://url.spec.whatwg.org/#concept-ipv4-parser">WHATWG rules</a>
 to parse and format IPv4 multiple string representations into a valid IPv4 decimal
 representation. The method only parameter should represent a host component value.
@@ -41,16 +41,16 @@ The package comes bundled with three implementations:
 
 For ease of usage the class exposes a `IPv4Normalizer::fromEnvironment` named constructor which 
 will pick the correct implementation based on the available extensions. If no calculator
-is provided a `League\Uri\Exceptions\Ipv4CalculatorMissing` exception will be thrown.
+is provided a `League\Uri\Ipv4\CalculatorMissing` exception will be thrown.
 
 If no normalization is possible `null` is returned.
 
 ```php
 <?php
 
-use League\Uri\IPV4\IPv4Converter;
+use League\Uri\IPV4\Converter;
 
-$converter = IPv4Converter::fromEnvironment();
+$converter = Converter::fromEnvironment();
 $converter('0');       // returns 0.0.0.0
 $converter('toto.be'); // returns null
 ```

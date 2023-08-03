@@ -35,7 +35,7 @@ use League\Uri\Contracts\AuthorityInterface;
 use League\Uri\Contracts\HostInterface;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\IPv4Normalizer;
-use League\Uri\IPv4\IPv4Calculator;
+use League\Uri\IPv4\Calculator;
 use \Psr\Http\Message\UriInterface as Psr7UriInterface;
 
 public function IPv4Normalizer::__construct(IPv4Calculator $calculator = null);
