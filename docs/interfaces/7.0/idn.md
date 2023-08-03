@@ -8,10 +8,11 @@ IDN Conversion
 
 In order to safely translate a domain name into it's unicode representation, we need a tool
 to correctly reports the convertion results. To do so the package provides a OOP wrapper
-around PHP's `idn_to_ascii` and `idn_to_unicode` functions using the class `League\Uri\Idna\Idna`
+around PHP's `idn_to_ascii` and `idn_to_unicode` functions using the
+`League\Uri\Idna\Converter` class.
 
-when performing a conversion a `League\Uri\Idna\Result` class is returned with information
-regarding the conversion.
+When performing a conversion a `League\Uri\Idna\Result` class is returned with information
+regarding the outcome of the conversion.
 
 With vanilla PHP you would to the following:
 
@@ -46,8 +47,8 @@ $result->isTransitionalDifferent(); // return false
 $result->hasErrors();      // returns false
 ```
 
-In case of error the `IdnaInfo::hasErrors` method returns `true` and you can inspect the reasons
-using the `errors` method which returns a list of `IdnaError` enum objects.
+In case of errors the `Result::hasErrors` method returns `true` and you can inspect the reasons
+using the `errors` method which returns a list of `Error` enum.
 
 ```php
 <?php
