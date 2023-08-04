@@ -10,7 +10,6 @@ The `League\Uri\BaseUri` class is build to ease gathering information regarding 
 The class makes it easier to transform and crawl pages containing URIs (ie: a web page, or an HTTP client for instance).
 
 <p class="message-warning">While the class does manipulate URI it does not implement any URI related interface.</p>
-<p class="message-notice">All the methods accepts string or Stringable objects.</p>
 <p class="message-notice">If a PSR-7 <code>UriInterface</code> implementing instance is given then the return value
 will also be a PSR-7 <code>UriInterface</code> implementing instance.</p>
 
@@ -33,7 +32,8 @@ The instance also implements PHP's `Stringable` and `JsonSerializable` interface
 
 ## URI resolution
 
-The `BaseUri::resolve` resolves a URI as a browser would for a relative URI while the `BaseUri::relativize` does the opposite.
+The `BaseUri::resolve` resolves a URI as a browser would for a relative URI while
+the `BaseUri::relativize` does the opposite.
 
 ~~~php
 <?php
@@ -79,7 +79,7 @@ You can always switch back to using the `Uri` object by unregistering the factor
 
 ## URI information
 
-The class contains a list of public methods which returns the URI state.
+The class also exposes a list of public methods which returns the URI state.
 
 ### BaseUri::isAbsolute
 
@@ -152,7 +152,7 @@ BaseUri::from('https://example.com/123')
     ->isCrossOrigin(new Uri('https://www.example.com/')); // returns true
 ~~~
 
-The method takes into account i18n while comparing both URI if the `intl-extension` is installed.
+The method takes into account i18n while comparing both URI if the PHP's `idn_*` functions can be used.
 
 ### BaseUri::origin
 

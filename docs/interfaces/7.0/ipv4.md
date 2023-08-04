@@ -14,9 +14,9 @@ The `League\Uri\IPv4\Converter` is a IPv4 Host Converter.
 use League\Uri\IPv4\Converter;
 use League\Uri\IPv4\NativeCalculator;
 
-$host = '300.0250.0000.0001:442';
+$host = '0300.0250.0000.0001';
 $converter = new Converter(new NativeCalculator());
-$convertedHost = $converter($authority);
+$convertedHost = $converter($host);
 
 echo $convertedHost; // returns '192.168.0.1'
 ```

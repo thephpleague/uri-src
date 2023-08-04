@@ -6,9 +6,9 @@ title: IDN - Domain Internationalization
 IDN Conversion
 ===========
 
-In order to safely translate a domain name into it's unicode representation, we need a tool
-to correctly reports the convertion results. To do so the package provides a OOP wrapper
-around PHP's `idn_to_ascii` and `idn_to_unicode` functions using the
+In order to safely translate a domain name into it's unicode representation and vice versa,
+we need a tool to correctly report the convertion results. To do so the package provides an
+enhanced OOP wrapper around PHP's `idn_to_ascii` and `idn_to_unicode` functions using the
 `League\Uri\Idna\Converter` class.
 
 When performing a conversion a `League\Uri\Idna\Result` class is returned with information
@@ -28,7 +28,7 @@ $result['errors'];  // returns 0
 $result['isTransitionalDifferent'];  // returns false
 ```
 
-In contrast, when using the `Idna` class the code becomes:
+In contrast, when using the `Converter` class the code becomes:
 
 ```php
 <?php
@@ -67,12 +67,13 @@ foreach ($result->errors() as $error) {
 //DISALLOWED: a label or domain name contains disallowed characters
 ```
 
-The enum `Error` provides the official name of the error as well as its description via
+The `Error` enum provides the official name of the error as well as its description via
 the `Error::description` method.
 
-Both static methods `Converter::toAscii` and `Converter::toUnicode` expect a host string and some IDN related options.
-You can provide PHP's own constants or if you want a more readable API you can use 
-the `League\Uri\Idna\Option` immutable object or use a combinaison of both APIs.
+Both static methods `Converter::toAscii` and `Converter::toUnicode` expect a host string
+and some IDN related options. You can provide PHP's own constants or if you want a more
+readable API you can use the `League\Uri\Idna\Option` immutable object or use a
+combination of both APIs.
 
 ```php
 <?php
@@ -121,5 +122,5 @@ method when appropriate.
 In contrary to PHP functions, if no option is provided both methods will use the correct basic options to validate
 domain names:
 
-- for `Converter::toAscii` the default will be `Option::forIDNA2008Ascii()`;
-- for `Converter::toUnicode` the default will be `Option::forIDNA2008Unicode()`;
+- for `Converter::toAscii` the default is `Option::forIDNA2008Ascii()`;
+- for `Converter::toUnicode` the default is `Option::forIDNA2008Unicode()`;

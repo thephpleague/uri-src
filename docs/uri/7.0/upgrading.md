@@ -23,42 +23,6 @@ This will edit (or create) your `composer.json` file.
 
 `League\Uri 7.0` requires a PHP version greater or equal than 8.1.0 (was previously 7.2.0).
 
-## Signature changes
-
-`UriTemplate::expand` use to return a `League\Uri\Contracts\UriInterface` implementing class.
-Starting with version `7.0.0` it will return a string. It is still possible to retain the old 
-behaviour:
-
-Before:
-
-~~~php
-<?php
-
-use League\Uri\Uri;
-use League\Uri\UriTemplate;
-
-$template = 'https://example.com/hotels/{hotel}/bookings/{booking}';
-$params = ['booking' => '42', 'hotel' => 'Rest & Relax'];
-
-$uriTemplate = new UriTemplate($template);
-$uriTemplate->expand($params); //instance of League\Uri\Uri
-~~~
-
-After:
-
-~~~php
-<?php
-
-use League\Uri\Uri;
-use League\Uri\UriTemplate;
-
-$template = 'https://example.com/hotels/{hotel}/bookings/{booking}';
-$params = ['booking' => '42', 'hotel' => 'Rest & Relax'];
-
-$uriTemplate = new UriTemplate($template);
-Uri::fromTemplate($uriTemplate, $params);  //instance of League\Uri\Uri
-~~~
-
 ## Deprecated methods
 
 The following methods are marked as deprecated. They are still present to allow an easier upgrade path

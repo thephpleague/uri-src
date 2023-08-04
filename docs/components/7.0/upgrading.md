@@ -62,11 +62,41 @@ After:
 use League\Uri\Uri;
 use League\Uri\Modifier;
 
-$uri = Uri::new('http://example.com?q=value#fragment');
-$newUri = Modifier::from($uri)->appendQuery('q=new.Value');
+$newUri = Modifier::from('http://example.com?q=value#fragment')->appendQuery('q=new.Value');
 echo $newUri::class; // return League\Uri\Modifier
-echo $newUri; // 'http://example.com?q=value&q=new.Value#fragment'
+echo $newUri;                 // 'http://example.com?q=value&q=new.Value#fragment'
+echo $newUri->getUriString(); // 'http://example.com?q=value&q=new.Value#fragment'
 $newUri->getUri()::class // return League\Uri\Uri
+~~~
+
+the `League\Uri\IPv4Normalizer` class is deprecated, you need to use the `League\Uri\Ipv4\Converter` class instead
+
+Before:
+
+~~~php
+<?php
+
+use League\Uri\IPv4Normalizer;
+use League\Uri\Components\Host;
+
+$host = new Host('0');
+$normalizer = new IPv4Normalizer();
+$normalizedHost = $normalizer->normalizeHost($host);
+echo $host;           // returns 0 
+echo $normalizedHost; // returns 0.0.0.0 ($normalizeHost is a Host object)
+~~~
+
+After:
+
+~~~php
+<?php
+
+use League\Uri\IPv4\Converter;
+use League\Uri\Components\Host;
+
+$host = new Host('0');
+$normalizedHost = Converter::fromEnvironment()($host);
+echo Host::new($normalizedHost); // returns 0.0.0.0 
 ~~~
 
 Deprecated methods
@@ -77,10 +107,6 @@ to version `7.0`, but it is recommended not to use them for new projects.
 
 | Deprecated methods                             | New stable methods                |
 |------------------------------------------------|-----------------------------------|
-| `IPv4Calculator::createFromGMP`                | `IPv4Calculator::fromGMP`         |
-| `IPv4Calculator::createFromBCMath`             | `IPv4Calculator::fromBCMath`      |
-| `IPv4Calculator::createFromNative`             | `IPv4Calculator::fromNative`      |
-| `IPv4Calculator::createFromServer`             | `IPv4Calculator::fromEnvironment` |
 | `Authority::createFromString`                  | `Authority::new`                  |
 | `Authority::createFromUri`                     | `Authority::new`                  |
 | `Authority::createFromNull`                    | `Authority::new`                  |
@@ -122,21 +148,11 @@ to version `7.0`, but it is recommended not to use them for new projects.
 | `Query::withoutParams`                         | `Query::withoutParameters`        |
 | `Query::toRFC3986`                             | `Query::value`                    |
 
-````diff
-use League\Uri\Components\Host;
 
-- Host::createFromString('bébé.be')->value(); //returns 'xn--bb-bjab.be'
-+ Host::new('bébé.be')->value(); //returns 'xn--bb-bjab.be'
-
-- Host::createFromNull()->value(); //returns null
-+ Host::new()->value(); //returns null
-````
 For the `Domain`, the `createFromLabels` named constructor is being replaced by `fromLabels`.
 The signature is also updated from `iterable` to `string` as variadic to allow easier validation of input.
 
 ````diff
-use League\Uri\Components\Domain;
-
 - Domain::createFromLabels(['who', 'are', 'you'])->value(); //returns 'you.are.who'
 + Domain::fromLabels('who', 'are', 'you')->value(); //returns 'you.are.who'
 ````
@@ -146,34 +162,28 @@ are being replaced by `fromRelative` and `fromAbsolute`. The signature is also u
 from `iterable` to `string` as variadic to allow easier validation of input.
 
 ````diff
-use League\Uri\Components\HierarchicalPath;
-
 - HierarchicalPath::createAbsoluteFromSegments(['who', 'are', 'you'])->value(); //returns '/who/are/you'
 + HierarchicalPath::fromAbsolute('who', 'are', 'you')->value(); //returns '/who/are/you'
+````
 
+````diff
 - HierarchicalPath::createRelativeFromSegments(['who', 'are', 'you'])->value(); //returns 'who/are/you'
 + HierarchicalPath::fromRelative('who', 'are', 'you')->value(); //returns 'who/are/you'
 ````
 
 For `Query::createFromRFC1738` and `Query::createFromRFC3986` are replaced by `Query::fromRFC1738` and `Query::fromRFC3986`
-with a change in signature. The query string needs to be explicitly set otherwise an exception
-will be thrown.
+with a change in signature. If the query string is not explicitly set it is considered to be the `null` value before
+it was falling back on the empty string.
 
 ````diff
-use League\Uri\Components\Query;
-
 - Query::createFromRFC1738()->value(); //returns ''
 + Query::fromRFC1738()->value();       //returns null
 + Query::fromRFC1738('')->value();     //returns ''
-+ Query::new()->value();               //returns null
 ````
 
 All remaining named constructors which starts with `createFrom*` are replaced by the same method starting with `from*`.
 
 ````diff
-use League\Uri\Components\Port;
-use League\Uri\Uri;
-
 - Port::createFromUri(Uri::createFromString('https://example.com:82'))->value(); //returns '82'
 + Port::fromUri('https://example.com:82')->value();  //returns '82'
 ````
@@ -187,8 +197,6 @@ The `UserInfo::withUserInfo` modifier method is removed and can be replaced by c
 new modifier methods introduced `UserInfo::withUser` and/or `UserInfo::withUPass`.
 
 ````diff
-use League\Uri\Components\UserInfo;
-
 - (new UserInfo('user', 'pass'))->withUserInfo('user', 'newPass')->value(); // returns 'user:newPass'
 + (new UserInfo('user', 'pass'))->withPass('newPass')->value(); // returns 'user:newPass'
 ````
@@ -200,8 +208,6 @@ Of note, it means that the `Scheme` and `Fragment` objects no longer contain met
 their value once instantiated.
 
 ````diff
-use League\Uri\Components\Fragment;
-
 - Fragmnt::createFromString('header1')->withContent('header2')->getUriComponent(); // returns '#header2'
 + Fragment::new('header1')->getUriComponent(); // returns '#header1'
 + Fragment::new('header2')->getUriComponent(); // returns '#header2'
@@ -211,7 +217,6 @@ To modify such component you are now required to create a new instance.
 
 ### other notable changes
 
-- `withContent` and `getContent` methods, already deprecated in version 2;
 - Support for `__set_state` with no replacement;
 - Support for `float` type as possible argument for components;
 - `Domain` value can be `null` previously it would trigger an exception.
