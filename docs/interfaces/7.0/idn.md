@@ -7,14 +7,11 @@ IDN Conversion
 ===========
 
 In order to safely translate a domain name into it's unicode representation and vice versa,
-we need a tool to correctly report the convertion results. To do so the package provides an
-enhanced OOP wrapper around PHP's `idn_to_ascii` and `idn_to_unicode` functions using the
+we need a tool to correctly report the conversion results. To do so the package provides an
+enhanced OOP wrapper around PHP's `idn_to_ascii` and `idn_to_utf8` functions using the
 `League\Uri\Idna\Converter` class.
 
-When performing a conversion a `League\Uri\Idna\Result` class is returned with information
-regarding the outcome of the conversion.
-
-With vanilla PHP you would to the following:
+With vanilla PHP you have to do the following:
 
 ```php
 <?php
@@ -28,7 +25,16 @@ $result['errors'];  // returns 0
 $result['isTransitionalDifferent'];  // returns false
 ```
 
-In contrast, when using the `Converter` class the code becomes:
+which means remembering:
+
+- the flags value,
+- the parameters position, 
+- the return value can be the domain converted of `false` in case of error
+- that the result is filled by reference so if not provided you won't know the reason for failure.
+- the `errors` keys represents a bitset of the error constants `IDNA_ERROR_*`
+
+In contrast, when performing a conversion with a method from `League\Uri\Idna\Converter` a `League\Uri\Idna\Result`
+instance is returned with information regarding the outcome of the conversion.
 
 ```php
 <?php
@@ -67,13 +73,12 @@ foreach ($result->errors() as $error) {
 //DISALLOWED: a label or domain name contains disallowed characters
 ```
 
-The `Error` enum provides the official name of the error as well as its description via
+The `League\Uri\Idna\Error` enum provides the official name of the error as well as its description via
 the `Error::description` method.
 
 Both static methods `Converter::toAscii` and `Converter::toUnicode` expect a host string
 and some IDN related options. You can provide PHP's own constants or if you want a more
-readable API you can use the `League\Uri\Idna\Option` immutable object or use a
-combination of both APIs.
+readable API you can use the `League\Uri\Idna\Option` immutable object.
 
 ```php
 <?php
@@ -97,7 +102,7 @@ $option2 = Option::new()
     ->checkBidi()
     ->useSTD3Rules()
     ->checkContextJ();
-            
+
 //can be rewritten as
 
 $option3 = Option::forIDNA2008Ascii();
@@ -128,10 +133,12 @@ domain names:
 Last but not least if you prefer methods that throw exceptions instead of having to check the `Result::hasErrors`
 method for error you can use the following sibling methods:
 
-- `Converter::toAsciiOrFail` which throws a `League\Uri\Idna\ConversionFailed` exception on error
-- `Converter::toUnicodeOrFail` which throws a `League\Uri\Idna\ConversionFailed` exception on error
+- `Converter::toAsciiOrFail` insteqd of `Converter::toAsciiOrFail`;
+- `Converter::toUnicodeOrFail` insteqd of `Converter::toUnicode`; 
 
-You can still access the result by calling the `ConversionFailed::result` method.
+Both methods will throw a `League\Uri\Idna\ConversionFailed` exception on error. You can still access the result
+by calling the `ConversionFailed::getResult` method and the exception message will contain a concatenation of all the
+error descriptions available for the submitted host.
 
 ```php
 <?php
@@ -143,7 +150,7 @@ use League\Uri\Idna\Error;
 try {
     $result = Converter::toAsciiOrFail('％００.com');
 } catch (ConversionFailed $exception) {
-    $result = $exception->result(); // the `League\Uri\Idna\Result` object
+    $result = $exception->getResult(); // the `League\Uri\Idna\Result` object
     echo $exception->getMessage(); 
     //displays "The host `％００.com` could not be converted: a label or domain name contains disallowed characters."
 }
