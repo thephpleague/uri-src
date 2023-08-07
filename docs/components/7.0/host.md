@@ -53,7 +53,7 @@ echo Host::new('ShOp.ExAmPle.COM')->value(); //display 'shop.example.com'
 echo Host::fromUri('https://BéBé.be')->toString(); //display 'xn--bb-bjab.be'
 ~~~
 
-<p class="message-warning">The last example depends on the presence of the <code>ext-intl</code> extension, otherwise the code will trigger a <code>IdnSupportMissing</code> exception</p>
+<p class="message-warning">The last example depends on the presence of the <code>ext-intl</code> extension, otherwise the code will trigger a <code>MissingFeature</code> exception</p>
 
 At any given time you can access the ascii or unicode Host representation using the two (2) following methods:
 

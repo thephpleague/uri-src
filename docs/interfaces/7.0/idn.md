@@ -73,6 +73,10 @@ foreach ($result->errors() as $error) {
 //DISALLOWED: a label or domain name contains disallowed characters
 ```
 
+<p class="message-warning">In case of error the return value of <code>Result::domain</code> <code>may</code>
+not be the same as the submitted value and may highlight the host part that triggered the error as per
+<a href="https://www.unicode.org/reports/tr46/#Processing">the specifications</a>.</p>
+
 The `League\Uri\Idna\Error` enum provides the official name of the error as well as its description via
 the `Error::description` method.
 
@@ -131,27 +135,27 @@ domain names:
 - for `Converter::toUnicode` the default is `Option::forIDNA2008Unicode()`;
 
 Last but not least if you prefer methods that throw exceptions instead of having to check the `Result::hasErrors`
-method for error you can use the following sibling methods:
+method for error you can use the following related methods:
 
 - `Converter::toAsciiOrFail` instead of `Converter::toAscii`;
 - `Converter::toUnicodeOrFail` instead of `Converter::toUnicode`; 
 
-Both methods will throw a `League\Uri\Idna\ConversionFailed` exception on error. You can still access the result
-by calling the `ConversionFailed::getResult` method and the exception message will contain a concatenation of all the
-error descriptions available for the submitted host.
+Both methods will directly return the converted domain string or throw a `League\Uri\Idna\ConversionFailed` exception
+on error. You can still access the result by calling the `ConversionFailed::getResult` method. The exception
+message will contain a concatenation of all the error descriptions available for the submitted host.
 
 ```php
 <?php
 
 use League\Uri\Idna\Converter;
 use League\Uri\Idna\ConversionFailed;
-use League\Uri\Idna\Error;
 
 try {
-    $result = Converter::toAsciiOrFail('％００.com');
+    $domain = Converter::toAsciiOrFail('％００.com');
 } catch (ConversionFailed $exception) {
-    $result = $exception->getResult(); // the `League\Uri\Idna\Result` object
+    $result = $exception->getResult(); // returns the `League\Uri\Idna\Result` object
+    echo $exception->getHost();        // display the host string as submitted
     echo $exception->getMessage(); 
-    //displays "The host `％００.com` could not be converted: a label or domain name contains disallowed characters."
+    //displays "Host `％００.com` is invalid: a label or domain name contains disallowed characters."
 }
 ````

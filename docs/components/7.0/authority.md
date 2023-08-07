@@ -93,4 +93,4 @@ These non-destructive rules are:
 echo Authority::new("www.ExAmPLE.com:80"); //displays www.example.com:80
 ~~~
 
-<p class="message-info">Host conversion depends on the presence of the <code>ext-intl</code> extension, if missing the code will trigger a <code>IdnSupportMissing</code> exception</p>
+<p class="message-info">Host conversion depends on the presence of the <code>idn_to_*</code> functions, if missing the code will trigger a <code>MissingFeature</code> exception</p>

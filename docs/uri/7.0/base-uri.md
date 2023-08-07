@@ -3,7 +3,7 @@ layout: default
 title: URI context aware wrapper
 ---
 
-URI context and manipulation
+URI info and full manipulation
 =======
 
 The `League\Uri\BaseUri` class is build to ease gathering information regarding a specific URI. 
