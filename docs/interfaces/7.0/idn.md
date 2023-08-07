@@ -133,8 +133,8 @@ domain names:
 Last but not least if you prefer methods that throw exceptions instead of having to check the `Result::hasErrors`
 method for error you can use the following sibling methods:
 
-- `Converter::toAsciiOrFail` insteqd of `Converter::toAsciiOrFail`;
-- `Converter::toUnicodeOrFail` insteqd of `Converter::toUnicode`; 
+- `Converter::toAsciiOrFail` instead of `Converter::toAscii`;
+- `Converter::toUnicodeOrFail` instead of `Converter::toUnicode`; 
 
 Both methods will throw a `League\Uri\Idna\ConversionFailed` exception on error. You can still access the result
 by calling the `ConversionFailed::getResult` method and the exception message will contain a concatenation of all the
