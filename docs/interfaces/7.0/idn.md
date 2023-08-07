@@ -124,3 +124,27 @@ domain names:
 
 - for `Converter::toAscii` the default is `Option::forIDNA2008Ascii()`;
 - for `Converter::toUnicode` the default is `Option::forIDNA2008Unicode()`;
+
+Last but not least if you prefer methods that throw exceptions instead of having to check the `Result::hasErrors`
+method for error you can use the following sibling methods:
+
+- `Converter::toAsciiOrFail` which throws a `League\Uri\Idna\ConversionFailed` exception on error
+- `Converter::toUnicodeOrFail` which throws a `League\Uri\Idna\ConversionFailed` exception on error
+
+You can still access the result by calling the `ConversionFailed::result` method.
+
+```php
+<?php
+
+use League\Uri\Idna\Converter;
+use League\Uri\Idna\ConversionFailed;
+use League\Uri\Idna\Error;
+
+try {
+    $result = Converter::toAsciiOrFail('％００.com');
+} catch (ConversionFailed $exception) {
+    $result = $exception->result(); // the `League\Uri\Idna\Result` object
+    echo $exception->getMessage(); 
+    //displays "The host `％００.com` could not be converted: a label or domain name contains disallowed characters."
+}
+````
