@@ -201,11 +201,11 @@ echo $newUri; //display "http://스타벅스코리아.com/to/the/sky/"
 <strong>League URI objects</strong> because the object always transcode the host component
 into its RFC3986/ascii representation.</p>
 
-### Modifier::normalizeIpv4
+### Modifier::hostToDecimal
 
 Normalizes the URI host content to a IPv4 dot-decimal notation if possible
-otherwise returns the uri instance unchanged. See the [IPv4 Normalizer documentation](/components/7.0/ipv4-normalizer/)
-documentation page for more information.
+otherwise returns the uri instance unchanged. See the [IPv4 Converter documentation](/components/7.0/ipv4/)
+page for more information.
 
 ~~~php
 <?php
@@ -213,8 +213,40 @@ documentation page for more information.
 use League\Uri\Modifier;
 
 $uri = 'http://0300.0250.0000.0001/path/to/the/sky.php';
-echo Modifier::from($uri)->normalizeIPv4()->getUri();
+echo Modifier::from($uri)->hostToDecimal()->getUri();
 //display 'http://192.168.0.1/path/to/the/sky.php'
+~~~
+
+### Modifier::hostToOctal
+
+Normalizes the URI host content to a IPv4 dot-octal notation if possible
+otherwise returns the uri instance unchanged. See the [IPv4 Converter documentation](/components/7.0/ipv4/)
+page for more information.
+
+~~~php
+<?php
+
+use League\Uri\Modifier;
+
+$uri = 'http://192.168.0.1/path/to/the/sky.php';
+echo Modifier::from($uri)->hostToOctal()->getUri();
+//display 'http://0300.0250.0000.0001/path/to/the/sky.php'
+~~~
+
+### Modifier::hostToHexadecimal
+
+Normalizes the URI host content to a IPv4 hexadecimal notation if possible
+otherwise returns the uri instance unchanged. See the [IPv4 Converter documentation](/components/7.0/ipv4/)
+page for more information.
+
+~~~php
+<?php
+
+use League\Uri\Modifier;
+
+$uri = 'http://192.168.257/path/to/the/sky.php';
+echo Modifier::from($uri)->hostToOctal()->getUri();
+//display 'http://0xc0a811/path/to/the/sky.php'
 ~~~
 
 ### Modifier::removeZoneIdentifier
@@ -303,7 +335,7 @@ echo Modifier::from($uri)->replaceLabel(-1, 'admin.shop');
 
 ### Modifier::removeLabels
 
-Removes selected labels from the current URI host. Labels are indicated using an array containing the labels offsets.
+Removes selected labels from the current URI host. Labels are indicated string variadic labels offsets.
 
 <p class="message-notice">Hosts are hierarchical components whose labels are indexed from right to left.</p>
 
@@ -323,6 +355,21 @@ $uri = "http://www.example.com/path/to/the/sky/";
 Modifier::from($uri)->removeLabels(-1, -3)->getUriString();
 //return "http://localhost/path/the/sky/"
 ~~~
+
+### Modifier::sliceLabels
+
+Slice the host from the current URI host. Negative offset are also supported.
+
+<p class="message-notice">Hosts are hierarchical components whose labels are indexed from right to left.</p>
+
+~~~php
+$uri = "http://www.localhost.com/path/to/the/sky/";
+echo Modifier::from($uri)->sliceLabels(1, 1)->getUriString();
+//display "http://localhost/path/the/sky/"
+~~~
+
+<p class="message-info">This modifier supports negative offset</p>
+
 
 ## Path modifiers
 
@@ -519,6 +566,16 @@ echo Modifier::from("http://www.example.com/path/to/the/sky/")
     ->getUri()
     ->getPath();
 //display "/path/the/"
+~~~
+
+### Modifier::sliceSegments
+
+Slice the path from the current URI path. Negative offset are also supported.
+
+~~~php
+$uri = "http://www.localhost.com/path/to/the/sky/";
+echo Modifier::from($uri)->sliceSegments(2, 2)->getUriString();
+//display "http://www.localhost.com/the/sky/"
 ~~~
 
 ### Modifier::replaceDataUriParameters

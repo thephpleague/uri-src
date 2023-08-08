@@ -148,7 +148,7 @@ message will contain a concatenation of all the error descriptions available for
 <?php
 
 use League\Uri\Idna\Converter;
-use League\Uri\Idna\ConversionFailed;
+use League\Uri\Exceptions\ConversionFailed;
 
 try {
     $domain = Converter::toAsciiOrFail('％００.com');

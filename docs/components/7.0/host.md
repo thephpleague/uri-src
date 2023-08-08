@@ -73,7 +73,6 @@ public Host::isIpv6(): bool
 public Host::isIpFuture(): bool
 public Host::hasZoneIdentifier(): bool
 public Host::withoutZoneIdentifier(): self
-public Host::toIpv4(): ?string
 ~~~
 
 ### Host::fromIp

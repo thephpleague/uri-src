@@ -16,7 +16,7 @@ use League\Uri\IPv4\NativeCalculator;
 
 $host = '0300.0250.0000.0001';
 $converter = new Converter(new NativeCalculator());
-$convertedHost = $converter($host);
+$convertedHost = $converter->toDecimal($host);
 
 echo $convertedHost; // returns '192.168.0.1'
 ```
@@ -24,7 +24,7 @@ echo $convertedHost; // returns '192.168.0.1'
 Usage
 --------
 
-The `Converter::__invoke` method tries to normalize a host based on
+The `Converter::toDecimal` method tries to normalize a host based on
 the normalization algorithm used by the <a href="https://url.spec.whatwg.org/#concept-ipv4-parser">WHATWG rules</a>
 to parse and format IPv4 multiple string representations into a valid IPv4 decimal
 representation. The method only parameter should represent a host component value.
@@ -41,7 +41,7 @@ The package comes bundled with three implementations:
 
 For ease of usage the class exposes a `IPv4Normalizer::fromEnvironment` named constructor which 
 will pick the correct implementation based on the available extensions. If no calculator
-is provided a `League\Uri\Ipv4\CalculatorMissing` exception will be thrown.
+is provided a `League\Uri\Ipv4\MissingFeature` exception will be thrown.
 
 If no normalization is possible `null` is returned.
 
@@ -51,6 +51,22 @@ If no normalization is possible `null` is returned.
 use League\Uri\IPV4\Converter;
 
 $converter = Converter::fromEnvironment();
-$converter('0');       // returns 0.0.0.0
-$converter('toto.be'); // returns null
+$converter->toDecimal('0');       // returns 0.0.0.0
+$converter->toDecimal('toto.be'); // returns null
+```
+
+The same functionality is provided to convert the IPv4 to Octal and Hexadecimal representation.
+
+- `Converter::toOctal` tries to convert the IPv4 to its octal dot notation or returns `null`
+- `Converter::toHexadecimal` tries to convert the IPv4 to its hexadecimal dot notation or returns `null`
+
+```php
+<?php
+
+use League\Uri\IPV4\Converter;
+
+$converter = Converter::fromEnvironment();
+$converter->toDecimal('0xc0a821');         // returns "192.168.2.1"
+$converter->toOctal('0xc0a821');           // returns "0300.0250.0002.0001"
+$converter->toHexadecimal('192.168.2.1.'); // returns "0xc0a821"
 ```
