@@ -24,14 +24,13 @@ echo $convertedHost; // returns '192.168.0.1'
 Usage
 --------
 
-The `Converter::toDecimal` method tries to normalize a host based on
-the normalization algorithm used by the <a href="https://url.spec.whatwg.org/#concept-ipv4-parser">WHATWG rules</a>
-to parse and format IPv4 multiple string representations into a valid IPv4 decimal
-representation. The method only parameter should represent a host component value.
+The `Converter::toDecimal` method tries to convert a host into a valid IPv4 decimal dot-notation
+representation based on the algorithm used by the [WHATWG rules](https://url.spec.whatwg.org/#concept-ipv4-parser).
+The method only parameter should represent a host value.
 
-To work as intended the class requires a `League\Uri\IPv4\IPv4Calculator` implementing class 
-responsible for making all the calculation needed to perform the conversion between
-IPv4 string representations.
+To work as intended the class requires a `League\Uri\IPv4\Calculator` implementing class 
+responsible for making all the calculations needed to perform the conversion between
+IPv4 representations.
 
 The package comes bundled with three implementations:
 
@@ -39,11 +38,11 @@ The package comes bundled with three implementations:
 - `League\Uri\IPv4\BCMathCalculator` which relies on BCMath extension;
 - `League\Uri\IPv4\NativeCalculator` which relies on PHP build against the x.64 architecture;
 
-For ease of usage the class exposes a `IPv4Normalizer::fromEnvironment` named constructor which 
-will pick the correct implementation based on the available extensions. If no calculator
-is provided a `League\Uri\Ipv4\MissingFeature` exception will be thrown.
+For ease of usage the class exposes a `fromEnvironment` named constructor which 
+will pick the correct implementation based on the available extensions. 
 
-If no normalization is possible `null` is returned.
+If no calculator is provided a `League\Uri\Exceptions\MissingFeature` exception will be thrown. likewise,
+if no convertion is possible `null` is returned.
 
 ```php
 <?php

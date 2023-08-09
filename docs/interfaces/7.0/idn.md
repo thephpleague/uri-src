@@ -30,8 +30,9 @@ which means remembering:
 - the flags value,
 - the parameters position, 
 - the return value can be the domain converted of `false` in case of error
-- that the result is filled by reference so if not provided you won't know the reason for failure.
+- that the result is filled by reference so if not provided you won't know the reason for failure or success.
 - the `errors` keys represents a bitset of the error constants `IDNA_ERROR_*`
+- IDNA options constants and IDNA error constants can be mistakingly used as they are both `int` with similar values
 
 In contrast, when performing a conversion with a method from `League\Uri\Idna\Converter` a `League\Uri\Idna\Result`
 instance is returned with information regarding the outcome of the conversion.
@@ -140,9 +141,13 @@ method for error you can use the following related methods:
 - `Converter::toAsciiOrFail` instead of `Converter::toAscii`;
 - `Converter::toUnicodeOrFail` instead of `Converter::toUnicode`; 
 
-Both methods will directly return the converted domain string or throw a `League\Uri\Idna\ConversionFailed` exception
-on error. You can still access the result by calling the `ConversionFailed::getResult` method. The exception
-message will contain a concatenation of all the error descriptions available for the submitted host.
+Both methods will directly return the converted domain string or throw a `League\Uri\Exceptions\ConversionFailed` exception
+on error. You can still access:
+
+- the result by calling the `ConversionFailed::getResult` method. 
+- the original submitted host string using the `ConversionFailed::getHost` method.
+
+The exception message will contain a concatenation of all the error descriptions available for the conversion.
 
 ```php
 <?php
@@ -154,7 +159,8 @@ try {
     $domain = Converter::toAsciiOrFail('％００.com');
 } catch (ConversionFailed $exception) {
     $result = $exception->getResult(); // returns the `League\Uri\Idna\Result` object
-    echo $exception->getHost();        // display the host string as submitted
+    echo $exception->getHost();        // display "％００.com"
+    echo $result->domain();            // display "�00.com"
     echo $exception->getMessage(); 
     //displays "Host `％００.com` is invalid: a label or domain name contains disallowed characters."
 }
