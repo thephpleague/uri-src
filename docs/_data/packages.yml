@@ -1,15 +1,15 @@
 package:
     'interfaces':
         name: 'uri-interfaces'
-        version: '2.0'
-        latest: '2.3.0'
+        version: '7.0'
+        latest: '7.0.0'
         documentation:
             - '7.0'
             - '2.0'
     'uri':
         name: 'uri'
-        version: '6.0'
-        latest: '6.8.0'
+        version: '7.0'
+        latest: '7.0.0'
         documentation:
             - '7.0'
             - '6.0'
@@ -17,8 +17,8 @@ package:
             - '4.0'
     'components':
         name: 'uri-components'
-        version: '2.0'
-        latest: '2.4.1'
+        version: '7.0'
+        latest: '7.0.0'
         documentation:
             - '7.0'
             - '2.0'
