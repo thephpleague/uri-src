@@ -22,8 +22,6 @@ use function explode;
 use function html_entity_decode;
 use function implode;
 use function is_array;
-use function is_bool;
-use function is_numeric;
 use function is_scalar;
 use function is_string;
 use function preg_match;
@@ -45,24 +43,10 @@ use const PHP_QUERY_RFC3986;
  */
 final class QueryString
 {
-    private const ENCODING_LIST = [
-        PHP_QUERY_RFC1738 => [
-            'suffixKey' => '*',
-            'suffixValue' => '*&',
-        ],
-        PHP_QUERY_RFC3986 => [
-            'suffixKey' => "!$'()*,;:@?/%",
-            'suffixValue' => "!$'()*,;=:@?/&%",
-        ],
-    ];
     private const PAIR_VALUE_DECODED = 1;
     private const PAIR_VALUE_PRESERVED = 2;
-    private const REGEXP_ENCODED_PATTERN = ',%[A-Fa-f0-9]{2},';
     private const REGEXP_INVALID_CHARS = '/[\x00-\x1f\x7f]/';
     private const REGEXP_UNRESERVED_CHAR = '/[^A-Za-z0-9_\-.~]/';
-
-    private static string $regexpKey;
-    private static string $regexpValue;
 
     /**
      * @codeCoverageIgnore
@@ -116,8 +100,10 @@ final class QueryString
 
     private static function filterQuery(Stringable|string|bool|null $query, int $encType): ?string
     {
+        static $encTypeList = [PHP_QUERY_RFC1738 => 1, PHP_QUERY_RFC3986 => 1];
+
         $query = match (true) {
-            !isset(self::ENCODING_LIST[$encType]) => throw new SyntaxError('Unknown or Unsupported encoding.'),
+            !isset($encTypeList[$encType]) => throw new SyntaxError('Unknown or Unsupported encoding.'),
             $query instanceof UriComponentInterface => $query->value(),
             $query instanceof Stringable => (string) $query,
             default => $query,
@@ -158,24 +144,11 @@ final class QueryString
      */
     private static function parsePair(string $pair, int $pairValueState): array
     {
-        $decodeMatches = static fn (array $matches): string => rawurldecode($matches[0]);
-
         [$key, $value] = explode('=', $pair, 2) + [1 => null];
 
-        $key = match (true) {
-            null === $key => '',
-            1 !== preg_match(self::REGEXP_ENCODED_PATTERN, $key) => $key,
-            default => (string) preg_replace_callback(self::REGEXP_ENCODED_PATTERN, $decodeMatches(...), $key),
-        };
-
         return match (true) {
-            null === $value,
-            self::PAIR_VALUE_PRESERVED === $pairValueState,
-            1 !== preg_match(self::REGEXP_ENCODED_PATTERN, $value) => [$key, $value],
-            default => [
-                $key,
-                preg_replace_callback(self::REGEXP_ENCODED_PATTERN, $decodeMatches(...), $value),
-            ],
+            self::PAIR_VALUE_PRESERVED === $pairValueState => [(string) Encoder::decodeAll($key), $value],
+            default => [(string) Encoder::decodeAll($key), Encoder::decodeAll($value)],
         };
     }
 
@@ -281,30 +254,35 @@ final class QueryString
     {
         $res = match (true) {
             '' === $separator => throw new SyntaxError('The separator character can not be the empty string.'),
-            !isset(self::ENCODING_LIST[$encType]) => throw new SyntaxError('Unknown or Unsupported encoding.'),
             default => [],
         };
 
-        self::$regexpValue = '/(%[A-Fa-f0-9]{2})|[^A-Za-z0-9_\-\.~'.preg_quote(
+        $regexpPart = match ($encType) {
+            PHP_QUERY_RFC3986 => ['suffixKey' => "!$'()*,;:@?/%", 'suffixValue' => "!$'()*,;=:@?/&%"],
+            PHP_QUERY_RFC1738  => ['suffixKey' => '*', 'suffixValue' => '*&'],
+            default => throw new SyntaxError('Unknown or Unsupported encoding.'),
+        };
+
+        $regexpValue = '/(%[A-Fa-f0-9]{2})|[^A-Za-z0-9_\-\.~'.preg_quote(
             str_replace(
                 html_entity_decode($separator, ENT_HTML5, 'UTF-8'),
                 '',
-                self::ENCODING_LIST[$encType]['suffixValue']
+                $regexpPart['suffixValue']
             ),
             '/'
         ).']+/ux';
 
-        self::$regexpKey = '/(%[A-Fa-f0-9]{2})|[^A-Za-z0-9_\-\.~'.preg_quote(
+        $regexpKey = '/(%[A-Fa-f0-9]{2})|[^A-Za-z0-9_\-\.~'.preg_quote(
             str_replace(
                 html_entity_decode($separator, ENT_HTML5, 'UTF-8'),
                 '',
-                self::ENCODING_LIST[$encType]['suffixKey']
+                $regexpPart['suffixKey']
             ),
             '/'
         ).']+/ux';
 
         foreach ($pairs as $pair) {
-            $res[] = self::buildPair($pair);
+            $res[] = self::buildPair($pair, $regexpKey, $regexpValue);
         }
 
         return match (true) {
@@ -319,7 +297,7 @@ final class QueryString
      *
      * @throws SyntaxError If the pair is invalid
      */
-    private static function buildPair(array $pair): string
+    private static function buildPair(array $pair, string $regexpKey, string $regexpValue): string
     {
         if ([0, 1] !== array_keys($pair)) {
             throw new SyntaxError('A pair must be a sequential array starting at `0` and containing two elements.');
@@ -332,25 +310,29 @@ final class QueryString
             default => $matches[0],
         };
 
-        $formatter = static fn (string $value, string $regexp): string => match (true) {
-            1 === preg_match('/[\x00-\x1f\x7f]/', $value) => rawurlencode($value),
+        $formatter = static fn (string|bool|int|float $value, string $regexp): string => match (true) {
+            true === $value => '1',
+            false === $value => '0',
+            !is_string($value) => (string) $value,
+            1 === preg_match(self::REGEXP_INVALID_CHARS, $value) => rawurlencode($value),
             1 === preg_match($regexp, $value) => (string) preg_replace_callback($regexp, $encodeMatches(...), $value),
             default => $value,
         };
 
         $name = match (true) {
             !is_scalar($name) => throw new SyntaxError(sprintf('A pair key must be a scalar value `%s` given.', gettype($name))),
-            is_bool($name) => (int) $name,
-            is_string($name) => $formatter($name, self::$regexpKey),
-            default => $name,
+            default => $formatter($name, $regexpKey),
+        };
+
+        $value = match (true) {
+            null === $value => null,
+            !is_scalar($value) => throw new SyntaxError(sprintf('A pair valu must be a scalar value or `null`; `%s` given.', gettype($name))),
+            default => $formatter($value, $regexpValue),
         };
 
         return match (true) {
-            is_string($value) => $name.'='.$formatter($value, self::$regexpValue),
-            is_numeric($value) => $name.'='.$value,
-            is_bool($value) => $name.'='.(int) $value,
-            null === $value => (string) $name,
-            default => throw new SyntaxError(sprintf('A pair value must be a scalar value or the null value, `%s` given.', gettype($value))),
+            null === $value => $name,
+            default => $name.'='.$value,
         };
     }
 }

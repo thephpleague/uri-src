@@ -302,7 +302,11 @@ final class DataPath extends Component implements DataPathInterface
 
         $path = $mimetype.$parameters.','.$data;
 
-        return preg_replace_callback(self::REGEXP_DATAPATH_ENCODING, $this->encodeMatches(...), $path) ?? $path;
+        return preg_replace_callback(
+            self::REGEXP_DATAPATH_ENCODING,
+            static fn (array $matches): string => rawurlencode($matches[0]),
+            $path
+        ) ?? $path;
     }
 
     public function toAscii(): DataPathInterface
