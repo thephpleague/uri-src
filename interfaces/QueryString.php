@@ -13,27 +13,16 @@ declare(strict_types=1);
 
 namespace League\Uri;
 
-use League\Uri\Contracts\UriComponentInterface;
 use League\Uri\Exceptions\SyntaxError;
+use League\Uri\KeyValue\Converter;
 use Stringable;
 use function array_key_exists;
 use function array_keys;
 use function explode;
-use function html_entity_decode;
-use function implode;
 use function is_array;
-use function is_scalar;
-use function is_string;
-use function preg_match;
-use function preg_quote;
-use function preg_replace_callback;
 use function rawurldecode;
-use function rawurlencode;
-use function sprintf;
-use function str_replace;
 use function strpos;
 use function substr;
-use const PHP_QUERY_RFC1738;
 use const PHP_QUERY_RFC3986;
 
 /**
@@ -45,8 +34,6 @@ final class QueryString
 {
     private const PAIR_VALUE_DECODED = 1;
     private const PAIR_VALUE_PRESERVED = 2;
-    private const REGEXP_INVALID_CHARS = '/[\x00-\x1f\x7f]/';
-    private const REGEXP_UNRESERVED_CHAR = '/[^A-Za-z0-9_\-.~]/';
 
     /**
      * @codeCoverageIgnore
@@ -65,22 +52,22 @@ final class QueryString
      * @see http://php.net/parse_str
      * @see https://wiki.php.net/rfc/on_demand_name_mangling
      *
+     * @param non-empty-string $separator
+     *
      * @throws SyntaxError
      */
     public static function extract(Stringable|string|bool|null $query, string $separator = '&', int $encType = PHP_QUERY_RFC3986): array
     {
-        $query = self::filterQuery($query, $encType);
-
-        return self::convert(match (true) {
-            '' === $separator => throw new SyntaxError('The separator character can not be the empty string.'),
-            null === $query,
-            '' === $query => [],
-            default => self::parsePairs($query, $separator, self::PAIR_VALUE_PRESERVED),
-        });
+        return self::convert(self::parsePairs(
+            Converter::fromEncodingType($encType, $separator)->toPairs($query),
+            self::PAIR_VALUE_PRESERVED
+        ));
     }
 
     /**
      * Parses a query string into a collection of key/value pairs.
+     *
+     * @param non-empty-string $separator
      *
      * @throws SyntaxError
      *
@@ -88,50 +75,21 @@ final class QueryString
      */
     public static function parse(Stringable|string|bool|null $query, string $separator = '&', int $encType = PHP_QUERY_RFC3986): array
     {
-        $query = self::filterQuery($query, $encType);
-
-        return match (true) {
-            '' === $separator => throw new SyntaxError('The separator character can not be the empty string.'),
-            null === $query => [],
-            '' === $query => [['', null]],
-            default => self::parsePairs($query, $separator, self::PAIR_VALUE_DECODED),
-        };
-    }
-
-    private static function filterQuery(Stringable|string|bool|null $query, int $encType): ?string
-    {
-        static $encTypeList = [PHP_QUERY_RFC1738 => 1, PHP_QUERY_RFC3986 => 1];
-
-        $query = match (true) {
-            !isset($encTypeList[$encType]) => throw new SyntaxError('Unknown or Unsupported encoding.'),
-            $query instanceof UriComponentInterface => $query->value(),
-            $query instanceof Stringable => (string) $query,
-            default => $query,
-        };
-
-        return match (true) {
-            null === $query => null,
-            false === $query => '0',
-            true === $query => '1',
-            1 === preg_match(self::REGEXP_INVALID_CHARS, $query) => throw new SyntaxError(sprintf('Invalid query string: %s.', $query)),
-            PHP_QUERY_RFC1738 === $encType => str_replace('+', '%20', $query),
-            default => $query,
-        };
+        return self::parsePairs(
+            Converter::fromEncodingType($encType, $separator)->toPairs($query),
+            self::PAIR_VALUE_DECODED
+        );
     }
 
     /**
-     * @param non-empty-string $query
-     * @param non-empty-string $separator
+     * @param array<string> $pairs
      *
      * @return array<int, array{0:string, 1:string|null}>
      */
-    private static function parsePairs(string $query, string $separator, int $pairValueState): array
+    private static function parsePairs(array $pairs, int $pairValueState): array
     {
         return array_reduce(
-            match (true) {
-                str_contains($query, $separator) => explode($separator, $query),
-                default => [$query],
-            },
+            $pairs,
             fn (array $carry, string|null $pairString) => [...$carry, self::parsePair((string) $pairString, $pairValueState)],
             []
         );
@@ -245,94 +203,47 @@ final class QueryString
      * a valid query string. This method differs from PHP http_build_query as
      * it does not modify parameters keys.
      *
+     *  If a reserved character is found in a URI component and
+     *  no delimiting role is known for that character, then it must be
+     *  interpreted as representing the data octet corresponding to that
+     *  character's encoding in US-ASCII.
+     *
+     * @see https://datatracker.ietf.org/doc/html/rfc3986#section-2.2
+     *
      * @param array<array{0:string, 1:string|float|int|bool|null}> $pairs
+     * @param non-empty-string                                     $separator
      *
      * @throws SyntaxError If the encoding type is invalid
      * @throws SyntaxError If a pair is invalid
      */
     public static function build(iterable $pairs, string $separator = '&', int $encType = PHP_QUERY_RFC3986): ?string
     {
-        $res = match (true) {
-            '' === $separator => throw new SyntaxError('The separator character can not be the empty string.'),
-            default => [],
-        };
-
-        $regexpPart = match ($encType) {
-            PHP_QUERY_RFC3986 => ['suffixKey' => "!$'()*,;:@?/%", 'suffixValue' => "!$'()*,;=:@?/&%"],
-            PHP_QUERY_RFC1738  => ['suffixKey' => '*', 'suffixValue' => '*&'],
-            default => throw new SyntaxError('Unknown or Unsupported encoding.'),
-        };
-
-        $regexpValue = '/(%[A-Fa-f0-9]{2})|[^A-Za-z0-9_\-\.~'.preg_quote(
-            str_replace(
-                html_entity_decode($separator, ENT_HTML5, 'UTF-8'),
-                '',
-                $regexpPart['suffixValue']
-            ),
-            '/'
-        ).']+/ux';
-
-        $regexpKey = '/(%[A-Fa-f0-9]{2})|[^A-Za-z0-9_\-\.~'.preg_quote(
-            str_replace(
-                html_entity_decode($separator, ENT_HTML5, 'UTF-8'),
-                '',
-                $regexpPart['suffixKey']
-            ),
-            '/'
-        ).']+/ux';
-
-        foreach ($pairs as $pair) {
-            $res[] = self::buildPair($pair, $regexpKey, $regexpValue);
-        }
-
-        return match (true) {
-            [] === $res => null,
-            PHP_QUERY_RFC1738 === $encType => str_replace('%20', '+', implode($separator, $res)),
-            default => implode($separator, $res),
-        };
+        return Converter::fromEncodingType($encType, $separator)->toValue(
+            (function ($keyValuePairs) {
+                foreach ($keyValuePairs as $keyValuePair) {
+                    yield self::buildPair($keyValuePair);
+                }
+            })($pairs)
+        );
     }
 
     /**
-     * Build a RFC3986 query key/value pair association.
+     * Build a query key/value pair association.
      *
      * @throws SyntaxError If the pair is invalid
      */
-    private static function buildPair(array $pair, string $regexpKey, string $regexpValue): string
+    private static function buildPair(array $pair): string
     {
         if ([0, 1] !== array_keys($pair)) {
             throw new SyntaxError('A pair must be a sequential array starting at `0` and containing two elements.');
         }
 
         [$name, $value] = $pair;
-
-        $encodeMatches = static fn (array $matches): string => match (true) {
-            1 === preg_match(self::REGEXP_UNRESERVED_CHAR, rawurldecode($matches[0])) => rawurlencode($matches[0]),
-            default => $matches[0],
-        };
-
-        $formatter = static fn (string|bool|int|float $value, string $regexp): string => match (true) {
-            true === $value => '1',
-            false === $value => '0',
-            !is_string($value) => (string) $value,
-            1 === preg_match(self::REGEXP_INVALID_CHARS, $value) => rawurlencode($value),
-            1 === preg_match($regexp, $value) => (string) preg_replace_callback($regexp, $encodeMatches(...), $value),
-            default => $value,
-        };
-
-        $name = match (true) {
-            !is_scalar($name) => throw new SyntaxError(sprintf('A pair key must be a scalar value `%s` given.', gettype($name))),
-            default => $formatter($name, $regexpKey),
-        };
-
-        $value = match (true) {
-            null === $value => null,
-            !is_scalar($value) => throw new SyntaxError(sprintf('A pair valu must be a scalar value or `null`; `%s` given.', gettype($name))),
-            default => $formatter($value, $regexpValue),
-        };
+        $name = (string) Encoder::encodeQueryKeyValue($name);
 
         return match (true) {
             null === $value => $name,
-            default => $name.'='.$value,
+            default => $name.'='.Encoder::encodeQueryKeyValue($value),
         };
     }
 }

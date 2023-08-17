@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace League\Uri;
 
+use Closure;
 use League\Uri\Contracts\UriComponentInterface;
 use League\Uri\Exceptions\SyntaxError;
 use Stringable;
@@ -86,18 +87,22 @@ final class Encoder
         return self::encode($component, $pattern);
     }
 
-    private static function encode(Stringable|string|int|bool|null $component, string $pattern): ?string
+    public static function encodeQueryKeyValue(mixed $component): ?string
     {
-        $component = self::filterComponent($component);
+        static $pattern = '/[^'.self::REGEXP_PART_UNRESERVED.']+|'.self::REGEXP_PART_ENCODED.'/ux';
+
         $encodeMatches = static fn (array $matches): string => match (true) {
             1 === preg_match('/[^'.self::REGEXP_PART_UNRESERVED.']/', rawurldecode($matches[0])) => rawurlencode($matches[0]),
             default => $matches[0],
         };
 
+        $component = self::filterComponent($component);
+
         return match (true) {
-            null === $component,
-            '' === $component => $component,
-            default => (string) preg_replace_callback($pattern, $encodeMatches(...), $component),
+            !is_scalar($component) => throw new SyntaxError(sprintf('A pair key/value must be a scalar value `%s` given.', gettype($component))),
+            1 === preg_match(self::REGEXP_CHARS_INVALID, $component) => rawurlencode($component),
+            1 === preg_match($pattern, $component) => (string) preg_replace_callback($pattern, $encodeMatches(...), $component),
+            default => $component,
         };
     }
 
@@ -124,10 +129,38 @@ final class Encoder
         return self::decode($component, $decodeMatches);
     }
 
+    private static function filterComponent(mixed $component): ?string
+    {
+        return match (true) {
+            true === $component => '1',
+            false === $component => '0',
+            $component instanceof UriComponentInterface => $component->value(),
+            $component instanceof Stringable,
+            is_scalar($component) => (string) $component,
+            null === $component => null,
+            default => throw new SyntaxError(sprintf('The component must be a scalar value `%s` given.', gettype($component))),
+        };
+    }
+
+    private static function encode(Stringable|string|int|bool|null $component, string $pattern): ?string
+    {
+        $component = self::filterComponent($component);
+        $encodeMatches = static fn (array $matches): string => match (true) {
+            1 === preg_match('/[^'.self::REGEXP_PART_UNRESERVED.']/', rawurldecode($matches[0])) => rawurlencode($matches[0]),
+            default => $matches[0],
+        };
+
+        return match (true) {
+            null === $component,
+            '' === $component => $component,
+            default => (string) preg_replace_callback($pattern, $encodeMatches(...), $component),
+        };
+    }
+
     /**
      * Decodes all the URI component characters.
      */
-    private static function decode(Stringable|string|int|null $component, callable $decodeMatches): ?string
+    private static function decode(Stringable|string|int|null $component, Closure $decodeMatches): ?string
     {
         $component = self::filterComponent($component);
 
@@ -136,17 +169,6 @@ final class Encoder
             1 === preg_match(self::REGEXP_CHARS_INVALID, $component) => throw new SyntaxError('Invalid component string: '.$component.'.'),
             1 === preg_match(self::REGEXP_CHARS_ENCODED, $component) => preg_replace_callback(self::REGEXP_CHARS_ENCODED, $decodeMatches(...), $component),
             default => $component,
-        };
-    }
-
-    private static function filterComponent(Stringable|string|int|bool|null $component): ?string
-    {
-        return match (true) {
-            $component instanceof UriComponentInterface => $component->value(),
-            null === $component => null,
-            true === $component => '1',
-            false === $component => '0',
-            default  => (string) $component,
         };
     }
 }
