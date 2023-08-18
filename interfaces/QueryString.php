@@ -14,8 +14,7 @@ declare(strict_types=1);
 namespace League\Uri;
 
 use League\Uri\Exceptions\SyntaxError;
-use League\Uri\Parser\Encoder;
-use League\Uri\Parser\KeyValueConverter;
+use League\Uri\KeyValuePair\Converter;
 use Stringable;
 use function array_key_exists;
 use function array_keys;
@@ -56,7 +55,7 @@ final class QueryString
      */
     public static function build(iterable $pairs, string $separator = '&', int $encType = PHP_QUERY_RFC3986): ?string
     {
-        return self::buildFromPairs($pairs, KeyValueConverter::fromEncodingType($encType)->withSeparator($separator));
+        return self::buildFromPairs($pairs, Converter::fromEncodingType($encType)->withSeparator($separator));
     }
 
     /**
@@ -78,7 +77,7 @@ final class QueryString
      * @throws SyntaxError If the encoding type is invalid
      * @throws SyntaxError If a pair is invalid
      */
-    public static function buildFromPairs(iterable $pairs, KeyValueConverter $converter): ?string
+    public static function buildFromPairs(iterable $pairs, Converter $converter): ?string
     {
         $keyValuePairs = [];
         foreach ($pairs as $pair) {
@@ -108,7 +107,7 @@ final class QueryString
      */
     public static function extract(Stringable|string|bool|null $query, string $separator = '&', int $encType = PHP_QUERY_RFC3986): array
     {
-        return self::extractFromValue($query, KeyValueConverter::fromEncodingType($encType)->withSeparator($separator));
+        return self::extractFromValue($query, Converter::fromEncodingType($encType)->withSeparator($separator));
     }
 
     /**
@@ -123,7 +122,7 @@ final class QueryString
      *
      * @throws SyntaxError
      */
-    public static function extractFromValue(Stringable|string|bool|null $query, KeyValueConverter $converter): array
+    public static function extractFromValue(Stringable|string|bool|null $query, Converter $converter): array
     {
         return self::convert(self::decodePairs($converter->toPairs($query), self::PAIR_VALUE_PRESERVED));
     }
@@ -139,7 +138,7 @@ final class QueryString
      */
     public static function parse(Stringable|string|bool|null $query, string $separator = '&', int $encType = PHP_QUERY_RFC3986): array
     {
-        return self::parseFromValue($query, KeyValueConverter::fromEncodingType($encType)->withSeparator($separator));
+        return self::parseFromValue($query, Converter::fromEncodingType($encType)->withSeparator($separator));
     }
 
     /**
@@ -149,7 +148,7 @@ final class QueryString
      *
      * @return array<int, array{0:string, 1:string|null}>
      */
-    public static function parseFromValue(Stringable|string|bool|null $query, KeyValueConverter $converter): array
+    public static function parseFromValue(Stringable|string|bool|null $query, Converter $converter): array
     {
         return self::decodePairs($converter->toPairs($query), self::PAIR_VALUE_DECODED);
     }

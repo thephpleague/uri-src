@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace League\Uri\Parser;
+namespace League\Uri;
 
 use Closure;
 use League\Uri\Contracts\UriComponentInterface;

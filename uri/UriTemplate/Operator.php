@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace League\Uri\UriTemplate;
 
+use League\Uri\Encoder;
 use League\Uri\Exceptions\SyntaxError;
-use League\Uri\Parser\Encoder;
 use Stringable;
 use function implode;
 use function is_array;

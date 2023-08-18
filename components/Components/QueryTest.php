@@ -686,7 +686,7 @@ final class QueryTest extends TestCase
     {
         $this->expectException(SyntaxError::class);
 
-        Query::fromRFC3986('foo=b%20ar;foo=baz', '|');
+        Query::fromRFC3986('foo=b%20ar;foo=baz', ''); /* @phpstan-ignore-line */
     }
 
     public function testItFailsToCreateFromRFCSpecificationWithEmptySeparator(): void

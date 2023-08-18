@@ -15,7 +15,7 @@ namespace League\Uri\Components;
 
 use League\Uri\Contracts\FragmentInterface;
 use League\Uri\Contracts\UriInterface;
-use League\Uri\Parser\Encoder;
+use League\Uri\Encoder;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use Stringable;
 
