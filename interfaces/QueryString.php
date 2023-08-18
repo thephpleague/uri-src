@@ -42,12 +42,76 @@ final class QueryString
     }
 
     /**
+     * Build a query string from a list of pairs.
+     *
+     * @see QueryString::buildFromPairs()
+     * @see https://datatracker.ietf.org/doc/html/rfc3986#section-2.2
+     *
+     * @param iterable<array{0:string, 1:string|float|int|bool|null}> $pairs
+     * @param non-empty-string                                        $separator
+     *
+     * @throws SyntaxError If the encoding type is invalid
+     * @throws SyntaxError If a pair is invalid
+     */
+    public static function build(iterable $pairs, string $separator = '&', int $encType = PHP_QUERY_RFC3986): ?string
+    {
+        return self::buildFromPairs($pairs, Converter::fromEncodingType($encType)->withSeparator($separator));
+    }
+
+    /**
+     * Build a query string from a list of pairs.
+     *
+     * The method expects the return value from Query::parse to build
+     * a valid query string. This method differs from PHP http_build_query as
+     * it does not modify parameters keys.
+     *
+     *  If a reserved character is found in a URI component and
+     *  no delimiting role is known for that character, then it must be
+     *  interpreted as representing the data octet corresponding to that
+     *  character's encoding in US-ASCII.
+     *
+     * @see https://datatracker.ietf.org/doc/html/rfc3986#section-2.2
+     *
+     * @param iterable<array{0:string, 1:string|float|int|bool|null}> $pairs
+     *
+     * @throws SyntaxError If the encoding type is invalid
+     * @throws SyntaxError If a pair is invalid
+     */
+    public static function buildFromPairs(iterable $pairs, Converter $converter): ? string
+    {
+        $keyValuePairs = [];
+        foreach ($pairs as $pair) {
+            $keyValuePairs[] = self::encodePair($pair);
+        }
+
+        return $converter->toValue($keyValuePairs);
+    }
+
+    /**
+     * Build a query key/value pair association.
+     *
+     * @param array{0:string, 1:string|float|int|bool|null} $pair
+     *
+     * @throws SyntaxError If the pair is invalid
+     *
+     * @return array{0:string, 1:string|null}
+     */
+    private static function encodePair(array $pair): array
+    {
+        if ([0, 1] !== array_keys($pair)) { /* @phpstan-ignore-line */
+            throw new SyntaxError('A pair must be a sequential array starting at `0` and containing two elements.');
+        }
+
+        return [(string) Encoder::encodeQueryKeyValue($pair[0]), match(true) {
+            null === $pair[1] => null,
+            default => Encoder::encodeQueryKeyValue($pair[1]),
+        }];
+    }
+
+    /**
      * Parses the query string like parse_str without mangling the results.
      *
-     * The result is similar as PHP parse_str when used with its
-     * second argument with the difference that variable names are
-     * not mangled.
-     *
+     * @see QueryString::extractFromValue()
      * @see http://php.net/parse_str
      * @see https://wiki.php.net/rfc/on_demand_name_mangling
      *
@@ -57,10 +121,24 @@ final class QueryString
      */
     public static function extract(Stringable|string|bool|null $query, string $separator = '&', int $encType = PHP_QUERY_RFC3986): array
     {
-        return self::convert(self::decodePairs(
-            Converter::fromEncodingType($encType, $separator)->toPairs($query),
-            self::PAIR_VALUE_PRESERVED
-        ));
+        return self::extractFromValue($query, Converter::fromEncodingType($encType)->withSeparator($separator));
+    }
+
+    /**
+     * Parses the query string like parse_str without mangling the results.
+     *
+     * The result is similar as PHP parse_str when used with its
+     * second argument with the difference that variable names are
+     * not mangled.
+     *
+     * @see http://php.net/parse_str
+     * @see https://wiki.php.net/rfc/on_demand_name_mangling
+     *
+     * @throws SyntaxError
+     */
+    public static function extractFromValue(Stringable|string|bool|null $query, Converter $converter): array
+    {
+        return self::convert(self::decodePairs($converter->toPairs($query), self::PAIR_VALUE_PRESERVED));
     }
 
     /**
@@ -74,10 +152,19 @@ final class QueryString
      */
     public static function parse(Stringable|string|bool|null $query, string $separator = '&', int $encType = PHP_QUERY_RFC3986): array
     {
-        return self::decodePairs(
-            Converter::fromEncodingType($encType, $separator)->toPairs($query),
-            self::PAIR_VALUE_DECODED
-        );
+        return self::parseFromValue($query, Converter::fromEncodingType($encType)->withSeparator($separator));
+    }
+
+    /**
+     * Parses a query string into a collection of key/value pairs.
+     *
+     * @throws SyntaxError
+     *
+     * @return array<int, array{0:string, 1:string|null}>
+     */
+    public static function parseFromValue(Stringable|string|bool|null $query, Converter $converter): array
+    {
+        return self::decodePairs($converter->toPairs($query), self::PAIR_VALUE_DECODED);
     }
 
     /**
@@ -195,56 +282,5 @@ final class QueryString
         $data[$key] = self::extractPhpVariable($data[$key], $index.$remaining, $value);
 
         return $data;
-    }
-
-    /**
-     * Build a query string from an associative array.
-     *
-     * The method expects the return value from Query::parse to build
-     * a valid query string. This method differs from PHP http_build_query as
-     * it does not modify parameters keys.
-     *
-     *  If a reserved character is found in a URI component and
-     *  no delimiting role is known for that character, then it must be
-     *  interpreted as representing the data octet corresponding to that
-     *  character's encoding in US-ASCII.
-     *
-     * @see https://datatracker.ietf.org/doc/html/rfc3986#section-2.2
-     *
-     * @param array<array{0:string, 1:string|float|int|bool|null}> $pairs
-     * @param non-empty-string                                     $separator
-     *
-     * @throws SyntaxError If the encoding type is invalid
-     * @throws SyntaxError If a pair is invalid
-     */
-    public static function build(iterable $pairs, string $separator = '&', int $encType = PHP_QUERY_RFC3986): ?string
-    {
-        $keyValuePairs = [];
-        foreach ($pairs as $pair) {
-            $keyValuePairs[] = self::encodePair($pair);
-        }
-
-        return Converter::fromEncodingType($encType, $separator)->toValue($keyValuePairs);
-    }
-
-    /**
-     * Build a query key/value pair association.
-     *
-     * @param array{0:string, 1:string|float|int|bool|null} $pair
-     *
-     * @throws SyntaxError If the pair is invalid
-     *
-     * @return array{0:string, 1:string|null}
-     */
-    private static function encodePair(array $pair): array
-    {
-        if ([0, 1] !== array_keys($pair)) { /* @phpstan-ignore-line */
-            throw new SyntaxError('A pair must be a sequential array starting at `0` and containing two elements.');
-        }
-
-        return [(string) Encoder::encodeQueryKeyValue($pair[0]), match(true) {
-            null === $pair[1] => null,
-            default => Encoder::encodeQueryKeyValue($pair[1]),
-        }];
     }
 }

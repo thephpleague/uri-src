@@ -74,14 +74,11 @@ final class Converter
         return new self($separator, ['%20'], ['+']);
     }
 
-    /**
-     * @param non-empty-string $separator
-     */
-    public static function fromEncodingType(int $encType, string $separator = '&'): self
+    public static function fromEncodingType(int $encType): self
     {
         return match (true) {
-            PHP_QUERY_RFC3986 === $encType => self::fromRFC3986($separator),
-            PHP_QUERY_RFC1738 === $encType => self::fromRFC1738($separator),
+            PHP_QUERY_RFC3986 === $encType => self::fromRFC3986(),
+            PHP_QUERY_RFC1738 === $encType => self::fromRFC1738(),
             default => throw new SyntaxError('Unknown or Unsupported encoding.'),
         };
     }
