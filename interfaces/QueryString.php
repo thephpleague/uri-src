@@ -18,7 +18,6 @@ use League\Uri\KeyValue\Converter;
 use Stringable;
 use function array_key_exists;
 use function array_keys;
-use function explode;
 use function is_array;
 use function rawurldecode;
 use function strpos;
@@ -58,7 +57,7 @@ final class QueryString
      */
     public static function extract(Stringable|string|bool|null $query, string $separator = '&', int $encType = PHP_QUERY_RFC3986): array
     {
-        return self::convert(self::parsePairs(
+        return self::convert(self::decodePairs(
             Converter::fromEncodingType($encType, $separator)->toPairs($query),
             self::PAIR_VALUE_PRESERVED
         ));
@@ -75,22 +74,22 @@ final class QueryString
      */
     public static function parse(Stringable|string|bool|null $query, string $separator = '&', int $encType = PHP_QUERY_RFC3986): array
     {
-        return self::parsePairs(
+        return self::decodePairs(
             Converter::fromEncodingType($encType, $separator)->toPairs($query),
             self::PAIR_VALUE_DECODED
         );
     }
 
     /**
-     * @param array<string> $pairs
+     * @param array<non-empty-list<string|null>> $pairs
      *
      * @return array<int, array{0:string, 1:string|null}>
      */
-    private static function parsePairs(array $pairs, int $pairValueState): array
+    private static function decodePairs(array $pairs, int $pairValueState): array
     {
         return array_reduce(
             $pairs,
-            fn (array $carry, string|null $pairString) => [...$carry, self::parsePair((string) $pairString, $pairValueState)],
+            fn (array $carry, array $pair) => [...$carry, self::decodePair($pair, $pairValueState)],
             []
         );
     }
@@ -98,11 +97,13 @@ final class QueryString
     /**
      * Returns the key/value pair from a query string pair.
      *
+     * @param non-empty-list<string|null> $pair
+     *
      * @return array{0:string, 1:string|null}
      */
-    private static function parsePair(string $pair, int $pairValueState): array
+    private static function decodePair(array $pair, int $pairValueState): array
     {
-        [$key, $value] = explode('=', $pair, 2) + [1 => null];
+        [$key, $value] = $pair;
 
         return match (true) {
             self::PAIR_VALUE_PRESERVED === $pairValueState => [(string) Encoder::decodeAll($key), $value],
@@ -218,32 +219,32 @@ final class QueryString
      */
     public static function build(iterable $pairs, string $separator = '&', int $encType = PHP_QUERY_RFC3986): ?string
     {
-        return Converter::fromEncodingType($encType, $separator)->toValue(
-            (function ($keyValuePairs) {
-                foreach ($keyValuePairs as $keyValuePair) {
-                    yield self::buildPair($keyValuePair);
-                }
-            })($pairs)
-        );
+        $keyValuePairs = [];
+        foreach ($pairs as $pair) {
+            $keyValuePairs[] = self::encodePair($pair);
+        }
+
+        return Converter::fromEncodingType($encType, $separator)->toValue($keyValuePairs);
     }
 
     /**
      * Build a query key/value pair association.
      *
+     * @param array{0:string, 1:string|float|int|bool|null} $pair
+     *
      * @throws SyntaxError If the pair is invalid
+     *
+     * @return array{0:string, 1:string|null}
      */
-    private static function buildPair(array $pair): string
+    private static function encodePair(array $pair): array
     {
-        if ([0, 1] !== array_keys($pair)) {
+        if ([0, 1] !== array_keys($pair)) { /* @phpstan-ignore-line */
             throw new SyntaxError('A pair must be a sequential array starting at `0` and containing two elements.');
         }
 
-        [$name, $value] = $pair;
-        $name = (string) Encoder::encodeQueryKeyValue($name);
-
-        return match (true) {
-            null === $value => $name,
-            default => $name.'='.Encoder::encodeQueryKeyValue($value),
-        };
+        return [(string) Encoder::encodeQueryKeyValue($pair[0]), match(true) {
+            null === $pair[1] => null,
+            default => Encoder::encodeQueryKeyValue($pair[1]),
+        }];
     }
 }

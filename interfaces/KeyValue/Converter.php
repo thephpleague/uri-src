@@ -16,11 +16,9 @@ namespace League\Uri\KeyValue;
 use League\Uri\Contracts\UriComponentInterface;
 use League\Uri\Exceptions\SyntaxError;
 use Stringable;
-use Traversable;
 use function array_filter;
 use function explode;
 use function implode;
-use function iterator_to_array;
 use function preg_match;
 use function str_contains;
 use function str_replace;
@@ -89,28 +87,36 @@ final class Converter
     }
 
     /**
-     * @return array<string>
+     * @return array<non-empty-list<string|null>>
      */
     public function toPairs(Stringable|string|bool|null $value): array
     {
         $filteredValue = $this->filterValue($value);
 
-        return match (true) {
+        $tmp = match (true) {
             null === $filteredValue => [],
-            str_contains($filteredValue, $this->separator) => explode($this->separator, $filteredValue),
-            default => [$filteredValue],
+            default => explode($this->separator, $filteredValue),
         };
+
+        return array_map(fn (string $pair): array => explode('=', $pair, 2) + [1 => null], $tmp);
     }
 
+    /**
+     * @param iterable<array{0:string|null, 1:string|null}> $pairs
+     */
     public function toValue(iterable $pairs): ?string
     {
-        if ($pairs instanceof Traversable) {
-            $pairs = iterator_to_array($pairs);
+        $filteredPairs = [];
+        foreach ($pairs as $pair) {
+            $filteredPairs[] = match (true) {
+                null === $pair[1] => (string) $pair[0],
+                default => $pair[0].'='.$pair[1],
+            };
         }
 
         return match (true) {
-            [] === $pairs => null,
-            default => str_replace($this->toRFC3986Encoding, $this->toEncoding, implode($this->separator, $pairs)),
+            [] === $filteredPairs => null,
+            default => str_replace($this->toRFC3986Encoding, $this->toEncoding, implode($this->separator, $filteredPairs)),
         };
     }
 
