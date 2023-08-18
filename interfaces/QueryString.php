@@ -77,35 +77,21 @@ final class QueryString
      * @throws SyntaxError If the encoding type is invalid
      * @throws SyntaxError If a pair is invalid
      */
-    public static function buildFromPairs(iterable $pairs, Converter $converter): ? string
+    public static function buildFromPairs(iterable $pairs, Converter $converter): ?string
     {
         $keyValuePairs = [];
         foreach ($pairs as $pair) {
-            $keyValuePairs[] = self::encodePair($pair);
+            if ([0, 1] !== array_keys($pair)) { /* @phpstan-ignore-line */
+                throw new SyntaxError('A pair must be a sequential array starting at `0` and containing two elements.');
+            }
+
+            $keyValuePairs[] = [(string) Encoder::encodeQueryKeyValue($pair[0]), match(true) {
+                null === $pair[1] => null,
+                default => Encoder::encodeQueryKeyValue($pair[1]),
+            }];
         }
 
         return $converter->toValue($keyValuePairs);
-    }
-
-    /**
-     * Build a query key/value pair association.
-     *
-     * @param array{0:string, 1:string|float|int|bool|null} $pair
-     *
-     * @throws SyntaxError If the pair is invalid
-     *
-     * @return array{0:string, 1:string|null}
-     */
-    private static function encodePair(array $pair): array
-    {
-        if ([0, 1] !== array_keys($pair)) { /* @phpstan-ignore-line */
-            throw new SyntaxError('A pair must be a sequential array starting at `0` and containing two elements.');
-        }
-
-        return [(string) Encoder::encodeQueryKeyValue($pair[0]), match(true) {
-            null === $pair[1] => null,
-            default => Encoder::encodeQueryKeyValue($pair[1]),
-        }];
     }
 
     /**
@@ -174,28 +160,20 @@ final class QueryString
      */
     private static function decodePairs(array $pairs, int $pairValueState): array
     {
+        $decodePair = static function (array $pair, int $pairValueState): array {
+            [$key, $value] = $pair;
+
+            return match (true) {
+                self::PAIR_VALUE_PRESERVED === $pairValueState => [(string) Encoder::decodeAll($key), $value],
+                default => [(string) Encoder::decodeAll($key), Encoder::decodeAll($value)],
+            };
+        };
+
         return array_reduce(
             $pairs,
-            fn (array $carry, array $pair) => [...$carry, self::decodePair($pair, $pairValueState)],
+            fn (array $carry, array $pair) => [...$carry, $decodePair($pair, $pairValueState)],
             []
         );
-    }
-
-    /**
-     * Returns the key/value pair from a query string pair.
-     *
-     * @param non-empty-list<string|null> $pair
-     *
-     * @return array{0:string, 1:string|null}
-     */
-    private static function decodePair(array $pair, int $pairValueState): array
-    {
-        [$key, $value] = $pair;
-
-        return match (true) {
-            self::PAIR_VALUE_PRESERVED === $pairValueState => [(string) Encoder::decodeAll($key), $value],
-            default => [(string) Encoder::decodeAll($key), Encoder::decodeAll($value)],
-        };
     }
 
     /**
