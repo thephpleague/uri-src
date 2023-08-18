@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace League\Uri\KeyValue;
+namespace League\Uri\Parser;
 
 use League\Uri\Contracts\UriComponentInterface;
 use League\Uri\Exceptions\SyntaxError;
@@ -25,7 +25,7 @@ use function str_replace;
 use const PHP_QUERY_RFC1738;
 use const PHP_QUERY_RFC3986;
 
-final class Converter
+final class KeyValueConverter
 {
     private const REGEXP_INVALID_CHARS = '/[\x00-\x1f\x7f]/';
     private const RFC_SUB_DELIM = "!$&'/()*+,;"; // the "=" character is intentionally missing

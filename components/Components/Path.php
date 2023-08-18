@@ -15,7 +15,7 @@ namespace League\Uri\Components;
 
 use League\Uri\Contracts\PathInterface;
 use League\Uri\Contracts\UriInterface;
-use League\Uri\Encoder;
+use League\Uri\Parser\Encoder;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use Stringable;
 use function array_pop;
