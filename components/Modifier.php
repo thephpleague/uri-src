@@ -156,13 +156,28 @@ class Modifier implements Stringable, JsonSerializable, UriAccess
         ));
     }
 
-    public function encodeQuery(KeyValuePairConverter $to, KeyValuePairConverter $from = null): static
+    /**
+     * Change the encoding of the query.
+     */
+    public function encodeQuery(KeyValuePairConverter|int $to, KeyValuePairConverter|int $from = null): static
     {
+        $to = match (true) {
+            !$to instanceof KeyValuePairConverter => KeyValuePairConverter::fromEncodingType($to),
+            default => $to,
+        };
+
+        $from = match (true) {
+            null === $from => KeyValuePairConverter::fromRFC3986(),
+            !$from instanceof KeyValuePairConverter => KeyValuePairConverter::fromEncodingType($from),
+            default => $from,
+        };
+
+        if ($to == $from) {
+            return $this;
+        }
+
         $originalQuery = $this->uri->getQuery();
-        $query = QueryString::buildFromPairs(
-            QueryString::parseFromValue($originalQuery, $from ?? KeyValuePairConverter::fromRFC3986()),
-            $to
-        );
+        $query = QueryString::buildFromPairs(QueryString::parseFromValue($originalQuery, $from), $to);
 
         return match (true) {
             null === $query,

@@ -86,8 +86,8 @@ enum Operator: string
      */
     public function decode(string $var): string
     {
-        return (string) match ($this) {
-            Operator::ReservedChars, Operator::Fragment => Encoder::encodeQueryOrFragment($var),
+        return match ($this) {
+            Operator::ReservedChars, Operator::Fragment => (string) Encoder::encodeQueryOrFragment($var),
             default => rawurlencode($var),
         };
     }
