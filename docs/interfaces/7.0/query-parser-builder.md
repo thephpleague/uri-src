@@ -7,7 +7,9 @@ Query Parser and Builder
 =======
 
 The `League\Uri\QueryString` is a PHP URI query parser and builder.
-<p class="message-notice">The parsing/building algorithms preserve pairs order and uses the same algorithm used by JavaScript <a href="https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/URLSearchParams">UrlSearchParams</a></p>
+
+<p class="message-notice">The parsing/building algorithms preserve pairs order and uses the same algorithm used by
+JavaScript <a href="https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/URLSearchParams">UrlSearchParams</a></p>
 
 ```php
 <?php
@@ -42,6 +44,7 @@ $pairs = QueryString::parse('module=home&action=show&page=😓');
 
 ```php
 <?php
+use League\Uri\KeyValuePair\Converter;
 
 public static function QueryString::parse($query, string $separator = '&', int $enc_type = PHP_QUERY_RFC3986): array;
 ```
@@ -160,6 +163,41 @@ parse_str($query, $variables);
 //     'module_' = 'hide',
 // ];
 ```
+
+## Advance usages
+
+Starting with version <code>7.1</code> you can have an improved control over the characters conversion
+by using the `League\Uri\KeyValuePair\Converter` class. The class is responsible for parsing the string into key/value
+pair and for converting key/value pairs into string adding an extra string replacement before parsing and 
+after building the string.
+
+```php
+use League\Uri\KeyValuePair\Converter as KeyValuePairConverter;
+use League\Uri\QueryString;
+
+$converter = KeyValuePairConverter::new(';')
+    ->withEncodingMap([
+        '%3F' => '?',
+        '%2F' => '/',
+        '%40' => '@',
+        '%3A' => ':',
+        '%5B' => '[',
+        '%5D' => ']',
+        '%3D' => '=',
+        '%23' => '#',
+    ]);
+
+$keyValuePairs = QueryString::parseFromValue('foo=bar&url=https://example.com?foo[2]=bar#fragment');
+
+echo QueryString::buildFromPairs($keyValuePairs, $converter));
+// displays foo=bar;url=https://example.com?foo[2]=bar#fragment
+```
+
+You can use the class on the following methods as the second argument:
+
+- `buildFromPairs` improved version of `build`
+- `extractFromValue` improved version of `extract`
+- `parseFromValue` improved version of `parse`
 
 ## Exceptions
 

@@ -92,6 +92,46 @@ The following modifiers update and normalize the URI query component.
 resulting query string may update the component character encoding. These changes are expected because of 
 the rules governing parsing and building query string.</p>
 
+### Modifier::encodeQuery
+
+<p class="message-notice">since version <code>7.1.0</code></p>
+
+Change the encoding of the query string. You can either specify one of PHP's constant between `PHP_QUERY_RFC1738` and
+`PHP_QUERY_RFC3986`
+
+~~~php
+use League\Uri\Modifier;
+
+echo Modifier::from("https://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
+    ->encodeQuery(PHP_QUERY_RFC1738)
+    ->getUri()
+    ->getQuery(); 
+//display "kingkong=toto&kingkong=ape&foo=bar+baz"
+~~~
+
+or for more specific conversions you can provide a `League\Uri\KeyValuePair\Converter` class.
+
+~~~php
+use League\Uri\KeyValuePair\Converter as KeyValuePairConverter;
+use League\Uri\Modifier;
+use Nyholm\Psr7\Uri;
+
+$converter = KeyValuePairConverter::new(';')
+    ->withEncodingMap([
+        '%3F' => '?',
+        '%2F' => '/',
+        '%40' => '@',
+        '%3A' => ':',
+    ]);
+    
+Modifier::from(new Uri('https://example.com?foo[2]=bar#fragment'))
+    ->appendQuery('url=https://example.com?foo[2]=bar#fragment')
+    ->encodeQuery($converter)
+    ->getUri()
+    ->getQuery();
+//display "foo%5B2%5D=bar;url=https://example.com?foo%5B2%5D%3Dbar%23fragment"
+~~~
+
 ### Modifier::sortQuery
 
 Sorts the query according to its key values. The sorting rules are the same uses by WHATWG `URLSearchParams::sort` method.
