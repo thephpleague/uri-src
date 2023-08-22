@@ -16,4 +16,5 @@ parameters:
 		- message: '#function gmp_(.*)? expects (GMP|int)#'
 		  path: interfaces/IPv4/GMPCalculator.php
 	reportUnmatchedIgnoredErrors: true
+	treatPhpDocTypesAsCertain: false
 	checkMissingIterableValueType: false
