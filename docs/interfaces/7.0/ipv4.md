@@ -69,3 +69,19 @@ $converter->toDecimal('0xc0a821');         // returns "192.168.2.1"
 $converter->toOctal('0xc0a821');           // returns "0300.0250.0002.0001"
 $converter->toHexadecimal('192.168.2.1.'); // returns "0xc0a821"
 ```
+
+<p class="message-notice">since version <code>7.2.0</code></p>
+
+It is possible to determine if a given domain is or can be converted to an IPv4 host the new `Converter::isIpv4`
+method. The method will return `true` if the submitted domain is an IPv4 host or is convertible to an IPv4 host.
+
+```php
+<?php
+
+use League\Uri\Ipv4\Converter;
+
+$converter = Converter::fromEnvironment();
+$converter->isIpv4('0xc0a821');    // return true
+$converter->isIdn('192.168.2.1.'); // return true
+$converter->isIdn('bébé.be');      // return false
+````
