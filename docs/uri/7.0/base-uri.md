@@ -130,6 +130,16 @@ Tells whether the given URI object represents the same document.
 BaseUri::from(Http::new("example.com?foo=bar#🏳️‍🌈"))->isSameDocument("exAMpLE.com?foo=bar#🍣🍺"); //returns true
 ~~~
 
+### BaseUri::hasIDN
+
+<p class="message-notice">since version <code>7.2.0</code></p>
+
+Tells whether the given URI object contains a IDN host.
+
+~~~php
+BaseUri::from(Http::new("https://bébé.be"))->isIdn(); //returns true
+~~~
+
 ### BaseUri::isCrossOrigin
 
 Tells whether the given URI object represents different origins.

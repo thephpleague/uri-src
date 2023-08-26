@@ -165,3 +165,19 @@ try {
     //displays "Host `％００.com` is invalid: a label or domain name contains disallowed characters."
 }
 ````
+
+<p class="message-notice">since version <code>7.2.0</code></p>
+
+It is possible to determine if a given domain is or can be internationalized using the new `Converter::isIDN`
+method. The method will return `true` if the submitted domain is valid and is/can be converted to its unicode form.
+
+```php
+<?php
+
+use League\Uri\Idna\Converter;
+
+Converter::isIdn('www.example.con'); // return false - the unicode form is identical
+Converter::isIdn('％００.com'); // return false - The host is invalid
+Converter::isIdn('bébé.be');   // return true
+Converter::isIdn('www.xn--85x722f.xn--55qx5d.cn');  // return true - a IDN host in its ascii form
+````
