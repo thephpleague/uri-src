@@ -16,7 +16,11 @@ With vanilla PHP you have to do the following:
 ```php
 <?php
 
-$flags = IDNA_NONTRANSITIONAL_TO_ASCII | IDNA_CHECK_BIDI | IDNA_USE_STD3_RULES | IDNA_CHECK_CONTEXTJ;
+$flags = IDNA_NONTRANSITIONAL_TO_ASCII |
+    IDNA_CHECK_BIDI |
+    IDNA_USE_STD3_RULES |
+    IDNA_CHECK_CONTEXTJ;
+    
 $res = idn_to_utf8('www.xn--85x722f.xn--55qx5d.cn', $flags, INTL_IDNA_VARIANT_UTS46, $result);
 
 $res;               // returns 'www.食狮.公司.cn'
@@ -82,8 +86,13 @@ The `League\Uri\Idna\Error` enum provides the official name of the error as well
 the `Error::description` method.
 
 Both static methods `Converter::toAscii` and `Converter::toUnicode` expect a host string
-and some IDN related options. You can provide PHP's own constants or if you want a more
-readable API you can use the `League\Uri\Idna\Option` immutable object.
+and some IDN related options. 
+
+<p class="message-info">since version <code>7.2.0</code> The <code>Converter</code> methods also accept <code>Stringable</code>
+object as domain input.</p>
+
+You can provide PHP's own constants or if you want a more readable API you can use the
+`League\Uri\Idna\Option` immutable object.
 
 ```php
 <?php
@@ -91,8 +100,10 @@ readable API you can use the `League\Uri\Idna\Option` immutable object.
 use League\Uri\Idna\Converter;
 use League\Uri\Idna\Option;
 
-$option = IDNA_NONTRANSITIONAL_TO_ASCII | IDNA_CHECK_BIDI | IDNA_USE_STD3_RULES | IDNA_CHECK_CONTEXTJ;
-
+$flags = IDNA_NONTRANSITIONAL_TO_ASCII |
+    IDNA_CHECK_BIDI |
+    IDNA_USE_STD3_RULES |
+    IDNA_CHECK_CONTEXTJ;
 //can be rewritten as
 
 $option1 = Option::new(IDNA_NONTRANSITIONAL_TO_ASCII)
