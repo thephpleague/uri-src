@@ -81,7 +81,7 @@ method. The method will return `true` if the submitted domain is an IPv4 host or
 use League\Uri\Ipv4\Converter;
 
 $converter = Converter::fromEnvironment();
-$converter->isIpv4('0xc0a821');    // return true
-$converter->isIdn('192.168.2.1.'); // return true
-$converter->isIdn('bébé.be');      // return false
+$converter->isIpv4('0xc0a821');     // return true
+$converter->isIpv4('192.168.2.1.'); // return true
+$converter->isIpv4('bébé.be');      // return false
 ````
