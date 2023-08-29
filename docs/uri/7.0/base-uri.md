@@ -137,7 +137,7 @@ BaseUri::from(Http::new("example.com?foo=bar#🏳️‍🌈"))->isSameDocument("
 Tells whether the given URI object contains a IDN host.
 
 ~~~php
-BaseUri::from(Http::new("https://bébé.be"))->isIdn(); //returns true
+BaseUri::from(Http::new("https://bébé.be"))->hasIdn(); //returns true
 ~~~
 
 ### BaseUri::isCrossOrigin

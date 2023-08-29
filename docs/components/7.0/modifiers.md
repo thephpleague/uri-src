@@ -166,34 +166,94 @@ Appends a submitted query string to the URI object to be modified. When appendin
 ~~~php
 Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3")
 echo Modifier::from($uri)
-    ->appendQuery($uri, 'kingkong=godzilla&toto')
+    ->appendQuery('kingkong=godzilla&toto')
     ->getUri()
     ->getQuery();
 //display "kingkong=toto&kingkong=godzilla&foo=bar%20baz&toto"
 ~~~
 
-### Modifier::removePairs
+### Modifier::appendQueryPairs
+
+Appends a query pairs to the URI object to be modified. When appending two query strings with
+the same key value the submitted query string value is added to the return query
+string without modifying the URI query string value.
+
+~~~php
+Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3")
+echo Modifier::from($uri)
+    ->appendQueryPairs([['kingkong', 'godzilla'], ['toto', null]])
+    ->getUri()
+    ->getQuery();
+//display "kingkong=toto&kingkong=godzilla&foo=bar%20baz&toto"
+~~~
+
+### Modifier::appendQueryParameters
+
+Appends a query PHP parameters to the URI object to be modified. When appending two query strings
+with the same key value the submitted query string value is added to the return query
+string without modifying the URI query string value.
+
+~~~php
+Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3")
+echo Modifier::from($uri)
+    ->appendQueryParameters(['kingkong' => 'godzilla', 'toto' => ''])
+    ->getUri()
+    ->getQuery();
+//display "kingkong=toto&kingkong=godzilla&foo=bar%20baz&toto="
+~~~
+
+### Modifier::removeQueryPairs
 
 Removes query pairs from the current URI query string by providing the pairs key.
 
 ~~~php
 $uri = "http://example.com/test.php?kingkong=toto&foo=bar+baz&bar=baz#doc3";
-$newUri = Modifier::from($uri)->removePairs('foo', 'bar')->getUri();
+$modifier = Modifier::from($uri);
+$newUri = $modifier->removeQueryPairs('foo', 'bar')->getUri();
 
-echo $uri->getQuery();    //display "kingkong=toto&foo=bar+baz&bar=baz"
-echo $newUri->getQuery(); //display "kingkong=toto"
+echo $modifier->getUri()->getQuery(); //display "kingkong=toto&foo=bar+baz&bar=baz"
+echo $newUri->getUri()->getQuery();   //display "kingkong=toto"
 ~~~
 
-### Modifier::removeParams
+### Modifier::removeQueryParameters
+
+<p class="message-notice">since version <code>7.2.0</code></p>
 
 Removes query params from the current URI query string by providing the param name. The removal preserves mangled key params.
 
 ~~~php
 $uri = "http://example.com/test.php?kingkong=toto&fo.o=bar&fo_o=bar";
-$newUri = Modifier::removeParams($uri, 'fo.o');
+$modifier = Modifier::from($uri);
+$newUri = $modifier->removeQueryParameters('fo.o');
 
-echo $uri->getQuery();    //display "kingkong=toto&fo.o=bar&fo_o=bar"
-echo $newUri->getQuery(); //display "kingkong=toto&fo_o=bar"
+echo $modifier->getUri()->getQuery(); //display "kingkong=toto&fo.o=bar&fo_o=bar
+echo $newUri->getUri()->getQuery();   //display "kingkong=toto&fo_o=bar"
+~~~
+
+### Modifier::mergeQueryParameters
+
+<p class="message-notice">since version <code>7.2.0</code></p>
+
+Merge PHP query parameters with the current URI query string by providing the parameters. The addition preserves mangled key params.
+
+~~~php
+$uri = "http://example.com/test.php?kingkong=toto&fo.o=bar&fo_o=bar";
+$newUri = Modifier::from($uri)->:mergeQueryParameters(['toto' => 'baz']);
+
+echo $newUri->getUri()->getQuery(); //display "kingkong=tot&fo.o=bar&fo_o=bar&toto=baz"
+~~~
+
+### Modifier::mergeQueryPairs
+
+<p class="message-notice">since version <code>7.2.0</code></p>
+
+Merge query paurs with the current URI query string by providing the pairs.
+
+~~~php
+$uri = "http://example.com/test.php?kingkong=toto&fo.o=bar&fo_o=bar";
+$newUri = Modifier::from($uri)->:mergeQueryPairs([['fo.o', 'champion']]);
+
+echo $newUri->getUri()->getQuery(); //display "kingkong=toto&fo.o=champion&fo_o=bar"
 ~~~
 
 ## Host modifiers
