@@ -49,7 +49,7 @@ final class QueryString
      *
      * @param iterable<array{0:string, 1:string|float|int|bool|null}> $pairs
      * @param non-empty-string $separator
-     * @param PHP_QUERY_RFC3986|PHP_QUERY_RFC1738 $encType
+     * @param int<1,2> $encType
      *
      * @throws SyntaxError If the encoding type is invalid
      * @throws SyntaxError If a pair is invalid
