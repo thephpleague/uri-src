@@ -230,6 +230,22 @@ echo $modifier->getUri()->getQuery(); //display "kingkong=toto&fo.o=bar&fo_o=bar
 echo $newUri->getUri()->getQuery();   //display "kingkong=toto&fo_o=bar"
 ~~~
 
+
+### Modifier::removeQueryParameterIndices
+
+<p class="message-notice">since version <code>7.2.0</code></p>
+
+Removes query params numeric indices from the current URI query string. The removal preserves mangled key params.
+
+~~~php
+$uri = "http://example.com/test.php?kingkong[1]=toto&fkingkong[2]=toto";
+$modifier = Modifier::from($uri);
+$newUri = $modifier->removeQueryParameterIndices();
+
+echo $modifier->getUri()->getQuery(); //display "kingkong%5B1%5D=toto&fkingkong%5B2%5D=toto"
+echo $newUri->getUri()->getQuery();   //display "kingkong%5B%5D=toto&fkingkong%5B%5D=toto"
+~~~
+
 ### Modifier::mergeQueryParameters
 
 <p class="message-notice">since version <code>7.2.0</code></p>
