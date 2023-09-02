@@ -23,19 +23,23 @@ use League\Uri\Contracts\UriComponentInterface;
 use League\Uri\KeyValuePair\Converter;
 use League\Uri\QueryString;
 use Stringable;
-
 use TypeError;
+
+use function array_map;
+use function array_reduce;
 use function count;
+use function func_get_arg;
+use function func_num_args;
 use function is_iterable;
 use function is_string;
 use function str_starts_with;
-use const SORT_STRING;
 
 /**
  * @implements IteratorAggregate<array{0:string, 1:string}>
  */
 final class URLSearchParams implements Countable, IteratorAggregate, Stringable
 {
+    private const REGEXP_NON_ASCII_PATTERN = '/[^\x20-\x7f]/';
     private QueryInterface $query;
 
     /**
@@ -78,14 +82,16 @@ final class URLSearchParams implements Countable, IteratorAggregate, Stringable
         return QueryString::parseFromValue($query, self::converter());
     }
 
+    /**
+     * Encode/Decode string using The application/x-www-form-urlencoded parser rules.
+     *
+     * @see https://url.spec.whatwg.org/#urlencoded-parsing
+     */
     private static function converter(): Converter
     {
         static $converter;
         $converter = $converter ?? Converter::new('&')
-            ->withEncodingMap([
-                '%20' => '+',
-                '%2A' => '*',
-        ]);
+            ->withEncodingMap(['%20' => '+', '%2A' => '*']);
 
         return $converter;
     }
@@ -159,7 +165,6 @@ final class URLSearchParams implements Countable, IteratorAggregate, Stringable
 
         $key = $this->filterValue($key);
         $argumentCount = func_num_args();
-
         if (1 === $argumentCount) {
             return $this->query->has($key);
         }
@@ -331,7 +336,21 @@ final class URLSearchParams implements Countable, IteratorAggregate, Stringable
             return $carry;
         }, []);
 
-        ksort($parameters, SORT_STRING);
+        $codepoints = fn (string $str): string => implode(
+            '.',
+            array_map(
+                fn (string $char) => mb_ord($char), /* @phpstan-ignore-line */
+                (array) preg_split(pattern:'//u', subject: $str, flags: PREG_SPLIT_NO_EMPTY)
+            )
+        );
+
+        $compare = fn (string $name1, string $name2): int => match (true) {
+            1 === preg_match(self::REGEXP_NON_ASCII_PATTERN, $name1),
+            1 === preg_match(self::REGEXP_NON_ASCII_PATTERN, $name2) => strcmp($codepoints($name1), $codepoints($name2)),
+            default => strcmp($name1, $name2),
+        };
+
+        uksort($parameters, $compare);
 
         $pairs = [];
         foreach ($parameters as $key => $values) {
