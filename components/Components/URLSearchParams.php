@@ -20,6 +20,8 @@ use Iterator;
 use IteratorAggregate;
 use League\Uri\Contracts\QueryInterface;
 use League\Uri\Contracts\UriComponentInterface;
+use League\Uri\KeyValuePair\Converter;
+use League\Uri\QueryString;
 use Stringable;
 
 use TypeError;
@@ -84,7 +86,14 @@ final class URLSearchParams implements Countable, IteratorAggregate, Stringable
      */
     public function toString(): string
     {
-        return (string) $this->query->toRFC1738();
+        static $converter;
+        $converter = $converter ?? Converter::new('&')
+        ->withEncodingMap([
+            '%20' => '+',
+            '%2A' => '*',
+        ]);
+
+        return (string) QueryString::buildFromPairs($this->query, $converter);
     }
 
     public function __toString(): string
@@ -119,14 +128,36 @@ final class URLSearchParams implements Countable, IteratorAggregate, Stringable
     /**
      * Tells whether the specified parameter is in the search parameters.
      */
-    public function has(?string ...$name): bool
+    public function has(): bool
     {
-        $keys = array_map(fn (?string $name) => match (true) {
-            null === $name => '',
-            default => $name,
-        }, $name);
+        if (func_num_args() < 1) {
+            throw new ArgumentCountError('The required key is missing.');
+        }
 
-        return $this->query->has(...$keys);
+        $key = func_get_arg(0);
+        if (null !== $key && !is_string($key)) {
+            throw new TypeError('The required key must be a string or null.');
+        }
+
+        $key = $this->filterValue($key);
+        $argumentCount = func_num_args();
+
+        if (1 === $argumentCount) {
+            return $this->query->has($key);
+        }
+
+        if (2 !== $argumentCount) {
+            throw new ArgumentCountError(__METHOD__.' requires a key and an optional value.');
+        }
+
+        $value = $this->filterValue(func_get_arg(1));  /* @phpstan-ignore-line */
+        foreach ($this->query as [$name, $content]) {
+            if ($key === $name && $value === $content) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -230,16 +261,20 @@ final class URLSearchParams implements Countable, IteratorAggregate, Stringable
      */
     public function delete(): void
     {
+        if (func_num_args() < 1) {
+            throw new ArgumentCountError('The required key is missing.');
+        }
+
         $key = func_get_arg(0);
         if (null !== $key && !is_string($key)) {
-            throw new TypeError('The required key must be a string or null; '.gettype($key).'received.');
+            throw new TypeError('The required key must be a string or null.');
         }
 
         $key = $this->filterValue($key);
         $argumentCount = func_num_args();
         $newQuery = match (true) {
             1 === $argumentCount => $this->query->withoutPairByKey($key),
-            2 === $argumentCount => $this->query->withoutPairByKeyValue($key, $this->filterValue(func_get_arg(1))), /* @phpstan-ignore-line  */
+            2 === $argumentCount => $this->query->withoutPairByKeyValue($key, $this->filterValue(func_get_arg(1))), /* @phpstan-ignore-line */
             default => throw new ArgumentCountError(__METHOD__.' requires a key and an optional value.'),
         };
 

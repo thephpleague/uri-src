@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace League\Uri\Components;
 
+use ArgumentCountError;
 use League\Uri\Exceptions\SyntaxError;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use TypeError;
 
 final class URLSearchParamsTest extends TestCase
 {
@@ -45,17 +47,14 @@ final class URLSearchParamsTest extends TestCase
     public function testTextConstructor(): void
     {
         $params = new URLSearchParams('a=b');
-
         self::assertTrue($params->has('a'));
         self::assertFalse($params->has('b'));
 
         $params = new URLSearchParams('a=b&c');
-
         self::assertTrue($params->has('a'));
         self::assertTrue($params->has('c'));
 
         $params = new URLSearchParams('&a&&& &&&&&a+b=& c&m%c3%b8%c3%b8');
-
         self::assertTrue($params->has('a'), 'Search params object has name "a"');
         self::assertTrue($params->has('a b'), 'Search params object has name "a b"');
         self::assertTrue($params->has(' '), 'Search params object has name " "');
@@ -64,24 +63,20 @@ final class URLSearchParamsTest extends TestCase
         self::assertTrue($params->has('møø'), 'Search params object has name "møø"');
 
         $params = new URLSearchParams('id=0&value=%');
-
         self::assertTrue($params->has('id'), 'Search params object has name "id"');
         self::assertTrue($params->has('value'), 'Search params object has name "value"');
         self::assertSame('0', $params->get('id'));
         self::assertSame('%', $params->get('value'));
 
         $params = new URLSearchParams('b=%2sf%2a');
-
         self::assertTrue($params->has('b'), 'Search params object has name "b"');
         self::assertSame('%2sf*', $params->get('b'));
 
         $params = new URLSearchParams('b=%2%2af%2a');
-
         self::assertTrue($params->has('b'), 'Search params object has name "b"');
         self::assertSame('%2*f*', $params->get('b'));
 
         $params = new URLSearchParams('b=%%2a');
-
         self::assertTrue($params->has('b'), 'Search params object has name "b"');
         self::assertSame('%*', $params->get('b'));
     }
@@ -90,18 +85,15 @@ final class URLSearchParamsTest extends TestCase
     {
         $seed = new URLSearchParams('a=b&c=d');
         $params = new URLSearchParams($seed);
-
         self::assertSame('b', $params->get('a'));
         self::assertSame('d', $params->get('c'));
         self::assertFalse($params->has('d'));
 
         // The name-value pairs are copied when created; later updates should not be observable.
         $seed->append('e', 'f');
-
         self::assertFalse($params->has('e'));
 
         $params->append('g', 'h');
-
         self::assertFalse($seed->has('g'));
     }
 
@@ -120,7 +112,6 @@ final class URLSearchParamsTest extends TestCase
         $params = new URLSearchParams();
         $params->set('query', $expected);
         $newParams = new URLSearchParams($params->toString());
-
         self::assertSame('query=%2B15555555555', $params->toString());
         self::assertSame($expected, $params->get('query'));
         self::assertSame($expected, $newParams->get('query'));
@@ -185,7 +176,6 @@ final class URLSearchParamsTest extends TestCase
         $res = json_decode($json);
 
         $params = new URLSearchParams($res->input);
-
         self::assertSame($res->output, [...$params], 'Invalid '.$res->name);
     }
 
@@ -242,14 +232,12 @@ final class URLSearchParamsTest extends TestCase
         $params->append('second', 2);
         $params->append('third', '');
         $params->append('first', 10);
-
         self::assertTrue($params->has('first'));
         self::assertSame('1', $params->get('first'));
         self::assertSame('2', $params->get('second'));
         self::assertSame('', $params->get('third'));
 
         $params->append('first', 10);
-
         self::assertSame('1', $params->get('first'));
         self::assertSame(['1', '10', '10'], [...$params->getAll('first')]);
     }
@@ -283,12 +271,15 @@ final class URLSearchParamsTest extends TestCase
         $params->append('first', 1);
         self::assertTrue($params->has('first'), 'Search params object has name "first"');
         self::assertSame($params->get('first'), '1', 'Search params object has name "first" with value "1"');
+
         $params->delete('first');
         self::assertCount(0, $params);
         self::assertFalse($params->has('first'), 'Search params object has no "first" name');
+
         $params->append('first', 1);
         $params->append('first', 10);
         self::assertCount(2, $params);
+
         $params->delete('first');
         self::assertFalse($params->has('first'), 'Search params object has no "first" name');
 
@@ -296,7 +287,6 @@ final class URLSearchParamsTest extends TestCase
         $params->delete('param1');
         $params->delete('param2');
         self::assertCount(0, $params);
-
         self::assertSame($params->toString(), '', 'Search params object has name "first" with value "1"');
     }
 
@@ -307,9 +297,32 @@ final class URLSearchParamsTest extends TestCase
         $params->append('a', 'c');
         $params->append('a', 'd');
         $params->delete('a', 'c');
-
         self::assertSame($params->toString(), 'a=b&a=d');
         self::assertCount(2, $params);
+    }
+
+    public function testInvalidDeleteUsageWithoutArguments(): void
+    {
+        $this->expectException(ArgumentCountError::class);
+
+        $params = new URLSearchParams('a=b&a=d&c&e&');
+        $params->delete();
+    }
+
+    public function testInvalidDeleteUsageWithoutKeyInUnknownType(): void
+    {
+        $this->expectException(TypeError::class);
+
+        $params = new URLSearchParams('a=b&a=d&c&e&');
+        $params->delete(4);
+    }
+
+    public function testInvalidDeleteUsageWithoutMoreThanTwoArguments(): void
+    {
+        $this->expectException(ArgumentCountError::class);
+
+        $params = new URLSearchParams('a=b&a=d&c&e&');
+        $params->delete('a', 'b', 'c');
     }
 
     public function testForEachCheck(): void
@@ -340,25 +353,20 @@ final class URLSearchParamsTest extends TestCase
     public function testGetMethod(): void
     {
         $params = new URLSearchParams('a=b&c=d');
-
         self::assertSame($params->get('a'), 'b');
         self::assertSame($params->get('c'), 'd');
         self::assertSame($params->get('e'), null);
 
         $params = new URLSearchParams('a=b&c=d&a=e');
-
         self::assertSame($params->get('a'), 'b');
 
         $params = new URLSearchParams('=b&c=d');
-
         self::assertSame($params->get(''), 'b');
 
         $params = new URLSearchParams('a=&c=d&a=e');
-
         self::assertSame($params->get('a'), '');
 
         $params = new URLSearchParams('first=second&third&&');
-
         self::assertTrue($params->has('first'), 'Search params object has name "first"');
         self::assertSame($params->get('first'), 'second', 'Search params object has name "first" with value "second"');
         self::assertSame($params->get('third'), '', 'Search params object has name "third" with the empty value.');
@@ -368,38 +376,30 @@ final class URLSearchParamsTest extends TestCase
     public function testGetAllMethod(): void
     {
         $params = new URLSearchParams('a=b&c=d');
-
         self::assertSame($params->getAll('a'), ['b']);
         self::assertSame($params->getAll('c'), ['d']);
         self::assertSame($params->getAll('e'), []);
 
         $params = new URLSearchParams('a=b&c=d&a=e');
-
         self::assertSame($params->getAll('a'), ['b', 'e']);
 
         $params = new URLSearchParams('=b&c=d');
-
         self::assertSame($params->getAll(''), ['b']);
 
         $params = new URLSearchParams('a=&c=d&a=e');
-
         self::assertSame($params->getAll('a'), ['', 'e']);
 
         $params = new URLSearchParams('a=1&a=2&a=3&a');
-
         self::assertTrue($params->has('a'), 'Search params object has name "a"');
 
         $matches = $params->getAll('a');
-
         self::assertCount(4, $matches, 'Search params object has values for name "a"');
         self::assertSame($matches, ['1', '2', '3', ''], 'Search params object has expected name "a" values');
 
         $params->set('a', 'one');
-
         self::assertSame($params->get('a'), 'one', 'Search params object has name "a" with value "one"');
 
         $matches = $params->getAll('a');
-
         self::assertCount(1, $matches, 'Search params object has values for name "a"');
         self::assertSame($matches, ['one'], 'Search params object has expected name "a" values');
     }
@@ -409,31 +409,173 @@ final class URLSearchParamsTest extends TestCase
         $params = new URLSearchParams('a=b&c=d');
         $params->set('a', 'B');
         self::assertSame($params->toString(), 'a=B&c=d');
+
         $params = new URLSearchParams('a=b&c=d&a=e');
         $params->set('a', 'B');
         self::assertSame($params->toString(), 'a=B&c=d');
+
         $params->set('e', 'f');
         self::assertSame($params->toString(), 'a=B&c=d&e=f');
 
         $params = new URLSearchParams('a=1&a=2&a=3');
         self::assertTrue($params->has('a'), 'Search params object has name "a"');
         self::assertSame($params->get('a'), '1', 'Search params object has name "a" with value "1"');
+
         $params->set('first', 4);
         self::assertTrue($params->has('a'), 'Search params object has name "a"');
         self::assertSame($params->get('a'), '1', 'Search params object has name "a" with value "1"');
+
         $params->set('a', 4);
         self::assertTrue($params->has('a'), 'Search params object has name "a"');
         self::assertSame($params->get('a'), '4', 'Search params object has name "a" with value "4"');
     }
 
-    public function testSerialize(): void
+    public function testSerializeSpace(): void
     {
         $params = new URLSearchParams();
         $params->append('a', 'b c');
         self::assertSame($params->toString(), 'a=b+c');
+
         $params->delete('a');
         $params->append('a b', 'c');
         self::assertSame($params->toString(), 'a+b=c');
+    }
+
+    public function testSerializeEmptyValue(): void
+    {
+        $params = new URLSearchParams();
+        $params->append('a', '');
+        self::assertSame($params.'', 'a=');
+
+        $params->append('a', '');
+        self::assertSame($params.'', 'a=&a=');
+
+        $params->append('', 'b');
+        self::assertSame($params.'', 'a=&a=&=b');
+
+        $params->append('', '');
+        self::assertSame($params.'', 'a=&a=&=b&=');
+
+        $params->append('', '');
+        self::assertSame($params.'', 'a=&a=&=b&=&=');
+    }
+
+    public function testSerializeName(): void
+    {
+        $params = new URLSearchParams();
+        $params->append('', 'b');
+        self::assertSame($params.'', '=b');
+        $params->append('', 'b');
+        self::assertSame($params.'', '=b&=b');
+    }
+
+    public function testSerializeEmptyNameAndValue(): void
+    {
+        $params =new URLSearchParams();
+        $params->append('', '');
+        self::assertSame($params.'', '=');
+        $params->append('', '');
+        self::assertSame($params.'', '=&=');
+    }
+
+    public function testSerializePlusSign(): void
+    {
+        $params =new URLSearchParams();
+        $params->append('a', 'b+c');
+        self::assertSame($params.'', 'a=b%2Bc');
+        $params->delete('a');
+        $params->append('a+b', 'c');
+        self::assertSame($params.'', 'a%2Bb=c');
+    }
+
+    public function testSerializeEqualSign(): void
+    {
+        $params =new URLSearchParams();
+        $params->append('=', 'a');
+        self::assertSame($params.'', '%3D=a');
+        $params->append('b', '=');
+        self::assertSame($params.'', '%3D=a&b=%3D');
+    }
+
+    public function testSerializeAmpersandSign(): void
+    {
+        $params =new URLSearchParams();
+        $params->append('&', 'a');
+        self::assertSame($params.'', '%26=a');
+        $params->append('b', '&');
+        self::assertSame($params.'', '%26=a&b=%26');
+    }
+
+    public function testSerializeReservedCharacters(): void
+    {
+        $params =new URLSearchParams();
+        $params->append('a', '*-._');
+        self::assertSame($params.'', 'a=*-._');
+        $params->delete('a');
+        $params->append('*-._', 'c');
+        self::assertSame($params.'', '*-._=c');
+    }
+
+    public function testSerializePercentage(): void
+    {
+        $params =new URLSearchParams();
+        $params->append('a', 'b%c');
+        self::assertSame($params.'', 'a=b%25c');
+        $params->delete('a');
+        $params->append('a%b', 'c');
+        self::assertSame($params.'', 'a%25b=c');
+
+        $params = new URLSearchParams('id=0&value=%');
+        self::assertSame($params.'', 'id=0&value=%25');
+    }
+
+    public function testSerializeNullByte(): void
+    {
+        $params =new URLSearchParams();
+        $params->append('a', "b\0c");
+        self::assertSame($params.'', 'a=b%00c');
+        $params->delete('a');
+        $params->append("a\0b", 'c');
+        self::assertSame($params.'', 'a%00b=c');
+    }
+
+    public function testSerializePileOfPoo(): void
+    {
+        $params =new URLSearchParams();
+        $params->append('a', 'b💩c');
+        self::assertSame($params.'', 'a=b%F0%9F%92%A9c');
+        $params->delete('a');
+        $params->append('a💩b', 'c');
+        self::assertSame($params.'', 'a%F0%9F%92%A9b=c');
+    }
+
+    public function testToStringMethod(): void
+    {
+        $params = new URLSearchParams('a=b&c=d&&e&&');
+        self::assertSame($params->toString(), 'a=b&c=d&e=');
+        $params = new URLSearchParams('a = b &a=b&c=d%20');
+        self::assertSame($params->toString(), 'a+=+b+&a=b&c=d+');
+        // The lone '=' _does_ survive the roundtrip.
+        $params = new URLSearchParams('a=&a=b');
+        self::assertSame($params->toString(), 'a=&a=b');
+
+        $params = new URLSearchParams('b=%2sf%2a');
+        self::assertSame($params->toString(), 'b=%252sf*');
+
+        $params = new URLSearchParams('b=%2%2af%2a');
+        self::assertSame($params->toString(), 'b=%252*f*');
+
+        $params = new URLSearchParams('b=%%2a');
+        self::assertSame($params->toString(), 'b=%25*');
+    }
+
+    public function testNoNormalizationForCarriageReturnCharacters(): void
+    {
+        $params = new URLSearchParams();
+        $params->append("a\nb", "c\rd");
+        $params->append("e\n\rf", "g\r\nh");
+
+        self::assertSame($params->toString(), 'a%0Ab=c%0Dd&e%0A%0Df=g%0D%0Ah');
     }
 
     /**
@@ -447,7 +589,6 @@ final class URLSearchParamsTest extends TestCase
 
         $params = new URLSearchParams($input);
         $params->sort();
-
         self::assertSame($output, [...$params]);
     }
 
@@ -490,5 +631,104 @@ final class URLSearchParamsTest extends TestCase
 ]
 JSON;
         yield from json_decode($json, true);
+    }
+
+    public function testSizeWithDeletionMethodAndBehaviour(): void
+    {
+        $params = new URLSearchParams('a=1&b=2&a=3');
+        self::assertCount(3, $params);
+        self::assertTrue($params->isNotEmpty());
+        self::assertFalse($params->isEmpty());
+
+        $params->delete('a');
+        self::assertCount(1, $params);
+    }
+
+    public function testSizeWithAdditionMethodAndBehaviour(): void
+    {
+        $params = new URLSearchParams('a=1&b=2&a=3');
+        self::assertCount(3, $params);
+
+        $params->append('b', '4');
+        self::assertCount(4, $params);
+    }
+
+    public function testSizeWithEmptyInstance(): void
+    {
+        $params = new URLSearchParams();
+        self::assertCount(0, $params);
+        self::assertFalse($params->isNotEmpty());
+        self::assertTrue($params->isEmpty());
+    }
+
+    public function testBasicHasMethod(): void
+    {
+        $params = new URLSearchParams('a=b&c=d');
+        self::assertTrue($params->has('a'));
+        self::assertTrue($params->has('c'));
+        self::assertFalse($params->has('e'));
+
+        $params = new URLSearchParams('a=b&c=d&a=e');
+        self::assertTrue($params->has('a'));
+
+        $params = new URLSearchParams('=b&c=d');
+        self::assertTrue($params->has(''));
+
+        $params = new URLSearchParams('null=a');
+        self::assertTrue($params->has(null));
+    }
+
+    public function testHasMethodFollowingADeletion(): void
+    {
+        $params = new URLSearchParams('a=b&c=d&&');
+        $params->append('first', 1);
+        $params->append('first', 2);
+        self::assertTrue($params->has('a'), 'Search params object has name "a"');
+        self::assertTrue($params->has('c'), 'Search params object has name "c"');
+        self::assertTrue($params->has('first'), 'Search params object has name "first"');
+        self::assertFalse($params->has('d'), 'Search params object has no name "d"');
+
+        $params->delete('first');
+        self::assertFalse($params->has('first'), 'Search params object has no name "first"');
+    }
+
+    public function testHasMethodSupportsTwoVariables(): void
+    {
+        $params = new URLSearchParams('a=b&a=d&c&e&');
+        self::assertTrue($params->has('a', 'b'));
+        self::assertFalse($params->has('a', 'c'));
+        self::assertTrue($params->has('a', 'd'));
+        self::assertTrue($params->has('e', ''));
+
+        $params->append('first', null);
+        self::assertFalse($params->has('first', ''));
+        self::assertTrue($params->has('first', 'null'));
+
+        $params->delete('a', 'b');
+        self::assertTrue($params->has('a', 'd'));
+    }
+
+    public function testInvalidHasUsageWithoutArguments(): void
+    {
+        $this->expectException(ArgumentCountError::class);
+
+        $params = new URLSearchParams('a=b&a=d&c&e&');
+        $params->has();
+    }
+
+    public function testInvalidHasUsageWithoutKeyInUnknownType(): void
+    {
+        $this->expectException(TypeError::class);
+
+        $params = new URLSearchParams('a=b&a=d&c&e&');
+        $params->has(4);
+    }
+
+    public function testInvalidHasUsageWithoutMoreThanTwoArguments(): void
+    {
+        $this->expectException(ArgumentCountError::class);
+
+        $params = new URLSearchParams('a=b&a=d&c&e&');
+        $params->has('a', 'b', 'c');
     }
 }
