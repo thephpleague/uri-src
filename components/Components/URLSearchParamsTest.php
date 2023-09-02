@@ -730,4 +730,40 @@ JSON;
         $params = new URLSearchParams('a=b&a=d&c&e&');
         $params->has('a', 'b', 'c');
     }
+
+    public function testJsonEncode(): void
+    {
+        self::assertSame(
+            '"a=1&b=2&c=3&a=4&a=3+d"',
+            json_encode(new URLSearchParams('a=1&b=2&c=3&a=4&a=3+d'))
+        );
+    }
+
+    public function testGetUriComponent(): void
+    {
+        self::assertSame('', (new URLSearchParams())->getUriComponent());
+        self::assertSame('', (new URLSearchParams(''))->getUriComponent());
+        self::assertSame('?foo=bar', (new URLSearchParams('foo=bar'))->getUriComponent());
+    }
+
+    public function testFromParameters(): void
+    {
+        $data = [
+            'filter' => [
+                'foo' => [
+                    'bar baz',
+                    'baz',
+                ],
+                'bar' => [
+                    'bar' => 'foo',
+                    'foo' => 'bar',
+                ],
+            ],
+        ];
+
+        $params = URLSearchParams::fromParameters($data);
+        self::assertCount(4, $params);
+        self::assertSame('bar baz', $params->get('filter[foo][0]'));
+        self::assertSame('bar', $params->get('filter[bar][foo]'));
+    }
 }

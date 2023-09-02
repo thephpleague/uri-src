@@ -20,8 +20,11 @@ use Iterator;
 use IteratorAggregate;
 use League\Uri\Contracts\QueryInterface;
 use League\Uri\Contracts\UriComponentInterface;
+use League\Uri\Contracts\UriInterface;
 use League\Uri\KeyValuePair\Converter;
 use League\Uri\QueryString;
+use League\Uri\Uri;
+use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use Stringable;
 use TypeError;
 
@@ -37,7 +40,7 @@ use function str_starts_with;
 /**
  * @implements IteratorAggregate<array{0:string, 1:string}>
  */
-final class URLSearchParams implements Countable, IteratorAggregate, Stringable
+final class URLSearchParams implements Countable, IteratorAggregate, UriComponentInterface
 {
     private const REGEXP_NON_ASCII_PATTERN = '/[^\x20-\x7f]/';
     private QueryInterface $query;
@@ -96,12 +99,25 @@ final class URLSearchParams implements Countable, IteratorAggregate, Stringable
         return $converter;
     }
 
-    /**
-     * Returns a new instance from a URI.
-     */
     public static function fromUri(Stringable|string $uri): self
     {
-        return new self(Query::fromUri($uri));
+        $query = match (true) {
+            $uri instanceof Psr7UriInterface,
+            $uri instanceof UriInterface => $uri->getQuery(),
+            default => Uri::new($uri)->getQuery(),
+        };
+
+        return new self(QueryString::parseFromValue($query, self::converter()));
+    }
+
+    public static function fromParameters(iterable $parameters): self
+    {
+        return new self(Query::fromParameters($parameters));
+    }
+
+    public function value(): string
+    {
+        return (string) QueryString::buildFromPairs($this->query, self::converter());
     }
 
     /**
@@ -109,12 +125,27 @@ final class URLSearchParams implements Countable, IteratorAggregate, Stringable
      */
     public function toString(): string
     {
-        return (string) QueryString::buildFromPairs($this->query, self::converter());
+        return $this->value();
     }
 
     public function __toString(): string
     {
-        return $this->toString();
+        return $this->value();
+    }
+
+    public function jsonSerialize(): string
+    {
+        return $this->value();
+    }
+
+    public function getUriComponent(): string
+    {
+        $value = $this->value();
+
+        return match (true) {
+            '' === $value => '',
+            default => '?'.$value,
+        };
     }
 
     /**
