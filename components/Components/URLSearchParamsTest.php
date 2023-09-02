@@ -190,9 +190,9 @@ final class URLSearchParamsTest extends TestCase
             ['{ "input": {"+": "%C2"}, "output": [["+", "%C2"]], "name": "object with +" }'],
             ['{ "input": {"c": "x", "a": "?"}, "output": [["c", "x"], ["a", "?"]], "name": "object with two keys" }'],
             ['{ "input": [["c", "x"], ["a", "?"]], "output": [["c", "x"], ["a", "?"]], "name": "array with two keys" }'],
-            //['{ "input": {"\uD835x": "1", "xx": "2", "\uD83Dx": "3"}, "output": [["\uFFFDx", "3"], ["xx", "2"]], "name": "2 unpaired surrogates (no trailing)" }'],
-            //['{ "input": {"x\uDC53": "1", "x\uDC5C": "2", "x\uDC65": "3"}, "output": [["x\uFFFD", "3"]], "name": "3 unpaired surrogates (no leading)" }'],
-            //['{ "input": {"a\0b": "42", "c\uD83D": "23", "d\u1234": "foo"}, "output": [["a\0b", "42"], ["c\uFFFD", "23"], ["d\u1234", "foo"]], "name": "object with NULL, non-ASCII, and surrogate keys" }']
+            // invalid json errors in PHP ['{ "input": {"\uD835x": "1", "xx": "2", "\uD83Dx": "3"}, "output": [["\uFFFDx", "3"], ["xx", "2"]], "name": "2 unpaired surrogates (no trailing)" }'],
+            // invalid json errors in PHP ['{ "input": {"x\uDC53": "1", "x\uDC5C": "2", "x\uDC65": "3"}, "output": [["x\uFFFD", "3"]], "name": "3 unpaired surrogates (no leading)" }'],
+            // invalid json errors in PHP ['{ "input": {"a\0b": "42", "c\uD83D": "23", "d\u1234": "foo"}, "output": [["a\0b", "42"], ["c\uFFFD", "23"], ["d\u1234", "foo"]], "name": "object with NULL, non-ASCII, and surrogate keys" }']
         ];
     }
 
@@ -562,7 +562,7 @@ final class URLSearchParamsTest extends TestCase
         self::assertSame($params->toString(), 'a=b&c=d&e=');
         $params = new URLSearchParams('a = b &a=b&c=d%20');
         self::assertSame($params->toString(), 'a+=+b+&a=b&c=d+');
-        // The lone '=' _does_ survive the roundtrip.
+        // The lone '=' _does_ survive the round trip.
         $params = new URLSearchParams('a=&a=b');
         self::assertSame($params->toString(), 'a=&a=b');
 
@@ -748,7 +748,7 @@ JSON;
 
     public function testFromParameters(): void
     {
-        $data = [
+        $parameters = [
             'filter' => [
                 'foo' => [
                     'bar baz',
@@ -761,7 +761,7 @@ JSON;
             ],
         ];
 
-        $params = URLSearchParams::fromParameters($data);
+        $params = URLSearchParams::fromParameters($parameters);
         self::assertCount(4, $params);
         self::assertSame('bar baz', $params->get('filter[foo][0]'));
         self::assertSame('bar', $params->get('filter[bar][foo]'));

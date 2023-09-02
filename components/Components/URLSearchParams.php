@@ -38,11 +38,12 @@ use function is_string;
 use function str_starts_with;
 
 /**
+ * @see https://url.spec.whatwg.org/#interface-urlsearchparams
+ *
  * @implements IteratorAggregate<array{0:string, 1:string}>
  */
 final class URLSearchParams implements Countable, IteratorAggregate, UriComponentInterface
 {
-    private const REGEXP_NON_ASCII_PATTERN = '/[^\x20-\x7f]/';
     private QueryInterface $query;
 
     /**
@@ -55,6 +56,7 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
     public function __construct(object|array|string|null $query = null)
     {
         $rawQuery = match (true) {
+            $query instanceof self,
             $query instanceof QueryInterface => $query,
             $query instanceof UriComponentInterface => self::resolvePairs($query->value()),
             is_iterable($query) => Query::fromPairs($query),
@@ -142,8 +144,8 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
     {
         $value = $this->value();
 
-        return match (true) {
-            '' === $value => '',
+        return match ('') {
+            $value => '',
             default => '?'.$value,
         };
     }
@@ -360,36 +362,6 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
      */
     public function sort(): void
     {
-        $parameters = array_reduce([...$this->query], function (array $carry, array $pair) {
-            $carry[$pair[0]] ??= [];
-            $carry[$pair[0]][] = $pair[1];
-
-            return $carry;
-        }, []);
-
-        $codepoints = fn (string $str): string => implode(
-            '.',
-            array_map(
-                fn (string $char) => mb_ord($char), /* @phpstan-ignore-line */
-                (array) preg_split(pattern:'//u', subject: $str, flags: PREG_SPLIT_NO_EMPTY)
-            )
-        );
-
-        $compare = fn (string $name1, string $name2): int => match (true) {
-            1 === preg_match(self::REGEXP_NON_ASCII_PATTERN, $name1),
-            1 === preg_match(self::REGEXP_NON_ASCII_PATTERN, $name2) => strcmp($codepoints($name1), $codepoints($name2)),
-            default => strcmp($name1, $name2),
-        };
-
-        uksort($parameters, $compare);
-
-        $pairs = [];
-        foreach ($parameters as $key => $values) {
-            foreach ($values as $value) {
-                $pairs[] = [$key, $value];
-            }
-        }
-
-        $this->updateQuery(Query::fromPairs($pairs));
+        $this->updateQuery($this->query->sort());
     }
 }
