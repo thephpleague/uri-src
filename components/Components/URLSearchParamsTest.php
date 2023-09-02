@@ -26,6 +26,9 @@ final class URLSearchParamsTest extends TestCase
         $params = new URLSearchParams();
         self::assertSame('', $params->toString());
         self::assertTrue($params->isEmpty());
+        self::assertSame([], [...$params]);
+        self::assertSame([], [...$params->keys()]);
+        self::assertSame([], [...$params->values()]);
 
         $params = new URLSearchParams('');
         self::assertSame('', $params->toString());
@@ -53,6 +56,8 @@ final class URLSearchParamsTest extends TestCase
         $params = new URLSearchParams('a=b&c');
         self::assertTrue($params->has('a'));
         self::assertTrue($params->has('c'));
+        self::assertSame(['a', 'c'], [...$params->keys()]);
+        self::assertSame(['b', ''], [...$params->values()]);
 
         $params = new URLSearchParams('&a&&& &&&&&a+b=& c&m%c3%b8%c3%b8');
         self::assertTrue($params->has('a'), 'Search params object has name "a"');
@@ -203,6 +208,8 @@ final class URLSearchParamsTest extends TestCase
 
         $params->append('a', 'c');
         self::assertSame('a=b&a=b&a=c', $params->toString());
+        self::assertSame(['a', 'a', 'a'], [...$params->keys()]);
+        self::assertSame(['b', 'b', 'c'], [...$params->values()]);
     }
 
     public function testItCanAppendEmptyString(): void

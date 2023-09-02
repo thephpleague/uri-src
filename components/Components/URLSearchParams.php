@@ -48,20 +48,20 @@ final class URLSearchParams implements Countable, IteratorAggregate, Stringable
     public function __construct(object|array|string|null $query = null)
     {
         $rawQuery = match (true) {
-            $query instanceof QueryInterface => $query->withSeparator('&'),
-            $query instanceof UriComponentInterface => Query::fromRFC1738($query->value()),
+            $query instanceof QueryInterface => $query,
+            $query instanceof UriComponentInterface => self::resolvePairs($query->value()),
             is_iterable($query) => Query::fromPairs($query),
             $query instanceof Stringable,
             null === $query,
             is_string($query) => match (true) {
-                str_starts_with((string) $query, '?') => Query::fromRFC1738(substr((string) $query, 1)),
-                default => Query::fromRFC1738($query),
+                str_starts_with((string) $query, '?') => self::resolvePairs(substr((string) $query, 1)),
+                default => self::resolvePairs($query),
             },
-            default => Query::fromPairs((function (object $object) {
+            default => (function (object $object) {
                 foreach ($object as $key => $value) { /* @phpstan-ignore-line */
                     yield [$this->filterValue($key), $this->filterValue($value)];
                 }
-            })($query)),
+            })($query),
         };
 
         $pairs = array_reduce([...$rawQuery], fn (array $carry, array $pair): array => match (true) {
@@ -73,8 +73,25 @@ final class URLSearchParams implements Countable, IteratorAggregate, Stringable
         $this->query = Query::fromPairs($pairs);
     }
 
+    private static function resolvePairs(Stringable|string|null $query): array
+    {
+        return QueryString::parseFromValue($query, self::converter());
+    }
+
+    private static function converter(): Converter
+    {
+        static $converter;
+        $converter = $converter ?? Converter::new('&')
+            ->withEncodingMap([
+                '%20' => '+',
+                '%2A' => '*',
+        ]);
+
+        return $converter;
+    }
+
     /**
-     * Returns a new instance from an URI.
+     * Returns a new instance from a URI.
      */
     public static function fromUri(Stringable|string $uri): self
     {
@@ -86,14 +103,7 @@ final class URLSearchParams implements Countable, IteratorAggregate, Stringable
      */
     public function toString(): string
     {
-        static $converter;
-        $converter = $converter ?? Converter::new('&')
-        ->withEncodingMap([
-            '%20' => '+',
-            '%2A' => '*',
-        ]);
-
-        return (string) QueryString::buildFromPairs($this->query, $converter);
+        return (string) QueryString::buildFromPairs($this->query, self::converter());
     }
 
     public function __toString(): string
@@ -127,6 +137,14 @@ final class URLSearchParams implements Countable, IteratorAggregate, Stringable
 
     /**
      * Tells whether the specified parameter is in the search parameters.
+     *
+     * The method can be used with one or two arguments representing the key and the optional value
+     * <code>
+     * $params = new URLSearchParams('a=b&c);
+     * $params->has('c');      // return true
+     * $params->has('a', 'b'); // return true
+     * $params->has('a', 'c'); // return false
+     * </code>
      */
     public function has(): bool
     {
@@ -161,7 +179,7 @@ final class URLSearchParams implements Countable, IteratorAggregate, Stringable
     }
 
     /**
-     * Returns the first value associated to the given search parameter or null if none exists..
+     * Returns the first value associated to the given search parameter or null if none exists.
      */
     public function get(string $name): ?string
     {
@@ -258,6 +276,11 @@ final class URLSearchParams implements Countable, IteratorAggregate, Stringable
      *
      * The method expects at least on parameter the key (string or null)
      * and an optional second and last parameter the value (Stringable|string|float|int|bool|null)
+     * <code>
+     * $params = new URLSearchParams('a=b&c);
+     * $params->delete('c'); //delete all parameters with the key 'c'
+     * $params->delete('a', 'b') //delete all pairs with the key 'a' and the value 'b'
+     * </code>
      */
     public function delete(): void
     {
