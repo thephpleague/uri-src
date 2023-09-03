@@ -246,6 +246,16 @@ final class Query extends Component implements QueryInterface
 
     public function sort(): self
     {
+        $codepoints = fn (?string $str): string => in_array($str, ['', null], true) ? '' : implode('.', array_map(
+            mb_ord(...), /* @phpstan-ignore-line */
+            (array) preg_split(pattern:'//u', subject: $str, flags: PREG_SPLIT_NO_EMPTY)
+        ));
+
+        $compare = fn (string $name1, string $name2): int => match (1) {
+            preg_match(self::REGEXP_NON_ASCII_PATTERN, $name1.$name2) => strcmp($codepoints($name1), $codepoints($name2)),
+            default => strcmp($name1, $name2),
+        };
+
         $parameters = array_reduce($this->pairs, function (array $carry, array $pair) {
             $carry[$pair[0]] ??= [];
             $carry[$pair[0]][] = $pair[1];
@@ -253,31 +263,17 @@ final class Query extends Component implements QueryInterface
             return $carry;
         }, []);
 
-        $codepoints = fn (?string $str): string => in_array($str, ['', null], true) ? '' : implode('.', array_map(
-            mb_ord(...), /* @phpstan-ignore-line */
-            (array) preg_split(pattern:'//u', subject: $str, flags: PREG_SPLIT_NO_EMPTY)
-        ));
-
-        $compare = fn (string $name1, string $name2): int => match (1) {
-            preg_match(self::REGEXP_NON_ASCII_PATTERN, $name1),
-            preg_match(self::REGEXP_NON_ASCII_PATTERN, $name2) => strcmp($codepoints($name1), $codepoints($name2)),
-            default => strcmp($name1, $name2),
-        };
-
         uksort($parameters, $compare);
 
         $pairs = [];
         foreach ($parameters as $key => $values) {
-            foreach ($values as $value) {
-                $pairs[] = [$key, $value];
-            }
+            $pairs = [...$pairs, ...array_map(fn ($value) => [$key, $value], $values)];
         }
 
-        if ($pairs === $this->pairs) {
-            return $this;
-        }
-
-        return self::fromPairs($pairs);
+        return match (true) {
+            $pairs === $this->pairs => $this,
+            default => self::fromPairs($pairs),
+        };
     }
 
     public function withoutDuplicates(): self
