@@ -12,10 +12,11 @@ All Notable changes to `League\Uri\Components` will be documented in this file
 - `League\Uri\Components\Query::withoutPairByKey`
 - `League\Uri\Components\Query::withoutPairByValue`
 - `League\Uri\Components\Query::withoutPairByKeyValue`
+- `League\Uri\Components\URLSearchParams`
 
 ### Fixed
 
-- None
+- `League\Uri\Components\Query::sort` to improve WHATWG compliance.
 
 ### Deprecated
 
