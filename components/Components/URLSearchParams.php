@@ -53,7 +53,7 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
      * A literal sequence of name-value string pairs, or any object with an iterator that produces a sequence of string pairs.
      * A record of string keys and string values. Note that nesting is not supported.
      */
-    public function __construct(object|array|string|null $query = null)
+    public function __construct(object|array|string|null $query = '')
     {
         $rawQuery = match (true) {
             $query instanceof self,
@@ -219,8 +219,10 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
     /**
      * Returns the first value associated to the given search parameter or null if none exists.
      */
-    public function get(string $name): ?string
+    public function get(?string $name): ?string
     {
+        $name = $this->filterValue($name);
+
         return match (true) {
             $this->has($name) => $this->query->get($name) ?? '',
             default => null,
@@ -232,9 +234,11 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
      *
      * @return array<string>
      */
-    public function getAll(string $name): array
+    public function getAll(?string $name): array
     {
-        return array_map(fn (string|null $value): string => $value ?? '', $this->query->getAll($name));
+        $name = $this->filterValue($name);
+
+        return array_map(fn (?string  $value): string => $value ?? '', $this->query->getAll($name));
     }
 
     /**
@@ -302,9 +306,20 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
     }
 
     /**
+     * sets the value associated with a given search parameter to the given value.
+     *
+     * If there were several matching values, this method deletes the others.
+     * If the search parameter doesn't exist, this method creates it.
+     */
+    public function set(?string $key, Stringable|string|float|int|bool|null $value): void
+    {
+        $this->updateQuery($this->query->withPair($this->filterValue($key), $this->filterValue($value)));
+    }
+
+    /**
      * appends a specified key/value pair as a new search parameter.
      */
-    public function append(string|null $key, Stringable|string|float|int|bool|null $value): void
+    public function append(?string $key, Stringable|string|float|int|bool|null $value): void
     {
         $this->updateQuery($this->query->appendTo($this->filterValue($key), $this->filterValue($value)));
     }
@@ -340,17 +355,6 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
         };
 
         $this->updateQuery($newQuery);
-    }
-
-    /**
-     * sets the value associated with a given search parameter to the given value.
-     *
-     * If there were several matching values, this method deletes the others.
-     * If the search parameter doesn't exist, this method creates it.
-     */
-    public function set(string|null $key, Stringable|string|float|int|bool|null $value): void
-    {
-        $this->updateQuery($this->query->withPair($this->filterValue($key), $this->filterValue($value)));
     }
 
     /**
