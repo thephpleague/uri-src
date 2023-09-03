@@ -112,9 +112,10 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
     }
 
     /**
-     * New instance.
+     * Returns a new instance from a string or a stringable object
+     * which will be parsed from application/x-www-form-urlencoded format.
      *
-     * A string, which will be parsed from application/x-www-form-urlencoded format. A leading '?' character is ignored.
+     * the leading '?' character if present is ignored.
      */
     public static function new(Stringable|string|null $value): self
     {
@@ -122,9 +123,10 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
     }
 
     /**
-     * New instance.
+     * Returns a new instance from a literal sequence of name-value string pairs,
+     * or any object with an iterator that produces a sequence of string pairs.
      *
-     * A literal sequence of name-value string pairs, or any object with an iterator that produces a sequence of string pairs.
+     * @param iterable<int, array{0:string, 1:string|null}> $pairs
      */
     public static function fromPairs(iterable $pairs): self
     {
@@ -132,19 +134,22 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
     }
 
     /**
-     * New instance.
+     * Returns a new instance from a record of string keys and string values.
      *
-     * A record of string keys and string values. Note that nesting is not supported.
+     * Note that nesting is not supported.
      */
-    public static function fromRecords(object $records): self
+    public static function fromRecords(object|iterable $records): self
     {
-        return new self((function (object $object) {
+        return new self((function (object|iterable $object) {
             foreach ($object as $key => $value) { /* @phpstan-ignore-line */
                 yield [self::uvString($key), self::uvString($value)];
             }
         })($records));
     }
 
+    /**
+     * Returns a new instance from a URI..
+     */
     public static function fromUri(Stringable|string $uri): self
     {
         $query = match (true) {
@@ -156,6 +161,9 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
         return new self(QueryString::parseFromValue($query, self::converter()));
     }
 
+    /**
+     * Returns a new instance from the result of PHP's parse_str.
+     */
     public static function fromParameters(iterable $parameters): self
     {
         return new self(Query::fromParameters($parameters));
@@ -265,10 +273,8 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
      */
     public function get(?string $name): ?string
     {
-        $name = self::uvString($name);
-
         return match (true) {
-            $this->has($name) => $this->query->get($name) ?? '',
+            $this->has($name) => $this->query->get(self::uvString($name)) ?? '',
             default => null,
         };
     }
@@ -280,9 +286,7 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
      */
     public function getAll(?string $name): array
     {
-        $name = self::uvString($name);
-
-        return array_map(fn (?string  $value): string => $value ?? '', $this->query->getAll($name));
+        return array_map(fn (?string  $value): string => $value ?? '', $this->query->getAll(self::uvString($name)));
     }
 
     /**

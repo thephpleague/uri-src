@@ -781,6 +781,13 @@ JSON;
         self::assertSame('false', $params->get('days'));
     }
 
+    public function testInstantiateWithPairsFails(): void
+    {
+        $this->expectException(SyntaxError::class);
+
+        URLSearchParams::fromPairs(['key' => '730d67']); /* @phpstan-ignore-line */
+    }
+
     public function testInstantiateWithPairs(): void
     {
         $pairs = [['a', 'b'], ['a', 'c']];

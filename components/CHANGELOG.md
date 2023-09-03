@@ -17,6 +17,7 @@ All Notable changes to `League\Uri\Components` will be documented in this file
 ### Fixed
 
 - `League\Uri\Components\Query::sort` to improve WHATWG compliance.
+- `League\Uri\QueryString::buildFromPairs` should throw `SyntaxError` instead of `TypeError`
 
 ### Deprecated
 
