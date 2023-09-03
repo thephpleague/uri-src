@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace League\Uri\Components;
 
 use ArgumentCountError;
+use DateInterval;
 use League\Uri\Exceptions\SyntaxError;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -765,5 +766,42 @@ JSON;
         self::assertCount(4, $params);
         self::assertSame('bar baz', $params->get('filter[foo][0]'));
         self::assertSame('bar', $params->get('filter[bar][foo]'));
+    }
+
+    public function testInstantiateWithRecords(): void
+    {
+        $interval = new DateInterval('P3MT12M5S');
+        $params = URLSearchParams::fromRecords($interval);
+        self::assertSame((new URLSearchParams($interval))->toString(), $params->toString());
+        self::assertSame('3', $params->get('m'));
+        self::assertSame('12', $params->get('i'));
+        self::assertSame('5', $params->get('s'));
+        self::assertSame('0', $params->get('y'));
+        self::assertSame('0', $params->get('invert'));
+        self::assertSame('false', $params->get('days'));
+    }
+
+    public function testInstantiateWithPairs(): void
+    {
+        $pairs = [['a', 'b'], ['a', 'c']];
+        $params = URLSearchParams::fromPairs($pairs);
+        self::assertSame((new URLSearchParams($pairs))->toString(), $params->toString());
+        self::assertSame('b', $params->get('a'));
+        self::assertSame(2, $params->size());
+        self::assertSame($pairs, [...$params->entries()]);
+    }
+
+    public function testInstantiateWithString(): void
+    {
+        $params = URLSearchParams::new('a=b');
+        self::assertSame((new URLSearchParams('a=b'))->toString(), $params->toString());
+        self::assertSame('b', $params->get('a'));
+
+        $params = URLSearchParams::new('?a=b');
+        self::assertSame((new URLSearchParams('?a=b'))->toString(), $params->toString());
+        self::assertSame('a=b', $params->toString());
+        self::assertSame('b', $params->get('a'));
+
+        self::assertSame('b', URLSearchParams::new('%3Fa=b')->get('?a'));
     }
 }

@@ -68,7 +68,7 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
             },
             default => (function (object $object) {
                 foreach ($object as $key => $value) { /* @phpstan-ignore-line */
-                    yield [$this->filterValue($key), $this->filterValue($value)];
+                    yield [self::uvString($key), self::uvString($value)];
                 }
             })($query),
         };
@@ -80,6 +80,16 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
         }, []);
 
         $this->query = Query::fromPairs($pairs);
+    }
+
+    private static function uvString(Stringable|string|float|int|bool|null $value): string
+    {
+        return match (true) {
+            null === $value => 'null',
+            false === $value => 'false',
+            true === $value => 'true',
+            default => (string) $value,
+        };
     }
 
     private static function resolvePairs(Stringable|string|null $query): array
@@ -99,6 +109,40 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
             ->withEncodingMap(['%20' => '+', '%2A' => '*']);
 
         return $converter;
+    }
+
+    /**
+     * New instance.
+     *
+     * A string, which will be parsed from application/x-www-form-urlencoded format. A leading '?' character is ignored.
+     */
+    public static function new(Stringable|string|null $value): self
+    {
+        return new self($value);
+    }
+
+    /**
+     * New instance.
+     *
+     * A literal sequence of name-value string pairs, or any object with an iterator that produces a sequence of string pairs.
+     */
+    public static function fromPairs(iterable $pairs): self
+    {
+        return new self(Query::fromPairs($pairs));
+    }
+
+    /**
+     * New instance.
+     *
+     * A record of string keys and string values. Note that nesting is not supported.
+     */
+    public static function fromRecords(object $records): self
+    {
+        return new self((function (object $object) {
+            foreach ($object as $key => $value) { /* @phpstan-ignore-line */
+                yield [self::uvString($key), self::uvString($value)];
+            }
+        })($records));
     }
 
     public static function fromUri(Stringable|string $uri): self
@@ -196,7 +240,7 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
             throw new TypeError('The required key must be a string or null.');
         }
 
-        $key = $this->filterValue($key);
+        $key = self::uvString($key);
         $argumentCount = func_num_args();
         if (1 === $argumentCount) {
             return $this->query->has($key);
@@ -206,7 +250,7 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
             throw new ArgumentCountError(__METHOD__.' requires a key and an optional value.');
         }
 
-        $value = $this->filterValue(func_get_arg(1));  /* @phpstan-ignore-line */
+        $value = self::uvString(func_get_arg(1));  /* @phpstan-ignore-line */
         foreach ($this->query as [$name, $content]) {
             if ($key === $name && $value === $content) {
                 return true;
@@ -221,7 +265,7 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
      */
     public function get(?string $name): ?string
     {
-        $name = $this->filterValue($name);
+        $name = self::uvString($name);
 
         return match (true) {
             $this->has($name) => $this->query->get($name) ?? '',
@@ -236,7 +280,7 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
      */
     public function getAll(?string $name): array
     {
-        $name = $this->filterValue($name);
+        $name = self::uvString($name);
 
         return array_map(fn (?string  $value): string => $value ?? '', $this->query->getAll($name));
     }
@@ -258,11 +302,27 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
     }
 
     /**
+     * @see URLSearchParams::count()
+     */
+    public function size(): int
+    {
+        return $this->count();
+    }
+
+    /**
      * Returns the total number of search parameter entries.
      */
     public function count(): int
     {
         return count($this->query);
+    }
+
+    /**
+     * @see URLSearchParams::getIterator()
+     */
+    public function entries(): Iterator
+    {
+        return $this->getIterator();
     }
 
     /**
@@ -288,16 +348,6 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
         }
     }
 
-    private function filterValue(Stringable|string|float|int|bool|null $value): string
-    {
-        return match (true) {
-            null === $value => 'null',
-            false === $value => 'false',
-            true === $value => 'true',
-            default => (string) $value,
-        };
-    }
-
     private function updateQuery(QueryInterface $query): void
     {
         if ($query->value() !== $this->query->value()) {
@@ -311,17 +361,17 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
      * If there were several matching values, this method deletes the others.
      * If the search parameter doesn't exist, this method creates it.
      */
-    public function set(?string $key, Stringable|string|float|int|bool|null $value): void
+    public function set(?string $name, Stringable|string|float|int|bool|null $value): void
     {
-        $this->updateQuery($this->query->withPair($this->filterValue($key), $this->filterValue($value)));
+        $this->updateQuery($this->query->withPair(self::uvString($name), self::uvString($value)));
     }
 
     /**
      * appends a specified key/value pair as a new search parameter.
      */
-    public function append(?string $key, Stringable|string|float|int|bool|null $value): void
+    public function append(?string $name, Stringable|string|float|int|bool|null $value): void
     {
-        $this->updateQuery($this->query->appendTo($this->filterValue($key), $this->filterValue($value)));
+        $this->updateQuery($this->query->appendTo(self::uvString($name), self::uvString($value)));
     }
 
     /**
@@ -341,16 +391,16 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
             throw new ArgumentCountError('The required key is missing.');
         }
 
-        $key = func_get_arg(0);
-        if (null !== $key && !is_string($key)) {
+        $name = func_get_arg(0);
+        if (null !== $name && !is_string($name)) {
             throw new TypeError('The required key must be a string or null.');
         }
 
-        $key = $this->filterValue($key);
+        $name = self::uvString($name);
         $argumentCount = func_num_args();
         $newQuery = match (true) {
-            1 === $argumentCount => $this->query->withoutPairByKey($key),
-            2 === $argumentCount => $this->query->withoutPairByKeyValue($key, $this->filterValue(func_get_arg(1))), /* @phpstan-ignore-line */
+            1 === $argumentCount => $this->query->withoutPairByKey($name),
+            2 === $argumentCount => $this->query->withoutPairByKeyValue($name, self::uvString(func_get_arg(1))), /* @phpstan-ignore-line */
             default => throw new ArgumentCountError(__METHOD__.' requires a key and an optional value.'),
         };
 
