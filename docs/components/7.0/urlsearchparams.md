@@ -26,24 +26,24 @@ in the following aspects:
 
 | WHATWG group Specification       | PHP implementation              |
 |----------------------------------|---------------------------------|
-| `URLSearchParams::size` property | `URLSearchParams::sixe()`method |
+| `URLSearchParams::size` property | `URLSearchParams::size()`method |
 | `URLSearchParams::forEach()`     | `URLSearchParams::each()`       |
 
 <p class="message-notice">As per the specification the class is mutable.</p>
-<p class="message-notice">As per the specification encoding is done follwoing the <code>application/x-www-form-urlencoded</code></p> 
+<p class="message-notice">As per the specification encoding is done following the <code>application/x-www-form-urlencoded</code> rules</p> 
 
 ## Usage
 
 ### Instantiation
 
 To instantiate a new instance you can use the default constructor which follow the specification
-or more specialized named constructors to avoid subtle bugs. 
+or one of the more specialized named constructors to avoid subtle bugs described below:
 
-- The `URLSearchParams::new` named constructor allow instantiating the object from a string or a stringable object.
-- The `URLSearchParams::fromUri` named constructor allow instantiating the object from a string or a stringable object.
-- The `URLSearchParams::fromRecords` named constructor allow instantiating the object from an object with public properties or generic iterator.
-- The `URLSearchParams::fromPairs` named constructor allow instantiating the object from an iterator which produces pairs.
-- The `URLSearchParams::fromParameters` named constructor allow instantiating the object from PHP query parameters.
+- The `URLSearchParams::new` instantiate from a query.
+- The `URLSearchParams::fromUri` instantiate from a URI.
+- The `URLSearchParams::fromPairs` instantiate from a collection of pairs.
+- The `URLSearchParams::fromRecords` nstantiate from an object with public properties or generic key/value iterator.
+- The `URLSearchParams::fromParameters` instantiate from the result of `parse_str` or the input of `http_build_query`.
 
 ```php
 $parameters = [
@@ -65,8 +65,8 @@ echo URLSearchParams::fromRecords($interval)->toString();
 //display "y=0&m=3&d=0&h=0&i=12&s=5&f=0&invert=0&days=false&from_string=false"
 `````
 
-<p class="message-warning"><code>URLSearchParams::new</code> To adhere to the specification, if a string starts with the
-character <code>?</code> the character will be skip before parsing the string.</p>
+<p class="message-warning"> To adhere to the specification, if a string starts with the character <code>?</code>;
+<code>URLSearchParams::new</code> will ignore it before parsing the string.</p>
 
 ```php
 use League\Uri\Components\URLSearchParams;
@@ -75,14 +75,14 @@ echo URLSearchParams::new('?a=b')->toString();
 echo URLSearchParams::new('a=b')->toString(); 
 echo (new URLSearchParams('?a=b'))->toString();
 //all the above code will display 'a=b'
-//to preserve the question makr you need to encode it.
+//to preserve the question mark you need to encode it.
 [...URLSearchParams::new('%3Fa=b')]; // returns [['?a', 'b']]
 [...(new URLSearchParams('%3Fa=b'))];  // returns [['?a', 'b']]
 `````
 
 ### Accessing and manipulating the data
 
-While the class implements all the metods define in the RFC, the follwoing methods are added to ease usage.
+While the class implements all the methods define in the RFC, the following methods are added to ease usage.
 
 - `URLSearchParams::isEmpty`
 - `URLSearchParams::isNotEmpty`
@@ -92,6 +92,7 @@ use League\Uri\Components\URLSearchParams;
 
 $params = new URLSearchParams('foo=bar&bar=baz+bar&foo=baz');
 $params->isNotEmpty(); //return true
+$params->isEmpty(); //return false
 $params->get('foo'); //returns 'bar'
 $params->getAll('foo'); //returns ['bar', 'baz']
 $params->has('foo'); //returns true
