@@ -131,7 +131,7 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
      */
     public static function new(Stringable|string|null $value): self
     {
-        return new self(self::formatQueryString($value));
+        return new self(Query::fromPairs(QueryString::parseFromValue(self::formatQueryString($value), self::converter())));
     }
 
     /**
@@ -152,7 +152,7 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
      */
     public static function fromRecords(object|iterable $records): self
     {
-        return new self(self::yieldPairs($records));
+        return new self(Query::fromPairs(self::yieldPairs($records)));
     }
 
     /**
@@ -166,7 +166,7 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
             default => Uri::new($uri)->getQuery(),
         };
 
-        return new self(QueryString::parseFromValue($query, self::converter()));
+        return new self(Query::fromPairs(QueryString::parseFromValue($query, self::converter())));
     }
 
     /**
