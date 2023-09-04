@@ -198,6 +198,11 @@ final class Query extends Component implements QueryInterface
         return [] !== $keys;
     }
 
+    public function hasPair(string $key, ?string $value): bool
+    {
+        return in_array([$key, $value], $this->pairs, true);
+    }
+
     public function get(string $key): ?string
     {
         foreach ($this->pairs as $pair) {
