@@ -39,10 +39,10 @@ in the following aspects:
 To instantiate a new instance you can use the default constructor which follow the specification
 or one of the more specialized named constructors to avoid subtle bugs described below:
 
-- The `URLSearchParams::new` instantiate from a query.
+- The `URLSearchParams::new` instantiate from a query; the `?` delimiter if present will be ignored.
 - The `URLSearchParams::fromUri` instantiate from a URI.
 - The `URLSearchParams::fromPairs` instantiate from a collection of pairs.
-- The `URLSearchParams::fromRecords` nstantiate from an object with public properties or generic key/value iterator.
+- The `URLSearchParams::fromAssociative` instantiate from an associative array or any object with public properties or generic key/value iterator (nested value are not supported).
 - The `URLSearchParams::fromParameters` instantiate from the result of `parse_str` or the input of `http_build_query`.
 
 ```php
@@ -61,7 +61,7 @@ echo $params;
 //display "filter%5BdateRange%5D%5Bstart%5D=2023-01-01&filter%5BdateRange%5D%5Bend%5D=2023-08-31"
 
 $interval = new DateInterval('P3MT12M5S');
-echo URLSearchParams::fromRecords($interval)->toString();
+echo URLSearchParams::fromAssociative($interval)->toString();
 //display "y=0&m=3&d=0&h=0&i=12&s=5&f=0&invert=0&days=false&from_string=false"
 `````
 

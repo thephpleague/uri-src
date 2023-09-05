@@ -768,10 +768,10 @@ JSON;
         self::assertSame('bar', $params->get('filter[bar][foo]'));
     }
 
-    public function testInstantiateWithRecords(): void
+    public function testInstantiateWithAssociativeInput(): void
     {
         $interval = new DateInterval('P3MT12M5S');
-        $params = URLSearchParams::fromRecords($interval);
+        $params = URLSearchParams::fromAssociative($interval);
         self::assertSame((new URLSearchParams($interval))->toString(), $params->toString());
         self::assertSame('3', $params->get('m'));
         self::assertSame('12', $params->get('i'));
@@ -779,6 +779,21 @@ JSON;
         self::assertSame('0', $params->get('y'));
         self::assertSame('0', $params->get('invert'));
         self::assertSame('false', $params->get('days'));
+        self::assertNull($params->get('yolo'));
+    }
+
+    public function testInstantiateWithAssociativeArray(): void
+    {
+        $associative = ['y' => 0, 'invert' => 0, 'days' => false, 'm'  => 3, 'i' => 12, 's' => 5, 'yolo' => null];
+        $params = URLSearchParams::fromAssociative($associative);
+        self::assertSame((new URLSearchParams((object) $associative))->toString(), $params->toString());
+        self::assertSame('3', $params->get('m'));
+        self::assertSame('12', $params->get('i'));
+        self::assertSame('5', $params->get('s'));
+        self::assertSame('0', $params->get('y'));
+        self::assertSame('0', $params->get('invert'));
+        self::assertSame('false', $params->get('days'));
+        self::assertSame('null', $params->get('yolo'));
     }
 
     public function testInstantiateWithPairsFails(): void

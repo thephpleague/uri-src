@@ -78,9 +78,12 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
         return QueryString::parseFromValue($query, self::converter());
     }
 
-    private static function yieldPairs(object|array $records): Iterator
+    /**
+     * @param object|iterable<array-key, Stringable|string|float|int|bool|null> $associative
+     */
+    private static function yieldPairs(object|iterable $associative): Iterator
     {
-        foreach ($records as $key => $value) { /* @phpstan-ignore-line */
+        foreach ($associative as $key => $value) { /* @phpstan-ignore-line */
             yield [self::uvString($key), self::uvString($value)];
         }
     }
@@ -148,11 +151,13 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
     /**
      * Returns a new instance from a record of string keys and string values.
      *
-     * Note that nesting is not supported.
+     * A record can be, an iterable or any object with scalar or null public properties. Nesting is not supported.
+     *
+     * @param object|iterable<array-key, Stringable|string|float|int|bool|null> $associative
      */
-    public static function fromRecords(object|iterable $records): self
+    public static function fromAssociative(object|iterable $associative): self
     {
-        return new self(Query::fromPairs(self::yieldPairs($records)));
+        return new self(Query::fromPairs(self::yieldPairs($associative)));
     }
 
     /**
