@@ -51,6 +51,7 @@ packages:
                 DataPath: '/components/7.0/data-path/'
                 HierarchicalPath: '/components/7.0/hierarchical-path/'
                 Query: '/components/7.0/query/'
+                URLSearchParams: '/components/7.0/urlsearchparams/'
                 Fragment: '/components/7.0/fragment/'
         '2.0':
             Documentation:

@@ -71,7 +71,7 @@ The `Query` object can return the query encoded using the [RFC3986](https://tool
 ~~~php
 $query = Query::fromRFC1738('foo=bar&bar=baz+bar', '&');
 $query->toRFC3986();  //returns 'foo=bar&bar=baz%20bar'
-$query->value(); //returns 'foo=bar&bar=baz%20bar'
+$query->value();     //returns 'foo=bar&bar=baz%20bar'
 ~~~
 
 If the query is undefined, this method returns `null`.
@@ -149,8 +149,10 @@ that parsing stayed unchanged before and after processing the query.
 ~~~php
 $query    = Query::fromRFC3986('foo=bar&baz=toto&foo=toto');
 $newQuery = $query->sort();
-$newQuery->__toString(); //return foo=bar&foo=toto&baz=toto
+$newQuery->__toString(); //return baz=toto&foo=bar&foo=toto
 ~~~
+
+<p class="message-notice">since version <code>7.3.0</code>, the sorting algorithm has been updated to match <a href="https://url.spec.whatwg.org/#dom-urlsearchparams-sort">WHATG group specification</a></p>
 
 ## Using the Query as a PHP data transport layer
 
@@ -178,7 +180,7 @@ an object with public properties.</p>
 
 <p class="message-notice">If you want a better parsing you can use the <a href="/components/7.0/query-parser-builder/">QueryString</a> class.</p>
 
-### Query::params
+### Query::parameters
 
 If you already have an instantiated `Query` object you can return all the query string deserialized arguments using the `Query::params` method:
 
@@ -188,7 +190,7 @@ parse_str($query_string, $out);
 var_export($out);
 // $out = ["foo_bar" => 'baz'];
 
-$arr = Query::fromRFC3986($query_string)->params();
+$arr = Query::fromRFC3986($query_string)->parameters();
 // $arr = ['foo.bar' => 'bar', 'foo_bar' => baz']];
 ~~~
 
@@ -197,14 +199,14 @@ If you are only interested in a given argument you can access it directly by sup
 
 ~~~php
 $query = Query::fromRFC3986('foo[]=bar&foo[]=y+olo&z=');
-$query->params('foo');   //return ['bar', 'y+olo']
-$query->params('gweta'); //return null
+$query->paramter('foo');   //return ['bar', 'y+olo']
+$query->paramter('gweta'); //return null
 ~~~
 
 The method returns the value of a specific argument. If the argument does not exist it will return `null`.
 
 
-### Query::withoutParam
+### Query::withoutParameter
 
 If you want to remove PHP's variable from the query string you can use the `Query::withoutParams` method as shown below
 
@@ -243,13 +245,16 @@ public Query::count(): int
 public Query::getIterator(): iterable
 public Query::pairs(): iterable
 public Query::has(string $key): bool
+public Query::hasPair(string $key, ?string $value): bool
 public Query::get(string $key): ?string
 public Query::getAll(string $key): array
-public Query::withPair(string $key, $value): QueryInterface
+public Query::withPair(string $key, $value): self
 public Query::withoutDuplicates(): self
 public Query::withoutEmptyPairs(): self
-public Query::withoutPair(string ...$keys): QueryInterface
-public Query::appendTo(string $key, $value): QueryInterface
+public Query::withoutPairByKey(string ...$keys): self
+public Query::withoutPairByValue(?string ...$values): self
+public Query::withoutPairByKeyValue(string $key, ?string $value): self
+public Query::appendTo(string $key, $value): self
 ~~~
 
 ### Query::fromPairs
@@ -320,7 +325,7 @@ foreach ($query->pairs() as $name => $value) {
 
 <p class="message-info">The returned iterable contains decoded data.</p>
 
-### Query::has
+### Query::has and Query::hasPair
 
 Because a query pair value can be `null` the `Query::has` method is used to remove the possible `Query::get` result ambiguity.
 
@@ -332,6 +337,24 @@ $query->getPair('gweta'); //return null
 
 $query->has('gweta'); //return false
 $query->has('p');     //return true
+~~~
+
+`Query::has` can take a variable list of keys to validate that they are **all** pesent in the query.
+
+~~~php
+$query = Query::fromRFC3986('foo=bar&p&z=');
+$query->has('foo', 'p', 'z');   //return true
+$query->has('foo', 'p', 'x');   //return false
+~~~
+
+<p class="message-notice">since version <code>7.3.0</code></p>
+
+If you are seeking the presence of a specific pair you may include the pair value in your search using `Query::hasPair`.
+
+~~~php
+$query = Query::fromRFC3986('foo=bar&p&z=');
+$query->hasPair('foo', 'p');  //return false
+$query->has('foo', 'bar');    //return true
 ~~~
 
 ### Query::get
@@ -358,16 +381,24 @@ $query->getAll('foo');   //return ['bar', 'BAZ']
 $query->getAll('gweta');  //return null
 ~~~
 
-### Query::withoutPair
+### Query::withoutPairByKey, Query::withoutPairByValue, Query::withoutPairByKeyAndValue
 
-`Query::withoutPair` returns a new `Query` object with deleted pairs according to their keys.
+<p class="message-notice">since version <code>7.3.0</code></p>
 
-This method expects an array containing a list of keys to remove as its single argument.
+`Query::withoutPairByKey` returns a new `Query` object with deleted pairs according to their keys.
+`Query::withoutPairByValue` does similar but delete the pairs according to their values. Last
+but not least `Query::withoutPairByKeyAndValue` does the deletion depending on the presence of 
+the pair key and value.
+
+`Query::withoutPairByKey` and `Query::withoutPairByValue` expect a variable list of key or value to 
+be removed as its sole arguments. `Query::withoutPairByKeyAndValue` on the other hand expect two (2)
+parameter the pair's key and value.
 
 ~~~php
 $query    = Query::fromRFC3986('foo=bar&p=y+olo&z=');
-$newQuery = $query->withoutPair('foo', 'p');
-echo $newQuery; //displays 'z='
+echo $query->withoutPairByKey('foo', 'p')->toString();  //displays 'z='
+echo $query->withoutPairByValue('bar')->toString();  //displays 'p=y+olo&z='
+echo $query->withoutPairByKeyAndValue('p', 'y+olo')->toString();  //displays 'foo=bar&z='
 ~~~
 
 ### Query::withoutEmptyPairs
