@@ -23,23 +23,28 @@ public static Query::new(Stringable|string|null $value = null): self
 public static Query::fromUri(): self
 public static Query::fromRFC3986(Stringable|string $value, string $separator = '&'): self
 public static Query::fromRFC1738(Stringable|string $value, string $separator = '&'): self
+public static Query::fromFormData(Stringable|string $value, string $separator = '&'): self
 ~~~
 
-- `new` and `fromRFC3986` instantiate a query string encoded using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) query component rules;
-- `fromRFC1738` instantiate a query string encoded using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
+- `new` and `fromRFC3986` instantiates a query string encoded using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) query component rules;
+- `fromRFC1738` instantiates a query string encoded using [RFC1738](https://tools.ietf.org/html/rfc1738) rules;
+- `fromFormData` instantiates a query string encoded using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
 
 ~~~php
 <?php
 
 use League\Uri\Components\Query;
 
-$query = Query::new('foo=bar&bar=baz%20bar');
+$query = Query::new('foo=bar&bar=baz%20bar%2A');
 //or
-$query = Query::fromRFC3986('foo=bar&bar=baz%20bar', '&');
-$query->params('bar'); // returns 'baz bar'
+$query = Query::fromRFC3986('foo=bar&bar=baz%20bar%2A', '&');
+$query->get('bar'); // returns 'baz bar*'
 
-$query = Query::fromRFC1738('foo=bar&bar=baz+bar', '&');
-$query->params('bar'); // returns 'baz bar'
+$query = Query::fromRFC1738('foo=bar&bar=baz+bar%2A', '&');
+$query->get('bar'); // returns 'baz bar*'
+
+$query = Query::fromFormData('foo=bar&bar=baz+bar*', '&');
+$query->get('bar'); // returns 'baz bar*'
 ~~~
 
 ### Query separator
@@ -69,9 +74,9 @@ In addition to the common methods from the [package common API](/components/7.0/
 The `Query` object can return the query encoded using the [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) query component rules
 
 ~~~php
-$query = Query::fromRFC1738('foo=bar&bar=baz+bar', '&');
-$query->toRFC3986();  //returns 'foo=bar&bar=baz%20bar'
-$query->value();     //returns 'foo=bar&bar=baz%20bar'
+$query = Query::fromRFC1738('foo=bar&bar=baz+bar%2A', '&');
+$query->toRFC3986();  //returns 'foo=bar&bar=baz%20bar%2A'
+$query->value();     //returns 'foo=bar&bar=baz%20bar%2A'
 ~~~
 
 If the query is undefined, this method returns `null`.
@@ -80,7 +85,7 @@ If the query is undefined, this method returns `null`.
 
 ### RFC1738 representation
 
-The `Query` object returns the query encoded using the  [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) query component rules
+The `Query` object returns the query encoded using the [RFC1738](https://tools.ietf.org/html/rfc1738) query component rules
 
 ~~~php
 $query = Query::fromRFC3986('foo=bar&bar=baz%20bar', '&');
@@ -90,7 +95,19 @@ $query->jsonSerialize(); //returns 'foo=bar&bar=baz+bar'
 
 If the query is undefined, this method returns `null`.
 
-<p class="message-info"><code>Query::jsonSerialize()</code> is a alias of <code>Query::toRFC1738()</code> to improve interoperability with JavaScript.</p>
+### FormData representation
+
+The `Query` object returns the query encoded using the [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) query component rules
+
+~~~php
+$query = Query::fromRFC3986('foo=bar&bar=baz%20bar%2A', '&');
+$query->toFormData(); // returns 'foo=bar&bar=baz+bar*'
+$query->jsonSerialize(); //returns 'foo=bar&bar=baz+bar*'
+~~~
+
+If the query is undefined, this method returns `null`.
+
+<p class="message-info"><code>Query::jsonSerialize()</code> is a alias of <code>Query::toFormData()</code> to improve interoperability with JavaScript.</p>
 
 ## Modifying the query
 
