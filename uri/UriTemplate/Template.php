@@ -46,7 +46,7 @@ final class Template implements Stringable
         $this->variableNames = array_unique(
             array_merge(
                 ...array_map(
-                    fn (Expression $expression): array => $expression->variableNames,
+                    static fn (Expression $expression): array => $expression->variableNames,
                     $expressions
                 )
             )
