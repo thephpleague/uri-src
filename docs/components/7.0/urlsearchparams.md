@@ -17,7 +17,7 @@ the following PHP interfaces:
 
 - `Countable`,
 - `IteratorAggregate`,
-- `Stringablew,`
+- `Stringable`,
 - and `JsonSerializable` 
 
 To get the full information on the class behaviour and feature you can go to the 
