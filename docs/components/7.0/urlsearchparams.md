@@ -91,13 +91,13 @@ While the class implements all the methods define in the RFC, the following meth
 use League\Uri\Components\URLSearchParams;
 
 $params = new URLSearchParams('foo=bar&bar=baz+bar&foo=baz');
-$params->isNotEmpty(); //return true
-$params->isEmpty(); //return false
+$params->isNotEmpty(); //returns true
+$params->isEmpty(); //returns false
 $params->get('foo'); //returns 'bar'
 $params->getAll('foo'); //returns ['bar', 'baz']
 $params->has('foo'); //returns true
 $params->has('foo', 'bar'); //returns true
-$params->has('foo', 'toto'); //returns false (the second parameters is the value of the pair)
+$params->has('foo', 'toto'); //returns false (the second parameter is the value of the pair)
 count($params); //returns 3
 $params->size();  //returns 3
 $params->delete('foo');

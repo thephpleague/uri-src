@@ -14,7 +14,7 @@ The library provides a `League\Uri\Components\Query` class to ease query string 
 
 ## Standard instantiation
 
-### Using a RFC compliant algorithm
+### Using an RFC compliant algorithm
 
 
 ~~~php
@@ -107,7 +107,7 @@ $query->jsonSerialize(); //returns 'foo=bar&bar=baz+bar*'
 
 If the query is undefined, this method returns `null`.
 
-<p class="message-info"><code>Query::jsonSerialize()</code> is a alias of <code>Query::toFormData()</code> to improve interoperability with JavaScript.</p>
+<p class="message-info"><code>Query::jsonSerialize()</code> is an alias of <code>Query::toFormData()</code> to improve interoperability with JavaScript.</p>
 
 ## Modifying the query
 
@@ -174,10 +174,11 @@ $newQuery->__toString(); //return baz=toto&foo=bar&foo=toto
 ## Using the Query as a PHP data transport layer
 
 ~~~php
-public static Query::fromParams($params, string $separator = '&'): self
-public Query::params(?string $name = null): mixed
+public static Query::fromParameters($params, string $separator = '&'): self
+public Query::parameters(): array
+public Query::parameter(string $name): mixed
 public Query::withoutNumericIndices(): self
-public Query::withoutParam(...string $offsets): self
+public Query::withoutParameter(...string $offsets): self
 ~~~
 
 ### Using PHP data structure to instantiate a new Query object
@@ -188,7 +189,7 @@ PHP own data structure to generate a query string *à la* `http_build_query`.
 ~~~php
 parse_str('foo=bar&bar=baz+bar', $params);
 
-$query = Query::fromParams($params, '|');
+$query = Query::fromParameters($params, '|');
 echo $query->value(); // returns 'foo=bar|bar=baz%20bar'
 ~~~
 
@@ -199,7 +200,7 @@ an object with public properties.</p>
 
 ### Query::parameters
 
-If you already have an instantiated `Query` object you can return all the query string deserialized arguments using the `Query::params` method:
+If you already have an instantiated `Query` object you can return all the query string deserialized arguments using the `Query::parameters` method:
 
 ~~~php
 $query_string = 'foo.bar=bar&foo_bar=baz';
@@ -216,8 +217,8 @@ If you are only interested in a given argument you can access it directly by sup
 
 ~~~php
 $query = Query::fromRFC3986('foo[]=bar&foo[]=y+olo&z=');
-$query->paramter('foo');   //return ['bar', 'y+olo']
-$query->paramter('gweta'); //return null
+$query->parameter('foo');   //return ['bar', 'y+olo']
+$query->parameter('gweta'); //return null
 ~~~
 
 The method returns the value of a specific argument. If the argument does not exist it will return `null`.
@@ -229,7 +230,7 @@ If you want to remove PHP's variable from the query string you can use the `Quer
 
 ~~~php
 $query = Query::fromRFC3986('foo[]=bar&foo[]=y+olo&z=');
-$new_query = $query->withoutParam('foo');
+$new_query = $query->withoutParameter('foo');
 $new_query->params('foo'); //return null
 echo $new_query->value(); //return 'z='
 ~~~
@@ -243,13 +244,13 @@ If your query string is created with `http_build_query` or the `Query::fromParam
 The `Query::withoutNumericIndices` removes any numeric index found in the query string as shown below:
 
 ~~~php
-$query = Query::fromParams(['foo' => ['bar', 'baz']]);
+$query = Query::fromParameters(['foo' => ['bar', 'baz']]);
 echo $query->value(); //return 'foo[0]=bar&foo[1]=baz'
 $new_query = $query->withoutNumericIndices();
 echo $new_query->value(); //return 'foo[]=bar&foo[]=baz'
 //of note both objects returns the same PHP's variables but differs regarding the pairs
-$query->params(); //return ['foo' => ['bar', 'baz']]
-$new_query->params(); //return ['foo' => ['bar', 'baz']]
+$query->parameters(); //return ['foo' => ['bar', 'baz']]
+$new_query->parameters(); //return ['foo' => ['bar', 'baz']]
 ~~~
 
 ## Using the Query as a collection of query pairs
@@ -412,7 +413,7 @@ be removed as its sole arguments. `Query::withoutPairByKeyAndValue` on the other
 parameter the pair's key and value.
 
 ~~~php
-$query    = Query::fromRFC3986('foo=bar&p=y+olo&z=');
+$query = Query::fromRFC3986('foo=bar&p=y+olo&z=');
 echo $query->withoutPairByKey('foo', 'p')->toString();  //displays 'z='
 echo $query->withoutPairByValue('bar')->toString();  //displays 'p=y+olo&z='
 echo $query->withoutPairByKeyAndValue('p', 'y+olo')->toString();  //displays 'foo=bar&z='
@@ -423,7 +424,7 @@ echo $query->withoutPairByKeyAndValue('p', 'y+olo')->toString();  //displays 'fo
 `Query::withoutEmptyPairs` returns a new `Query` object with deleted empty pairs. A pair is considered empty if its key equals the empty string and its value is `null`.
 
 ~~~php
-$query    = Query::fromRFC3986('&&=toto&&&&=&');
+$query = Query::fromRFC3986('&&=toto&&&&=&');
 $newQuery = $query->withoutEmptyPairs();
 echo $query; //displays '&&=toto&&&&=&'
 echo $newQuery; //displays '=toto&='
