@@ -94,9 +94,13 @@ For Hosts:
 - [Host](/components/7.0/host/)
 - [Domain](/components/7.0/host/domain/)
 
-Other URI Components:
+For Queries:
 
 - [Query](/components/7.0/query/)
+- [URLSearchParams](/components/7.0/urlsearchparams/)
+
+Other URI Components:
+
 - [Scheme](/components/7.0/scheme/)
 - [Fragment](/components/7.0/fragment/)
 - [Port](/components/7.0/port/)
