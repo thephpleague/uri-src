@@ -800,4 +800,12 @@ final class QueryTest extends TestCase
 
         Query::fromRFC1738('foo=b%20ar;foo=baz', ''); /* @phpstan-ignore-line */
     }
+
+    public function testInstantiationFromURLSearchParams(): void
+    {
+        $expected = ['foo' => 'bar'];
+        $query = Query::fromParameters(URLSearchParams::fromParameters($expected));
+
+        self::assertSame($expected, $query->parameters());
+    }
 }

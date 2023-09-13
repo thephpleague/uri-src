@@ -75,7 +75,7 @@ final class Query extends Component implements QueryInterface
      */
     public static function fromParameters(object|array $parameters, string $separator = '&'): self
     {
-        if ($parameters instanceof QueryInterface) {
+        if ($parameters instanceof QueryInterface || $parameters instanceof URLSearchParams) {
             return self::fromPairs($parameters, $separator);
         }
 
