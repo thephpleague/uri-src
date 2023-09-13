@@ -16,6 +16,7 @@ namespace League\Uri\Components;
 use ArgumentCountError;
 use Closure;
 use Countable;
+use Generator;
 use Iterator;
 use IteratorAggregate;
 use League\Uri\Contracts\QueryInterface;
@@ -26,9 +27,13 @@ use League\Uri\KeyValuePair\Converter;
 use League\Uri\QueryString;
 use League\Uri\Uri;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
+use ReflectionObject;
+use ReflectionProperty;
 use Stringable;
+use Traversable;
 
 use function array_is_list;
+use function array_key_exists;
 use function array_keys;
 use function array_map;
 use function count;
@@ -37,7 +42,10 @@ use function func_num_args;
 use function is_array;
 use function is_iterable;
 use function is_object;
+use function is_scalar;
+use function iterator_to_array;
 use function json_encode;
+use function spl_object_hash;
 use function str_starts_with;
 
 use const JSON_PRESERVE_ZERO_FRACTION;
@@ -210,7 +218,65 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
      */
     public static function fromParameters(object|array $parameters): self
     {
-        return new self(Query::fromParameters($parameters));
+        return self::fromPairs(match (true) {
+            $parameters instanceof QueryInterface,
+            $parameters instanceof URLSearchParams => $parameters,
+            $parameters instanceof Traversable => self::parametersToPairs(iterator_to_array($parameters)),
+            default => self::parametersToPairs($parameters),
+        });
+    }
+
+    private static function parametersToPairs(array|object $data, string|int $prefix = '', array &$recursive = []): array
+    {
+        $pairs = [];
+        foreach (self::yieldParameters($data) as $name => $value) {
+            if (is_object($data)) {
+                $id = spl_object_hash($data);
+                if (!array_key_exists($id, $recursive)) {
+                    $recursive[$id] = 0;
+                }
+            }
+
+            if (is_object($value)) {
+                $id = spl_object_hash($value);
+                if (array_key_exists($id, $recursive)) {
+                    $recursive[$id] = 1;
+
+                    return [];
+                }
+
+                $recursive[$id] = 0;
+            }
+
+            if ('' !== $prefix) {
+                $name = $prefix.'['.$name.']';
+            }
+
+            $pairs = match (true) {
+                is_array($value),
+                is_object($value) => [...$pairs, ...self::parametersToPairs($value, $name, $recursive)],
+                is_scalar($value) => [...$pairs, [$name, self::uvString($value)]],
+                default => $pairs,
+            };
+        }
+
+        return $pairs;
+    }
+
+    /**
+     * @return Generator<array-key, mixed>
+     */
+    private static function yieldParameters(object|array $data): Generator
+    {
+        if (is_array($data)) {
+            yield from $data;
+
+            return;
+        }
+
+        foreach ((new ReflectionObject($data))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+            yield $property->getName() => $property->getValue($data);
+        }
     }
 
     public function value(): ?string
