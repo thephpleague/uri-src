@@ -818,6 +818,8 @@ JSON;
     }
 
     /**
+     * @see https://github.com/php/php-src/tree/master/ext/standard/tests/http/http_build_query
+     *
      * @dataProvider providesParametersInput
      */
     public function testFromParametersWithDifferentInput(object|array $data, string $expected): void
@@ -977,7 +979,7 @@ JSON;
                     yield from ['foo' => 'bar'];
                 }
             },
-            'expected' => 'foo=bar',
+            'expected' => '',
         ];
     }
 }

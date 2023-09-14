@@ -16,7 +16,6 @@ namespace League\Uri\Components;
 use ArgumentCountError;
 use Closure;
 use Countable;
-use Generator;
 use Iterator;
 use IteratorAggregate;
 use League\Uri\Contracts\QueryInterface;
@@ -27,10 +26,7 @@ use League\Uri\KeyValuePair\Converter;
 use League\Uri\QueryString;
 use League\Uri\Uri;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
-use ReflectionObject;
-use ReflectionProperty;
 use Stringable;
-use Traversable;
 
 use function array_is_list;
 use function array_key_exists;
@@ -39,6 +35,7 @@ use function array_map;
 use function count;
 use function func_get_arg;
 use function func_num_args;
+use function get_object_vars;
 use function is_array;
 use function is_iterable;
 use function is_object;
@@ -214,38 +211,33 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
     }
 
     /**
-     * Returns a new instance from the result of PHP's parse_str.
+     * Returns a new instance from the input of PHP's http_build_query.
      */
     public static function fromParameters(object|array $parameters): self
     {
-        return self::fromPairs(match (true) {
-            $parameters instanceof QueryInterface,
-            $parameters instanceof URLSearchParams => $parameters,
-            $parameters instanceof Traversable => self::parametersToPairs(iterator_to_array($parameters)),
-            default => self::parametersToPairs($parameters),
-        });
+        return self::fromPairs(self::parametersToPairs($parameters));
     }
 
     private static function parametersToPairs(array|object $data, string|int $prefix = '', array &$recursive = []): array
     {
+        $yieldParameters = static fn (object|array $data): array => is_array($data) ? $data : get_object_vars($data);
+
         $pairs = [];
-        foreach (self::yieldParameters($data) as $name => $value) {
+        foreach ($yieldParameters($data) as $name => $value) {
             if (is_object($data)) {
                 $id = spl_object_hash($data);
                 if (!array_key_exists($id, $recursive)) {
-                    $recursive[$id] = 0;
+                    $recursive[$id] = 1;
                 }
             }
 
             if (is_object($value)) {
                 $id = spl_object_hash($value);
                 if (array_key_exists($id, $recursive)) {
-                    $recursive[$id] = 1;
-
                     return [];
                 }
 
-                $recursive[$id] = 0;
+                $recursive[$id] = 1;
             }
 
             if ('' !== $prefix) {
@@ -261,22 +253,6 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
         }
 
         return $pairs;
-    }
-
-    /**
-     * @return Generator<array-key, mixed>
-     */
-    private static function yieldParameters(object|array $data): Generator
-    {
-        if (is_array($data)) {
-            yield from $data;
-
-            return;
-        }
-
-        foreach ((new ReflectionObject($data))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            yield $property->getName() => $property->getValue($data);
-        }
     }
 
     public function value(): ?string
@@ -490,7 +466,7 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
         $this->updateQuery(match (func_num_args()) {
             1 => $this->pairs->withoutPairByKey($name),
             2 => $this->pairs->withoutPairByKeyValue($name, self::uvString(func_get_arg(1))), /* @phpstan-ignore-line */
-            default => throw new ArgumentCountError(__METHOD__.' requires at least one r as the pair name and a second optional argument as the pair value.'),
+            default => throw new ArgumentCountError(__METHOD__.' requires at least one argument as the pair name and a second optional argument as the pair value.'),
         });
     }
 

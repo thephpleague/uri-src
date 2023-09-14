@@ -437,13 +437,13 @@ final class QueryTest extends TestCase
             ],
         ];
 
-        self::assertSame($data, Query::fromParameters(new ArrayIterator($data))->parameters());
+        self::assertSame([], Query::fromParameters(new ArrayIterator($data))->parameters());
     }
 
     public function testCreateFromParamsWithQueryObject(): void
     {
         $query = Query::new('a=1&b=2');
-        self::assertEquals($query->value(), Query::fromParameters($query)->value());
+        self::assertEquals('pairs%5B0%5D%5B0%5D=a&pairs%5B0%5D%5B1%5D=1&pairs%5B1%5D%5B0%5D=b&pairs%5B1%5D%5B1%5D=2&separator=%26&parameters%5Ba%5D=1&parameters%5Bb%5D=2', Query::fromParameters($query)->value());
     }
 
     public static function testWithoutNumericIndices(): void
@@ -502,7 +502,7 @@ final class QueryTest extends TestCase
 
     public function testGetContentOnEmptyContent(): void
     {
-        self::assertNull(Query::fromParameters([])->value());
+        self::assertSame('', Query::fromParameters([])->value());
     }
 
     public function testGetContentOnHavingContent(): void
@@ -806,6 +806,6 @@ final class QueryTest extends TestCase
         $expected = ['foo' => 'bar'];
         $query = Query::fromParameters(URLSearchParams::fromParameters($expected));
 
-        self::assertSame($expected, $query->parameters());
+        self::assertSame('', $query->value());
     }
 }

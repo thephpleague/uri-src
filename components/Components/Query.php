@@ -22,7 +22,6 @@ use League\Uri\KeyValuePair\Converter;
 use League\Uri\QueryString;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use Stringable;
-use Traversable;
 
 use function array_column;
 use function array_count_values;
@@ -35,7 +34,6 @@ use function count;
 use function http_build_query;
 use function implode;
 use function is_int;
-use function iterator_to_array;
 use function preg_match;
 use function preg_quote;
 use function preg_replace;
@@ -69,27 +67,13 @@ final class Query extends Component implements QueryInterface
     }
 
     /**
-     * Returns a new instance from the result of PHP's parse_str.
+     * Returns a new instance from the input of http_build_query.
      *
      * @param non-empty-string $separator
      */
     public static function fromParameters(object|array $parameters, string $separator = '&'): self
     {
-        if ($parameters instanceof QueryInterface || $parameters instanceof URLSearchParams) {
-            return self::fromPairs($parameters, $separator);
-        }
-
-        $parameters = match (true) {
-            $parameters instanceof Traversable => iterator_to_array($parameters),
-            default => $parameters,
-        };
-
-        $query = match ([]) {
-            $parameters => null,
-            default => http_build_query(data: $parameters, arg_separator: $separator),
-        };
-
-        return new self($query, Converter::fromRFC1738($separator));
+        return new self(http_build_query(data: $parameters, arg_separator: $separator), Converter::fromRFC1738($separator));
     }
 
     /**
