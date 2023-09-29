@@ -98,6 +98,13 @@ final class FactoryTest extends TestCase
             'expected' => 'data:text/plain;foo=bar,Hello%20World%21',
         ];
 
+        yield 'empty data with optional argument field' => [
+            'data' => '',
+            'mimetype' => 'application/json',
+            'parameters' => 'foo=bar',
+            'expected' => 'data:application/json;foo=bar,',
+        ];
+
         yield 'changing the parameters' => [
             'data' => 'Hello World!',
             'mimetype' => 'text/no-plain',
