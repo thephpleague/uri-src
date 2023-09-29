@@ -62,6 +62,87 @@ final class FactoryTest extends TestCase
         ];
     }
 
+    /** @dataProvider provideValidData */
+    public function testFromData(string $data, ?string $mimetype, ?string $parameters, string $expected): void
+    {
+        $arguments = [$data];
+        if (null !== $mimetype) {
+            $arguments[] = $mimetype;
+        }
+
+        if (null !== $parameters) {
+            $arguments[] = $parameters;
+        }
+
+        self::assertSame($expected, Uri::fromData(...$arguments)->toString());
+    }
+
+    public static function provideValidData(): iterable
+    {
+        yield 'empty data' => [
+            'data' => '',
+            'mimetype' => null,
+            'parameters' => null,
+            'expected' => 'data:text/plain;charset=us-ascii,',
+        ];
+
+        yield 'simple string' => [
+            'data' => 'Hello World!',
+            'mimetype' => null,
+            'parameters' => null,
+            'expected' => 'data:text/plain;charset=us-ascii,Hello%20World%21',
+        ];
+
+        yield 'changing the mimetype' => [
+            'data' => 'Hello World!',
+            'mimetype' => 'text/no-plain',
+            'parameters' => null,
+            'expected' => 'data:text/no-plain;charset=us-ascii,Hello%20World%21',
+        ];
+
+        yield 'empty parameters' => [
+            'data' => 'Hello World!',
+            'mimetype' => null,
+            'parameters' => '',
+            'expected' => 'data:text/plain;charset=us-ascii,Hello%20World%21',
+        ];
+
+        yield 'changing the parameters' => [
+            'data' => 'Hello World!',
+            'mimetype' => 'text/no-plain',
+            'parameters' => 'foo=bar',
+            'expected' => 'data:text/no-plain;foo=bar,Hello%20World%21',
+        ];
+
+        yield 'the parameters can start with the ; character' => [
+            'data' => 'Hello World!',
+            'mimetype' => 'text/no-plain',
+            'parameters' => ';foo=bar',
+            'expected' => 'data:text/no-plain;foo=bar,Hello%20World%21',
+        ];
+    }
+
+    public function testFromDataFailsWithInvalidMimeType(): void
+    {
+        $this->expectException(SyntaxError::class);
+
+        Uri::fromData('Hello World!', 'text\plain');
+    }
+
+    public function testFromDataFailsWithReservedParameterName(): void
+    {
+        $this->expectException(SyntaxError::class);
+
+        Uri::fromData('Hello World!', 'text/plain', 'base64=foobar');
+    }
+
+    public function testFromDataFailsWithMalformedParameters(): void
+    {
+        $this->expectException(SyntaxError::class);
+
+        Uri::fromData('Hello World!', 'text/plain', 'foobar');
+    }
+
     /**
      * @dataProvider unixpathProvider
      */
