@@ -63,48 +63,39 @@ final class FactoryTest extends TestCase
     }
 
     /** @dataProvider provideValidData */
-    public function testFromData(string $data, ?string $mimetype, ?string $parameters, string $expected): void
+    public function testFromData(string $data, string $mimetype, string $parameters, string $expected): void
     {
-        $arguments = [$data];
-        if (null !== $mimetype) {
-            $arguments[] = $mimetype;
-        }
-
-        if (null !== $parameters) {
-            $arguments[] = $parameters;
-        }
-
-        self::assertSame($expected, Uri::fromData(...$arguments)->toString());
+        self::assertSame($expected, Uri::fromData($data, $mimetype, $parameters)->toString());
     }
 
     public static function provideValidData(): iterable
     {
         yield 'empty data' => [
             'data' => '',
-            'mimetype' => null,
-            'parameters' => null,
+            'mimetype' => '',
+            'parameters' => '',
             'expected' => 'data:text/plain;charset=us-ascii,',
         ];
 
         yield 'simple string' => [
             'data' => 'Hello World!',
-            'mimetype' => null,
-            'parameters' => null,
+            'mimetype' => '',
+            'parameters' => '',
             'expected' => 'data:text/plain;charset=us-ascii,Hello%20World%21',
         ];
 
         yield 'changing the mimetype' => [
             'data' => 'Hello World!',
             'mimetype' => 'text/no-plain',
-            'parameters' => null,
+            'parameters' => '',
             'expected' => 'data:text/no-plain;charset=us-ascii,Hello%20World%21',
         ];
 
-        yield 'empty parameters' => [
+        yield 'empty mimetype but added parameters' => [
             'data' => 'Hello World!',
-            'mimetype' => null,
-            'parameters' => '',
-            'expected' => 'data:text/plain;charset=us-ascii,Hello%20World%21',
+            'mimetype' => '',
+            'parameters' => 'foo=bar',
+            'expected' => 'data:text/plain;foo=bar,Hello%20World%21',
         ];
 
         yield 'changing the parameters' => [

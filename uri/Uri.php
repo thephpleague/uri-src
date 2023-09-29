@@ -516,7 +516,7 @@ final class Uri implements UriInterface
         static $regexpMimetype = ',^\w+/[-.\w]+(?:\+[-.\w]+)?$,';
 
         $mimetype = match (true) {
-            '' == $mimetype => 'text/plain',
+            '' === $mimetype => 'text/plain',
             1 === preg_match($regexpMimetype, $mimetype) =>  $mimetype,
             default => throw new SyntaxError('Invalid mimeType, `'.$mimetype.'`.'),
         };
