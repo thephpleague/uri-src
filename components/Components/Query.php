@@ -23,6 +23,8 @@ use League\Uri\QueryString;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use Stringable;
 
+use Traversable;
+
 use function array_column;
 use function array_count_values;
 use function array_filter;
@@ -71,7 +73,7 @@ final class Query extends Component implements QueryInterface
      *
      * @param non-empty-string $separator
      */
-    public static function fromParameters(object|array $parameters, string $separator = '&'): self
+    public static function fromPhpVariable(object|array $parameters, string $separator = '&'): self
     {
         return new self(http_build_query(data: $parameters, arg_separator: $separator), Converter::fromRFC1738($separator));
     }
@@ -651,5 +653,36 @@ final class Query extends Component implements QueryInterface
     public function withoutPair(string ...$keys): QueryInterface
     {
         return $this->withoutPairByKey(...$keys);
+    }
+
+    /**
+     * DEPRECATION WARNING! This method will be removed in the next major point release.
+     *
+     * @param non-empty-string $separator
+     *
+     * @see Query::fromPhpVariable()
+     *
+     * @codeCoverageIgnore
+     * Returns a new instance from the result of PHP's parse_str.
+     *
+     * @deprecated Since version 7.0.0
+     */
+    public static function fromParameters(object|array $parameters, string $separator = '&'): self
+    {
+        if ($parameters instanceof QueryInterface) {
+            return self::fromPairs($parameters, $separator);
+        }
+
+        $parameters = match (true) {
+            $parameters instanceof Traversable => iterator_to_array($parameters),
+            default => $parameters,
+        };
+
+        $query = match ([]) {
+            $parameters => null,
+            default => http_build_query(data: $parameters, arg_separator: $separator),
+        };
+
+        return new self($query, Converter::fromRFC1738($separator));
     }
 }

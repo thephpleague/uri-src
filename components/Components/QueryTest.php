@@ -349,7 +349,7 @@ final class QueryTest extends TestCase
      */
     public function testwithoutParam(array $origin, array $without, string $expected): void
     {
-        self::assertSame($expected, Query::fromParameters($origin)->withoutParameters(...$without)->toString());
+        self::assertSame($expected, Query::fromPhpVariable($origin)->withoutParameters(...$without)->toString());
     }
 
     public static function withoutParamProvider(): array
@@ -408,7 +408,7 @@ final class QueryTest extends TestCase
             ],
         ];
 
-        $query = Query::fromParameters($data);
+        $query = Query::fromPhpVariable($data);
         self::assertSame('foo%5B0%5D=bar&foo%5B1%5D=baz', $query->value());
 
         self::assertTrue($query->hasParameter('foo'));
@@ -437,13 +437,13 @@ final class QueryTest extends TestCase
             ],
         ];
 
-        self::assertSame([], Query::fromParameters(new ArrayIterator($data))->parameters());
+        self::assertSame([], Query::fromPhpVariable(new ArrayIterator($data))->parameters());
     }
 
     public function testCreateFromParamsWithQueryObject(): void
     {
         $query = Query::new('a=1&b=2');
-        self::assertEquals('pairs%5B0%5D%5B0%5D=a&pairs%5B0%5D%5B1%5D=1&pairs%5B1%5D%5B0%5D=b&pairs%5B1%5D%5B1%5D=2&separator=%26&parameters%5Ba%5D=1&parameters%5Bb%5D=2', Query::fromParameters($query)->value());
+        self::assertEquals('pairs%5B0%5D%5B0%5D=a&pairs%5B0%5D%5B1%5D=1&pairs%5B1%5D%5B0%5D=b&pairs%5B1%5D%5B1%5D=2&separator=%26&parameters%5Ba%5D=1&parameters%5Bb%5D=2', Query::fromPhpVariable($query)->value());
     }
 
     public static function testWithoutNumericIndices(): void
@@ -464,7 +464,7 @@ final class QueryTest extends TestCase
         $withIndices = 'filter%5Bfoo%5D%5B0%5D=bar&filter%5Bfoo%5D%5B1%5D=baz&filter%5Bbar%5D%5Bbar%5D=foo&filter%5Bbar%5D%5Bfoo%5D=bar';
         $withoutIndices = 'filter%5Bfoo%5D%5B%5D=bar&filter%5Bfoo%5D%5B%5D=baz&filter%5Bbar%5D%5Bbar%5D=foo&filter%5Bbar%5D%5Bfoo%5D=bar';
 
-        $query = Query::fromParameters($data);
+        $query = Query::fromPhpVariable($data);
         self::assertSame($withIndices, $query->value());
         self::assertSame($data, $query->parameters());
 
@@ -488,43 +488,43 @@ final class QueryTest extends TestCase
 
     public function testWithoutNumericIndicesDoesNotAffectPairValue(): void
     {
-        $query = Query::fromParameters(['foo' => 'bar[3]']);
+        $query = Query::fromPhpVariable(['foo' => 'bar[3]']);
 
         self::assertSame($query, $query->withoutNumericIndices());
     }
 
     public function testCreateFromParamsOnEmptyParams(): void
     {
-        $query = Query::fromParameters([]);
+        $query = Query::fromPhpVariable([]);
 
         self::assertSame($query, $query->withoutNumericIndices());
     }
 
     public function testGetContentOnEmptyContent(): void
     {
-        self::assertSame('', Query::fromParameters([])->value());
+        self::assertSame('', Query::fromPhpVariable([])->value());
     }
 
     public function testGetContentOnHavingContent(): void
     {
-        self::assertSame('foo=bar', Query::fromParameters(['foo' => 'bar'])->value());
+        self::assertSame('foo=bar', Query::fromPhpVariable(['foo' => 'bar'])->value());
     }
 
     public function testGetContentOnToString(): void
     {
-        self::assertSame('foo=bar', (string) Query::fromParameters(['foo' => 'bar']));
+        self::assertSame('foo=bar', (string) Query::fromPhpVariable(['foo' => 'bar']));
     }
 
     public function testWithSeperatorOnHavingSeparator(): void
     {
-        $query = Query::fromParameters(['foo' => '/bar']);
+        $query = Query::fromPhpVariable(['foo' => '/bar']);
 
         self::assertSame($query, $query->withSeparator('&'));
     }
 
     public function testWithoutNumericIndicesOnEmptyContent(): void
     {
-        $query = Query::fromParameters([]);
+        $query = Query::fromPhpVariable([]);
 
         self::assertSame($query, $query->withoutNumericIndices());
     }
@@ -804,7 +804,7 @@ final class QueryTest extends TestCase
     public function testInstantiationFromURLSearchParams(): void
     {
         $expected = ['foo' => 'bar'];
-        $query = Query::fromParameters(URLSearchParams::fromParameters($expected));
+        $query = Query::fromPhpVariable(URLSearchParams::fromPhpVariable($expected));
 
         self::assertSame('', $query->value());
     }
