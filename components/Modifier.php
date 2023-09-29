@@ -150,7 +150,7 @@ class Modifier implements Stringable, JsonSerializable, UriAccess
      */
     public function appendQueryParameters(object|array $parameters): self
     {
-        return $this->appendQuery(Query::fromPhpVariable($parameters)->value());
+        return $this->appendQuery(Query::fromVariable($parameters)->value());
     }
 
     /**
@@ -200,7 +200,7 @@ class Modifier implements Stringable, JsonSerializable, UriAccess
             $currentParameters === $parameters => $this,
             default => new static($this->uri->withQuery(
                 self::normalizeComponent(
-                    Query::fromPhpVariable([...$currentParameters, ...$parameters])->value(),
+                    Query::fromVariable([...$currentParameters, ...$parameters])->value(),
                     $this->uri
                 )
             )),

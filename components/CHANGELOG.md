@@ -6,8 +6,8 @@ All Notable changes to `League\Uri\Components` will be documented in this file
 
 ### Added
 
-- `Query::fromPhpVariable`
-- `UrlSearchParams::fromPhpVariable`
+- `Query::fromVariable`
+- `UrlSearchParams::fromVariable`
 
 ### Fixed
 
@@ -15,8 +15,8 @@ All Notable changes to `League\Uri\Components` will be documented in this file
 
 ### Deprecated
 
-- `Query::fromParameters` use `Query::fromPhpVariable` instead
-- `UrlSearchParams::fromParameters` use `UrlSearchParams::fromPhpVariable` instead
+- `Query::fromParameters` use `Query::fromVariable` instead
+- `UrlSearchParams::fromParameters` use `UrlSearchParams::fromVariable` instead
 
 ### Removed
 

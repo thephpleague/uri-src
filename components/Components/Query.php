@@ -73,7 +73,7 @@ final class Query extends Component implements QueryInterface
      *
      * @param non-empty-string $separator
      */
-    public static function fromPhpVariable(object|array $parameters, string $separator = '&'): self
+    public static function fromVariable(object|array $parameters, string $separator = '&'): self
     {
         return new self(http_build_query(data: $parameters, arg_separator: $separator), Converter::fromRFC1738($separator));
     }
@@ -660,7 +660,7 @@ final class Query extends Component implements QueryInterface
      *
      * @param non-empty-string $separator
      *
-     * @see Query::fromPhpVariable()
+     * @see Query::fromVariable()
      *
      * @codeCoverageIgnore
      * Returns a new instance from the result of PHP's parse_str.

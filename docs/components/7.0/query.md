@@ -174,14 +174,14 @@ $newQuery->__toString(); //return baz=toto&foo=bar&foo=toto
 ## Using the Query as a PHP data transport layer
 
 ~~~php
-public static Query::fromPhpVariable($params, string $separator = '&'): self
+public static Query::fromVariable($params, string $separator = '&'): self
 public Query::parameters(): array
 public Query::parameter(string $name): mixed
 public Query::withoutNumericIndices(): self
 public Query::withoutParameter(...string $offsets): self
 ~~~
 
-<p class="message-info"><code>Query::fromPhpVariable</code> replaced the deprecated 
+<p class="message-info"><code>Query::fromVariable</code> replaced the deprecated 
 <code>Query::fromParameters</code> named constructor which was 
 not inconsistent against <code>http_build_query</code> algorithm.</p>
 
@@ -193,7 +193,7 @@ PHP own data structure to generate a query string *à la* `http_build_query`.
 ~~~php
 parse_str('foo=bar&bar=baz+bar', $params);
 
-$query = Query::fromPhpVariable($params, '|');
+$query = Query::fromVariable($params, '|');
 echo $query->value(); // returns 'foo=bar|bar=baz%20bar'
 ~~~
 
@@ -248,7 +248,7 @@ If your query string is created with `http_build_query` or the `Query::fromParam
 The `Query::withoutNumericIndices` removes any numeric index found in the query string as shown below:
 
 ~~~php
-$query = Query::fromPhpVariable(['foo' => ['bar', 'baz']]);
+$query = Query::fromVariable(['foo' => ['bar', 'baz']]);
 echo $query->value(); //return 'foo[0]=bar&foo[1]=baz'
 $new_query = $query->withoutNumericIndices();
 echo $new_query->value(); //return 'foo[]=bar&foo[]=baz'

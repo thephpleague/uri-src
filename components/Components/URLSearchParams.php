@@ -213,7 +213,7 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
     /**
      * Returns a new instance from the input of PHP's http_build_query.
      */
-    public static function fromPhpVariable(object|array $parameters): self
+    public static function fromVariable(object|array $parameters): self
     {
         return self::fromPairs(self::parametersToPairs($parameters));
     }
@@ -486,7 +486,7 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
      * DEPRECATION WARNING! This method will be removed in the next major point release.
      *
      * @deprecated Since version 7.4.0
-     * @see URLSearchParams::fromPhpVariable()
+     * @see URLSearchParams::fromVariable()
      *
      * @codeCoverageIgnore
      *

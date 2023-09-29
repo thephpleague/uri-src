@@ -742,7 +742,7 @@ JSON;
             ],
         ];
 
-        $params = URLSearchParams::fromPhpVariable($parameters);
+        $params = URLSearchParams::fromVariable($parameters);
         self::assertCount(4, $params);
         self::assertSame('bar baz', $params->get('filter[foo][0]'));
         self::assertSame('bar', $params->get('filter[bar][foo]'));
@@ -813,7 +813,7 @@ JSON;
 
         self::assertSame(
             URLSearchParams::fromAssociative($parameters)->toString(),
-            URLSearchParams::fromPhpVariable($parameters)->toString(),
+            URLSearchParams::fromVariable($parameters)->toString(),
         );
     }
 
@@ -824,7 +824,7 @@ JSON;
      */
     public function testFromParametersWithDifferentInput(object|array $data, string $expected): void
     {
-        self::assertSame($expected, URLSearchParams::fromPhpVariable($data)->toString());
+        self::assertSame($expected, URLSearchParams::fromVariable($data)->toString());
     }
 
     public static function providesParametersInput(): iterable
