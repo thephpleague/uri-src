@@ -7,6 +7,8 @@ All Notable changes to `League\Uri` will be documented in this file
 ### Added
 
 - `Uri::fromData`
+- `BaseUri::unixPath`
+- `BaseUri::windowsPath`
 
 ### Fixed
 
