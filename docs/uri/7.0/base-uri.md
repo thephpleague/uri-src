@@ -195,3 +195,19 @@ use League\Uri\BaseUri;
 
 BaseUri::from((Http::new('/path/to/endpoint'))->origin(); //returns null
 ~~~
+
+### BaseUri::unixPath and BaseUri::windowsPath
+
+<p class="message-notice">since version <code>7.3.0</code></p>
+
+Returns the OS specific path from a URI.
+
+~~~php
+BaseUri::from('file://server/share/My%20Documents%20100%2520/foo.txt')->windowsPath();
+//returns '\\server\share\My Documents 100%20\foo.txt'
+
+BaseUri::from('file:///path%20empty/bar')->unixPath();
+//returns '/path empty/bar'
+~~~
+
+If the URI scheme is present and is not the `file` scheme, `null` will be returned,
