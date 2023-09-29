@@ -43,7 +43,7 @@ or one of the more specialized named constructors to avoid subtle bugs described
 - The `URLSearchParams::fromUri` instantiate from a URI.
 - The `URLSearchParams::fromPairs` instantiate from a collection of pairs.
 - The `URLSearchParams::fromAssociative` instantiate from an associative array or any object with public properties or generic key/value iterator (nested value are not supported).
-- The `URLSearchParams::fromParameters` instantiate from the result of `parse_str` or the input of `http_build_query`.
+- The `URLSearchParams::fromVariable` instantiate from the result of `parse_str` or the input of `http_build_query`.
 
 ```php
 $parameters = [
@@ -55,7 +55,7 @@ $parameters = [
     ],
 ];
 
-$params = URLSearchParams::fromParameters($parameters);
+$params = URLSearchParams::fromVariable($parameters);
 $params->get('filter[dateRange][start]'); //returns '2023-01-01
 echo $params; 
 //display "filter%5BdateRange%5D%5Bstart%5D=2023-01-01&filter%5BdateRange%5D%5Bend%5D=2023-08-31"
@@ -67,6 +67,10 @@ echo URLSearchParams::fromAssociative($interval)->toString();
 
 <p class="message-warning"> To adhere to the specification, if a string starts with the character <code>?</code>;
 <code>URLSearchParams::new</code> will ignore it before parsing the string.</p>
+
+<p class="message-info"><code>URLSearchParams::fromVariable</code> replaced the deprecated 
+<code>URLSearchParams::fromParameters</code> named constructor which was
+not inconsistent against <code>http_build_query</code> algorithm.</p>
 
 ```php
 use League\Uri\Components\URLSearchParams;
