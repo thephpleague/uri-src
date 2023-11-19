@@ -589,6 +589,23 @@ final class Uri implements UriInterface
     }
 
     /**
+     * Creates a new instance from a RFC8089 compatible URI.
+     *
+     * @see https://datatracker.ietf.org/doc/html/rfc8089
+     */
+    public static function fromRfc8089(Stringable|string $uri): UriInterface
+    {
+        $fileUri = self::new((string) preg_replace(',^(file:/)([^/].*)$,i', 'file:///$2', (string) $uri));
+        $scheme = (string) $fileUri->getScheme();
+
+        return match (true) {
+            'file' !== $scheme => throw new SyntaxError('The URI scheme must be `file`; `'.$scheme.'` given.'),
+            'localhost' === $fileUri->getAuthority() => $fileUri->withHost(''),
+            default => $fileUri,
+        };
+    }
+
+    /**
      * Create a new instance from the environment.
      */
     public static function fromServer(array $server): self
