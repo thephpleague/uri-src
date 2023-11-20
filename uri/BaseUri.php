@@ -156,9 +156,15 @@ class BaseUri implements Stringable, JsonSerializable, UriAccess
      */
     public function toRfc8089(): ?string
     {
+        $path = $this->uri->getPath();
+
         return match (true) {
             'file' !== $this->uri->getScheme() => null,
-            in_array($this->uri->getAuthority(), ['', null, 'localhost'], true) => 'file:'.$this->uri->getPath(),
+            in_array($this->uri->getAuthority(), ['', null, 'localhost'], true) => 'file:'.match (true) {
+                '' === $path,
+                '/' === $path[0] => $path,
+                default => '/'.$path,
+            },
             default => (string) $this->uri,
         };
     }
