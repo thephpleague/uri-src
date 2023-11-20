@@ -596,10 +596,10 @@ final class Uri implements UriInterface
     public static function fromRfc8089(Stringable|string $uri): UriInterface
     {
         $fileUri = self::new((string) preg_replace(',^(file:/)([^/].*)$,i', 'file:///$2', (string) $uri));
-        $scheme = (string) $fileUri->getScheme();
+        $scheme = $fileUri->getScheme();
 
         return match (true) {
-            'file' !== $scheme => throw new SyntaxError('The URI scheme must be `file`; `'.$scheme.'` given.'),
+            'file' !== $scheme => throw new SyntaxError('As per RFC8089, the URI scheme must be `file`.'),
             'localhost' === $fileUri->getAuthority() => $fileUri->withHost(''),
             default => $fileUri,
         };

@@ -210,4 +210,21 @@ BaseUri::from('file:///path%20empty/bar')->unixPath();
 //returns '/path empty/bar'
 ~~~
 
-If the URI scheme is present and is not the `file` scheme, `null` will be returned,
+If the URI scheme is present and is not the `file` scheme, `null` will be returned.
+
+### BaseUri::toRfc8089
+
+<p class="message-notice">since version <code>7.4.0</code></p>
+
+Returns the RFC8089 representation of a file URI
+
+~~~php
+BaseUri::from('file://localhost/etc/fstab')->toRfc8089();
+//returns 'file:/etc/fstab'
+
+BaseUri::from('file:///path%20empty/bar')->toRfc8089();
+//returns 'file:/path empty/bar'
+~~~
+
+If the URI scheme is not the `file` scheme, `null` will be returned.
+

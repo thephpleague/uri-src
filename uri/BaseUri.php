@@ -151,6 +151,8 @@ class BaseUri implements Stringable, JsonSerializable, UriAccess
 
     /**
      * Returns a string representation of a File URI according to RFC8089.
+     *
+     * The method will return null if the URI scheme is not the `file` scheme
      */
     public function toRfc8089(): ?string
     {
@@ -158,6 +160,18 @@ class BaseUri implements Stringable, JsonSerializable, UriAccess
             'file' !== $this->uri->getScheme() => null,
             in_array($this->uri->getAuthority(), ['', null, 'localhost'], true) => 'file:'.$this->uri->getPath(),
             default => (string) $this->uri,
+        };
+    }
+
+    /**
+     * Tells whether the `file` scheme base URI represents a local file.
+     */
+    public function isLocalFile(): bool
+    {
+        return match (true) {
+            'file' !== $this->uri->getScheme() => false,
+            in_array($this->uri->getAuthority(), ['', null, 'localhost'], true) => true,
+            default => false,
         };
     }
 
