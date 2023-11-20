@@ -228,3 +228,12 @@ BaseUri::from('file:///path%20empty/bar')->toRfc8089();
 
 If the URI scheme is not the `file` scheme, `null` will be returned.
 
+### BaseUri::isLocalFile
+
+<p class="message-notice">since version <code>7.4.0</code></p>
+
+Tells whether the given URI object represents a local file path.
+
+~~~php
+BaseUri::from("file://localhost/etc/fstab")->isLocalFile(); //returns true
+~~~
