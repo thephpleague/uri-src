@@ -22,7 +22,7 @@ jobs:
                   persist-credentials: 'false'
             - uses: frankdejonge/use-github-token@1.0.2
               with:
-                  authentication: 'nyamsprod:${{ secrets.PERSONAL_ACCESS_TOKEN }}'
+                  authentication: 'nyamsprod:${{ secrets.PERSONAL_GITHUB_TOKEN }}'
                   user_name: 'ignace nyamagana butera'
                   user_email: 'nyamsprod@gmail.com'
             - name: Cache splitsh-lite
