@@ -140,7 +140,7 @@ to version `7.0`, but it is recommended not to use them for new projects.
 | `HierarchicalPath::createAbsoluteFromSegments` | `HierarchicalPath::fromAbsolute`  |
 | `Query::createFromParams`                      | `Query::fromParameters`           |
 | `Query::createFromPairs`                       | `Query::fromPirs`                 |
-| `Query::createFromUri`                         | `Query::new`                      |
+| `Query::createFromUri`                         | `Query::fromUri()`                |
 | `Query::createFromRFC3986`                     | `Query::fromRFC3986`              |
 | `Query::createFromRFC1738`                     | `Query::fromRFC1738`              |
 | `Query::params`                                | `Query::parameter`                |
