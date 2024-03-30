@@ -139,7 +139,7 @@ to version `7.0`, but it is recommended not to use them for new projects.
 | `HierarchicalPath::createRelativeFromSegments` | `HierarchicalPath::fromRelative`  |
 | `HierarchicalPath::createAbsoluteFromSegments` | `HierarchicalPath::fromAbsolute`  |
 | `Query::createFromParams`                      | `Query::fromParameters`           |
-| `Query::createFromPairs`                       | `Query::fromPirs`                 |
+| `Query::createFromPairs`                       | `Query::fromPairs`                |
 | `Query::createFromUri`                         | `Query::fromUri()`                |
 | `Query::createFromRFC3986`                     | `Query::fromRFC3986`              |
 | `Query::createFromRFC1738`                     | `Query::fromRFC1738`              |
