@@ -76,10 +76,13 @@ echo $uri, PHP_EOL; // returns http://shop.bébé.be./toto?foo=toto&foo=tata
 <p class="message-warning">While the class does manipulate URI it does not implement any URI related interface.</p>
 <p class="message-notice">If a PSR-7 or a League <code>UriInterface</code> implementing instance is given
 then the return value will also be a PSR-7 <code>UriInterface</code> implementing instance.</p>
+<p class="message-notice"><code>getIdnUriString</code> was added in version <code>7.5.0</code>.</p>
 
 The `Modifier::getUri` method returns either a `PSR-7` or a League URI `UriInterface`, conversely,
-the `Modifier::getUriString` method returns the URI as a string. Last but not least, the class implements
-the `Stringable` and the `JsonSerializable` interface to improve developer experience.
+the `Modifier::getUriString` method returns the RFC3986 string representation for the URI and
+the `Modifier::getIdnUriString` method returns the RFC3986 string representation for the URI
+with a Internationalized Domain Name (IDNA) if applicable. Last but not least, the class
+implements the `Stringable` and the `JsonSerializable` interface to improve developer experience.
 
 Under the hood the `Modifier` class intensively uses the [URI components objects](/components/7.0/)
 to apply changes to the submitted URI object.
