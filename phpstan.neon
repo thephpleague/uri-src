@@ -15,6 +15,6 @@ parameters:
 		  path: interfaces/IPv4/NativeCalculator.php
 		- message: '#function gmp_(.*)? expects (GMP|int)#'
 		  path: interfaces/IPv4/GMPCalculator.php
+		- identifier: missingType.iterableValue
 	reportUnmatchedIgnoredErrors: true
 	treatPhpDocTypesAsCertain: false
-	checkMissingIterableValueType: false

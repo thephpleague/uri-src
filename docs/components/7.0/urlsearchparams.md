@@ -90,6 +90,7 @@ While the class implements all the methods define in the RFC, the following meth
 
 - `URLSearchParams::isEmpty`
 - `URLSearchParams::isNotEmpty`
+- `URLSearchParams::uniqueKeyCount` new in version `7.5.0`
 
 ~~~php
 use League\Uri\Components\URLSearchParams;
@@ -104,6 +105,7 @@ $params->has('foo', 'bar'); //returns true
 $params->has('foo', 'toto'); //returns false (the second parameter is the value of the pair)
 count($params); //returns 3
 $params->size();  //returns 3
+$params->uniqueKeyCount(); //returns 2
 $params->delete('foo');
 count($params); //returns 1 (because all the pairs which contains foo have been removed)
 $params->set('aha', true);
