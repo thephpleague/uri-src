@@ -30,19 +30,6 @@ echo $baseUri; // display 'http://www.example.com'
 
 The instance also implements PHP's `Stringable` and `JsonSerializable` interface.
 
-Since version `7.5` it is possible to use the `getIdnUriString` to get the URI with its host in its
-internationalized string format.
-
-~~~php
-<?php
-
-use League\Uri\BaseUri;
-
-$baseUri = BaseUri::from('http://www.bébé.be');
-$baseUri->getUriString(); // return 'http://xn--bb-bjab.be'
-$baseUri->getIdnUriString(); // display 'http://www.bébé.be'
-~~~
-
 ## URI resolution
 
 The `BaseUri::resolve` resolves a URI as a browser would for a relative URI while

@@ -11,7 +11,7 @@ All Notable changes to `League\Uri\Components` will be documented in this file
 
 ### Fixed
 
-- None
+- Adding `SensitiveParameter` attribute in the `UserInfo` and the `Authority` class.
 
 ### Deprecated
 

@@ -6,11 +6,12 @@ All Notable changes to `League\Uri\Interfaces` will be documented in this file
 
 ### Added
 
-- `UriAccess::getIdnUriString`
+- `UriInterface::getUsername` returns the encoded user component of the URI.
+- `UriInterface::getPassword` returns the encoded scheme-specific information about how to gain authorization to access the resource.
 
 ### Fixed
 
-- None
+- Adding Host resolution caching to speed up URI parsing in `UriString`
 
 ### Deprecated
 
