@@ -15,7 +15,7 @@ All Notable changes to `League\Uri` will be documented in this file
 
 ### Deprecated
 
-- None
+- Usage of PSR-7 `UriFactoryInterface` is deprecated in `BaseUri` class
 
 ### Removed
 

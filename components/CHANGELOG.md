@@ -12,10 +12,11 @@ All Notable changes to `League\Uri\Components` will be documented in this file
 ### Fixed
 
 - Adding `SensitiveParameter` attribute in the `UserInfo` and the `Authority` class.
+- Remove Usage of PSR-7 `UriInterface` in `UrlSearchParams` class
 
 ### Deprecated
 
-- None
+- Usage of PSR-7 `UriFactoryInterface` is deprecated in `Modifier` class
 
 ### Removed
 

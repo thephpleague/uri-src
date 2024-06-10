@@ -51,6 +51,10 @@ class BaseUri implements Stringable, JsonSerializable, UriAccess
     protected readonly Psr7UriInterface|UriInterface|null $origin;
     protected readonly ?string $nullValue;
 
+    /**
+     * @param Psr7UriInterface|UriInterface $uri
+     * @param UriFactoryInterface|null $uriFactory Deprecated, will be removed in the next major release
+     */
     final protected function __construct(
         protected readonly Psr7UriInterface|UriInterface $uri,
         protected readonly ?UriFactoryInterface $uriFactory
