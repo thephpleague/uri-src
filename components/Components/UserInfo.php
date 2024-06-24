@@ -113,9 +113,8 @@ final class UserInfo extends Component implements UserInfoInterface
     public function value(): ?string
     {
         return match (true) {
-            null === $this->username => null,
-            null === $this->password => Encoder::encodeUser($this->username),
-            default => Encoder::encodeUser($this->username).':'.Encoder::encodePassword($this->password),
+            null === $this->password => $this->getUsername(),
+            default => $this->getUsername().':'.$this->getPassword(),
         };
     }
 
@@ -132,6 +131,22 @@ final class UserInfo extends Component implements UserInfoInterface
     public function getPass(): ?string
     {
         return $this->password;
+    }
+
+    public function getUsername(): ?string
+    {
+        return match ($this->username) {
+            null => null,
+            default => Encoder::encodeUser($this->username)
+        };
+    }
+
+    public function getPassword(): ?string
+    {
+        return match ($this->password) {
+            null => null,
+            default => Encoder::encodePassword($this->password)
+        };
     }
 
     /**

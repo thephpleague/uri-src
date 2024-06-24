@@ -8,6 +8,7 @@ All Notable changes to `League\Uri\Interfaces` will be documented in this file
 
 - `UriInterface::getUsername` returns the encoded user component of the URI.
 - `UriInterface::getPassword` returns the encoded scheme-specific information about how to gain authorization to access the resource.
+- `Uri\IPv6\Converter` allow expanding and compressing IPv6.
 
 ### Fixed
 

@@ -8,6 +8,8 @@ All Notable changes to `League\Uri\Components` will be documented in this file
 
 - `UrlSearchParams::uniqueKeyCount`
 - `Modifier::getIdnUriString`
+- `Modifier::hostToIpv6Compressed`
+- `Modifier::hostToIpv6Expanded`
 
 ### Fixed
 
