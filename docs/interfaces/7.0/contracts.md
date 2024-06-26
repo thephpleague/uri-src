@@ -27,6 +27,8 @@ The `UriInterface` interface defines the following methods to access the URI str
 
 public UriInterface::getScheme(): ?string
 public UriInterface::getUserInfo(): ?string
+public UriInterface::getUsername(): ?string
+public UriInterface::getPassword(): ?string
 public UriInterface::getHost(): ?string
 public UriInterface::getPort(): ?int
 public UriInterface::getAuthority(): ?string
@@ -51,7 +53,7 @@ Delimiter characters are not part of the URI component and **must not** be added
 <?php
 
 public UriInterface::withScheme(Stringable|string|null $scheme): self
-public UriInterface::withUserInfo(Stringable|string|null $user [, string $password = null]): self
+public UriInterface::withUserInfo(Stringable|string|null $user [, Stringable|string|null $password = null]): self
 public UriInterface::withHost(Stringable|string|null $host): self
 public UriInterface::withPort(?int $port): self
 public UriInterface::withPath(Stringable|string $path): self
@@ -64,8 +66,8 @@ public UriInterface::withFragment(Stringable|string|null $fragment): self
 This interface exposes the same methods as `Psr\Http\Message\UriInterface`. But, differs on the following keys:
 
 - This interface does not require the `http` and `https` schemes to be supported.
-- Setter and Getter component methods, with the exception of the path component, accept and can return the `null` value.
-- If no scheme is present, you are not required to fallback to `http` and `https` schemes specific validation rules.
+- Setter and Getter component methods, except the path component, accept and can return the `null` value.
+- If no scheme is present, the requirement to fall back to `http` and `https` schemes specific validation rules is not enforced.
 
 ### League\Uri\Contract\UriComponentInterface
 
@@ -78,7 +80,7 @@ The `UriComponentInterface` interface defines the following methods to access th
 ~~~php
 <?php
 public UriComponentInterface::value(): ?string
-public UriComponentInterface::toString(): ?string
+public UriComponentInterface::toString(): string
 public UriComponentInterface::getUriComponent(): ?string
 public UriComponentInterface::jsonSerialize(): ?string
 public UriComponentInterface::__toString(): string

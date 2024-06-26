@@ -368,6 +368,36 @@ echo Modifier::from($uri)->hostToOctal()->getUri();
 //display 'http://0xc0a811/path/to/the/sky.php'
 ~~~
 
+### Modifier::hostToIpv6Compressed
+
+Normalizes the URI host content to a compressed IPv6 notation if possible.
+See the [IPv6 Converter documentation](/components/7.0/ipv6/) page for more information.
+
+~~~php
+<?php
+
+use League\Uri\Modifier;
+
+$uri = 'http://[1050:0000:0000:0000:0005:0000:300c:326b]/path/to/the/sky.php';
+echo Modifier::from($uri)->hostToIpv6Compressed()->getUriString();
+//display 'http://[1050::5:0:300c:326b]/path/to/the/sky.php'
+~~~
+
+### Modifier::hostToIpv6Expanded
+
+Normalizes the URI host content to a expanded IPv6 notation if possible.
+See the [IPv6 Converter documentation](/components/7.0/ipv6/) page for more information.
+
+~~~php
+<?php
+
+use League\Uri\Modifier;
+
+$uri = 'http://[0000:0000:0000:0000:0000:0000:0000:0001]/path/to/the/sky.php';
+echo Modifier::from($uri)->hostToIpv6Compressed()->getUriString();
+//display 'http://[::1]/path/to/the/sky.php'
+~~~
+
 ### Modifier::removeZoneIdentifier
 
 Removes the host zone identifier if present
