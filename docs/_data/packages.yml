@@ -1,15 +1,19 @@
 package:
     'interfaces':
         name: 'uri-interfaces'
+        description: 'The URI utility package'
         version: '7.0'
         latest: '7.0.0'
+        status: maintained
         documentation:
             - '7.0'
             - '2.0'
     'uri':
         name: 'uri'
+        description: 'The URI manipulation package'
         version: '7.0'
         latest: '7.0.0'
+        status: maintained
         documentation:
             - '7.0'
             - '6.0'
@@ -17,39 +21,51 @@ package:
             - '4.0'
     'components':
         name: 'uri-components'
+        description: 'The URI components package'
         version: '7.0'
         latest: '7.0.0'
+        status: maintained
         documentation:
             - '7.0'
             - '2.0'
             - '1.0'
     'schemes':
         name: 'uri-schemes'
+        description: 'The URI-scheme specific package'
         version: '1.0'
         latest: '1.2.1'
+        status: eol
         documentation:
             - '1.0'
     'parser':
         name: 'uri-parser'
+        description: 'The RFC3986 URI parser and builder'
         version: '1.0'
         latest: '1.4.1'
+        status: eol
         documentation:
             - '1.0'
     'query-parser':
         name: 'uri-query-parser'
+        description: 'Query string parser and builder'
         version: '1.0'
         latest: '1.0.1'
+        status: eol
         documentation:
             - '1.0'
     'manipulations':
         name: 'uri-manipulations'
+        description: 'Partially update and format URI'
         version: '1.0'
         latest: '1.5.0'
+        status: eol
         documentation:
             - '1.0'
     'domain-parser':
         name: 'uri-hostname-parser'
+        description: 'Hostname Parser and Resolver'
         version: '1.0'
         latest: '1.1.1'
+        status: eol
         documentation:
             - '1.0'

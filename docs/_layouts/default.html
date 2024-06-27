@@ -1,102 +1,199 @@
 {% assign uriPackage = page.url | remove_first: "/" | split: "/" %}
 {% assign package = uriPackage[0] %}
 {% assign version = uriPackage[1] %}
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="docsearch:version" content="4.0">
-    <title>{{ page.title }} - {{ site.data.project.title }}</title>
     <meta name="description" content="{{ site.data.project.description }}">
-    <link rel="icon" type="image/x-icon" href="//theme.thephpleague.com/img/favicon.ico" />
+    <meta name="docsearch:version" content="{{ version }}">
+    <title>{{ page.title }} - {{ site.data.project.title }}</title>
+    <link rel="icon" href="/assets/img/uri-logo.svg" type="image/svg+xml">
     <link rel="apple-touch-icon-precomposed" href="//theme.thephpleague.com/img/apple-touch-icon-precomposed.png">
-    <link rel="stylesheet" href="//theme.thephpleague.com/css/all.css?2">
-    <link rel="stylesheet" href="/custom.css?27">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Onest:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="{{ site.data.manifest['docs.css'] }}" rel="stylesheet">
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{  site.data.project.google_analytics_tracking_id }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{  site.data.project.google_analytics_tracking_id }}');
+    </script>
 </head>
-<body>
-<header>
-    <div class="header-content">
-        <a class="logo" href="/">
-            <span class="name"><em>League\</em>Uri</span>
-        </a>
-
-        <nav>
-            <h2>Packages</h2>
-            <ul>
-{% for v in site.data.packages.package %}
-                <li{% if package == v[0] %} class="selected"{% endif %}><a href="/{{ v[0] }}/{{ v[1].documentation[0]}}/">{{ v[1].name }}</a></li>
-{% endfor %}
-            </ul>
-        </nav>
-    </div>
-</header>
-
-<input type="checkbox" id="menu">
-<label for="menu" onclick>
-    <div class="closed">&#9776;</div>
-    <div class="open">&#10799;</div>
-</label>
-
-<main>
-    <menu>
-        <div class="versions-small">
-        <h2>Packages</h2>
-            <ul>
-{% for v in site.data.packages.package %}
-                <li{% if package == v[0] %} class="selected"{% endif %}><a href="/{{ v[0] }}/">{{ v[1].name }}</a></li>
-{% endfor %}
-            </ul>
+<body class="bg-white text-dark font-onest antialiased relative">
+<div class="relative z-10">
+    <header class="flex items-center sm:justify-center pl-6 pr-6 pb-6 max-w-7xl mx-auto pb-32">
+        <div class="flex gap-6 md:gap-0 md:flex-row justify-between md:items-center p-3 md:p-6 w-full max-w-7xl">
+            <a class="flex items-center gap-2 sm:gap-3" href="/">
+                <img src="/assets/img/uri-logo.svg" alt="Logo" class="w-[40px] sm:w-[50px] h-[40px] sm:h-[50px]"/>
+                <div class="font-black text-2xl">URI <span class="text-slate-300 font-italic">toolkit</span></div>
+            </a>
         </div>
-
-        <div class="menu-section">
-            <h2>Versions</h2>
-            <ul>
-                {% for link in site.data.packages.package[package].documentation %}
+        <nav class="flex items-center gap-0 md:gap-0 hidden lg:block">
+            <div id="packageDropdown" class="relative">
+                <button type="button" class="inline-flex items-center gap-x-1 px-2 py-2 sm:px-6 sm:py-3 font-black text-md text-white whitespace-nowrap bg-uri-base hover:bg-uri-dark" aria-expanded="false">
+                    <span>PACKAGES</span>
+                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div id="packageDropdownList" class="hidden absolute left-8 top-8 z-10 mt-5 w-screen max-w-max -translate-x-1/2 px-4">
+                {% for v in site.data.packages.package %}
+                    <div class="flex-auto overflow-hidden bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
+                        <div>
+                            <div class="group relative flex gap-x-6 p-2 hover:bg-gray-50{% if package == v[0] %} bg-uri-light hover:bg-uri-dark text-white{% endif %}">
+                                <div>
+                                    <a href="/{{ v[0] }}/{{ v[1].documentation[0]}}/" class="font-semibold {% if package == v[0] %}text-white-50{% else %}text-gray-900{% endif %}">
+                                        {{ v[1].name }}
+                                        <span class="absolute inset-0"></span>
+                                    </a>
+                                    <p class="mt-1 {% if package == v[0] %}text-white{% else %}text-gray-600{% endif %}">{{ v[1].description }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main class="relative flex justify-center mx-auto max-w-8xl sm:px-2 lg:px-8 xl:px-12">
+        <label for="navigation" class="fixed top-5 right-5 z-50 flex items-center justify-center w-12 h-12 mb-4 ml-4 bg-white border rounded-full shadow-lg cursor-pointer text-slate-600 border-slate-300 lg:hidden transition duration-200 ease-in-out active:scale-95">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 8h16M4 16h16" />
+            </svg>
+        </label>
+        <input type="checkbox" name="navigation" id="navigation" class="hidden peer" />
+        <div class="fixed top-[3.5rem] h-screen shadow-xl px-4 left-0 hidden peer-checked:block lg:relative lg:top-0 lg:h-auto lg:px-0 lg:block lg:flex-none lg:shadow-none  bg-slate-100 lg:bg-transparent z-50">
+            <div class="absolute inset-y-0 right-0 w-full lg:w-[50vw]"></div>
+            <nav class="sticky top-[4.5rem] w-64 pr-8 text-base lg:text-sm xl:w-72 xl:pr-16">
+                <ul role="list" class="-ml-0.5 h-[calc(100vh-4.5rem)] overflow-y-auto py-7 pl-0.5 space-y-4">
+                    {% for section in site.data.menu.packages[package][version] %}
+                    <h3 class="font-semibold tracking-tight text-slate-900">{{ section[0] }}</h3>
+                    <ul role="list" class="pl-3 mt-3 space-y-2">
+                        {% for link in section[1] %}
+                        <li {% if page.url == link[1] %}class="selected"{% endif %}>
+                            <a href="{{ link[1] }}" class="text-slate-900 hover:text-slate-800">{{ link[0] }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endfor %}
+                    <h3 class="font-semibold tracking-tight text-slate-900">Older versions</h3>
+                    <ul role="list" class="pl-3 mt-3 space-y-2">
+                    {% for link in site.data.packages.package[package].documentation %}
                     <li {% if version == link %}class="selected"{% endif %}>
                         <a href="/{{ package}}/{{ link }}/">v{{ link }}</a>
                     </li>
-                {% endfor %}
-            </ul>
+                    {% endfor %}
+                    </ul>
+                    <div class="lg:hidden">
+                    <h3 class="font-semibold tracking-tight text-slate-900">Packages</h3>
+                    <ul role="list" class="pl-3 mt-3 space-y-2">
+                        {% for v in site.data.packages.package %}
+                        <li {% if package == v[0] %} class="selected"{% endif %}>
+                            <a href="/{{ v[0] }}/{{ v[1].documentation[0]}}/">{{ v[1].name }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    </div>
+
+                </ul>
+            </nav>
+        </div>
+        <div class="flex-auto max-w-2xl min-w-0 px-4 py-10 lg:max-w-4xl lg:pr-0 lg:pl-8 xl:px-16">
+            <article class="content">
+            {% if version != site.data.packages.package[package].version %}
+            <p class="message-notice">Please consider using the <a href="/{{ package}}/{{ site.data.packages.package[package].version }}/">the latest stable version</a> for any production code.</p>
+            {% endif %}
+
+            {% for deprecated in site.data.project.deprecated %}
+            {% if deprecated[0] == package %}
+            <p class="message-notice">This package is deprecated Please consider using an <a href="/{{ deprecated[1] }}">stable alternative</a> for any production code.</p>
+            {% endif %}
+            {% endfor %}
+            {{ content }}
+            </article>
+        </div>
+    </main>
+    <footer class="p-6 max-w-7xl mx-auto pb-32">
+        <hr class="border-t border-light border-opacity-50 max-w-7xl mx-auto" />
+
+        <div class="flex flex-col lg:flex-row gap-12 my-16 px-6 md:px-0">
+            <a href="https://csv.thephpleague.com/" class="flex gap-3 lg:justify-between items-start transition-all hover-block">
+                <img src="/assets/img/csv-logo.svg" alt="CSV Logo" class="" />
+
+                <div class="flex flex-col">
+                    <div class="font-black text-lg text-dark">CSV</div>
+
+                    <p class="text-light">Data manipulation made easy in PHP</p>
+                </div>
+            </a>
+
+            <a href="https://uri.thephpleague.com/" class="flex gap-3 lg:justify-between items-start transition-all hover-block">
+                <img src="/assets/img/uri-logo.svg" alt="URI Logo" class="" />
+
+                <div class="flex flex-col">
+                    <div class="font-black text-lg text-dark">URI</div>
+
+                    <p class="text-light">Modern API to process URIs in PHP</p>
+                </div>
+            </a>
+
+            <a href="https://period.thephpleague.com/" class="flex gap-3 lg:justify-between items-start transition-all hover-block">
+                <img src="/assets/img/period-logo.svg" alt="Period Logo" class="" />
+
+                <div class="flex flex-col">
+                    <div class="font-black text-lg text-dark">PERIOD</div>
+
+                    <p class="text-light">Time range API for PHP</p>
+                </div>
+            </a>
         </div>
 
-        {% for section in site.data.menu.packages[package][version] %}
-        <div class="menu-section">
-            <h2>{{ section[0] }}</h2>
-            <ul>
-                {% for link in section[1] %}
-                    <li {% if page.url == link[1] %}class="selected"{% endif %}>
-                        <a href="{{ link[1] }}">{{ link[0] }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
+        <hr class="border-t border-light border-opacity-50 max-w-7xl mx-auto mb-16" />
+
+        <div class="gap-12 sm:gap-32 grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
+            <div class="flex flex-col gap-3 sm:col-span-3 lg:col-span-1">
+                <div class="text-csv-base font-black text-xl">Copyright</div>
+
+                <a href="//thephpleague.com" class="font-mono tracking-tighter text-sm underline transition-all hover-text">The League of <br />Extraordinary Packages</a>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <div class="text-dark font-black text-xl">Questions?</div>
+                <p class="font-mono text-sm tracking-tighter">
+                    <a href="https://phpc.social/@nyamsprod" target="_blank" class="transition-all hover-text">
+                        Package created and maintained by <span class="underline">Ignace Nyamagana Butera.</span>
+                    </a>
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <div class="text-dark font-black text-xl">Design</div>
+
+                <p class="font-mono text-sm tracking-tighter">
+                    <a href="https://twitter.com/sandr" target="_blank" class="transition-all hover-text">
+                        Brand and site design by <span class="underline">Sander van der Kolk</span>
+                    </a>
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <div class="font-black text-xl">License package</div>
+
+                <p class="font-mono text-sm tracking-tighter">
+                    <a href="https://github.com/thephpleague/csv/blob/master/LICENSE" target="_blank" class="transition-all hover-text underline">
+                        The MIT License (MIT)
+                    </a>
+                </p>
+            </div>
         </div>
-        {% endfor %}
-
-    </menu>
-    <article>
-    {% if version != site.data.packages.package[package].version %}
-        <p class="message-notice">Please consider using the <a href="/{{ package}}/{{ site.data.packages.package[package].version }}/">the latest stable version</a> for any production code.</p>
-    {% endif %}
-
-    {% for deprecated in site.data.project.deprecated %}
-{% if deprecated[0] == package %}
-        <p class="message-notice">This package is deprecated Please consider using an <a href="/{{ deprecated[1] }}">stable alternative</a> for any production code.</p>
-{% endif %}
-    {% endfor %}
-
-        {{ content }}
-    </article>
-</main>
-<aside class="sponsors hide">
-    <p>Love this package ? <a href="https://github.com/sponsors/{{ site.data.project.author.github_account }}">Support its development!</a></p>
-</aside>
-<footer>
-    <span>&copy; Copyright <a href="//thephpleague.com">The League of Extraordinary Packages</a>.</span>
-    <span>Site design by <a href="//reinink.ca">Jonathan Reinink</a> and <a href="//nyamsprod.com">Ignace Nyamagana Butera</a>.</span>
-</footer>
-
-<script src="/custom.js?5"></script>
+    </footer>
+</div>
+<script src="{{ site.data.manifest['docs.js'] }}"></script>
 </body>
 </html>

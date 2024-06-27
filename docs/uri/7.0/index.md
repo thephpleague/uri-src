@@ -12,7 +12,6 @@ Overview
 [![Source Code](https://img.shields.io/badge/source-league/uri-blue.svg?style=flat-square)](https://github.com/thephpleague/uri)
 [![Latest Stable Version](https://img.shields.io/github/release/thephpleague/uri.svg?style=flat-square)](https://packagist.org/packages/league/uri)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)<br>
-[![Build](https://github.com/thephpleague/uri/workflows/build/badge.svg)](https://github.com/thephpleague/uri/actions?query=workflow%3A%22build%22)
 [![Total Downloads](https://img.shields.io/packagist/dt/league/uri.svg?style=flat-square)](https://packagist.org/packages/league/uri)
 
 This package contains features and capabilities to ease manipulating URIs.

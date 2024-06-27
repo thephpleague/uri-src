@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Modern API to process URIs in PHP">
+    <meta name="docsearch:version" content="4.0">
+    <meta name="theme-color" content="#376FFF">
+    <link rel="icon" href="/assets/img/uri-logo.svg" type="image/svg+xml">
+    <title>Modern API to process URIs in PHP - URI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Onest:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="{{ site.data.manifest['docs.css'] }}" rel="stylesheet">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-46050814-6"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+        gtag('config', 'UA-46050814-6');
+    </script>
+</head>
+<body class="bg-white text-dark font-onest antialiased relative">
+<div class="relative z-10">
+    <header class="flex items-center sm:justify-center">
+        <div class="flex gap-6 md:gap-0 md:flex-row justify-between md:items-center p-3 md:p-6 w-full max-w-7xl">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <img src="/assets/img/uri-logo.svg" alt="Logo" class="w-[40px] sm:w-[50px] h-[40px] sm:h-[50px]"/>
+                <div class="font-black text-2xl">URI <span class="text-slate-300 font-italic">toolkit</span></div>
+            </div>
+            <nav class="flex items-center gap-0 md:gap-0">
+                <a href="https://github.com/thephpleague/uri-src" class="px-2 py-2 sm:px-6 sm:py-3 font-black text-md text-black-50 hover:text-uri-dark hover:underline whitespace-nowrap">SOURCE CODE</a>
+                <div id="packageDropdown" class="relative hidden lg:block">
+                    <button type="button" class="inline-flex items-center gap-x-1 px-2 py-2 sm:px-6 sm:py-3 font-black text-md text-white whitespace-nowrap bg-uri-base hover:bg-uri-dark" aria-expanded="false">
+                        <span>DOCUMENTATION</span>
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="packageDropdownList" class="hidden absolute right-0 top-8 z-10 mt-5 w-screen max-w-max -translate-x-1/2 px-4" style="left:110px">
+                        {% for v in site.data.packages.package %}
+                        {% if v[1].status != 'eol' %}
+                        <div class="flex-auto overflow-hidden bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
+                            <div>
+                                <div class="group relative flex gap-x-6 p-2 hover:bg-gray-50{% if package == v[0] %} bg-uri-light hover:bg-uri-light text-white{% endif %}">
+                                    <div>
+                                        <a href="/{{ v[0] }}/{{ v[1].documentation[0]}}/" class="font-semibold text-gray-900">
+                                            {{ v[1].name }}
+                                            <span class="absolute inset-0"></span>
+                                        </a>
+                                        <p class="mt-1 text-gray-600">{{ v[1].description }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex justify-center">
+        <div class="flex flex-col gap-3 pt-24 justify-between px-6 sm:px-12 lg:px-0 w-full max-w-5xl">
+            <h1 class="font-black text-6xl md:text-7xl lg:text-9xl tracking-tighter text-center text-slate-300">
+                The URI toolkit<br>
+                <span class="text-black text-5xl md:text-6xl lg:text-8xl">For PHP Developers</span>
+            </h1>
+
+            <div class="text-center leading-loose text-slate-800">
+                <p>Suite of packages which provide intuitive features to parse, validate, format and manipulate URIs and their
+                    components. <span class="hidden md:inline">Built to enable working with any kind of
+                    <a class="underline" href="https://tools.ietf.org/html/rfc3986">RFC3986</a> compliant URI
+                    and follow closely the latest <a class="underline" href="https://url.spec.whatwg.org/">WHATWG URL Living Standard</a>
+                    specification.</span> <span class="hidden lg:inline">It
+                    provides an enhanced replacement for PHP's <code class="font-mono text-base text-uri-base">parse_url</code>,
+                    <code class="font-mono text-base text-uri-base">http_build_query</code>, PECL's
+                    <code class="font-mono text-base text-uri-base">http_build_url</code> functions, and
+                    a <a href="https://www.php-fig.org/psr/psr-7/">PSR-7</a> <code class="font-mono text-base text-uri-base">UriInterface</code>
+                    adapter.</span>
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-3 my-4">
+                <div class="language-php highlighter-rouge">
+                    <div class="highlight"><pre class="highlight bg-slate-50 border border-slate-200 bg-opacity-80">
+<code><span class="k">use</span> <span class="nx">League\Uri\Components\Query</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">League\Uri\Modifier</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">League\Uri\Uri</span><span class="p">;</span>
+
+<span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Uri</span><span class="o">::</span><span class="na">new</span><span class="p">(</span><span class="s1">'https://example.com?q=value#fragment'</span><span class="p">);</span>
+<span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">getScheme</span><span class="p">();</span> <span class="c1">// returns 'http'</span>
+<span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">getHost</span><span class="p">();</span>   <span class="c1">// returns 'example.com'</span>
+
+<span class="nv">$newUri</span> <span class="o">=</span> <span class="nx">Modifier</span><span class="o">::</span><span class="na">from</span><span class="p">(</span><span class="nv">$uri</span><span class="p">)</span><span class="o">-&gt;</span><span class="s1"><span class="na">appendQuery</span><span class="p">(</span>'q=new.Value'</span><span class="p">);</span>
+<span class="k">echo</span> <span class="nv">$newUri</span><span class="p">;</span> <span class="c1">// 'https://example.com?q=value&amp;q=new.Value#fragment'</span>
+
+<span class="nv">$query</span> <span class="o">=</span> <span class="nx">Query</span><span class="o">::</span><span class="na">fromUri</span><span class="p">(</span><span class="nv">$newUri</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">'q'</span><span class="p">);</span>    <span class="c1">// returns 'value'</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">getAll</span><span class="p">(</span><span class="s1">'q'</span><span class="p">);</span> <span class="c1">// returns ['value', 'new.Value']</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">parameter</span><span class="p">(</span><span class="s1">'q'</span><span class="p">);</span> <span class="c1">// returns 'new.Value'</span>
+</code></pre></div></div>
+            </div>
+
+            <div class="flex flex-col gap-3 my-16">
+
+                <h3 class="font-black text-3xl md:text-5xl tracking-tighter mb-6 text-center">Choose the package that suits your needs</h3>
+
+                <div class="mx-4 md:mx-0 md:grid md:grid-cols-3 md:gap-3">
+                    <a href="/interfaces/7.0/" class="block my-4 rounded-lg border border-light border-opacity-50 p-6 hover:bg-slate-50 hover:border-uri-dark hover:bg-opacity-80">
+                        <h3 class="font-bold text-xl text-uri-dark uppercase">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 inline">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            </svg>
+
+                            uri-interfaces
+                        </h3>
+                        <p class="text-light leading-loose my-4">The URI utility package</p>
+                        <ul class="leading-loose pl-4 list-image-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxNCAxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSIjMzhiZGY4Ij48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xMy42ODUuMTUzYS43NTIuNzUyIDAgMCAxIC4xNDMgMS4wNTJsLTggMTAuNWEuNzUuNzUgMCAwIDEtMS4xMjcuMDc1bC00LjUtNC41YS43NS43NSAwIDAgMSAxLjA2LTEuMDZsMy44OTQgMy44OTMgNy40OC05LjgxN2EuNzUuNzUgMCAwIDEgMS4wNS0uMTQzWiIgLz48L3N2Zz4=')]">
+                            <li>URI parser and builder</li>
+                            <li>Query parser and builder</li>
+                            <li>IDNA, IPv4 and IPv6 converter</li>
+                            <li>Encode/decode URI components</li>
+                        </ul>
+                    </a>
+
+                    <a href="/uri/7.0/" class="block my-4 rounded-lg border border-light border-opacity-50 p-6 hover:bg-slate-50 hover:border-uri-dark hover:bg-opacity-80">
+                        <h3 class="font-bold text-xl text-uri-dark uppercase">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 inline">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+                            </svg>
+                            uri
+                        </h3>
+                        <p class="text-light leading-loose my-4">The URI manipulation package</p>
+                        <ul class="leading-loose pl-4 list-image-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxNCAxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSIjMzhiZGY4Ij48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xMy42ODUuMTUzYS43NTIuNzUyIDAgMCAxIC4xNDMgMS4wNTJsLTggMTAuNWEuNzUuNzUgMCAwIDEtMS4xMjcuMDc1bC00LjUtNC41YS43NS43NSAwIDAgMSAxLjA2LTEuMDZsMy44OTQgMy44OTMgNy40OC05LjgxN2EuNzUuNzUgMCAwIDEgMS4wNS0uMTQzWiIgLz48L3N2Zz4=')]">
+                            <li>URI object with complete validation</li>
+                            <li>Resolves and Relativizes URIs</li>
+                            <li>Expands URI Templates</li>
+                            <li><code class="font-mono text-base text-uri-base">PSR-7</code> and <code class="font-mono text-base text-uri-base">PSR-17</code> URI adapters</li>
+                        </ul>
+                    </a>
+
+                    <a href="/components/7.0/" class="block my-4 rounded-lg border border-light border-opacity-50 p-6 hover:bg-slate-50 hover:border-uri-dark hover:bg-opacity-80">
+                        <h3 class="font-bold text-xl text-uri-dark uppercase">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 inline">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                            </svg>
+
+                            uri-components
+                        </h3>
+                        <p class="text-light leading-loose my-4">The URI components package</p>
+                        <ul class="leading-loose pl-4 list-image-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxNCAxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSIjMzhiZGY4Ij48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xMy42ODUuMTUzYS43NTIuNzUyIDAgMCAxIC4xNDMgMS4wNTJsLTggMTAuNWEuNzUuNzUgMCAwIDEtMS4xMjcuMDc1bC00LjUtNC41YS43NS43NSAwIDAgMSAxLjA2LTEuMDZsMy44OTQgMy44OTMgNy40OC05LjgxN2EuNzUuNzUgMCAwIDEgMS4wNS0uMTQzWiIgLz48L3N2Zz4=')]">
+                            <li>Provides URI components objects</li>
+                            <li><code class="font-mono text-base text-uri-base">URLSearchParams</code> for PHP</li>
+                            <li>Partial modifiers for URI.</li>
+                        </ul>
+                    </a>
+                </div>
+                <div class="flex flex-col gap-6 pb-4 text-light">
+                    <div class="text-xl text-center">Love this toolkit ? <a href="https://github.com/sponsors/nyamsprod" class="text-uri-dark underline hover:text-uri-light">Sponsor its development</a></div>
+                </div>
+                <div class="bg-gray-100 p-6 rounded-lg text-light flex flex-col sm:flex-row gap-6">
+                    <div class="bg-uri-light text-uri-dark font-black text-lg w-12 h-12 flex shrink-0 items-center justify-center rounded-full">!</div>
+                    <p>Once a new <strong>major</strong> version is released, the previous stable release remains supported for <strong>six more months</strong> with patches and security fixes.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="p-6 max-w-7xl mx-auto pb-32">
+        <hr class="border-t border-light border-opacity-50 max-w-7xl mx-auto" />
+
+        <div class="flex flex-col lg:flex-row gap-12 my-16 px-6 md:px-0">
+            <a href="https://csv.thephpleague.com/" class="flex gap-3 lg:justify-between items-start transition-all hover-block">
+                <img src="/assets/img/csv-logo.svg" alt="CSV Logo" class="" />
+
+                <div class="flex flex-col">
+                    <div class="font-black text-lg text-dark">CSV</div>
+
+                    <p class="text-light">Data manipulation made easy in PHP</p>
+                </div>
+            </a>
+
+            <a href="https://uri.thephpleague.com/" class="flex gap-3 lg:justify-between items-start transition-all hover-block">
+                <img src="/assets/img/uri-logo.svg" alt="URI Logo" class="" />
+
+                <div class="flex flex-col">
+                    <div class="font-black text-lg text-dark">URI</div>
+
+                    <p class="text-light">Modern API to process URIs in PHP</p>
+                </div>
+            </a>
+
+            <a href="https://period.thephpleague.com/" class="flex gap-3 lg:justify-between items-start transition-all hover-block">
+                <img src="/assets/img/period-logo.svg" alt="Period Logo" class="" />
+
+                <div class="flex flex-col">
+                    <div class="font-black text-lg text-dark">PERIOD</div>
+
+                    <p class="text-light">Time range API for PHP</p>
+                </div>
+            </a>
+        </div>
+
+        <hr class="border-t border-light border-opacity-50 max-w-7xl mx-auto mb-16" />
+
+        <div class="gap-12 sm:gap-32 grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
+            <div class="flex flex-col gap-3 sm:col-span-3 lg:col-span-1">
+                <div class="text-csv-base font-black text-xl">Copyright</div>
+
+                <a href="//thephpleague.com" class="font-mono tracking-tighter text-sm underline transition-all hover-text">The League of <br />Extraordinary Packages</a>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <div class="text-dark font-black text-xl">Questions?</div>
+                <p class="font-mono text-sm tracking-tighter">
+                    <a href="https://phpc.social/@nyamsprod" target="_blank" class="transition-all hover-text">
+                        Package created and maintained by <span class="underline">Ignace Nyamagana Butera.</span>
+                    </a>
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <div class="text-dark font-black text-xl">Design</div>
+
+                <p class="font-mono text-sm tracking-tighter">
+                    <a href="https://twitter.com/sandr" target="_blank" class="transition-all hover-text">
+                        Brand and site design by <span class="underline">Sander van der Kolk</span>
+                    </a>
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <div class="font-black text-xl">License package</div>
+
+                <p class="font-mono text-sm tracking-tighter">
+                    <a href="https://github.com/thephpleague/csv/blob/master/LICENSE" target="_blank" class="transition-all hover-text underline">
+                        The MIT License (MIT)
+                    </a>
+                </p>
+            </div>
+        </div>
+    </footer>jek
+</div>
+<div class="absolute z-0 flex justify-center top-0 right-0 overflow-hidden">
+    <img src="/assets/img/uri-logo-big.svg" alt="Logo" class="w-1/2 sm:w-auto rotate-6 z-0 top-logo -right-logo"/>
+</div>
+<script src="{{ site.data.manifest['docs.js'] }}"></script>
+</body>
+</html>
