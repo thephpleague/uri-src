@@ -16,5 +16,5 @@ deprecated:
     'schemes': 'uri'
     'manipulations': 'components'
     'domain-parser': ''
-    'parser': 'uri'
-    'query-parser': 'components'
+    'parser': 'interfaces'
+    'query-parser': 'interfaces'
