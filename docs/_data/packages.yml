@@ -3,7 +3,7 @@ package:
         name: 'uri-interfaces'
         description: 'The URI utility package'
         version: '7.0'
-        latest: '7.0.0'
+        latest: '7.4.1'
         status: maintained
         documentation:
             - '7.0'
@@ -12,7 +12,7 @@ package:
         name: 'uri'
         description: 'The URI manipulation package'
         version: '7.0'
-        latest: '7.0.0'
+        latest: '7.4.1'
         status: maintained
         documentation:
             - '7.0'
@@ -23,7 +23,7 @@ package:
         name: 'uri-components'
         description: 'The URI components package'
         version: '7.0'
-        latest: '7.0.0'
+        latest: '7.4.1'
         status: maintained
         documentation:
             - '7.0'
