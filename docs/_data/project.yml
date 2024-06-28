@@ -13,8 +13,8 @@ author:
     github_account: 'nyamsprod'
 support: 'Once a new major version is released, the previous stable release remains supported for six more months through patches and security fixes.'
 deprecated:
-    'schemes': 'https://uri.thephpeleague.com/uri/'
-    'manipulations': 'https://uri.thephpeleague.com/components'
+    'schemes': 'https://uri.thephpleague.com/uri/'
+    'manipulations': 'https://uri.thephpleague.com/components/'
     'domain-parser': 'https://github.com/jeremykendall/php-domain-parser'
-    'parser': 'https://uri.thephpeleague.com/interfaces'
-    'query-parser': 'https://uri.thephpeleague.com/interfaces'
+    'parser': 'https://uri.thephpleague.com/interfaces/'
+    'query-parser': 'https://uri.thephpleague.com/interfaces/'
