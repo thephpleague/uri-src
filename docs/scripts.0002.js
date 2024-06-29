@@ -48,13 +48,19 @@
       }, false);
     snippet.appendChild(link);
   });
-})();
-
-window.addEventListener('DOMContentLoaded', (e) => {
 
   const dropDownList = document.getElementById('packageDropdownList');
+  const dropDownButton = document.getElementById('packageDropdown');
 
-  document.getElementById('packageDropdown').addEventListener('click', (e) => {
+  dropDownButton.addEventListener('click', () => {
     dropDownList.classList.toggle('hidden');
-  })
-})
+  });
+
+  document.addEventListener('click',  (event) => {
+    if (!dropDownButton.contains(event.target) && !dropDownList.contains(event.target)) {
+        dropDownList.classList.add('hidden');
+    }
+  });
+})();
+
+
