@@ -36,10 +36,6 @@ The `BaseUri::resolve` resolves a URI as a browser would for a relative URI whil
 the `BaseUri::relativize` does the opposite.
 
 ~~~php
-<?php
-
-use League\Uri\BaseUri;
-
 $baseUri = BaseUri::from('http://www.ExaMPle.com');
 $uri = 'http://www.example.com/?foo=toto#~typo';
 
@@ -86,11 +82,6 @@ The class also exposes a list of public methods which returns the URI state.
 Tells whether the URI represents an absolute URI.
 
 ~~~php
-<?php
-
-use League\Uri\Uri;
-use League\Uri\BaseUri;
-
 BaseUri::from(Uri::fromServer($_SERVER))->isAbsoulte(); //returns true
 BaseUri::from("/🍣🍺")->isAbsolute(); //returns false
 ~~~
@@ -170,12 +161,6 @@ Returns the URI origin used for comparison when calling the `isCrossOrigin` meth
 the [WHATWG URL Living standard](https://url.spec.whatwg.org/#origin)
 
 ~~~php
-<?php
-
-use League\Uri\Http;
-use League\Uri\Uri;
-use League\Uri\BaseUri;
-
 echo BaseUri::from(Http::new('https://uri.thephpleague.com/uri/6.0/info/'))->origin(); //display 'https://uri.thephpleague.com';
 echo BaseUri::from('blob:https://mozilla.org:443')->origin();       //display 'https://mozilla.org'
 BaseUri::from(Uri::new('file:///usr/bin/php'))->origin();           //returns null
@@ -188,11 +173,6 @@ Because the origin property does not exist in the RFC3986 specification this add
 - For non-absolute URI the method will return `null`
 
 ~~~php
-<?php
-
-use League\Uri\Http;
-use League\Uri\BaseUri;
-
 BaseUri::from((Http::new('/path/to/endpoint'))->origin(); //returns null
 ~~~
 

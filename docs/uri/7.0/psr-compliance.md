@@ -62,16 +62,12 @@ header is taken into account for security reasons.</p>
 You can also return a URI based on standard specifications:
 
 ~~~php
-<?php
-
-use League\Uri\Http;
-
 $uri = Http::fromBaseUri("./p#~toto", "http://www.example.com/path/to/the/sky/");
 echo $uri; //displays "http://www.example.com/path/to/the/sky/p#~toto"
 
 $template = 'https://example.com/hotels/{hotel}/bookings/{booking}';
 $variables = ['booking' => '42', 'hotel' => 'Rest & Relax'];
-echo Http::fromTemplate($template, $variables)->toString();
+echo Http::fromTemplate($template, $variables);
 //displays "https://example.com/hotels/Rest%20%26%20Relax/bookings/42"
 ~~~
 
@@ -88,9 +84,6 @@ for resolution. You can get a more in-depth understanding of
 In addition to PSR-7 compliance, the class implements PHP's `JsonSerializable` interface.
 
 ~~~php
-<?php
-use League\Uri\Http;
-
 echo json_encode(Http::new('http://example.com/path/to?q=foo%20bar#section-42'));
 // display "http:\/\/example.com\/path\/to?q=foo%20bar#section-42"
 ~~~

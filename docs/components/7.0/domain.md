@@ -20,6 +20,10 @@ representation ends with a `.`, otherwise it is known as being a relative or a p
 The class allows use to get the domain name status and update it using the following feature
 
 ~~~php
+<?php
+
+use League\Uri\Components\Domain;
+
 $host = Domain::new('www.11.be');
 $host->isAbsolute(); // return false
 
@@ -65,11 +69,7 @@ Since we are manipulating the domain name as an ordered list we can use known me
 as with normal lists.
 
 ~~~php
-<?php
-
-use League\Uri\Components\Domain;
-
-$path = .Domain::new('www.bbc.co.uk');
+$path = Domain::new('www.bbc.co.uk');
 $path->keys();          //return [0, 1, 2, 3];
 $path->keys('www');     //return [3];
 $path->keys('gweta');   //return [];

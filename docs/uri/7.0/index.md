@@ -16,8 +16,8 @@ Overview
 
 This package contains features and capabilities to ease manipulating URIs.
 
-It allows simple URI manipulation via the context aware wrapper [BaseUri](/uri/7.0/base-uri).
-But also expose a complete API around URI creation using the [UriTemplate](/uri/7.0/uri-template)
+`league\uri` allows simple URI manipulation via the context aware wrapper [BaseUri](/uri/7.0/base-uri).
+But also exposes a complete API around URI creation using the [UriTemplate](/uri/7.0/uri-template)
 and the [URI](/uri/7.0/rfc3986/) class which represents a generic RFC3986 compliant URI
 object.
 

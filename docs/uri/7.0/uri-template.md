@@ -41,9 +41,6 @@ The constructor takes a optional set of default variables that can be applied by
 expanding the URI template.
 
 ~~~php
-<?php
-
-use League\Uri\UriTemplate;
 $template = 'https://api.twitter.com/{version}/search/{term:1}/{term}/{?q*,limit}';
 
 $params = [
@@ -62,9 +59,6 @@ echo $uriTemplate->expand($params);
 The default variables are overwritten by those supplied to the `expand` method.
 
 ~~~php
-<?php
-
-use League\Uri\UriTemplate;
 $template = 'https://api.twitter.com/{version}/search/{term:1}/{term}/{?q*,limit}';
 
 $params = [
@@ -86,9 +80,6 @@ is an immutable object instead of modifying the current instance, a new
 instance with the modified default variables will be returned.
 
 ~~~php
-<?php
-
-use League\Uri\UriTemplate;
 $template = 'https://api.twitter.com/{version}/search/{term:1}/{term}/{?q*,limit}';
 
 $params = [
@@ -108,10 +99,6 @@ $newUriTemplate->getDefaultVariables(); //returns  new VariableBag(['version' =>
 nested array like the one used with <code>http_build_query</code></p>
 
 ~~~php
-<?php
-
-use League\Uri\UriTemplate;
-
 $template = 'https://example.com/hotels/{hotel}/book{?query*}';
 $params = [
     'hotel' => 'Rest & Relax',
@@ -137,9 +124,6 @@ trigger the exception to alert the user that something might be wrong and
 that the generated URI might not be the one expected.
 
 ~~~php
-<?php
-
-use League\Uri\UriTemplate;
 $template = 'https://api.twitter.com/{version}/search/{term:1}/{term}/{?q*,limit}';
 
 $params = [
@@ -162,9 +146,6 @@ method. It behaves exactly like the `expand` method but will additionnally throw
 exception if there are missing required variables.
 
 ~~~php
-<?php
-
-use League\Uri\UriTemplate;
 $template = 'https://api.twitter.com/{version}/search/{term}/{?q*,limit}';
 
 $params = [
@@ -191,10 +172,6 @@ template expression delimiters. If not used as the boundary of an expression an
 exception will be triggered. 
 
 ~~~php
-<?php
-
-use League\Uri\UriTemplate;
-
 $template = 'https://example.com/hotels/{/book{?query*}';
 $uriTemplate = new UriTemplate($template);
 // will throw a League\Uri\Exceptions\SyntaxError on instantiation
@@ -203,10 +180,6 @@ $uriTemplate = new UriTemplate($template);
 If your template do require them you should URL encode them.
 
 ~~~php
-<?php
-
-use League\Uri\UriTemplate;
-
 $template = 'https://example.com/hotels/%7B/{hotel}';
 $params = ['booking' => 42, 'hotel' => 'Rest & Relax'];
 

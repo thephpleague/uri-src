@@ -29,7 +29,7 @@ $authority = new UserInfo('user', 'pass');
 $authority->toString(); //returns 'user:pass'
 
 UserInfo::new('user:pass')->value(); //returns 'user:pass'
-UserInfo::fromUri("http://www.example.com/path/to/the/sky")->getPort(); //return null;
+UserInfo::fromUri("http://www.example.com/path/to/the/sky")->getUser(); //return null;
 UserInfo::new()->value(); //return null;
 UserInfo::fromComponents(
 	UriString::parse("http://user:pass@example.com:42/5.0/uri/api")
@@ -47,11 +47,15 @@ and `UserInfo::getPass` methods like shown below.
 ~~~php
 use League\Uri\Components\UserInfo;
 
-$info = new UserInfo('foo', 'bar');
-$info->getUser();    //returns 'foo'
-$info->getPass();    //returns 'bar'
-$info->components(); //returns array {"user" => "foo", "pass" => "bar"}
+$info = new UserInfo('user', 'p@ss');
+$info->getUser();    //returns 'user'
+$info->getPass();    //returns 'p@ss'
+$info->getUsername(); //returns 'user'
+$info->getPassword(); //returns 'p%40ss'
+$info->components(); //returns array {"user" => "user", "pass" => "p@ss"}
 ~~~
+
+<p class="message-notice"><code>getUsername</code> and <code>getPassword</code> are added in version <code>7.5.0</code></p>
 
 ## Modifying the user information
 
@@ -69,7 +73,7 @@ echo $info->withUser('john')->withPass('doe'); //displays john:doe
 
 ~~~php
 new UserInfo(null, 'bar');  // throws a SyntaxError
-UserInfo::fromAuthority('thephpleague:443')->withPassword('foo'); // throws a SyntaxError
+UserInfo::fromAuthority('thephpleague:443')->withPass('foo'); // throws a SyntaxError
 ~~~
 
 <p class="message-warning">If the submitted value is not valid a <code>League\Uri\Exceptions\SyntaxError</code> exception is thrown.</p>

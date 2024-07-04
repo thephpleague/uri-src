@@ -49,10 +49,6 @@ The DataPath class exposes the following specific methods:
 Each of these methods return a string. This string can be empty if the data where no supplied when constructing the URI.
 
 ~~~php
-<?php
-
-use League\Uri\Components\DataPath ;
-
 $path = DataPath::new('text/plain;charset=us-ascii,Hello%20World%21');
 echo $path->getMediaType();  //returns 'text/plain;charset=us-ascii'
 echo $path->getMimeType();   //returns 'text/plain'
@@ -73,10 +69,6 @@ Since we are dealing with a data and not just a URI, the only property that can 
 To set new parameters you should use the `withParameters` method:
 
 ~~~php
-<?php
-
-use League\Uri\Components\DataPath;
-
 $path = DataPath::new('text/plain;charset=us-ascii,Hello%20World%21');
 $newPath = $path->withParameters('charset=utf-8');
 echo $newPath; //returns 'text/plain;charset=utf-8,Hello%20World%21'
@@ -89,10 +81,6 @@ echo $newPath; //returns 'text/plain;charset=utf-8,Hello%20World%21'
 Another manipulation is to transcode the data from ASCII to is base64 encoded (or binary) version. If no conversion is possible the former object is returned otherwise a new valid data uri object is created.
 
 ~~~php
-<?php
-
-use League\Uri\Components\DataPath;
-
 $path = DataPath::new('text/plain;charset=us-ascii,Hello%20World%21');
 $path->isBinaryData(); // return false;
 $newPath = $path->toBinary();
@@ -113,10 +101,6 @@ By default, the open mode is set to `w`. If for any reason the file is not acces
 The method returns the `SplFileObject` object used to save the data-uri data for further analysis/manipulation if you want.
 
 ~~~php
-<?php
-
-use League\Uri\Components\DataPath;
-
 $path = DataPath::fromFileContents('path/to/my/file.png');
 $file = $path->save('path/where/to/save/my/image.png');
 //$file is a SplFileObject which point to the newly created file;

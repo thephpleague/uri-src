@@ -512,6 +512,10 @@ img {
   @apply underline;
 }
 
+.content p {
+  @apply mb-4
+}
+
 .algolia-autocomplete input {
   font-weight: normal;
   font-size: 16px;

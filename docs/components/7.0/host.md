@@ -14,17 +14,14 @@ exposes basic properties and method to manipulate any type of host whether it is
 
 ## Host types
 
-The `Host` allows use to know its type using 3 methods `isRegisteredName`, `isDomain` and `isIp`.
-
 If you don't have an IP then you are dealing with a registered name. A registered name can be a [domain name](http://tools.ietf.org/html/rfc1034) subset
-if it follows [RFC1123](http://tools.ietf.org/html/rfc1123#section-2.1), but it is not a requirement as stated
-in [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.2.2)
+if it follows [RFC1123](http://tools.ietf.org/html/rfc1123#section-2.1), but it is not a requirement as stated in [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.2.2)
 
 > (...) URI producers should use names that conform to the DNS syntax, even when use of DNS is not immediately apparent, and should limit these names to no more than 255 characters in length.
 
-~~~php
-use League\Uri\Components\Host;
+As such to expose the correct type, the `Host` object uses 3 methods `isRegisteredName`, `isDomain` and `isIp`.
 
+~~~php
 $domain = Host::new('www.example.co.uk');
 $domain->isRegisteredName();  //return true
 $domain->isDomain();          //return true
@@ -67,7 +64,7 @@ echo $host->toAscii();    //displays 'xn--bb-bjab.be'
 ## Host as IP address
 
 ~~~php
-public static Host::fromIp(string $ip, string $version = '', ?IPv4Normalizer $ipV4Normalizer = null): self
+public static Host::fromIp(string $ip, string $version = ''): self
 public Host::isIpv4(): bool
 public Host::isIpv6(): bool
 public Host::isIpFuture(): bool
@@ -90,27 +87,10 @@ Host::fromIp('uri.thephpleague.com');
 //throws League\Uri\Exceptions\SyntaxError
 ~~~
 
-The method can also infer the IPv4 from its hexadecimal or octal representation.
+The method can also infer the IPv4 from its hexadecimal or octal representation. Behind the scene This normalization
+works using WHATWG IPv4 host parsing rules via the `League\Uri\Ipv4\Converter` class
 
-~~~php
-use League\Uri\Components\Host;
-use League\Uri\IPv4\GMPCalculator;
-
-Host::fromIp('999999999')->toString(); //display '59.154.201.255'
-~~~
-
-This normalization works using:
- 
-- a `League\Uri\Ipv4Calculators\IPv4Calculator;` implementing object to calculate the IP address like shown below;
-- WHATWG IPv4 host parsing rules;
-
-You can skip providing such object if:
-
-- **the BCMath extension is installed and configured** or
-- **the GMP extension is installed and configured** or
-- **you are using a x.64 build of PHP**
-
-<p class="message-warning">A <code>RuntimeException</code> will be trigger if no <code>League\Uri\Maths\Math</code> is provided or can not be detected</p>.
+<p class="message-warning">A <code>RuntimeException</code> will be trigger if the conversion can not be done due to a lack of supported PHP extension.</p>
 
 ~~~php
 echo Host::fromIp('999999999'); //display '59.154.201.255'

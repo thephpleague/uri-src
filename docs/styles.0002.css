@@ -1919,6 +1919,10 @@ img {
   text-decoration-line: none;
 }
 
+.content p {
+  margin-bottom: 1rem;
+}
+
 .algolia-autocomplete input {
   font-weight: normal;
   font-size: 16px;

@@ -102,7 +102,7 @@ For Queries:
 Other URI Components:
 
 - [Scheme](/components/7.0/scheme/)
-- [Fragment](/components/7.0/fragment/)
-- [Port](/components/7.0/port/)
 - [Authority](/components/7.0/authority/)
 - [UserInfo](/components/7.0/userinfo/)
+- [Port](/components/7.0/port/)
+- [Fragment](/components/7.0/fragment/)
