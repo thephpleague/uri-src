@@ -88,6 +88,21 @@ echo json_encode(Http::new('http://example.com/path/to?q=foo%20bar#section-42'))
 // display "http:\/\/example.com\/path\/to?q=foo%20bar#section-42"
 ~~~
 
+### Differences with the Generic RFC3986 URI
+
+Because of its normalization rules a `PSR-7` UriInterface implementing object
+may return a different URI representation than a generic URI implementing class.
+
+~~~php
+echo (string) Http::new('http://example.com/path/to?#');
+// returns 'http://example.com/path/to
+
+echo (string) Uri::new('http://example.com/path/to?#');
+// returns 'http://example.com/path/to?#'
+~~~
+
+<p class="message-info">This improved compliance is available since version <code>7.5.0</code></p>
+
 ## PSR-17 compatibility
 
 The package also provides an implementation of the `UriFactoryInterface` from [PSR-17](https://www.php-fig.org/psr/psr-17/)
