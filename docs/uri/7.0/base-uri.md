@@ -106,7 +106,7 @@ BaseUri::from("/🍣🍺")->isNetworkPath(); //returns false
 
 ### BaseUri::isOpaque
 
-<p class="message-notice">added in version <code>7.5.0</code></p>
+<p class="message-notice">since version <code>7.5.0</code></p>
 
 Tells whether the given URI object represents an opaque URI. An URI is said to be
 opaque if and only if it is absolute but does not have an authority
