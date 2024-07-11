@@ -104,6 +104,18 @@ BaseUri::from("//example.com/toto")->isNetworkPath(); //returns true
 BaseUri::from("/🍣🍺")->isNetworkPath(); //returns false
 ~~~
 
+### BaseUri::isOpaque
+
+<p class="message-notice">added in version <code>7.5.0</code></p>
+
+Tells whether the given URI object represents an opaque URI. An URI is said to be
+opaque if and only if it is absolute but does not have an authority
+
+~~~php
+BaseUri::from("email:john@example.com?subject=🏳️‍🌈"))->isOpaque(); //returns true
+BaseUri::from("/🍣🍺")->isOpaque(); //returns false
+~~~
+
 ### BaseUri::isRelativePath
 
 Tells whether the given URI object represents a relative path.
