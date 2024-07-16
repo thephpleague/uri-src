@@ -12,7 +12,7 @@ This package contains:
 
 - interface to represent [URI and components objects](/interfaces/7.0/contracts/)
 - parsers to parse and build [URI](/interfaces/7.0/uri-parser-builder/) and [Query](/interfaces/7.0/query-parser-builder/) strings that provide enhanced replacement for PHP's `parse_url` and PECL's `http_build_url` functions via its [UriString](/uri/7.0/parser-builder) class.
-- tools to help in processing URIs ([IPv4 Converter](/interfaces/7.0/ipv4/) and [IDN converter](/interfaces/7.0/idn/)) and their components in various ways.
+- tools to help in processing URIs ([IPv4 Converter](/interfaces/7.0/ipv4/), [IPv6 Converter](/interfaces/7.0/ipv6/)  and [IDN converter](/interfaces/7.0/idn/)) and their components in various ways.
 
 System Requirements
 -------

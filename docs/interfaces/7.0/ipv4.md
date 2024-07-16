@@ -45,10 +45,6 @@ If no calculator is provided a `League\Uri\Exceptions\MissingFeature` exception 
 if no convertion is possible `null` is returned.
 
 ```php
-<?php
-
-use League\Uri\IPV4\Converter;
-
 $converter = Converter::fromEnvironment();
 $converter->toDecimal('0');       // returns 0.0.0.0
 $converter->toDecimal('toto.be'); // returns null
@@ -60,10 +56,6 @@ The same functionality is provided to convert the IPv4 to Octal and Hexadecimal 
 - `Converter::toHexadecimal` tries to convert the IPv4 to its hexadecimal dot notation or returns `null`
 
 ```php
-<?php
-
-use League\Uri\IPV4\Converter;
-
 $converter = Converter::fromEnvironment();
 $converter->toDecimal('0xc0a821');         // returns "192.168.2.1"
 $converter->toOctal('0xc0a821');           // returns "0300.0250.0002.0001"
@@ -76,10 +68,6 @@ It is possible to determine if a given domain is or can be converted to an IPv4 
 method. The method will return `true` if the submitted domain is an IPv4 host or is convertible to an IPv4 host.
 
 ```php
-<?php
-
-use League\Uri\Ipv4\Converter;
-
 $converter = Converter::fromEnvironment();
 $converter->isIpv4('0xc0a821');     // return true
 $converter->isIpv4('192.168.2.1.'); // return true

@@ -29,7 +29,7 @@ $str = QueryString::build($pairs, '|');
 
 ## Parsing the URI query string
 
-Parsing a query string is easy.
+To parse a query string you can use the ` QueryString::parse` method as shown below:
 
 ```php
 $pairs = QueryString::parse('module=home&action=show&page=😓');
@@ -62,8 +62,6 @@ The `QueryString::parse` method parameters are:
 Here's a simple example showing how to use all the given parameters:
 
 ```php
-<?php
-
 $pairs = QueryString::parse(
     'module=home:action=show:page=toto+bar&action=hide',
     ':',
@@ -84,8 +82,6 @@ $pairs = QueryString::parse(
 To convert back the collection of key/value pairs into a valid query string or the `null` value you can use the static public `QueryString::build` method.
 
 ```php
-<?php
-
 $pairs = QueryString::build([
     ['module', 'home'],
     ['action', 'show'],
@@ -133,8 +129,6 @@ public static function QueryString::convert(iterable $pairs): array;
 both methods, however, do not allow parameters key mangling in the returned array like  `parse_str`;
 
 ```php
-<?php
-
 $query = 'module=show&arr.test[1]=sid&arr test[4][two]=fred&+module+=hide';
 
 $params = QueryString::extract($query, '&', PHP_QUERY_RFC1738);
@@ -204,11 +198,6 @@ You can use the class on the following methods as the second argument:
 All exceptions extend the `League\Uri\Exceptions\UriException` marker class which extends PHP's `Throwable` class.
 
 ```php
-<?php
-
-use League\Uri\Exceptions\InvalidUriComponent;
-use League\Uri\QueryString;
-
 try {
     QueryString::extract('foo=bar', '&', 42);
 } catch (UriException $e) {

@@ -33,12 +33,12 @@ which means remembering:
 
 - the flags value,
 - the parameters position, 
-- the return value can be the domain converted of `false` in case of error
+- the return value can be the converted domain or `false` in case of error
 - that the result is filled by reference so if not provided you won't know the reason for failure or success.
 - the `errors` keys represents a bitset of the error constants `IDNA_ERROR_*`
-- IDNA options constants and IDNA error constants can be mistakingly used as they are both `int` with similar values
+- IDNA options constants and IDNA error constants can be mistakenly used as they are both `int` with similar values
 
-In contrast, when performing a conversion with a method from `League\Uri\Idna\Converter` a `League\Uri\Idna\Result`
+In contrast, when performing a conversion with the `League\Uri\Idna\Converter` a `League\Uri\Idna\Result`
 instance is returned with information regarding the outcome of the conversion.
 
 ```php

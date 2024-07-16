@@ -6,9 +6,11 @@ title: RFC3986 - RFC3987 URI Parser
 URI parser and builder
 =======
 
-The `League\Uri\UriString` class is a user-land PHP URI parser and builder compliant with
-[RFC 3986](http://tools.ietf.org/html/rfc3986) and [RFC 3987](http://tools.ietf.org/html/rfc3987)
-. This class is a drop-in replacement for PHP's `parse_url` function.
+PHP has been relying on the `parse_url` function to split URI into its component. But the
+function predates RFC3986 and as such does not fully comply to the specification. To work
+around this limitation the tooklit provides the `League\Uri\UriString` class. It is a
+user-land PHP URI parser and builder compliant with [RFC 3986](http://tools.ietf.org/html/rfc3986) and [RFC 3987](http://tools.ietf.org/html/rfc3987)
+The class act as a drop-in replacement for PHP's `parse_url` feature.
 
 ## URI parsing
 
@@ -70,6 +72,7 @@ var_export(UriString::parse('http:www.example.com'));
 ~~~php
 UriString::build(array $components): string
 UriString::buildAuthority(array $components): string
+UriString::buildUri(?string $scheme, ?string $authority, string $path, ?string $query, ?string $fragment): string
 ~~~
 
 You can rebuild a URI from its hash representation returned by the `UriString::parse` method or PHP's `parse_url` function using the `UriString::build` public static method.  

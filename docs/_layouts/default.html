@@ -43,6 +43,7 @@
                 </button>
                 <div id="packageDropdownList" class="hidden absolute left-8 top-8 z-10 mt-5 w-screen max-w-max -translate-x-1/2 px-4">
                 {% for v in site.data.packages.package %}
+                    {% if v[1].status != 'eol' %}
                     <div class="flex-auto overflow-hidden bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
                         <div>
                             <div class="group relative flex gap-x-6 p-2 hover:bg-gray-50{% if package == v[0] %} bg-uri-light hover:bg-uri-dark text-white{% endif %}">
@@ -56,6 +57,31 @@
                             </div>
                         </div>
                     </div>
+                    {% endif %}
+                {% endfor %}
+                <div class="flex-auto overflow-hidden text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
+                    <div>
+                        <div class="group relative flex gap-x-6 p-2 bg-uri-dark text-white">
+                            <div class="font-semibold">abandoned packages</div>
+                        </div>
+                    </div>
+                </div>
+                {% for v in site.data.packages.package %}
+                {% if v[1].status == 'eol' %}
+                <div class="flex-auto overflow-hidden bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5">
+                    <div>
+                        <div class="group relative flex gap-x-6 p-2 hover:bg-gray-50{% if package == v[0] %} bg-uri-light hover:bg-uri-dark text-white{% endif %}">
+                            <div>
+                                <a href="/{{ v[0] }}/{{ v[1].documentation[0]}}/" class="font-semibold {% if package == v[0] %}text-white-50{% else %}text-gray-900{% endif %}">
+                                    {{ v[1].name }}
+                                    <span class="absolute inset-0"></span>
+                                </a>
+                                <p class="mt-1 {% if package == v[0] %}text-white{% else %}text-gray-600{% endif %}">{{ v[1].description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
                 {% endfor %}
                 </div>
             </div>
