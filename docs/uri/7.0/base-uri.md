@@ -30,6 +30,17 @@ echo $baseUri; // display 'http://www.example.com'
 
 The instance also implements PHP's `Stringable` and `JsonSerializable` interface.
 
+In addition to all the non-destructive rules from RFC3968, duting instantiation, the class
+will convert the host if possible:
+
+- to its IPv4 decimal representation
+- to its compressed IPv6 representation (since version **7.5**)
+
+```php
+BaseUri::from('https://0:443/')->getUriString(); // returns 'https://0.0.0.0/
+BaseUri::from('FtP://[1050:0000:0000:0000:0005:0000:300c:326b]/path')->getUriString(); // returns 'ftp://[1050::5:0:300c:326b]/path
+```
+
 ## URI resolution
 
 The `BaseUri::resolve` resolves a URI as a browser would for a relative URI while
