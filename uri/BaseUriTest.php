@@ -628,4 +628,80 @@ final class BaseUriTest extends TestCase
             'uri' => 'data:',
         ];
     }
+
+    #[Test]
+    #[DataProvider('redactUriUserInfoProvider')]
+    public function it_can_redact_user_info_password_component(string $uri, string $expected):void
+    {
+        self::assertSame($expected, BaseUri::from($uri)->redactUserInfo()->getUriString());
+    }
+
+    public static function redactUriUserInfoProvider(): iterable
+    {
+        yield 'empty URI' => [
+            'uri' => '',
+            'expected' => '',
+        ];
+
+        yield 'URI with user only' => [
+            'uri' => 'https://user@example.com',
+            'expected' => 'https://user@example.com',
+        ];
+
+        yield 'URI with complete user info only' => [
+            'uri' => 'https://user:pass@example.com',
+            'expected' => 'https://user:*****@example.com',
+        ];
+
+        yield 'URI without user info only' => [
+            'uri' => 'https://example.com',
+            'expected' => 'https://example.com',
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('redactUrQueryPairsProvider')]
+    public function it_can_redact_query_parameters(string $uri, array $pairs, string $expected):void
+    {
+        self::assertSame($expected, BaseUri::from($uri)->redactQueryPairs(...$pairs)->getUriString());
+    }
+
+    public static function redactUrQueryPairsProvider(): iterable
+    {
+        yield 'empty URI' => [
+            'uri' => '',
+            'pairs' => ['toto', 'foobar'],
+            'expected' => '',
+        ];
+
+        yield 'URI with complete user info only' => [
+            'uri' => 'https://user:pass@example.com',
+            'pairs' => ['toto', 'foobar'],
+            'expected' => 'https://user:pass@example.com',
+        ];
+
+        yield 'URI with query pair not matching' => [
+            'uri' => 'https://example.com?key=value',
+            'pairs' => ['toto', 'foobar'],
+            'expected' => 'https://example.com?key=value',
+        ];
+
+        yield 'URI with query with one query pair matching' => [
+            'uri' => 'https://example.com?key=value',
+            'pairs' => ['key', 'foobar'],
+            'expected' => 'https://example.com?key=*****',
+        ];
+
+        yield 'URI with query containing array like paraneters (1)' => [
+            'uri' => 'https://example.com?key[]=value&key[]=value&key=value',
+            'pairs' => ['key', 'foobar'],
+            'expected' => 'https://example.com?key%5B%5D=value&key%5B%5D=value&key=*****',
+        ];
+
+        yield 'URI with query containing array like paraneters (2)' => [
+            'uri' => 'https://example.com?key[]=value&key[]=value&key=value',
+            'pairs' => ['key[]', 'foobar'],
+            'expected' => 'https://example.com?key%5B%5D=*****&key%5B%5D=*****&key=value',
+        ];
+    }
 }

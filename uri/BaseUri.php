@@ -49,6 +49,8 @@ class BaseUri implements Stringable, JsonSerializable, UriAccess
     /** @var array<string,int> */
     final protected const DOT_SEGMENTS = ['.' => 1, '..' => 1];
 
+    final protected const COMPONENT_MASK = '*****';
+
     protected readonly Psr7UriInterface|UriInterface|null $origin;
     protected readonly ?string $nullValue;
 
@@ -268,6 +270,67 @@ class BaseUri implements Stringable, JsonSerializable, UriAccess
     public function hasIdn(): bool
     {
         return Converter::isIdn($this->uri->getHost());
+    }
+
+    /**
+     * Redact the User Info from the Base URI.
+     *
+     * If a password is present it will be replaced by the `***` value.
+     */
+    public function redactUserInfo(): static
+    {
+        $userInfo = $this->uri->getUserInfo();
+        if (null === $userInfo || !str_contains($userInfo, ':')) {
+            return $this;
+        }
+
+        [$user, $password] = explode(':',  $userInfo, 2) + [1 => null];
+
+        return match ($password) {
+            null => $this,
+            default => new static($this->uri->withUserInfo($user, self::COMPONENT_MASK), $this->uriFactory),
+        };
+    }
+
+    /**
+     * Redact the Query String Pairs from the Base URI.
+     *
+     * Value from QueryPairs found will be mask using the `*****` value.
+     */
+    public function redactQueryPairs(string ...$name): self
+    {
+        if ($name === []) {
+            return $this;
+        }
+
+        $currentQuery = $this->uri->getQuery();
+        if ($currentQuery ===  null || !str_contains($currentQuery, '=')) {
+            return $this;
+        }
+
+        $name = array_map(Encoder::decodeAll(...), $name);
+        $pairs = [];
+        foreach (explode('&', $currentQuery) as $part) {
+            [$key, ] = explode('=', $part, 2) + [1 => null];
+            $pairs[] = (in_array(Encoder::decodeAll($key), $name, true)) ? $key.'='.self::COMPONENT_MASK : $part;
+        }
+
+        $query = implode('&', $pairs);
+        if ($currentQuery === $query) {
+            return $this;
+        }
+
+        return new static($this->uri->withQuery($query), $this->uriFactory);
+    }
+
+    /**
+     * @param string ...$name
+     *
+     * @return self
+     */
+    public function redactSensitiveParameters(string ...$name): self
+    {
+        return $this->redactUserInfo()->redactQueryPairs(...$name);
     }
 
     /**
