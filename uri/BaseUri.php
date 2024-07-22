@@ -273,39 +273,23 @@ class BaseUri implements Stringable, JsonSerializable, UriAccess
     }
 
     /**
-     * Redact the User Info from the Base URI.
+     * Redact the password component and any query pairs whose key is submitted.
      *
-     * If a password is present it will be replaced by the `***` value.
+     * All redacted values will be replaced by the 5-star mask.
+     * The return value MAY not be a valid URI
+     *
+     * @param string ...$name
      */
-    public function redactUserInfo(): static
+    public function redactSensitiveParameters(string ...$name): string
     {
-        $userInfo = $this->uri->getUserInfo();
-        if (null === $userInfo || !str_contains($userInfo, ':')) {
-            return $this;
+        $components = UriString::parse($this);
+        if ($components['pass'] !== null) {
+            $components['pass'] = self::COMPONENT_MASK;
         }
 
-        [$user, $password] = explode(':',  $userInfo, 2) + [1 => null];
-
-        return match ($password) {
-            null => $this,
-            default => new static($this->uri->withUserInfo($user, self::COMPONENT_MASK), $this->uriFactory),
-        };
-    }
-
-    /**
-     * Redact the Query String Pairs from the Base URI.
-     *
-     * Value from QueryPairs found will be mask using the `*****` value.
-     */
-    public function redactQueryPairs(string ...$name): self
-    {
-        if ($name === []) {
-            return $this;
-        }
-
-        $currentQuery = $this->uri->getQuery();
-        if ($currentQuery ===  null || !str_contains($currentQuery, '=')) {
-            return $this;
+        $currentQuery = $components['query'];
+        if (null === $currentQuery || !str_contains($currentQuery, '=')) {
+            return UriString::build($components);
         }
 
         $name = array_map(Encoder::decodeAll(...), $name);
@@ -317,20 +301,12 @@ class BaseUri implements Stringable, JsonSerializable, UriAccess
 
         $query = implode('&', $pairs);
         if ($currentQuery === $query) {
-            return $this;
+            return UriString::build($components);
         }
 
-        return new static($this->uri->withQuery($query), $this->uriFactory);
-    }
+        $components['query'] = $query;
 
-    /**
-     * @param string ...$name
-     *
-     * @return self
-     */
-    public function redactSensitiveParameters(string ...$name): self
-    {
-        return $this->redactUserInfo()->redactQueryPairs(...$name);
+        return UriString::build($components);
     }
 
     /**

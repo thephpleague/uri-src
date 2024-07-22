@@ -633,7 +633,7 @@ final class BaseUriTest extends TestCase
     #[DataProvider('redactUriUserInfoProvider')]
     public function it_can_redact_user_info_password_component(string $uri, string $expected):void
     {
-        self::assertSame($expected, BaseUri::from($uri)->redactUserInfo()->getUriString());
+        self::assertSame($expected, BaseUri::from($uri)->redactSensitiveParameters());
     }
 
     public static function redactUriUserInfoProvider(): iterable
@@ -663,7 +663,7 @@ final class BaseUriTest extends TestCase
     #[DataProvider('redactUrQueryPairsProvider')]
     public function it_can_redact_query_parameters(string $uri, array $pairs, string $expected):void
     {
-        self::assertSame($expected, BaseUri::from($uri)->redactQueryPairs(...$pairs)->getUriString());
+        self::assertSame($expected, BaseUri::from($uri)->redactSensitiveParameters(...$pairs));
     }
 
     public static function redactUrQueryPairsProvider(): iterable
@@ -677,7 +677,7 @@ final class BaseUriTest extends TestCase
         yield 'URI with complete user info only' => [
             'uri' => 'https://user:pass@example.com',
             'pairs' => ['toto', 'foobar'],
-            'expected' => 'https://user:pass@example.com',
+            'expected' => 'https://user:*****@example.com',
         ];
 
         yield 'URI with query pair not matching' => [
