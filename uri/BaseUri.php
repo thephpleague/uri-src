@@ -24,6 +24,7 @@ use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use Stringable;
 
+use function array_map;
 use function array_pop;
 use function array_reduce;
 use function count;
@@ -278,9 +279,9 @@ class BaseUri implements Stringable, JsonSerializable, UriAccess
      * All redacted values will be replaced by the 5-star mask.
      * The return value MAY not be a valid URI
      *
-     * @param string ...$name
+     * @param string ...$names
      */
-    public function redactSensitiveParameters(string ...$name): string
+    public function redactSensitiveParameters(string ...$names): string
     {
         $components = UriString::parse($this);
         if ($components['pass'] !== null) {
@@ -288,23 +289,21 @@ class BaseUri implements Stringable, JsonSerializable, UriAccess
         }
 
         $currentQuery = $components['query'];
-        if (null === $currentQuery || !str_contains($currentQuery, '=')) {
+        if ([] === $names || null === $currentQuery || !str_contains($currentQuery, '=')) {
             return UriString::build($components);
         }
 
-        $name = array_map(Encoder::decodeAll(...), $name);
+        $names = array_map(Encoder::decodeAll(...), $names);
         $pairs = [];
         foreach (explode('&', $currentQuery) as $part) {
             [$key, ] = explode('=', $part, 2) + [1 => null];
-            $pairs[] = (in_array(Encoder::decodeAll($key), $name, true)) ? $key.'='.self::COMPONENT_MASK : $part;
+            $pairs[] = match (in_array(Encoder::decodeAll($key), $names, true)) {
+                true => $key.'='.self::COMPONENT_MASK,
+                false => $part,
+            };
         }
 
-        $query = implode('&', $pairs);
-        if ($currentQuery === $query) {
-            return UriString::build($components);
-        }
-
-        $components['query'] = $query;
+        $components['query'] = implode('&', $pairs);
 
         return UriString::build($components);
     }
