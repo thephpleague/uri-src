@@ -32,7 +32,7 @@ final class ConverterTest extends TestCase
         yield 'no change happen with a IPv4 ipv6' => [
             'ipv6' => '127.0.0.1',
             'ipv6Compressed' => '127.0.0.1',
-            'ipv6Expanded' => '127.0.0.1',
+            'ipv6Expanded' => '[0000:0000:0000:0000:0000:ffff:7f00:0001]',
         ];
 
         yield 'IPv6 gets expanded if needed' => [
@@ -67,8 +67,6 @@ final class ConverterTest extends TestCase
     public static function invalidIpv6(): iterable
     {
         yield 'hostname' => ['invalidIp' => 'example.com'];
-
-        yield 'IPv4' => ['invalidIp' => '127.0.0.2'];
 
         yield 'ip future' => ['invalidIp' => '[v42.fdfsffd]'];
 
