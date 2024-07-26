@@ -30,7 +30,7 @@ echo $baseUri; // display 'http://www.example.com'
 
 The instance also implements PHP's `Stringable` and `JsonSerializable` interface.
 
-In addition to all the non-destructive rules from RFC3968, duting instantiation, the class
+In addition to all the non-destructive rules from RFC3968, during instantiation, the class
 will convert the host if possible:
 
 - to its IPv4 decimal representation

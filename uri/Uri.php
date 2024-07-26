@@ -23,7 +23,6 @@ use League\Uri\Exceptions\SyntaxError;
 use League\Uri\Idna\Converter as IdnConverter;
 use League\Uri\UriTemplate\TemplateCanNotBeExpanded;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
-use SensitiveParameter;
 use Stringable;
 
 use function array_filter;
@@ -212,7 +211,7 @@ final class Uri implements UriInterface
     private function __construct(
         ?string $scheme,
         ?string $user,
-        #[SensitiveParameter] ?string $pass,
+        ?string $pass,
         ?string $host,
         ?int $port,
         string $path,
@@ -271,7 +270,7 @@ final class Uri implements UriInterface
      */
     private function formatUserInfo(
         ?string $user,
-        #[SensitiveParameter] ?string $password
+        ?string $password
     ): ?string {
         return match (null) {
             $password => $user,
@@ -380,7 +379,7 @@ final class Uri implements UriInterface
     /**
      * Create a new instance from a string.
      */
-    public static function new(#[SensitiveParameter] Stringable|string $uri = ''): self
+    public static function new(Stringable|string $uri = ''): self
     {
         $components = match (true) {
             $uri instanceof UriInterface => $uri->toComponents(),
@@ -405,8 +404,8 @@ final class Uri implements UriInterface
      * The returned URI must be absolute.
      */
     public static function fromBaseUri(
-        #[SensitiveParameter] Stringable|string $uri,
-        #[SensitiveParameter] Stringable|string|null $baseUri = null
+        Stringable|string $uri,
+        Stringable|string|null $baseUri = null
     ): self {
         $uri = self::new($uri);
         $baseUri = BaseUri::from($baseUri ?? $uri);
@@ -441,7 +440,7 @@ final class Uri implements UriInterface
      *
      * @param InputComponentMap $components a hash representation of the URI similar to PHP parse_url function result
      */
-    public static function fromComponents(#[SensitiveParameter] array $components = []): self
+    public static function fromComponents(array $components = []): self
     {
         $components += [
             'scheme' => null, 'user' => null, 'pass' => null, 'host' => null,
@@ -603,7 +602,7 @@ final class Uri implements UriInterface
     /**
      * Create a new instance from the environment.
      */
-    public static function fromServer(#[SensitiveParameter] array $server): self
+    public static function fromServer(array $server): self
     {
         $components = ['scheme' => self::fetchScheme($server)];
         [$components['user'], $components['pass']] = self::fetchUserInfo($server);
@@ -631,7 +630,7 @@ final class Uri implements UriInterface
      *
      * @return non-empty-array{0: ?string, 1: ?string}
      */
-    private static function fetchUserInfo(#[SensitiveParameter] array $server): array
+    private static function fetchUserInfo(array $server): array
     {
         $server += ['PHP_AUTH_USER' => null, 'PHP_AUTH_PW' => null, 'HTTP_AUTHORIZATION' => ''];
         $user = $server['PHP_AUTH_USER'];
@@ -1054,7 +1053,7 @@ final class Uri implements UriInterface
      *
      * @throws SyntaxError if the submitted data cannot be converted to string
      */
-    private function filterString(#[SensitiveParameter] Stringable|string|null $str): ?string
+    private function filterString(Stringable|string|null $str): ?string
     {
         $str = match (true) {
             $str instanceof UriComponentInterface => $str->value(),
@@ -1071,7 +1070,7 @@ final class Uri implements UriInterface
 
     public function withUserInfo(
         Stringable|string|null $user,
-        #[SensitiveParameter] Stringable|string|null $password = null
+        Stringable|string|null $password = null
     ): UriInterface {
         $user = Encoder::encodeUser($this->filterString($user));
         $pass = Encoder::encodePassword($this->filterString($password));

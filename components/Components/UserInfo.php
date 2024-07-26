@@ -21,7 +21,6 @@ use League\Uri\Encoder;
 use League\Uri\Exceptions\SyntaxError;
 use League\Uri\Uri;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
-use SensitiveParameter;
 use Stringable;
 
 use function explode;
@@ -36,7 +35,6 @@ final class UserInfo extends Component implements UserInfoInterface
      */
     public function __construct(
         Stringable|string|null $username,
-        #[SensitiveParameter]
         Stringable|string|null $password = null
     ) {
         $this->username = $this->validateComponent($username);
@@ -51,7 +49,7 @@ final class UserInfo extends Component implements UserInfoInterface
     /**
      * Create a new instance from a URI object.
      */
-    public static function fromUri(#[SensitiveParameter] Stringable|string $uri): self
+    public static function fromUri(Stringable|string $uri): self
     {
         $uri = self::filterUri($uri);
 
@@ -64,7 +62,7 @@ final class UserInfo extends Component implements UserInfoInterface
     /**
      * Create a new instance from an Authority object.
      */
-    public static function fromAuthority(#[SensitiveParameter] Stringable|string|null $authority): self
+    public static function fromAuthority(Stringable|string|null $authority): self
     {
         return match (true) {
             $authority instanceof AuthorityInterface => self::new($authority->getUserInfo()),
@@ -80,7 +78,7 @@ final class UserInfo extends Component implements UserInfoInterface
      *
      * @param array{user? : ?string, pass? : ?string} $components
      */
-    public static function fromComponents(#[SensitiveParameter] array $components): self
+    public static function fromComponents(array $components): self
     {
         $components += ['user' => null, 'pass' => null];
 
@@ -93,7 +91,7 @@ final class UserInfo extends Component implements UserInfoInterface
     /**
      * Creates a new instance from an encoded string.
      */
-    public static function new(#[SensitiveParameter] Stringable|string|null $value = null): self
+    public static function new(Stringable|string|null $value = null): self
     {
         if ($value instanceof UriComponentInterface) {
             $value = $value->value();
@@ -164,7 +162,7 @@ final class UserInfo extends Component implements UserInfoInterface
         };
     }
 
-    public function withPass(#[SensitiveParameter] Stringable|string|null $password): self
+    public function withPass(Stringable|string|null $password): self
     {
         $password = $this->validateComponent($password);
 
@@ -185,7 +183,7 @@ final class UserInfo extends Component implements UserInfoInterface
      *
      * Create a new instance from a URI object.
      */
-    public static function createFromUri(#[SensitiveParameter] Psr7UriInterface|UriInterface $uri): self
+    public static function createFromUri(Psr7UriInterface|UriInterface $uri): self
     {
         return self::fromUri($uri);
     }
@@ -200,7 +198,7 @@ final class UserInfo extends Component implements UserInfoInterface
      *
      * Create a new instance from an Authority object.
      */
-    public static function createFromAuthority(#[SensitiveParameter] AuthorityInterface|Stringable|string $authority): self
+    public static function createFromAuthority(AuthorityInterface|Stringable|string $authority): self
     {
         return self::fromAuthority($authority);
     }
@@ -215,7 +213,7 @@ final class UserInfo extends Component implements UserInfoInterface
      *
      * Creates a new instance from an encoded string.
      */
-    public static function createFromString(#[SensitiveParameter] Stringable|string $userInfo): self
+    public static function createFromString(Stringable|string $userInfo): self
     {
         return self::new($userInfo);
     }

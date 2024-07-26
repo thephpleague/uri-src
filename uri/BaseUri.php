@@ -24,6 +24,7 @@ use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use Stringable;
 
+use function array_map;
 use function array_pop;
 use function array_reduce;
 use function count;
@@ -48,6 +49,8 @@ class BaseUri implements Stringable, JsonSerializable, UriAccess
 
     /** @var array<string,int> */
     final protected const DOT_SEGMENTS = ['.' => 1, '..' => 1];
+
+    final protected const COMPONENT_MASK = '*****';
 
     protected readonly Psr7UriInterface|UriInterface|null $origin;
     protected readonly ?string $nullValue;
@@ -276,6 +279,41 @@ class BaseUri implements Stringable, JsonSerializable, UriAccess
     public function hasIPv4(): bool
     {
         return IPv4Converter::fromEnvironment()->isIpv4($this->uri->getHost());
+    }
+
+    /**
+     * Redact the password component and any query pairs whose key is submitted.
+     *
+     * All redacted values will be replaced by the 5-star mask.
+     * The return value MAY not be a valid URI
+     *
+     * @param string ...$names
+     */
+    public function redactSensitiveParameters(string ...$names): string
+    {
+        $components = UriString::parse($this);
+        if ($components['pass'] !== null) {
+            $components['pass'] = self::COMPONENT_MASK;
+        }
+
+        $currentQuery = $components['query'];
+        if ([] === $names || null === $currentQuery || !str_contains($currentQuery, '=')) {
+            return UriString::build($components);
+        }
+
+        $names = array_map(Encoder::decodeAll(...), $names);
+        $pairs = [];
+        foreach (explode('&', $currentQuery) as $part) {
+            [$key, ] = explode('=', $part, 2) + [1 => null];
+            $pairs[] = match (in_array(Encoder::decodeAll($key), $names, true)) {
+                true => $key.'='.self::COMPONENT_MASK,
+                false => $part,
+            };
+        }
+
+        $components['query'] = implode('&', $pairs);
+
+        return UriString::build($components);
     }
 
     /**
