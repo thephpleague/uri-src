@@ -71,7 +71,7 @@ either its IPv4 mapped IPv6 address representation or its 6to4 notation.
 ```php
 $converter = Converter::fromEnvironment();
 $converter->toDecimal('[2002:0000:0000::]') // returns 0.0.0.0
-$converter->toIPv4MapedIPv6('0xc0a821');    // returns "[::ffff:192.168.2.1]"
+$converter->toIPv4MappedIPv6('0xc0a821');    // returns "[::ffff:192.168.2.1]"
 $converter->to6to4('0xc0a821');             // returns "[2002:00c0:a821::]"
 ```
 
