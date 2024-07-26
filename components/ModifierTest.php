@@ -883,7 +883,7 @@ final class ModifierTest extends TestCase
         yield 'no change happen with a IPv4 host' => [
             'inputUri' => 'https://127.0.0.1/foo/bar',
             'compressedUri' => 'https://127.0.0.1/foo/bar',
-            'expandedUri' => 'https://[0000:0000:0000:0000:0000:ffff:7f00:0001]/foo/bar',
+            'expandedUri' => 'https://127.0.0.1/foo/bar',
         ];
 
         yield 'IPv6 gets expanded if needed' => [

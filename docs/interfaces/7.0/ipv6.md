@@ -39,12 +39,6 @@ echo Converter::expand('[1050:0000:0000:0000:0005:0000:300c:326b]');
 // returns [1050:0000:0000:0000:0005:0000:300c:326b]
 ```
 
-The compress method can also be used to convert a IPv6-mapped IPv4 address into a IPv4
-address in its decimal form. Conversely, presented with an IPv4 address, 
-the `Converted::expand` method will do the opposite and convert the 
-IPv4 address into its IPv6-mapped IPv4 address representation in long form.
-
-
 To complement the host related methods the class also provide stricter IPv6 compress and expand
 methods using the  `Converter::compressIp` and  `Converter::expandId` methods. Those methods will
 throw if the submitted value is not a valid IPv6 representation.

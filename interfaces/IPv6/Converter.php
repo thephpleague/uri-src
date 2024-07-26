@@ -6,6 +6,7 @@ namespace League\Uri\IPv6;
 
 use Stringable;
 use ValueError;
+
 use const FILTER_FLAG_IPV6;
 use const FILTER_VALIDATE_IP;
 
@@ -18,9 +19,6 @@ use function unpack;
 
 final class Converter
 {
-    private const IPV4_MAPPED_PREFIX = '::ffff:';
-    private const IPV6_6TO4_PREFIX = '2002:';
-
     /**
      * Significant 10 bits of IP to detect Zone ID regular expression pattern.
      *
@@ -30,34 +28,14 @@ final class Converter
 
     public static function compressIp(string $ipAddress): string
     {
-        if (false === filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-            throw new ValueError('The submitted IP is not a valid IPv6 address.');
-        }
-
-        $ipAddress = strtolower((string) inet_ntop((string) inet_pton($ipAddress)));
-        if (str_starts_with($ipAddress, self::IPV4_MAPPED_PREFIX)) {
-            return substr($ipAddress, 7);
-        }
-
-        if (!str_starts_with($ipAddress, self::IPV6_6TO4_PREFIX)) {
-            return $ipAddress;
-        }
-
-        $hexPart = substr($ipAddress, 5, 9);
-        $hexParts = explode(':', $hexPart);
-
-        return (string) match (true) {
-            count($hexParts) < 2 => $ipAddress,
-            default => long2ip((int) hexdec($hexParts[0]) * 65536 + (int) hexdec($hexParts[1])),
+        return match (filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            false => throw new ValueError('The submitted IP is not a valid IPv6 address.'),
+            default =>  strtolower((string) inet_ntop((string) inet_pton($ipAddress))),
         };
     }
 
     public static function expandIp(string $ipAddress): string
     {
-        if (false !== filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-            $ipAddress =  self::IPV4_MAPPED_PREFIX.$ipAddress;
-        }
-
         if (false === filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
             throw new ValueError('The submitted IP is not a valid IPv6 address.');
         }
@@ -102,8 +80,8 @@ final class Converter
         $components['ipAddress'] ??= null;
         $components['zoneIdentifier'] ??= null;
 
-        if (null !== $components['ipAddress'] && false !== filter_var($components['ipAddress'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-            return $components['ipAddress'];
+        if (null === $components['ipAddress']){
+            return '';
         }
 
         return '['.$components['ipAddress'].match ($components['zoneIdentifier']) {
@@ -126,10 +104,6 @@ final class Converter
         $host = (string) $host;
         if ($host === '') {
             return ['ipAddress' => null, 'zoneIdentifier' => null];
-        }
-
-        if (false !== filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-            return ['ipAddress' => self::IPV4_MAPPED_PREFIX.$host, 'zoneIdentifier' => null];
         }
 
         if (!str_starts_with($host, '[')) {

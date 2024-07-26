@@ -62,6 +62,20 @@ $converter->toOctal('0xc0a821');           // returns "0300.0250.0002.0001"
 $converter->toHexadecimal('192.168.2.1.'); // returns "0xc0a821"
 ```
 
+<p class="message-notice">since version <code>7.5.0</code></p>
+
+The `toDecimal` method will also infer the IPv4 address out of an IPv4 mapped IPv6 address or
+from a 6to4 notation and two (2) new dedicated method allow to convert your IPv4 address into
+either its IPv4 mapped IPv6 address representation or its 6to4 notation.
+
+```php
+$converter = Converter::fromEnvironment();
+$converter->toDecimal('[2002:0000:0000::]') // returns 0.0.0.0
+$converter->toIPv4MapedIPv6('0xc0a821');    // returns "[::ffff:192.168.2.1]"
+$converter->to6to4('0xc0a821');             // returns "[2002:00c0:a821::]"
+```
+
+
 <p class="message-notice">since version <code>7.2.0</code></p>
 
 It is possible to determine if a given domain is or can be converted to an IPv4 host the new `Converter::isIpv4`
