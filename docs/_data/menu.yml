@@ -26,8 +26,10 @@ packages:
                 Introduction: '/interfaces/7.0/'
             Tools:
                 Contracts: '/interfaces/7.0/contracts/'
+            Parsers:
                 URI Parser: '/interfaces/7.0/uri-parser-builder/'
                 Query Parser: '/interfaces/7.0/query-parser-builder/'
+            Converters:
                 IPv4 Converter: '/interfaces/7.0/ipv4/'
                 IPv6 Converter: '/interfaces/7.0/ipv6/'
                 IDN Converter: '/interfaces/7.0/idn/'

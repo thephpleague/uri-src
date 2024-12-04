@@ -3,7 +3,7 @@ layout: default
 title: RFC3986 - RFC3987 URI Parser
 ---
 
-URI parser and builder
+URI Parser and Builder
 =======
 
 PHP has been relying on the `parse_url` function to split URI into its component. But the

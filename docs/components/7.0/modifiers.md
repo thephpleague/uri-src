@@ -143,7 +143,7 @@ Sorts the query according to its key values. The sorting rules are the same uses
 use League\Uri\Modifier;
 
 echo Modifier::from("http://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
-    ->sortQuery($uri)
+    ->sortQuery()
     ->getUri()
     ->getQuery(); 
 //display "kingkong=toto&kingkong=ape&foo=bar%20baz"
