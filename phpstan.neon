@@ -16,5 +16,6 @@ parameters:
 		- message: '#function gmp_(.*)? expects (GMP|int)#'
 		  path: interfaces/IPv4/GMPCalculator.php
 		- identifier: missingType.iterableValue
+		- '#Attribute class Deprecated does not exist.#'
 	reportUnmatchedIgnoredErrors: true
 	treatPhpDocTypesAsCertain: false
