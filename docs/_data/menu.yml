@@ -24,7 +24,6 @@ packages:
         '7.0':
             Getting Started:
                 Introduction: '/interfaces/7.0/'
-            Tools:
                 Contracts: '/interfaces/7.0/contracts/'
             Parsers:
                 URI Parser: '/interfaces/7.0/uri-parser-builder/'
