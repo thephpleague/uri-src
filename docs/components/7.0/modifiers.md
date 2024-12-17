@@ -76,7 +76,7 @@ echo $uri, PHP_EOL; // returns http://shop.bébé.be./toto?foo=toto&foo=tata
 <p class="message-warning">While the class does manipulate URI it does not implement any URI related interface.</p>
 <p class="message-notice">If a PSR-7 or a League <code>UriInterface</code> implementing instance is given
 then the return value will also be a PSR-7 <code>UriInterface</code> implementing instance.</p>
-<p class="message-notice"><code>getIdnUriString</code> was added in version <code>7.5.0</code>.</p>
+<p class="message-notice">The <code>getIdnUriString</code> method is available since version <code>7.5.0</code>.</p>
 
 The `Modifier::getUri` method returns either a `PSR-7` or a League URI `UriInterface`, conversely,
 the `Modifier::getUriString` method returns the RFC3986 string representation for the URI and
@@ -86,6 +86,91 @@ implements the `Stringable` and the `JsonSerializable` interface to improve deve
 
 Under the hood the `Modifier` class intensively uses the [URI components objects](/components/7.0/)
 to apply changes to the submitted URI object.
+
+<p class="message-notice">The <code>when</code> method is available since version <code>7.6.0</code></p>
+
+To ease modifying URI since version 7.6.0, the `when` method is added and the modifier methods from
+the underlying URI object are now accessible via proxy.
+
+```php
+use League\Uri\Modifier;
+
+$foo = '';
+echo Modifier::from('http://bébé.be')
+    ->when(
+        '' !== $foo, 
+        fn (Modifier $uri) => $uri->withQuery('firstname=jane&lastname=Doe'),  //on true
+        fn (Modifier $uri) => $uri->mergeQueryParameters(['firstname' => 'john', 'lastname' => 'Doe']), //on false
+    )
+    ->appendSegment('toto')
+    ->addRootLabel()
+    ->prependLabel('shop')
+    ->appendQuery('foo=toto&foo=tata')
+    ->withFragment('chapter1')
+    ->getUriIdnString();
+// returns 'http://shop.bébé.be./toto?firstname=john&lastname=Doe&foo=toto&foo=tata#chapter1';
+```
+
+### Available methods
+
+<div class="flex flex-row flex-wrap">
+<div>
+<ul>
+  <li><a href="#modifierencodequery">encodeQuery</a></li>
+  <li><a href="#modifiersortquery">sortQuery</a></li>
+  <li><a href="#modifiermergequery">mergeQuery</a></li>
+  <li><a href="#modifierappendquery">appendQuery</a></li>
+  <li><a href="#modifierappendqueryparameters">appendQueryParameters</a></li>
+  <li><a href="#modifierremovequeryparameters">removeQueryParameters</a></li>
+  <li><a href="#modifierremovequeryparameterindices">removeQueryParameterIndices</a></li>
+  <li><a href="#modifiermergequeryparameters">mergeQueryParameters</a></li>
+  <li><a href="#modifierappendquerypairs">appendQueryPairs</a></li>
+  <li><a href="#modifierremovequerypairs">removeQueryPairs</a></li>
+  <li><a href="#modifiermergequerypairs">mergeQueryPairs</a></li>
+</ul>
+</div>
+<div>
+<ul>
+  <li><a href="#modifierhosttoascii">hostToAscii</a></li>
+  <li><a href="#modifierhosttounicode">hostToUnicode</a></li>
+  <li><a href="#modifierhosttodecimal">hostToDecimal</a></li>
+  <li><a href="#modifierhosttooctal">hostToOctal</a></li>
+  <li><a href="#modifierhosttohexadecimal">hostToHexadecimal</a></li>
+  <li><a href="#modifierhosttoipv6compressed">hostToIpv6Compressed</a></li>
+  <li><a href="#modifierhosttoipv6expanded">hostToIpv6Expanded</a></li>
+  <li><a href="#modifierremovezoneidentifier">removeZoneIdentifier</a></li>
+  <li><a href="#modifieraddrootlabel">addRootLabel</a></li>
+  <li><a href="#modifierremoverootlabel">removeRootLabel</a></li>
+  <li><a href="#modifierprependlabel">prependLabel</a></li>
+  <li><a href="#modifierreplacelabel">replaceLabel</a></li>
+  <li><a href="#modifierremovelabels">removeLabels</a></li>
+  <li><a href="#modifierslicelabels">sliceLabels</a></li>
+</ul>
+</div>
+<div>
+<ul>
+  <li><a href="#modifierremovedotsegments">removeDotSegments</a></li>
+  <li><a href="#modifierremoveemptysegments">removeEmptySegments</a></li>
+  <li><a href="#modifierremovetrailingslash">removeTrailingSlash</a></li>
+  <li><a href="#modifieraddtrailingslash">addTrailingSlash</a></li>
+  <li><a href="#modifierremoveleadingslash">removeLeadingSlash</a></li>
+  <li><a href="#modifieraddleadingslash">addLeadingSlash</a></li>
+  <li><a href="#modifierreplacedirname">replaceDirname</a></li>
+  <li><a href="#modifierreplacebasename">replaceBasename</a></li>
+  <li><a href="#modifierreplaceextension">replaceExtension</a></li>
+  <li><a href="#modifieraddbasepath">addBasePath</a></li>
+  <li><a href="#modifierremovebasepath">removeBasePath</a></li>
+  <li><a href="#modifierappendsegment">appendSegment</a></li>
+  <li><a href="#modifierprependsegment">prependSegment</a></li>
+  <li><a href="#modifierreplacesegment">replaceSegment</a></li>
+  <li><a href="#modifierremovesegments">removeSegments</a></li>
+  <li><a href="#modifierslicesegments">sliceSegments</a></li>
+  <li><a href="#modifierreplacedatauriparameters">replaceDataUriParameters</a></li>
+  <li><a href="#modifierdatapathtobinary">dataPathToBinary</a></li>
+  <li><a href="#modifierdatapathtoascii">dataPathToAscii</a></li>
+</ul>
+</div>
+</div>
 
 ## Query modifiers
 

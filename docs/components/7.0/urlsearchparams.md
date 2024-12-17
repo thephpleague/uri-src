@@ -115,3 +115,20 @@ $params->get('bar'); //returns "baz bar"
 $params->sort();
 echo $params->toString(); //returns "aha=true&aha=null&bar=baz+bar"
 ~~~
+
+<p class="message-notice">The <code>when</code> method is available since version <code>7.6.0</code></p>
+To ease building the instance, the `when` method is added to all components to conditionally create your component.
+
+```php
+use League\Uri\Components\URLSearchParams;
+
+$foo = '';
+echo URLSearchParams::fromUri('https://uri.thephpleague.com/components/7.0/modifiers/')
+    ->when(
+        '' !== $foo, 
+        fn (URLSearchParams $query) => $query->append(['foo', $foo]),  //on true
+        fn (URLSearchParams $query) => $query->set(['bar', 'baz']), //on false
+    )
+    ->toString();
+// returns 'bar=baz';
+```
