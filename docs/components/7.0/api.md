@@ -30,7 +30,7 @@ Port::fromAuthority('example.com')->value(); // displays null
 Path::new()->value();                        // displays ''
 ~~~ 
 
-Because URI component car be formatted differently depending on the context, each objects exposes
+Because URI component can be formatted differently depending on the context, each object exposes
 different representations:
 
 ~~~php
@@ -76,6 +76,23 @@ an explicit `toString()` method to cast the URI component to a string.
 
 <p class="message-notice">Normalization and encoding are component specific.</p>
 <p class="message-notice"><code>JsonSerializable</code> encoding <strong>may</strong> differ to improve interoperability with current specification.</p>
+
+<p class="message-notice">The <code>when</code> method is available since version <code>7.6.0</code></p>
+To ease building components, the `when` method is added to all components to conditionally create your component.
+
+```php
+use League\Uri\Components\Query;
+
+$foo = '';
+echo Query::fromUri('https://uri.thephpleague.com/components/7.0/modifiers/')
+    ->when(
+        '' !== $foo, 
+        fn (Query $query) => $query->withPair(['foo', $foo]),  //on true
+        fn (Query $query) => $query->withPair(['bar', 'baz']), //on false
+    )
+    ->getUriComponent();
+// returns '?bar=baz';
+```
 
 ## List of URI component objects
 

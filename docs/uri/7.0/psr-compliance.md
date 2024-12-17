@@ -88,6 +88,23 @@ echo json_encode(Http::new('http://example.com/path/to?q=foo%20bar#section-42'))
 // display "http:\/\/example.com\/path\/to?q=foo%20bar#section-42"
 ~~~
 
+<p class="message-notice">The <code>when</code> method is available since version <code>7.6.0</code></p>
+To ease building the instance, the `when` method is added to conditionally create your component.
+
+```php
+use League\Uri\Http;
+
+$foo = 'boo';
+echo Http::new('https://uri.thephpleague.com/components/7.0/modifiers/')
+    ->when(
+        '' !== $foo, 
+        fn (Http $uri) => $uri->withPath('/'.$foo),  //on true
+        fn (Http $uri) => $uri->withPath('/default'), //on false
+    )
+    ->toString();
+// returns 'https://uri.thephpleague.com/boo';
+```
+
 ### Differences with the Generic RFC3986 URI
 
 Because of its normalization rules a `PSR-7` UriInterface implementing object
