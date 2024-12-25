@@ -46,6 +46,9 @@ as an IPv4 address.
 In order to create Data URI from the content of a file you are required to also
 install the `fileinfo` extension otherwise an exception will be thrown.
 
+To use the `toAnchor` method you need to have the `ext-dom` extension
+installed in your system.
+
 Installation
 --------
 

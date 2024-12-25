@@ -25,6 +25,7 @@
     "require": {
         "php": "^8.1",
         "ext-bcmath": "*",
+        "ext-dom": "*",
         "ext-fileinfo": "*",
         "ext-gmp": "*",
         "ext-intl": "*",
