@@ -46,8 +46,11 @@ as an IPv4 address.
 In order to create Data URI from the content of a file you are required to also
 install the `fileinfo` extension otherwise an exception will be thrown.
 
-To use the `toAnchor` method you need to have the `ext-dom` extension
+To convert a URI into an HTML anchor tag you need to have the `ext-dom` extension
 installed in your system.
+
+To enable URI normalization, the `ext-mbstring` extension or a polyfill
+like `symfony/polyfill-mbstring` must be present in your system.
 
 Installation
 --------
