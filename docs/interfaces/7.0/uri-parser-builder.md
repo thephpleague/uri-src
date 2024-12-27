@@ -15,9 +15,11 @@ The class act as a drop-in replacement for PHP's `parse_url` feature.
 ## URI parsing
 
 ~~~php
-UriString::resolve(string $uri, ?string $baseUri = null): array
 UriString::parse(string $uri): array
+UriString::normalize(string $uri): string
 UriString::parseAuthority(string $autority): array
+UriString::normalizeAuthority(string $autority): string
+UriString::resolve(string $uri, ?string $baseUri = null): string
 ~~~
 
 The parser is:
@@ -74,17 +76,31 @@ a base URI which must be absolute, the URI will then be resolved using the base 
 
 ```php
 $components = UriString::resolve('"/foo", "https://example.com");
+//returns "https://example.com/foo"
+```
+
+It is possible to normalize a URI against the RFC3986 rules using the `UriString::normalize` method.
+The method expects a string and will return the same array as `UriString::parse` but each component will
+have been normalized.
+
+```php
+use League\Uri\UriString;
+
+$parsed = UriString::parse("https://EXAMPLE.COM/foo/../bar");
 //returns the following array
 //array(
-//  'scheme' => 'https',
+//  'scheme' => 'http',
 //  'user' => null,
 //  'pass' => null,
-//  'host' => 'example.com'',
+//  'host' => 'EXAMPLE.COM',
 //  'port' => null,
-//  'path' => '/foo',
+//  'path' => '/foo/../bar',
 //  'query' => null,
 //  'fragment' => null,
 //);
+
+$normalized = UriString::normalize("https://EXAMPLE.COM/foo/../bar");
+//returns "https://example.com/bar"
 ```
 
 ## URI Building
@@ -119,39 +135,3 @@ echo UriString::build($components); //displays http://hello:world@foo.com?@bar.c
 The `build` method provides similar functionality to the `http_build_url()` function from v1.x of the [`pecl_http`](https://pecl.php.net/package/pecl_http) PECL extension.
 
 <p class="message-notice">The class also exposes a <code>UriString::buildAuthority</code> you can use to build an authority from its hash representation.</p>
-
-## URI Normalization
-
-It is possible to normalize a URI against the RFC3986 rules using the `UriString::normalize` method.
-The method expects a string and will return the same array as `UriString::parse` but each component will
-have been normalized.
-
-```php
-use League\Uri\UriString;
-
-$parsed = UriString::parse("https://EXAMPLE.COM/foo/../bar");
-//returns the following array
-//array(
-//  'scheme' => 'http',
-//  'user' => null,
-//  'pass' => null,
-//  'host' => 'EXAMPLE.COM',
-//  'port' => null,
-//  'path' => '/foo/../bar',
-//  'query' => null,
-//  'fragment' => null,
-//);
-
-$normalized = UriString::normalize("https://EXAMPLE.COM/foo/../bar");
-//returns the following array
-//array(
-//  'scheme' => 'http',
-//  'user' => null,
-//  'pass' => null,
-//  'host' => 'example.com',
-//  'port' => null,
-//  'path' => '/bar',
-//  'query' => null,
-//  'fragment' => null,
-//);
-```
