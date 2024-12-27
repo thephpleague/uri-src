@@ -49,9 +49,6 @@ install the `fileinfo` extension otherwise an exception will be thrown.
 To convert a URI into an HTML anchor tag you need to have the `ext-dom` extension
 installed in your system.
 
-To enable URI normalization, the `ext-mbstring` extension or a polyfill
-like `symfony/polyfill-mbstring` must be present in your system.
-
 Installation
 --------
 

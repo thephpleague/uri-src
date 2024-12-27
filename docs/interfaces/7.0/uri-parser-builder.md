@@ -15,6 +15,7 @@ The class act as a drop-in replacement for PHP's `parse_url` feature.
 ## URI parsing
 
 ~~~php
+UriString::resolve(string $uri, ?string $baseUri = null): array
 UriString::parse(string $uri): array
 UriString::parseAuthority(string $autority): array
 ~~~
@@ -67,6 +68,25 @@ var_export(UriString::parse('http:www.example.com'));
 <p class="message-warning">This invalid HTTP URI is successfully parsed.</p>
 <p class="message-notice">The class also exposes a <code>UriString::parseAuthority</code> you can use to parse an authority string.</p>
 
+If you need to resolve your URI in the context of a Base URI the `resolve` public static method will let you
+do just that. The method expect either a full URI as its single parameter or a relative URI following by
+a base URI which must be absolute, the URI will then be resolved using the base URI.
+
+```php
+$components = UriString::resolve('"/foo", "https://example.com");
+//returns the following array
+//array(
+//  'scheme' => 'https',
+//  'user' => null,
+//  'pass' => null,
+//  'host' => 'example.com'',
+//  'port' => null,
+//  'path' => '/foo',
+//  'query' => null,
+//  'fragment' => null,
+//);
+```
+
 ## URI Building
 
 ~~~php
@@ -99,3 +119,39 @@ echo UriString::build($components); //displays http://hello:world@foo.com?@bar.c
 The `build` method provides similar functionality to the `http_build_url()` function from v1.x of the [`pecl_http`](https://pecl.php.net/package/pecl_http) PECL extension.
 
 <p class="message-notice">The class also exposes a <code>UriString::buildAuthority</code> you can use to build an authority from its hash representation.</p>
+
+## URI Normalization
+
+It is possible to normalize a URI against the RFC3986 rules using the `UriString::normalize` method.
+The method expects a string and will return the same array as `UriString::parse` but each component will
+have been normalized.
+
+```php
+use League\Uri\UriString;
+
+$parsed = UriString::parse("https://EXAMPLE.COM/foo/../bar");
+//returns the following array
+//array(
+//  'scheme' => 'http',
+//  'user' => null,
+//  'pass' => null,
+//  'host' => 'EXAMPLE.COM',
+//  'port' => null,
+//  'path' => '/foo/../bar',
+//  'query' => null,
+//  'fragment' => null,
+//);
+
+$normalized = UriString::normalize("https://EXAMPLE.COM/foo/../bar");
+//returns the following array
+//array(
+//  'scheme' => 'http',
+//  'user' => null,
+//  'pass' => null,
+//  'host' => 'example.com',
+//  'port' => null,
+//  'path' => '/bar',
+//  'query' => null,
+//  'fragment' => null,
+//);
+```
