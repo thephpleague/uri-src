@@ -145,6 +145,7 @@ echo Modifier::from('http://bébé.be')
   <li><a href="#modifierreplacelabel">replaceLabel</a></li>
   <li><a href="#modifierremovelabels">removeLabels</a></li>
   <li><a href="#modifierslicelabels">sliceLabels</a></li>
+  <li><a href="#modifierwhatwghost">whatWgHost</a></li>
 </ul>
 </div>
 <div>
@@ -604,6 +605,19 @@ echo Modifier::from($uri)->sliceLabels(1, 1)->getUriString();
 
 <p class="message-info">This modifier supports negative offset</p>
 
+### Modifier::whatWgHost
+
+Returns the host as formatted following WHATWG host formatting
+
+<p class="message-notice">available since version <code>7.6.0</code></p>
+
+~~~php
+$uri = "https://0:0@0:0";
+echo Modifier::from($uri)->whatWgHost()->getUriString();
+//display "https://0:0@0.0.0.0:0"
+~~~
+
+In case of IPv4 and/or IPv6 some extra normalization are applied.
 
 ## Path modifiers
 
