@@ -6,6 +6,8 @@ title: URI context aware wrapper
 URI info and full manipulation
 =======
 
+<p class="message-warning">The class is deprecated please use the <code>Uri</code> class instead startinh with version <code>7.6.0</code>.</p>
+
 The `League\Uri\BaseUri` class is build to ease gathering information regarding a specific URI. 
 The class makes it easier to transform and crawl pages containing URIs (ie: a web page, or an HTTP client for instance).
 

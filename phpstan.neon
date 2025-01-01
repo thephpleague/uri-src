@@ -21,5 +21,6 @@ parameters:
 		- message: '#Variable method call on Psr\\Http\\Message\\UriInterface.#'
 		  path: components/Modifier.php
 		- '#Attribute class Deprecated does not exist.#'
+		- '#deprecated class League\\Uri\\BaseUri#'
 	reportUnmatchedIgnoredErrors: true
 	treatPhpDocTypesAsCertain: false
