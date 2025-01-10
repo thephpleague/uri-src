@@ -134,3 +134,21 @@ HierarchicalPath::fromAbsolute('path','to', 'the', 'sky')->withoutSegment(0, 1)-
 
 <p class="message-info">Just like the <code>HierarchicalPath::get</code> this method supports negative offset.</p>
 <p class="message-notice">if the specified offset does not exist, no modification is performed and the current object is returned.</p>
+
+### Removing empty segments
+
+Sometimes your path may contain multiple adjacent delimiters. Since removing them may result in a semantically
+different URI, this normalization can not be applied by default. To remove adjacent delimiters you can call
+the `HierarchicalPath::withoutEmptySegments` method which convert you path as described below:
+
+~~~php
+<?php
+
+use League\Uri\Components\HierarchicalPath;
+
+$path = HierarchicalPath::new("path////to/the/sky//");
+$newPath = $path->withoutEmptySegments();
+echo $path;    //displays 'path////to/the/sky//'
+echo $newPath; //displays 'path/to/the/sky/'
+~~~
+
