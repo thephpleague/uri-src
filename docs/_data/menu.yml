@@ -40,7 +40,8 @@ packages:
             Getting Started:
                 Introduction: '/components/7.0/'
                 From 2.x to 7.x: '/components/7.0/upgrading/'
-                Modifier: '/components/7.0/modifiers/'
+            URI Manipulation:
+                URI Modifier: '/components/7.0/modifiers/'
             URI components:
                 Common API: '/components/7.0/api/'
                 Scheme: '/components/7.0/scheme/'
