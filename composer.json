@@ -30,18 +30,20 @@
         "ext-gmp": "*",
         "ext-intl": "*",
         "ext-mbstring": "*",
-        "friendsofphp/php-cs-fixer": "^3.65.0",
+        "friendsofphp/php-cs-fixer": "^3.67.1",
         "guzzlehttp/psr7": "^2.7.0",
+        "http-interop/http-factory-tests": "^2.2",
         "laminas/laminas-diactoros": "^3.5.0",
         "nyholm/psr7": "^1.8.2",
         "phpbench/phpbench": "^1.3.1",
-        "phpstan/phpstan": "^1.12.14",
+        "phpstan/phpstan": "^1.12.15",
         "phpstan/phpstan-deprecation-rules": "^1.2.1",
         "phpstan/phpstan-phpunit": "^1.4.2",
         "phpstan/phpstan-strict-rules": "^1.6.1",
-        "phpunit/phpunit": "^10.5.17 || ^11.5.2",
+        "phpunit/phpunit": "^10.5.17 || ^11.5.3",
         "psr/http-factory": "^1.1.0",
         "psr/http-message": "^1.1.0 || ^2.0",
+        "slim/psr7": "^1.7",
         "symfony/var-dumper": "^6.4.15",
         "uri-templates/uritemplate-test": "dev-master"
     },
@@ -61,7 +63,11 @@
     ],
     "autoload": {
         "psr-4": {
-            "League\\Uri\\": ["uri", "components", "interfaces"]
+            "League\\Uri\\": [
+                "uri",
+                "components",
+                "interfaces"
+            ]
         }
     },
     "scripts": {
