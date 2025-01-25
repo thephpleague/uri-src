@@ -9,7 +9,6 @@ URI Template
 The `League\Uri\UriTemplate` class enables expanding a URI object based on a URI template and its 
 submitted parameters following [RFC 6570 URI Template](http://tools.ietf.org/html/rfc6570).
 
-
 ## Template expansion
 
 The `UriTemplate::expand` public method expands a URI template to generate a valid URI conforming
@@ -187,3 +186,27 @@ $uriTemplate = new UriTemplate($template);
 echo $uriTemplate->expand($params), PHP_EOL;
 // https://example.com/hotels/%7B/Rest%20%26%20Relax
 ~~~
+
+## Interoperability
+
+<p class="message-notice">Available since <code>version 7.6</code></p>
+
+To allow easier integration with other PHP packages and especially [PSR-13](https://www.php-fig.org/psr/psr-13/)
+the `UriTemplate` class implements the `Stringable` interface.
+
+~~~php
+use League\Uri\UriTemplate;
+use Symfony\Component\WebLink\Link;
+
+$uriTemplate = new UriTemplate('https://google.com/search{?q*}');
+
+$link = (new Link())
+    ->withHref($uriTemplate)
+    ->withRel('next')
+    ->withAttribute('me', 'you');
+
+// Once serialized will return
+// '<https://google.com/search{?q*}>; rel="next"; me="you"'
+~~~
+
+The `Symfony\Component\WebLink\Link` package implements `PSR-13` interfaces.
