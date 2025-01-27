@@ -16,13 +16,12 @@ Overview
 
 This package contains features and capabilities to ease manipulating URIs.
 
-`league\uri` allows simple URI manipulation via the context aware wrapper [BaseUri](/uri/7.0/base-uri).
-But also exposes a complete API around URI creation using the [UriTemplate](/uri/7.0/uri-template)
-and the [URI](/uri/7.0/rfc3986/) class which represents a generic RFC3986 compliant URI
-object.
+`league\uri` allows straightforward URI manipulation and exposes a complete API around
+URI creation and modification using the [UriTemplate](/uri/7.0/uri-template) and the [URI](/uri/7.0/rfc3986/) class.
+The latter represents a generic RFC3986 compliant URI object with support for RFC3987 IDN host.
 
-For interoperability, we also provide [PSR-7 and PSR-17](/uri/7.0/psr-compliance/)
-compliant implementation around URI access and creation. 
+For interoperability, the package also provide [PSR-7 and PSR-17](/uri/7.0/psr-compliance/) compliant implementations
+around URI access and creation. 
 
 System Requirements
 -------
