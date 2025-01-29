@@ -85,7 +85,7 @@ with a `PSR-7` Uri object in which case a `PSR-7` Uri object of the same type is
 are not interested in the returned URI but only on its underlying string representation, you can instead use
 the `Modifier::getUriString` which is a shortcut to `Modifier::getUri->__toString()`.
 
-<p class="message-notice">Available since version <code>7.6.0</code>
+<p class="message-notice">Available since version <code>7.6.0</code></p>
 
 the `Modifier::toString` method returns the **strict** RFC3986 string representation of the URI regardless of the underlying URI object string representation.
 This is the representation used by the `Stringable` and the `JsonSerializable` interface to improve interoperability.
