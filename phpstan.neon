@@ -16,10 +16,6 @@ parameters:
 		- message: '#function gmp_(.*)? expects (GMP|int)#'
 		  path: interfaces/IPv4/GMPCalculator.php
 		- identifier: missingType.iterableValue
-		- message: '#Variable method call on League\\Uri\\Contracts\\UriInterface.#'
-		  path: components/Modifier.php
-		- message: '#Variable method call on Psr\\Http\\Message\\UriInterface.#'
-		  path: components/Modifier.php
 		- '#Attribute class Deprecated does not exist.#'
 		- '#deprecated class League\\Uri\\BaseUri#'
 		- '#\Dom\\HTMLDocument#'

@@ -87,10 +87,10 @@ implements the `Stringable` and the `JsonSerializable` interface to improve deve
 Under the hood the `Modifier` class intensively uses the [URI components objects](/components/7.0/)
 to apply changes to the submitted URI object.
 
-<p class="message-notice">The <code>when</code> method is available since version <code>7.6.0</code></p>
+<p class="message-notice">The <code>when</code>, <code>toString</code> and <code>toDisplayString</code> methods are available since version <code>7.6.0</code></p>
 
-To ease modifying URI since version 7.6.0, the `when` method is added and the modifier methods from
-the underlying URI object are now accessible via proxy.
+To ease modifying URI since version 7.6.0 you can directly access the modifier methods from the underlying
+URI object. The methods behave as their owner so T
 
 ```php
 use League\Uri\Modifier;
@@ -99,19 +99,19 @@ $foo = '';
 echo Modifier::from('http://bébé.be')
     ->when(
         '' !== $foo, 
-        fn (Modifier $uri) => $uri->withQuery('firstname=jane&lastname=Doe'),  //on true
-        fn (Modifier $uri) => $uri->mergeQueryParameters(['firstname' => 'john', 'lastname' => 'Doe']), //on false
+        fn (Modifier $uri) => $uri->withQuery('fname=jane&lname=Doe'),  //on true
+        fn (Modifier $uri) => $uri->mergeQueryParameters(['fname' => 'john', 'lname' => 'Doe']), //on false
     )
     ->appendSegment('toto')
     ->addRootLabel()
     ->prependLabel('shop')
     ->appendQuery('foo=toto&foo=tata')
     ->withFragment('chapter1')
-    ->getUriIdnString();
-// returns 'http://shop.bébé.be./toto?firstname=john&lastname=Doe&foo=toto&foo=tata#chapter1';
+    ->toDisplayString();
+// returns 'http://shop.bébé.be./toto?fname=john&lname=Doe&foo=toto&foo=tata#chapter1';
 ```
 
-### Available methods
+### Available modifiers
 
 <div class="flex flex-row flex-wrap">
 <div>
@@ -145,7 +145,7 @@ echo Modifier::from('http://bébé.be')
   <li><a href="#modifierreplacelabel">replaceLabel</a></li>
   <li><a href="#modifierremovelabels">removeLabels</a></li>
   <li><a href="#modifierslicelabels">sliceLabels</a></li>
-  <li><a href="#modifierwhatwghost">whatWgHost</a></li>
+  <li><a href="#modifierwhatwgHost">whatwgHost</a></li>
 </ul>
 </div>
 <div>
@@ -605,7 +605,7 @@ echo Modifier::from($uri)->sliceLabels(1, 1)->getUriString();
 
 <p class="message-info">This modifier supports negative offset</p>
 
-### Modifier::whatWgHost
+### Modifier::whatwgHost
 
 Returns the host as formatted following WHATWG host formatting
 
@@ -613,7 +613,7 @@ Returns the host as formatted following WHATWG host formatting
 
 ~~~php
 $uri = "https://0:0@0:0";
-echo Modifier::from($uri)->whatWgHost()->getUriString();
+echo Modifier::from($uri)->whatwgHost()->getUriString();
 //display "https://0:0@0.0.0.0:0"
 ~~~
 
