@@ -73,45 +73,42 @@ echo $uri::class;   // returns GuzzleHttp\Psr7\Uri
 echo $uri, PHP_EOL; // returns http://shop.bébé.be./toto?foo=toto&foo=tata
 ~~~
 
+### Returned URI object and string representations
+
 <p class="message-warning">While the class does manipulate URI it does not implement any URI related interface.</p>
-<p class="message-notice">If a PSR-7 or a League <code>UriInterface</code> implementing instance is given
-then the return value will also be a PSR-7 <code>UriInterface</code> implementing instance.</p>
-<p class="message-notice">The <code>getIdnUriString</code> method is available since version <code>7.5.0</code>.</p>
+<p class="message-notice">If an <code>UriInterface</code> implementing instance is given, then the returned URI object will also be of the same <code>UriInterface</code> type.</p>
 
-The `Modifier::getUri` method returns either a `PSR-7` or a League URI `UriInterface`, conversely,
-the `Modifier::getUriString` method returns the RFC3986 string representation for the URI and
-the `Modifier::getIdnUriString` method returns the RFC3986 string representation for the URI
-with a Internationalized Domain Name (IDNA) if applicable. Last but not least, the class
-implements the `Stringable` and the `JsonSerializable` interface to improve developer experience.
+The `Modifier` can return different URI results depending on the context and your usage.
 
-Under the hood the `Modifier` class intensively uses the [URI components objects](/components/7.0/)
-to apply changes to the submitted URI object.
+The `Modifier::getUri` method returns a League URI `UriInterface` unless you instantiated the modifier
+with a `PSR-7` Uri object in which case a `PSR-7` Uri object of the same type is returned. If you
+are not interested in the returned URI but only on its underlying string representation, you can instead use
+the `Modifier::getUriString` which is a shortcut to `Modifier::getUri->__toString()`.
 
-<p class="message-notice">The <code>when</code>, <code>toString</code> and <code>toDisplayString</code> methods are available since version <code>7.6.0</code></p>
+<p class="message-notice">Available since version <code>7.6.0</code>
 
-To ease modifying URI since version 7.6.0 you can directly access the modifier methods from the underlying
-URI object. The methods behave as their owner so T
+the `Modifier::toString` method returns the **strict** RFC3986 string representation of the URI regardless of the underlying URI object string representation.
+This is the representation used by the `Stringable` and the `JsonSerializable` interface to improve interoperability.
+
+The `Modifier::toDisplayString` method returns a RFC3987 like string representation which is more suited for
+displaying the URI and should not be used to interact with an API as the produced URI may not be RFC3986 compliant
+at all.
 
 ```php
-use League\Uri\Modifier;
+use GuzzleHttp\Psr7\Utils;
 
-$foo = '';
-echo Modifier::from('http://bébé.be')
-    ->when(
-        '' !== $foo, 
-        fn (Modifier $uri) => $uri->withQuery('fname=jane&lname=Doe'),  //on true
-        fn (Modifier $uri) => $uri->mergeQueryParameters(['fname' => 'john', 'lname' => 'Doe']), //on false
-    )
-    ->appendSegment('toto')
-    ->addRootLabel()
-    ->prependLabel('shop')
-    ->appendQuery('foo=toto&foo=tata')
-    ->withFragment('chapter1')
-    ->toDisplayString();
-// returns 'http://shop.bébé.be./toto?fname=john&lname=Doe&foo=toto&foo=tata#chapter1';
+$uri = Modifier::from(Utils::uriFor('https://bébé.be?foo[]=bar'))->prepend('shop');
+$uri->getUri()::class;        // returns 'GuzzleHttp\Psr7\Uri'
+$uri->getUri()->__toString(); // returns 'https://shop.bébé.be?foo%5B%5D=bar'
+$uri->getUriString();         // returns 'https://shop.bébé.be?foo%5B%5D=bar'
+$uri->toString();             // returns 'https://shop.xn--bb-bjab.be?foo%5B%5D=bar'
+$uri->toDisplayString();      // returns 'https://shop.bébé.be?foo[]=bar'
 ```
 
 ### Available modifiers
+
+Under the hood the `Modifier` class intensively uses the [URI components objects](/components/7.0/)
+to apply the following changes to the submitted URI.
 
 <div class="flex flex-row flex-wrap">
 <div>
@@ -864,3 +861,29 @@ echo Modifier::from($uri)
     ->getPath();
 //display "text/plain;charset=US-ASCII,Hello%20World!"
 ~~~
+
+### General modification
+
+<p class="message-notice">The <code>when</code> methods is available since version <code>7.6.0</code></p>
+
+To ease modifying URI since version 7.6.0 you can directly access the modifier methods from the underlying
+URI object.
+
+```php
+use League\Uri\Modifier;
+
+$foo = '';
+echo Modifier::from('http://bébé.be')
+    ->when(
+        '' !== $foo, 
+        fn (Modifier $uri) => $uri->withQuery('fname=jane&lname=Doe'),  //on true
+        fn (Modifier $uri) => $uri->mergeQueryParameters(['fname' => 'john', 'lname' => 'Doe']), //on false
+    )
+    ->appendSegment('toto')
+    ->addRootLabel()
+    ->prependLabel('shop')
+    ->appendQuery('foo=toto&foo=tata')
+    ->withFragment('chapter1')
+    ->toDisplayString();
+// returns 'http://shop.bébé.be./toto?fname=john&lname=Doe&foo=toto&foo=tata#chapter1';
+```
