@@ -48,8 +48,10 @@ Each static decoding method is component aware and will prevent decoding compone
 of a full URI.
 
 <p class="message-info">The <code>scheme</code> and <code>port</code> do not requires a specific class to be correctly
-encoded. While host can be urlencoded and urldecoded, modern <code>host</code> encoding/decoding mechanism relies on a
-much more strict and documented process like the one use for instance wit the <code>League\Uri\Idna\Converter</code> class.</p>
+encoded. While host can be urlencoded and urldecoded, modern <code>host</code> encoding/decoding mechanism
+relies on a much more strict and documented process like the one use for instance wit the
+<code>League\Uri\Idna\Converter</code> class.</p>
 
 <p class="message-warning">The <code>Encoder::decodeAll</code> and <code>decodeEncoder::Partial</code> may produce 
-ecoded components that are not valid (containing white spaces) in the context of a full URI creation.</p>
+component representation that are not valid (containing white spaces or representing the <code>null</code> value)
+in the context of a full URI creation.</p>
