@@ -7,21 +7,21 @@ on:
 jobs:
     linux_tests:
         name: PHP on ${{ matrix.php }} - ${{ matrix.stability }} - ${{ matrix.composer-flags }}
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-22.04
         strategy:
             matrix:
                 php: ['8.1', '8.2', '8.3', '8.4']
                 stability: [prefer-lowest, prefer-stable]
         steps:
             - name: Checkout code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
                   php-version: ${{ matrix.php }}
                   coverage: xdebug
-                  tools: composer:v2
+                  tools: composer, phpunit, php-cs-fixer, phpstan:1, phpstan/phpstan-deprecation-rules:1, phpstan/phpstan-phpunit:1, phpstan/phpstan-strict-rules:1
             - name: Check PHP Version
               run: php -v
 
