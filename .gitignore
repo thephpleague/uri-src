@@ -1,6 +1,8 @@
 vendor
 build
 docs/_site
+docs/output.css
+docs/tailwindcss
 composer.lock
 .idea
 .php_cs.cache
