@@ -29,6 +29,7 @@ packages:
                 URI Parser: '/interfaces/7.0/uri-parser-builder/'
                 Query Parser: '/interfaces/7.0/query-parser-builder/'
             Converters:
+                Encoder & Decoder: '/interfaces/7.0/encoder/'
                 IPv4 Converter: '/interfaces/7.0/ipv4/'
                 IPv6 Converter: '/interfaces/7.0/ipv6/'
                 IDN Converter: '/interfaces/7.0/idn/'
