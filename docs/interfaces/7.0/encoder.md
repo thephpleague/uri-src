@@ -18,14 +18,26 @@ The class provides encoding mechanism for the following URI components:
 use League\Uri\Encoder;
 
 $component = '/thi:s/is/a?simple=path';
+$query = 'simple#=path&ké?=23';
 
-echo Encoder::encodeUser($component);          // returns "%2Fthi%3As%2Fis%2Fa%3Fsimple=path"
-echo Encoder::encodePassword($component);      // returns "%2Fthi:s%2Fis%2Fa%3Fsimple=path"
-echo Encoder::encodePath($component);          // returns "/thi:s/is/a%3Fsimple=path"
-echo Encoder::encodeQueryKeyValue($component); // returns "/thi:s/is/a?simple=path"
+echo Encoder::encodeUser($component);        // returns "%2Fthi%3As%2Fis%2Fa%3Fsimple=path"
+echo Encoder::encodePassword($component);    // returns "%2Fthi:s%2Fis%2Fa%3Fsimple=path"
+echo Encoder::encodePath($component);        // returns "/thi:s/is/a%3Fsimple=path"
+echo Encoder::encodeQueryOrFragment($query); // returns "simple%23=path&k%C3%A9?=23"
 ````
 
-Each static encoding method is component aware and will prevent encoding component specific characters that must or 
+The class also provides a more specific encodage used for query string key/value pair.
+
+```php
+<?php
+$queryKey = 'ké#';
+$queryValue = '&foobar';
+
+echo Encoder::encodeQueryKeyValue($queryKey);   // returns "k%C3%A9%23"
+echo Encoder::encodeQueryKeyValue($queryValue); // returns "%26foobar"
+````
+
+Each static encoding method is component aware and will prevent encoding component special characters that must or 
 must not be encoded in the context of a full URI.
 
 To complete the encoding methods, the class also exposes static decoding methods to safely decode URI components:
