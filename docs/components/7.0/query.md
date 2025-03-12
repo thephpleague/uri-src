@@ -177,6 +177,7 @@ $newQuery->__toString(); //return baz=toto&foo=bar&foo=toto
 public static Query::fromVariable($params, string $separator = '&'): self
 public Query::parameters(): array
 public Query::parameter(string $name): mixed
+public Query::hasParameter(string ...$name): bool
 public Query::withoutNumericIndices(): self
 public Query::withoutParameter(...string $offsets): self
 ~~~
@@ -227,6 +228,16 @@ $query->parameter('gweta'); //return null
 
 The method returns the value of a specific argument. If the argument does not exist it will return `null`.
 
+The class can tell whether a parameter or a range of parameters are present using the `Query::hasParameter` method.
+The method will take a variadic number of parameter names and will return `true` only if all the names are
+present in the query parameter bag.
+
+~~~php
+$query = Query::fromRFC3986('foo[]=bar&foo[]=y+olo&z=');
+$query->hasParameter('gweta');        //return false
+$query->hasParameter('foo', 'z');     //return true
+$query->hasParameter('foo', 'gweta'); //return false
+~~~
 
 ### Query::withoutParameter
 
