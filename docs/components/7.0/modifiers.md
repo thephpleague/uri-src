@@ -128,8 +128,10 @@ to apply the following changes to the submitted URI.
 </div>
 <div>
 <ul>
+  <li><a href="#modifiernormalizehost">normalizeHost</a></li>
   <li><a href="#modifierhosttoascii">hostToAscii</a></li>
   <li><a href="#modifierhosttounicode">hostToUnicode</a></li>
+  <li><a href="#modifiernormalizeip">normalizeIp</a></li>
   <li><a href="#modifierhosttodecimal">hostToDecimal</a></li>
   <li><a href="#modifierhosttooctal">hostToOctal</a></li>
   <li><a href="#modifierhosttohexadecimal">hostToHexadecimal</a></li>
@@ -142,7 +144,6 @@ to apply the following changes to the submitted URI.
   <li><a href="#modifierreplacelabel">replaceLabel</a></li>
   <li><a href="#modifierremovelabels">removeLabels</a></li>
   <li><a href="#modifierslicelabels">sliceLabels</a></li>
-  <li><a href="#modifiernormalizehostip">normalizeHostIp</a></li>
 </ul>
 </div>
 <div>
