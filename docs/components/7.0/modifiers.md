@@ -498,6 +498,20 @@ echo get_class($newUri); //display \Zend\Diactoros\Uri
 echo $newUri; //display 'http://[fe80::1234]/path/to/the/sky.php'
 ~~~
 
+### Modifier::normalizeHostIp
+
+Returns the host as formatted following WHATWG host formatting
+
+<p class="message-notice">available since version <code>7.6.0</code></p>
+
+~~~php
+$uri = "https://0:0@0:0";
+echo Modifier::from($uri)->normalizeHostIp()->getUriString();
+//display "https://0:0@0.0.0.0:0"
+~~~
+
+In case of IPv4 and/or IPv6 some extra normalization are applied.
+
 ### Modifier::addRootLabel
 
 Adds the root label if not present
@@ -601,20 +615,6 @@ echo Modifier::from($uri)->sliceLabels(1, 1)->getUriString();
 ~~~
 
 <p class="message-info">This modifier supports negative offset</p>
-
-### Modifier::normalizeHostIp
-
-Returns the host as formatted following WHATWG host formatting
-
-<p class="message-notice">available since version <code>7.6.0</code></p>
-
-~~~php
-$uri = "https://0:0@0:0";
-echo Modifier::from($uri)->normalizeHostIp()->getUriString();
-//display "https://0:0@0.0.0.0:0"
-~~~
-
-In case of IPv4 and/or IPv6 some extra normalization are applied.
 
 ## Path modifiers
 
