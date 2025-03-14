@@ -476,9 +476,9 @@ See the [IPv6 Converter documentation](/components/7.0/ipv6/) page for more info
 
 use League\Uri\Modifier;
 
-$uri = 'http://[0000:0000:0000:0000:0000:0000:0000:0001]/path/to/the/sky.php';
-echo Modifier::from($uri)->hostToIpv6Compressed()->getUriString();
-//display 'http://[::1]/path/to/the/sky.php'
+$uri = 'http://[::1]/path/to/the/sky.php';
+echo Modifier::from($uri)->hostToIpv6Expanded()->getUriString();
+//display 'http://[0000:0000:0000:0000:0000:0000:0000:0001]/path/to/the/sky.php'
 ~~~
 
 ### Modifier::removeZoneIdentifier
@@ -498,19 +498,36 @@ echo get_class($newUri); //display \Zend\Diactoros\Uri
 echo $newUri; //display 'http://[fe80::1234]/path/to/the/sky.php'
 ~~~
 
-### Modifier::normalizeHostIp
+### Modifier::normalizeIp
 
-Returns the host as formatted following WHATWG host formatting
+Format the IP host:
+
+- it will compress the IP representation if the host is an IPv6 address
+- it will convert the host to its IPv4 decimal format if possible
 
 <p class="message-notice">available since version <code>7.6.0</code></p>
 
 ~~~php
 $uri = "https://0:0@0:0";
-echo Modifier::from($uri)->normalizeHostIp()->getUriString();
+echo Modifier::from($uri)->normalizeIp()->getUriString();
 //display "https://0:0@0.0.0.0:0"
 ~~~
 
-In case of IPv4 and/or IPv6 some extra normalization are applied.
+### Modifier::normalizeHost
+
+If the host is an IP address or a registrable domain that can be assimilated to
+an IPv4 address it will use the `Modifier::normalizeIp` method. Otherwise, it
+will try to convert the host into its ASCII format.
+
+<p class="message-notice">available since version <code>7.6.0</code></p>
+
+~~~php
+$uri = "https://0:0@0:0";
+echo Modifier::from($uri)->normalizeHost()->getUriString();
+//display "https://0:0@0.0.0.0:0"
+~~~
+
+This is the algorithm used by the WHATWG URL specification.
 
 ### Modifier::addRootLabel
 
