@@ -142,7 +142,7 @@ to apply the following changes to the submitted URI.
   <li><a href="#modifierreplacelabel">replaceLabel</a></li>
   <li><a href="#modifierremovelabels">removeLabels</a></li>
   <li><a href="#modifierslicelabels">sliceLabels</a></li>
-  <li><a href="#modifierwhatwgHost">useWhatwgHost</a></li>
+  <li><a href="#modifiernormalizehostip">normalizeHostIp</a></li>
 </ul>
 </div>
 <div>
@@ -602,7 +602,7 @@ echo Modifier::from($uri)->sliceLabels(1, 1)->getUriString();
 
 <p class="message-info">This modifier supports negative offset</p>
 
-### Modifier::useWhatwgHost
+### Modifier::normalizeHostIp
 
 Returns the host as formatted following WHATWG host formatting
 
@@ -610,7 +610,7 @@ Returns the host as formatted following WHATWG host formatting
 
 ~~~php
 $uri = "https://0:0@0:0";
-echo Modifier::from($uri)->useWhatwgHost()->getUriString();
+echo Modifier::from($uri)->normalizeHostIp()->getUriString();
 //display "https://0:0@0.0.0.0:0"
 ~~~
 
