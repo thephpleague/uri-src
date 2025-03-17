@@ -50,7 +50,7 @@ use League\Uri\Encoder;
 $component = '%2Fthi%3As%2Fis%2Fa%3Fsimple%23=%20path';
 
 echo Encoder::decodeAll($component);                  // returns "/thi:s/is/a?simple#= path"
-echo Encoder::decodePartial($component);              // returns "%2Fthi:s%2Fis%2Fa?simple#= path"
+echo Encoder::decodeNecessary($component);            // returns "%2Fthi:s%2Fis%2Fa?simple#= path"
 echo Encoder::decodeUnreservedCharacters($component); // returns "/thi:s/is/a?simple#=%20path"
 echo Encoder::decodePath($component);                 // returns "%2Fthi:s%2Fis%2Fa%3Fsimple%23=%20path"
 echo Encoder::decodeQuery($component);                // returns "/thi:s/is/a?simple%23=%20path"
