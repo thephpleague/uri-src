@@ -64,6 +64,5 @@ encoded. While host can be urlencoded and urldecoded, modern <code>host</code> e
 relies on a much more strict and documented process like the one use for instance wit the
 <code>League\Uri\Idna\Converter</code> class.</p>
 
-<p class="message-warning">The <code>Encoder::decodeAll</code> and <code>decodeEncoder::Partial</code> may produce 
-component representation that are not valid (containing white spaces or representing the <code>null</code> value)
-in the context of a full URI creation.</p>
+<p class="message-warning">The <code>Encoder::decodeAll</code> may produce component representation that are not valid
+(containing white spaces or representing the <code>null</code> value) in the context of a full URI creation.</p>
