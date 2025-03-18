@@ -16,8 +16,8 @@ The class act as a drop-in replacement for PHP's `parse_url` feature.
 
 ~~~php
 UriString::parse(string $uri): array
-UriString::normalize(string $uri): string
 UriString::parseAuthority(string $autority): array
+UriString::normalize(string $uri): string
 UriString::normalizeAuthority(string $autority): string
 UriString::resolve(string $uri, ?string $baseUri = null): string
 ~~~
@@ -75,7 +75,7 @@ do just that. The method expect either a full URI as its single parameter or a r
 a base URI which must be absolute, the URI will then be resolved using the base URI.
 
 ```php
-$components = UriString::resolve('"/foo", "https://example.com");
+$components = UriString::resolve("/foo", "https://example.com");
 //returns "https://example.com/foo"
 ```
 
