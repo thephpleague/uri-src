@@ -47,6 +47,9 @@
         "symfony/var-dumper": "^6.4.15",
         "uri-templates/uritemplate-test": "dev-master"
     },
+    "require-dev": {
+        "bakame/aide-uri": "dev-main"
+    },
     "repositories": [
         {
             "type": "package",
@@ -90,6 +93,8 @@
         "benchmark": "Runs performance benchmark on several key classes of the library",
         "test": "Runs full test suite except for the benchmark"
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "config": {
         "sort-packages": true
     }
