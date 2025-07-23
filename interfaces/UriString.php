@@ -591,7 +591,7 @@ final class UriString
 
             $slashPos = strpos($pathPart, '/');
 
-            if ($slashPos !== false) {
+            if (false !== $slashPos) {
                 $potentialPort = substr($pathPart, 0, $slashPos);
                 $remainingPath = substr($pathPart, $slashPos);
             } else {
@@ -603,7 +603,7 @@ final class UriString
                 preg_match('/^\d+$/', $potentialPort)) {
 
                 $parts['authority'] = '//';
-                $parts['acontent'] = $potentialHost . ':' . $potentialPort;
+                $parts['acontent'] = $potentialHost.':'.$potentialPort;
                 $parts['scheme'] = '';
                 $parts['scontent'] = '';
                 $parts['path'] = $remainingPath;
@@ -620,31 +620,31 @@ final class UriString
 
             $endPos = false;
 
-            if ($slashPos !== false) {
-                if ($endPos === false) {
+            if (false !== $slashPos) {
+                if (false === $endPos) {
                     $endPos = $slashPos;
                 } else {
                     $endPos = min($endPos, $slashPos);
                 }
             }
 
-            if ($queryPos !== false) {
-                if ($endPos === false) {
+            if (false !== $queryPos) {
+                if (false === $endPos) {
                     $endPos = $queryPos;
                 } else {
                     $endPos = min($endPos, $queryPos);
                 }
             }
-            
-            if ($fragmentPos !== false) {
-                if ($endPos === false) {
+
+            if (false !== $fragmentPos) {
+                if (false === $endPos) {
                     $endPos = $fragmentPos;
                 } else {
                     $endPos = min($endPos, $fragmentPos);
                 }
             }
 
-            if ($endPos !== false) {
+            if (false !== $endPos) {
                 $ipCandidate = substr($path, 0, $endPos);
             } else {
                 $ipCandidate = $path;

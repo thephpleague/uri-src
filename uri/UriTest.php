@@ -1159,18 +1159,18 @@ class UriTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('zeroIpAddressProvider')]
+    #[DataProvider('ipAddressPortPathProvider')]
     public function it_can_parse_zero_ip_addresses(string $uriString, string $expectedHost, ?int $expectedPort, ?string $expectedScheme, string $expectedPath): void
     {
         $uri = Uri::new($uriString);
-        
+
         self::assertSame($expectedHost, $uri->getHost());
         self::assertSame($expectedPort, $uri->getPort());
         self::assertSame($expectedScheme, $uri->getScheme());
         self::assertSame($expectedPath, $uri->getPath());
     }
 
-    public static function zeroIpAddressProvider(): array
+    public static function ipAddressPortPathProvider(): array
     {
         return [
             ['0.0.0.0', '0.0.0.0', null, null, ''],
