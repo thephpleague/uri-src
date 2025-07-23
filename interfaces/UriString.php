@@ -584,6 +584,60 @@ final class UriString
         preg_match(self::REGEXP_URI_PARTS, $uri, $parts);
         $parts += ['query' => '', 'fragment' => ''];
 
+        // Handle IP addresses & IP addresses with ports (e.g., "0.0.0.0:7700" or "0.0.0.0:7700/health")
+        if ($parts['scheme'] && $parts['scontent'] && ! $parts['authority']) {
+            $potentialHost = $parts['scontent'];
+            $pathPart = $parts['path'];
+
+            // Extract port and remaining path
+            $slashPos = strpos($pathPart, '/');
+            if ($slashPos !== false) {
+                $potentialPort = substr($pathPart, 0, $slashPos);
+                $remainingPath = substr($pathPart, $slashPos);
+            } else {
+                $potentialPort = $pathPart;
+                $remainingPath = '';
+            }
+
+            // Check if this looks like an IP address with port
+            if (filter_var($potentialHost, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6) &&
+                preg_match('/^\d+$/', $potentialPort)) {
+
+                // Restructure as authority-based URI
+                $parts['authority'] = '//';
+                $parts['acontent'] = $potentialHost . ':' . $potentialPort;
+                $parts['scheme'] = '';
+                $parts['scontent'] = '';
+                $parts['path'] = $remainingPath;
+            }
+        }
+
+        // Bare IP addresses (e.g., "0.0.0.0" or "0.0.0.0/health")
+        if (! $parts['scheme'] && ! $parts['authority'] && $parts['path']) {
+            $path = $parts['path'];
+
+            // Extract potential IP address from the beginning of the path
+            $slashPos = strpos($path, '/');
+            $queryPos = strpos($path, '?');
+            $fragmentPos = strpos($path, '#');
+
+            $endPos = false;
+
+            if ($slashPos !== false) $endPos = ($endPos === false) ? $slashPos : min($endPos, $slashPos);
+            if ($queryPos !== false) $endPos = ($endPos === false) ? $queryPos : min($endPos, $queryPos);
+            if ($fragmentPos !== false) $endPos = ($endPos === false) ? $fragmentPos : min($endPos, $fragmentPos);
+
+            $ipCandidate = ($endPos !== false) ? substr($path, 0, $endPos) : $path;
+
+            // Check if this is a bare IP address
+            if (filter_var($ipCandidate, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6)) {
+                // Restructure as authority-based URI
+                $parts['authority'] = '//';
+                $parts['acontent'] = $ipCandidate;
+                $parts['path'] = substr($path, strlen($ipCandidate));
+            }
+        }
+
         if (':' === ($parts['scheme']  ?? null) || 1 !== preg_match(self::REGEXP_URI_SCHEME, $parts['scontent'] ?? '')) {
             throw new SyntaxError(sprintf('The uri `%s` contains an invalid scheme', $uri));
         }

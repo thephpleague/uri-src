@@ -1157,4 +1157,30 @@ class UriTest extends TestCase
         // Ensure file handle of \SplFileObject gets closed.
         unlink($newFilePath);
     }
+
+    #[Test]
+    #[DataProvider('zeroIpAddressProvider')]
+    public function it_can_parse_zero_ip_addresses(string $uriString, string $expectedHost, ?int $expectedPort, ?string $expectedScheme, string $expectedPath): void
+    {
+        $uri = Uri::new($uriString);
+        
+        self::assertSame($expectedHost, $uri->getHost());
+        self::assertSame($expectedPort, $uri->getPort());
+        self::assertSame($expectedScheme, $uri->getScheme());
+        self::assertSame($expectedPath, $uri->getPath());
+    }
+
+    public static function zeroIpAddressProvider(): array
+    {
+        return [
+            ['0.0.0.0', '0.0.0.0', null, null, ''],
+            ['http://0.0.0.0', '0.0.0.0', null, 'http', ''],
+            ['0.0.0.0:7700', '0.0.0.0', 7700, null, ''],
+            ['http://0.0.0.0:7700', '0.0.0.0', 7700, 'http', ''],
+            ['0.0.0.0/health', '0.0.0.0', null, null, '/health'],
+            ['0.0.0.0:7700/health', '0.0.0.0', 7700, null, '/health'],
+            ['http://0.0.0.0/health', '0.0.0.0', null, 'http', '/health'],
+            ['http://0.0.0.0:7700/health', '0.0.0.0', 7700, 'http', '/health'],
+        ];
+    }
 }
