@@ -589,8 +589,8 @@ final class UriString
             $potentialHost = $parts['scontent'];
             $pathPart = $parts['path'];
 
-            // Extract port and remaining path
             $slashPos = strpos($pathPart, '/');
+
             if ($slashPos !== false) {
                 $potentialPort = substr($pathPart, 0, $slashPos);
                 $remainingPath = substr($pathPart, $slashPos);
@@ -599,11 +599,9 @@ final class UriString
                 $remainingPath = '';
             }
 
-            // Check if this looks like an IP address with port
             if (filter_var($potentialHost, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6) &&
                 preg_match('/^\d+$/', $potentialPort)) {
 
-                // Restructure as authority-based URI
                 $parts['authority'] = '//';
                 $parts['acontent'] = $potentialHost . ':' . $potentialPort;
                 $parts['scheme'] = '';
@@ -616,22 +614,43 @@ final class UriString
         if (! $parts['scheme'] && ! $parts['authority'] && $parts['path']) {
             $path = $parts['path'];
 
-            // Extract potential IP address from the beginning of the path
             $slashPos = strpos($path, '/');
             $queryPos = strpos($path, '?');
             $fragmentPos = strpos($path, '#');
 
             $endPos = false;
 
-            if ($slashPos !== false) $endPos = ($endPos === false) ? $slashPos : min($endPos, $slashPos);
-            if ($queryPos !== false) $endPos = ($endPos === false) ? $queryPos : min($endPos, $queryPos);
-            if ($fragmentPos !== false) $endPos = ($endPos === false) ? $fragmentPos : min($endPos, $fragmentPos);
+            if ($slashPos !== false) {
+                if ($endPos === false) {
+                    $endPos = $slashPos;
+                } else {
+                    $endPos = min($endPos, $slashPos);
+                }
+            }
 
-            $ipCandidate = ($endPos !== false) ? substr($path, 0, $endPos) : $path;
+            if ($queryPos !== false) {
+                if ($endPos === false) {
+                    $endPos = $queryPos;
+                } else {
+                    $endPos = min($endPos, $queryPos);
+                }
+            }
+            
+            if ($fragmentPos !== false) {
+                if ($endPos === false) {
+                    $endPos = $fragmentPos;
+                } else {
+                    $endPos = min($endPos, $fragmentPos);
+                }
+            }
 
-            // Check if this is a bare IP address
+            if ($endPos !== false) {
+                $ipCandidate = substr($path, 0, $endPos);
+            } else {
+                $ipCandidate = $path;
+            }
+
             if (filter_var($ipCandidate, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6)) {
-                // Restructure as authority-based URI
                 $parts['authority'] = '//';
                 $parts['acontent'] = $ipCandidate;
                 $parts['path'] = substr($path, strlen($ipCandidate));
