@@ -1,0 +1,22 @@
+includes:
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-phpunit/rules.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+parameters:
+	paths:
+		- uri
+		- components
+		- interfaces
+	ignoreErrors:
+		- message: '#Cannot cast mixed to string.#'
+		  path: interfaces/IPv4/BCMathCalculator.php
+		- message: '#Cannot cast mixed to string.#'
+		  path: interfaces/IPv4/NativeCalculator.php
+		- message: '#function gmp_(.*)? expects (GMP|int)#'
+		  path: interfaces/IPv4/GMPCalculator.php
+		- identifier: missingType.iterableValue
+		- '#deprecated class League\\Uri\\BaseUri#'
+		- '#\Dom\\HTMLDocument#'
+	reportUnmatchedIgnoredErrors: true
+	treatPhpDocTypesAsCertain: false
