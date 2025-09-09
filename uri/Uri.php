@@ -444,10 +444,7 @@ final class Uri implements Conditionable, UriInterface, UriRenderer, UriInspecto
      */
     private function formatPort(?int $port = null): ?int
     {
-        $defaultPort = null;
-        if ($this->scheme !== null && array_key_exists($this->scheme, self::SCHEME_DEFAULT_PORT)) {
-            $defaultPort = self::SCHEME_DEFAULT_PORT[$this->scheme];
-        };
+        $defaultPort = self::SCHEME_DEFAULT_PORT[$this->scheme ?? ''] ?? null;
 
         return match (true) {
             null === $port, $defaultPort === $port => null,
@@ -1107,7 +1104,7 @@ final class Uri implements Conditionable, UriInterface, UriRenderer, UriInspecto
     {
         try {
             if ('blob' !== $this->scheme) {
-                if ($this->scheme === null || !isset(static::WHATWG_SPECIAL_SCHEMES[$this->scheme])) {
+                if (!isset(static::WHATWG_SPECIAL_SCHEMES[$this->scheme ?? ''])) {
                     return null;
                 }
 
