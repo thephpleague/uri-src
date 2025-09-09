@@ -45,10 +45,8 @@
         "psr/http-message": "^1.1.0 || ^2.0",
         "slim/psr7": "^1.7",
         "symfony/var-dumper": "^6.4.15",
-        "uri-templates/uritemplate-test": "dev-master"
-    },
-    "require-dev": {
-        "bakame/aide-uri": "dev-main"
+        "uri-templates/uritemplate-test": "dev-master",
+        "rowbot/url": "^4.0"
     },
     "repositories": [
         {
@@ -69,9 +67,13 @@
             "League\\Uri\\": [
                 "uri",
                 "components",
-                "interfaces"
+                "interfaces",
+                "polyfill"
             ]
-        }
+        },
+        "classmap": [
+            "polyfill/lib"
+        ]
     },
     "scripts": {
         "benchmark": "phpbench run --report=default",
