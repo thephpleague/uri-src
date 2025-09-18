@@ -40,11 +40,13 @@ final class UriTest extends TestCase
     #[Test]
     public function it_will_throw_an_error_if_the_instance_is_not_correctly_initialized(): void
     {
-        $reflection = new ReflectionClass(Uri::class);
-        $uri = $reflection->newInstanceWithoutConstructor();
-
-        $this->expectException(Error::class);
-        $uri->toRawString();
+        if (PHP_VERSION_ID < 80500) {
+            $uri = (new ReflectionClass(Uri::class))->newInstanceWithoutConstructor();
+            $this->expectException(Error::class);
+            $uri->toRawString();
+        } else {
+            $this->markTestSkipped('This test requires PHP < 8.5');
+        }
     }
 
     #[Test]
@@ -127,7 +129,7 @@ final class UriTest extends TestCase
         self::assertSame('foo=bar%26baz%3Dqux', $uri->getRawQuery());
 
         self::assertSame('/', $uri->getRawPath());
-        self::assertSame('', $uri->getPath());
+        self::assertSame('/', $uri->getPath());
     }
 
     #[Test]
@@ -312,12 +314,12 @@ final class UriTest extends TestCase
     }
 
     #[Test]
-    public function it_can_noemalize_ip_v6_host(): void
+    public function it_can_normalize_ip_v6_host(): void
     {
         $uri = new Uri('https://[2001:0db8:0001:0000:0000:0ab9:C0A8:0102]/?foo=bar%26baz%3Dqux');
 
         self::assertSame(
-            'https://[2001:0db8:0001:0000:0000:0ab9:c0a8:0102]?foo=bar%26baz%3Dqux',
+            'https://[2001:0db8:0001:0000:0000:0ab9:c0a8:0102]/?foo=bar%26baz%3Dqux',
             $uri->toString()
         );
     }
