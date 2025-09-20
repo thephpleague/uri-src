@@ -12,6 +12,7 @@
       <directory suffix="Test.php">uri</directory>
       <directory suffix="Test.php">components</directory>
       <directory suffix="Test.php">interfaces</directory>
+      <directory suffix="Test.php">polyfill</directory>
     </testsuite>
   </testsuites>
   <logging>
@@ -22,6 +23,7 @@
       <directory suffix=".php">uri</directory>
       <directory suffix=".php">components</directory>
       <directory suffix=".php">interfaces</directory>
+      <directory suffix=".php">polyfill</directory>
     </include>
     <exclude>
       <directory suffix="Bench.php">uri</directory>
@@ -31,6 +33,8 @@
       <directory suffix="Test.php">components</directory>
       <directory suffix="Bench.php">interfaces</directory>
       <directory suffix="Test.php">interfaces</directory>
+      <directory suffix="Bench.php">polyfill</directory>
+      <directory suffix="Test.php">polyfill</directory>
     </exclude>
   </source>
 </phpunit>
