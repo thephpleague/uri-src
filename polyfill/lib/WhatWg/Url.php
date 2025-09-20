@@ -18,14 +18,13 @@ use League\Uri\Polyfill\UrlValidationErrorCollector;
 use ReflectionClass;
 use ReflectionProperty;
 use Rowbot\Idna\Idna;
+use Rowbot\URL\Component\Host\NullHost;
 use Rowbot\URL\Component\Host\StringHost;
 use Rowbot\URL\URL as WhatWgURL;
 use Rowbot\URL\URLRecord;
 use SensitiveParameter;
-use TypeError;
 use Uri\UriComparisonMode;
 
-use function dd;
 use function in_array;
 use function substr;
 
@@ -206,22 +205,16 @@ if (PHP_VERSION_ID < 80500) {
                 return $this;
             }
 
-            $copy = $this->copy();
-            $port = $copy->url->port;
-            if (null !== $port && '' !== $port) {
-                $host .= ':'.$port;
-            }
-
-            dd($host);
-
             try {
-                $copy->url->host = $host;
+                $copy = $this->copy();
+                $urlRecord = self::urlRecord($this);
+                $urlRecord->host = (null === $host) ? new NullHost() : new StringHost($host);
+                $copy->url->href = $urlRecord->serializeURL();
 
                 return $copy;
-            } catch (TypeError $exception) {
-                throw new InvalidUrlException('The specified host is malformed');
+            } catch (Exception $exception) {
+                throw new InvalidUrlException('The specified host is malformed', previous: $exception);
             }
-
         }
 
         public function getPort(): ?int
@@ -238,10 +231,20 @@ if (PHP_VERSION_ID < 80500) {
                 return $this;
             }
 
-            $copy = $this->copy();
-            $copy->url->port = (string) $port;
+            try {
+                $copy = $this->copy();
+                $urlRecord = self::urlRecord($this);
+                $urlRecord->port = $port;
+                $copy->url->href = $urlRecord->serializeURL();
 
-            return $copy;
+                return $copy;
+            } catch (Exception $exception) {
+                throw new InvalidUrlException('The specified port is malformed', errors: [new UrlValidationError(
+                    $urlRecord->serializeURL(),
+                    UrlValidationErrorType::PortOutOfRange,
+                    true,
+                )], previous: $exception);
+            }
         }
 
         public function getPath(): string
@@ -401,6 +404,11 @@ if (PHP_VERSION_ID < 80500) {
                 'query' => $this->getQuery(),
                 'fragment' => $this->getFragment(),
             ];
+        }
+
+        public function serializeUrl(?string $hostname): string
+        {
+
         }
     }
 }

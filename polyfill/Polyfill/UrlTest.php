@@ -207,15 +207,21 @@ final class UrlTest extends TestCase
     }
 
     #[Test]
-    public function it_will_not_update_on_invalid_with_input(): void
+    public function it_will_fail_to_update_with_an_invalid_port(): void
     {
-        $url = new Url('https://user:pass@example.com/foo/bar');
-        $urlBis = $url
-            ->withScheme('gopher')
-            ->withPort(12345678)
-            ->withHost('::1');
+        $this->expectException(InvalidUrlException::class);
 
-        self::assertTrue($urlBis->equals($url));
+        $url = new Url('https://user:pass@example.com/foo/bar');
+        $url->withPort(12345678);
+    }
+
+    #[Test]
+    public function it_will_fail_to_update_with_an_invalid_host(): void
+    {
+        $this->expectException(InvalidUrlException::class);
+
+        $url = new Url('https://user:pass@example.com/foo/bar');
+        $url->withHost('::1');
     }
 
     #[Test]
