@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Aide.Uri (https://https://github.com/bakame-php/aide-uri)
+ * League.Uri (https://uri.thephpleague.com)
  *
  * (c) Ignace Nyamagana Butera <nyamsprod@gmail.com>
  *
@@ -22,8 +22,10 @@ use Rowbot\URL\Component\Host\StringHost;
 use Rowbot\URL\URL as WhatWgURL;
 use Rowbot\URL\URLRecord;
 use SensitiveParameter;
+use TypeError;
 use Uri\UriComparisonMode;
 
+use function dd;
 use function in_array;
 use function substr;
 
@@ -205,9 +207,21 @@ if (PHP_VERSION_ID < 80500) {
             }
 
             $copy = $this->copy();
-            $copy->url->hostname = (string) $host;
+            $port = $copy->url->port;
+            if (null !== $port && '' !== $port) {
+                $host .= ':'.$port;
+            }
 
-            return $copy;
+            dd($host);
+
+            try {
+                $copy->url->host = $host;
+
+                return $copy;
+            } catch (TypeError $exception) {
+                throw new InvalidUrlException('The specified host is malformed');
+            }
+
         }
 
         public function getPort(): ?int

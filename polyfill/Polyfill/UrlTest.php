@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Aide.Uri (https://https://github.com/bakame-php/aide-uri)
+ * League.Uri (https://uri.thephpleague.com)
  *
  * (c) Ignace Nyamagana Butera <nyamsprod@gmail.com>
  *
@@ -108,10 +108,10 @@ final class UrlTest extends TestCase
     #[Test]
     public function it_fails_silently_on_wither(): void
     {
-        $url = new Url('https://example.com');
-        $newUrl = $url->withHost('2001:db8:0:0:0:0:0:1');
+        $this->expectException(InvalidUrlException::class);
 
-        self::assertSame('example.com', $newUrl->getAsciiHost());
+        $url = new Url('https://example.com');
+        $url->withHost('2001:db8:0:0:0:0:0:1');
     }
 
     #[Test]

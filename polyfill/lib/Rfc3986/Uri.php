@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Aide.Uri (https://https://github.com/bakame-php/aide-uri)
+ * League.Uri (https://uri.thephpleague.com)
  *
  * (c) Ignace Nyamagana Butera <nyamsprod@gmail.com>
  *
