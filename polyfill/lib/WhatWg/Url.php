@@ -231,20 +231,14 @@ if (PHP_VERSION_ID < 80500) {
                 return $this;
             }
 
-            try {
+            if (null === $port || (65535 >= $port && 0 >= $port)) {
                 $copy = $this->copy();
-                $urlRecord = self::urlRecord($this);
-                $urlRecord->port = $port;
-                $copy->url->href = $urlRecord->serializeURL();
+                $copy->url->port = $port;
 
                 return $copy;
-            } catch (Exception $exception) {
-                throw new InvalidUrlException('The specified port is malformed', errors: [new UrlValidationError(
-                    $urlRecord->serializeURL(),
-                    UrlValidationErrorType::PortOutOfRange,
-                    true,
-                )], previous: $exception);
             }
+
+            throw new InvalidUrlException('The specified port is malformed', [new UrlValidationError((string) $port, UrlValidationErrorType::PortOutOfRange, true)]);
         }
 
         public function getPath(): string
