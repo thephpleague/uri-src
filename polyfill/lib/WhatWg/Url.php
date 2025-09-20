@@ -153,7 +153,7 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getAsciiHost(): ?string
         {
-            return '' === $this->url->hostname ? null : $this->url->hostname;
+            return $this->url->hostname;
         }
 
         public function getUnicodeHost(): ?string
@@ -207,7 +207,7 @@ if (PHP_VERSION_ID < 80500) {
 
             try {
                 $copy = $this->copy();
-                $urlRecord = self::urlRecord($this);
+                $urlRecord = self::urlRecord($copy);
                 $urlRecord->host = (null === $host) ? new NullHost() : new StringHost($host);
                 $copy->url->href = $urlRecord->serializeURL();
 

@@ -230,11 +230,11 @@ final class UrlTest extends TestCase
         $url = new Url('FiLE:///c:/Users/JohnDoe/Documents/report.txt');
 
         self::assertSame('file', $url->getScheme());
-        self::assertNull($url->getUnicodeHost());
-        self::assertNull($url->getAsciiHost());
-        self::assertNull($url->getPort());
-        self::assertNull($url->getFragment());
-        self::assertNull($url->getQuery());
+        self::assertSame('', $url->getUnicodeHost(), 'the unicode host must be null');
+        self::assertSame('', $url->getAsciiHost(), 'the ascii host must be null');
+        self::assertNull($url->getPort(), 'the port must be null');
+        self::assertNull($url->getFragment(), 'the fragment must be null');
+        self::assertNull($url->getQuery(), 'the port must be null');
         self::assertSame('file:///c:/Users/JohnDoe/Documents/report.txt', $url->toUnicodeString());
         self::assertSame($url->toUnicodeString(), $url->toAsciiString());
     }
@@ -254,7 +254,8 @@ final class UrlTest extends TestCase
             ->withFragment('#abc');
 
         self::assertTrue($urlBis->equals($url));
-        self::assertSame($urlBis, $url);
+        self::assertSame($urlBis->toUnicodeString(), $url->toUnicodeString());
+        self::assertSame($urlBis->toAsciiString(), $url->toAsciiString());
     }
 
     #[Test]

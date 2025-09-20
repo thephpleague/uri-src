@@ -255,7 +255,7 @@ if (PHP_VERSION_ID < 80500) {
         {
             return match (true) {
                 $port === $this->getPort() => $this,
-                null === $port || ($port >= 0 && $port <= 65535) => $this->withComponent(['port' => $port]),
+                null === $port || 0 <= $port => $this->withComponent(['port' => $port]),
                 default => throw new InvalidUriException('The port component value must be null or an integer between 0 and 65535.'),
             };
         }

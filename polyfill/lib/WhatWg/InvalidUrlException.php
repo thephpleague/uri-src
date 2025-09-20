@@ -18,6 +18,7 @@ use Uri\InvalidUriException;
 use ValueError;
 
 use function array_is_list;
+use function implode;
 
 use const PHP_VERSION_ID;
 
@@ -51,7 +52,11 @@ if (PHP_VERSION_ID < 80500) {
                 $title[] = $error->type->name;
             }
 
-            parent::__construct($message.' ('.implode(' ', $title).')', $code, $previous);
+            if ([] !== $title) {
+                $message .= ' ('.implode(' ', $title).')';
+            }
+
+            parent::__construct($message, $code, $previous);
 
             $this->errors = $errors;
         }

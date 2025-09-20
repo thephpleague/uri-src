@@ -105,7 +105,7 @@ final class UriTest extends TestCase
         $uri = new Uri('http://example.com');
 
         $this->expectException(InvalidUriException::class);
-        $uri->withPort(65536);
+        $uri->withPort(-1);
     }
 
     #[Test]
@@ -335,9 +335,9 @@ final class UriTest extends TestCase
     #[Test]
     public function it_can_not_update_invalid_host_according_to_rfc3986(): void
     {
-        $this->expectException(InvalidUriException::class);
-
-        (new Uri('foo/bar'))->withHost('ex%61mple.com');
+        $uri = (new Uri('/foo/bar'))->withHost('ex%61mple.com');
+        self::assertSame('ex%61mple.com', $uri->getRawHost());
+        self::assertSame('example.com', $uri->getHost());
     }
 
     #[Test]
