@@ -46,7 +46,7 @@
         "slim/psr7": "^1.7",
         "symfony/var-dumper": "^6.4.15",
         "uri-templates/uritemplate-test": "dev-master",
-        "rowbot/url": "^4.0"
+        "rowbot/url": "^4.1"
     },
     "repositories": [
         {
