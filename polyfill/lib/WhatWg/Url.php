@@ -18,8 +18,11 @@ use League\Uri\Polyfill\UrlValidationErrorCollector;
 use ReflectionClass;
 use ReflectionProperty;
 use Rowbot\Idna\Idna;
+use Rowbot\URL\BasicURLParser;
 use Rowbot\URL\Component\Host\NullHost;
 use Rowbot\URL\Component\Host\StringHost;
+use Rowbot\URL\ParserState;
+use Rowbot\URL\String\Utf8String;
 use Rowbot\URL\URL as WhatWgURL;
 use Rowbot\URL\URLRecord;
 use SensitiveParameter;
@@ -98,15 +101,24 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @throws InvalidUrlException
          */
-        public function withScheme(string $scheme): self
+        public function withScheme(?string $scheme): self
         {
-            $scheme = strtolower($scheme);
+            $scheme = strtolower((string) $scheme);
             if ($scheme === $this->getScheme() || $scheme === $this->url->protocol) {
                 return $this;
             }
 
             $copy = $this->copy();
-            $copy->url->protocol = $scheme;
+            $urlRecord = self::urlRecord($copy);
+            $collector = new UrlValidationErrorCollector();
+            $parser = new BasicUrlParser($collector);
+            $result = $parser->parse(
+                input: Utf8String::fromUnsafe($scheme),
+                url: $urlRecord,
+                stateOverride: ParserState::SCHEME
+            );
+
+            false !== $result || throw new InvalidUrlException('Can not set the scheme', $collector->errors());
 
             return $copy;
         }
@@ -201,20 +213,31 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function withHost(?string $host): self
         {
+            // 1 - the submitted host is equal to the current host
             if (in_array($host, [$this->url->hostname, $this->getAsciiHost(), $this->getUnicodeHost()], true)) {
                 return $this;
             }
 
-            try {
-                $copy = $this->copy();
-                $urlRecord = self::urlRecord($copy);
-                $urlRecord->host = (null === $host) ? new NullHost() : new StringHost($host);
-                $copy->url->href = $urlRecord->serializeURL();
-
-                return $copy;
-            } catch (Exception $exception) {
-                throw new InvalidUrlException('The specified host is malformed', previous: $exception);
+            // 2 - the path is Opaque, it must be a noop, as per the WHATWG URL Standard.
+            if (self::urlRecord($this)->path->isOpaque()) {
+                return $this;
             }
+
+            $copy = $this->copy();
+            $urlRecord = self::urlRecord($copy);
+
+            // 3 - validated the new host in the context of the new URL
+            $collector = new UrlValidationErrorCollector();
+            $parser = new BasicUrlParser($collector);
+            $result = $parser->parse(
+                input: null === $host ? new NullHost() : new StringHost($host),
+                url: $urlRecord,
+                stateOverride: ParserState::HOST
+            );
+
+            false !== $result || throw new InvalidUrlException('Can not set the host', $collector->errors());
+
+            return $copy;
         }
 
         public function getPort(): ?int
@@ -398,11 +421,6 @@ if (PHP_VERSION_ID < 80500) {
                 'query' => $this->getQuery(),
                 'fragment' => $this->getFragment(),
             ];
-        }
-
-        public function serializeUrl(?string $hostname): string
-        {
-
         }
     }
 }

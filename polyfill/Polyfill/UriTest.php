@@ -274,14 +274,6 @@ final class UriTest extends TestCase
     }
 
     #[Test]
-    public function it_fails_to_update_the_uri_if_the_component_is_invalid(): void
-    {
-        $this->expectException(InvalidUriException::class);
-
-        (new Uri(''))->withPath(':/')->toString();
-    }
-
-    #[Test]
     public function it_can_update_the_uri_scheme(): void
     {
         $uri = new Uri('https://www.b%C3%A9b%C3%A9.be#foobar');
@@ -325,15 +317,37 @@ final class UriTest extends TestCase
     }
 
     #[Test]
-    public function it_can_not_update_invalid_path_according_to_rfc3986(): void
+    public function it_fails_to_update_the_uri_if_the_path_is_invalid_example1(): void
     {
+        $this->markTestSkipped('Waiting for a php-src issue relative to URI path normalization be resolved.');
+
         $this->expectException(InvalidUriException::class);
 
-        (new Uri('foo/bar'))->withPath('//foo');
+        (new Uri('data:foo'))->withPath('//foo');
     }
 
     #[Test]
-    public function it_can_not_update_invalid_host_according_to_rfc3986(): void
+    public function it_fails_to_update_the_uri_if_the_path_is_invalid_example2(): void
+    {
+        $this->markTestSkipped('Waiting for a php-src issue relative to URI path normalization be resolved.');
+
+        $this->expectException(InvalidUriException::class);
+
+        (new Uri(''))->withPath(':/')->toString();
+    }
+
+    #[Test]
+    public function it_fails_to_update_the_uri_if_the_path_is_invalid_example3(): void
+    {
+        $this->markTestSkipped('Waiting for a php-src issue relative to URI path normalization be resolved.');
+
+        $this->expectException(InvalidUriException::class);
+
+        (new Uri('relative_path'))->withHost('host')->toString();
+    }
+
+    #[Test]
+    public function it_can_update_invalid_host_according_to_rfc3986(): void
     {
         $uri = (new Uri('/foo/bar'))->withHost('ex%61mple.com');
         self::assertSame('ex%61mple.com', $uri->getRawHost());
