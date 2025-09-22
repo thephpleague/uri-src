@@ -14,6 +14,11 @@
             "name": "uri-interfaces",
             "directory": "interfaces",
             "target": "git@github.com:thephpleague/uri-interfaces.git"
+        },
+        {
+            "name": "uri-polyfill",
+            "directory": "polyfill",
+            "target": "git@github.com:thephpleague/uri-polyfill.git"
         }
     ]
 }

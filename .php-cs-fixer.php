@@ -14,6 +14,7 @@ EOF;
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__.'/uri')
     ->in(__DIR__.'/components')
+    ->in(__DIR__.'/polyfill')
     ->in(__DIR__.'/interfaces');
 
 $config = new PhpCsFixer\Config();
