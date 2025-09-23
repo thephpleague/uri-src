@@ -372,8 +372,8 @@ if (PHP_VERSION_ID < 80500) {
             $this->setNormalizedComponents();
             $components = $this->normalizedComponents;
             $authority = UriString::buildAuthority($components);
-            if (str_starts_with($components['path'], '/') && null === $authority) {
-                $components['host'] = '';
+            if (str_starts_with($this->rawComponents['path'], '/./') && null === $authority) {
+                $components['path'] = '/.'.$components['path'];
             }
 
             $this->normalizedUri ??= UriString::build($components);

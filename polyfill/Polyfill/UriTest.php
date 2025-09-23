@@ -422,7 +422,7 @@ final class UriTest extends TestCase
             'expectedRawPath' => '/.//foo',
             'expectedPath' => '//foo',
             'expectedRawUriString' => '/.//foo',
-            'expectedUriString' => '////foo',
+            'expectedUriString' => '/.//foo',
         ];
 
         yield 'adding an absolute double slash path on a scheme but authorityless URI' => [
@@ -431,7 +431,16 @@ final class UriTest extends TestCase
             'expectedRawPath' => '/.//foo',
             'expectedPath' => '//foo',
             'expectedRawUriString' => 'data:/.//foo',
-            'expectedUriString' => 'data:////foo',
+            'expectedUriString' => 'data:/.//foo',
+        ];
+
+        yield 'adding a absolute double slash path without dot segment includedd but authorityless URI' => [
+            'uri' => new Uri('data:foo'),
+            'path' => '//foo/../bar/./baz',
+            'expectedRawPath' => '/.//foo/../bar/./baz',
+            'expectedPath' => '//bar/baz',
+            'expectedRawUriString' => 'data:/.//foo/../bar/./baz',
+            'expectedUriString' => 'data:/.//bar/baz',
         ];
     }
 
