@@ -29,7 +29,7 @@ its <code>SensitiveParameter</code> polyfill</p>
 Install the package using Composer.
 
 ```bash
-composer require leagye/uri-polyfill:^7.6
+composer require league/uri-polyfill:^7.6
 ```
 
 ## Documentation
