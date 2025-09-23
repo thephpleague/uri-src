@@ -25,7 +25,7 @@ final class InvalidUrlExceptionTest extends TestCase
     {
         $this->expectException(ValueError::class);
 
-        new InvalidUrlException('message', ['foo' => 'bar']);
+        new InvalidUrlException('message', ['foo' => 'bar']); /* @phpstan-ignore-line */
     }
 
     #[Test]
@@ -33,6 +33,6 @@ final class InvalidUrlExceptionTest extends TestCase
     {
         $this->expectException(ValueError::class);
 
-        new InvalidUrlException('message', ['error']);
+        new InvalidUrlException('message', ['error']); /* @phpstan-ignore-line */
     }
 }

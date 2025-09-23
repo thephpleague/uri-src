@@ -46,11 +46,12 @@ final class UriTest extends TestCase
     public function it_will_throw_an_error_if_the_instance_is_not_correctly_initialized(): void
     {
         if (PHP_VERSION_ID < 80500) {
+            /** @var Uri $uri */
             $uri = (new ReflectionClass(Uri::class))->newInstanceWithoutConstructor();
             $this->expectException(Error::class);
             $uri->toRawString();
         } else {
-            $this->markTestSkipped('This test requires PHP < 8.5');
+            self::markTestSkipped('This test requires PHP < 8.5');
         }
     }
 
@@ -194,6 +195,7 @@ final class UriTest extends TestCase
     public function it_can_be_unserialized(): void
     {
         $uri = new Uri('HTTPS://EXAMPLE.COM/foo/../bar/');
+        /** @var Uri $uriB */
         $uriB = unserialize(serialize($uri));
 
         self::assertSame($uri->toRawString(), $uriB->toRawString());
@@ -341,7 +343,7 @@ final class UriTest extends TestCase
         string $expectedUriString,
     ): void {
         if (version_compare(PHP_VERSION, '8.5.0-dev', '>=')) {
-            $this->markTestSkipped('Waiting for the path resolution update on the upstream uriparser library.');
+            self::markTestSkipped('Waiting for the path resolution update on the upstream uriparser library.');
         }
 
         $newUri = $uri->withPath($path);

@@ -8,6 +8,7 @@ parameters:
 		- uri
 		- components
 		- interfaces
+		- polyfill
 	ignoreErrors:
 		- message: '#Cannot cast mixed to string.#'
 		  path: interfaces/IPv4/BCMathCalculator.php

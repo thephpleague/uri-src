@@ -175,7 +175,7 @@ if (PHP_VERSION_ID < 80500) {
 
             $components = $this->rawComponents;
             $components['scheme'] = $scheme;
-            $components['path'] = $this->filterPathForModification($components['path'], $components);
+            $components['path'] = $this->preparePathForModification($components['path'], $components);
 
             return  $this->withComponent($components);
         }
@@ -255,7 +255,7 @@ if (PHP_VERSION_ID < 80500) {
 
             $components = $this->rawComponents;
             $components['host'] = $host;
-            $components['path'] = $this->filterPathForModification($components['path'], $components);
+            $components['path'] = $this->preparePathForModification($components['path'], $components);
 
             return  $this->withComponent($components);
         }
@@ -298,15 +298,11 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function withPath(string $path): self
         {
-            if ($path === $this->getRawPath()) {
-                return $this;
-            }
-
-            if (!Encoder::isPathEncoded($path)) {
-                throw new InvalidUriException('The encoded path component `'.$path.'` contains invalid characters.');
-            }
-
-            return $this->withComponent(['path' => $this->filterPathForModification($path, $this->rawComponents)]);
+            return match (true) {
+                $path === $this->getRawPath() => $this,
+                Encoder::isPathEncoded($path) => $this->withComponent(['path' => $this->preparePathForModification($path, $this->rawComponents)]),
+                default => throw new InvalidUriException('The encoded path component `'.$path.'` contains invalid characters.'),
+            };
         }
 
         public function getRawQuery(): ?string
@@ -372,6 +368,8 @@ if (PHP_VERSION_ID < 80500) {
             $this->setNormalizedComponents();
             $components = $this->normalizedComponents;
             $authority = UriString::buildAuthority($components);
+            // preserving the first `/./` segment in case of normalisation
+            // see https://github.com/php/php-src/issues/19897
             if (str_starts_with($this->rawComponents['path'], '/./') && null === $authority) {
                 $components['path'] = '/.'.$components['path'];
             }
@@ -430,10 +428,13 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * @param InputComponentMap $components
+         * Formatting the path when setting the path to avoid
+         * exception to be thrown needlessly on a common scenario
+         * see https://github.com/php/php-src/issues/19897.
          *
+         * @param InputComponentMap $components
          */
-        private function filterPathForModification(string $path, array $components): string
+        private function preparePathForModification(string $path, array $components): string
         {
             $isAbsolute = str_starts_with($path, '/');
             $authority = UriString::buildAuthority($components);
