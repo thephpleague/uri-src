@@ -44,6 +44,9 @@ if (PHP_VERSION_ID < 80500) {
      */
     final class Url
     {
+        private const PORT_RANGE_MIN = 0;
+        private const PORT_RANGE_MAX = 65535;
+
         private WhatWgURL $url;
         private ?string $unicodeHost = null;
         private bool $unicodeHostInitialized = false;
@@ -254,14 +257,14 @@ if (PHP_VERSION_ID < 80500) {
                 return $this;
             }
 
-            if (null === $port || (65535 >= $port && 0 >= $port)) {
+            if (null === $port || (self::PORT_RANGE_MIN <= $port && self::PORT_RANGE_MAX >= $port)) {
                 $copy = $this->copy();
                 $copy->url->port = $port;
 
                 return $copy;
             }
 
-            throw new InvalidUrlException('The specified port is malformed', [new UrlValidationError((string) $port, UrlValidationErrorType::PortOutOfRange, true)]);
+            throw new InvalidUrlException('Port must be between '.self::PORT_RANGE_MIN.' and '.self::PORT_RANGE_MAX, [new UrlValidationError((string) $port, UrlValidationErrorType::PortOutOfRange, true)]);
         }
 
         public function getPath(): string
