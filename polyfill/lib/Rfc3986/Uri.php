@@ -127,10 +127,20 @@ if (PHP_VERSION_ID < 80500) {
                 return;
             }
 
-            $this->normalizedComponents = [
+            $components = [
                 ...self::addUserInfoComponent(UriString::parseNormalized($this->rawUri)),
                 ...['host' => Encoder::normalizeHost($this->rawComponents['host'])],
             ];
+
+            $authority = UriString::buildAuthority($components);
+            // preserving the first `/./` segment in case of normalization
+            // when no authority is present,
+            // see https://github.com/php/php-src/issues/19897
+            if (str_starts_with($this->rawComponents['path'], '/./') && null === $authority) {
+                $components['path'] = '/.'.$components['path'];
+            }
+
+            $this->normalizedComponents = $components;
             $this->isNormalized = true;
         }
 
@@ -366,15 +376,7 @@ if (PHP_VERSION_ID < 80500) {
         public function toString(): string
         {
             $this->setNormalizedComponents();
-            $components = $this->normalizedComponents;
-            $authority = UriString::buildAuthority($components);
-            // preserving the first `/./` segment in case of normalisation
-            // see https://github.com/php/php-src/issues/19897
-            if (str_starts_with($this->rawComponents['path'], '/./') && null === $authority) {
-                $components['path'] = '/.'.$components['path'];
-            }
-
-            $this->normalizedUri ??= UriString::build($components);
+            $this->normalizedUri ??= UriString::build($this->normalizedComponents);
 
             return $this->normalizedUri;
         }
@@ -429,7 +431,7 @@ if (PHP_VERSION_ID < 80500) {
 
         /**
          * Formatting the path when setting the path to avoid
-         * exception to be thrown needlessly on a common scenario
+         * exception to be thrown on an invalid path.
          * see https://github.com/php/php-src/issues/19897.
          *
          * @param InputComponentMap $components
@@ -439,19 +441,28 @@ if (PHP_VERSION_ID < 80500) {
             $isAbsolute = str_starts_with($path, '/');
             $authority = UriString::buildAuthority($components);
             if (null !== $authority) {
+                // If there is an authority, the path must start with a `/`
                 return $isAbsolute ? $path : '/'.$path;
             }
 
-            if (!$isAbsolute) {
-                $colonPos = strpos($path, ':');
-                $slashPos = strpos($path, '/');
-                if (false === $colonPos || (false !== $slashPos && $colonPos > $slashPos)) {
-                    return $path;
-                }
+            // If there is no authority, the path cannot start with `//`
+            if ($isAbsolute) {
+                return '/.'.$path;
+            }
+
+            $colonPos = strpos($path, ':');
+            if (false === $colonPos) {
+                return $path;
+            }
+
+            // In the absence of a scheme and of an authority,
+            // the first path segment cannot contain a colon (":") character.'
+            $slashPos = strpos($path, '/');
+            if (false === $slashPos || $colonPos < $slashPos) {
                 return './'.$path;
             }
 
-            return '/.'.$path;
+            return $path;
         }
     }
 }

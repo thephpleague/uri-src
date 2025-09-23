@@ -339,7 +339,7 @@ final class UriTest extends TestCase
         string $path,
         string $expectedRawPath,
         string $expectedPath,
-        string $expectedRawUriString,
+        string $expectedUriRawString,
         string $expectedUriString,
     ): void {
         if (version_compare(PHP_VERSION, '8.5.0-dev', '>=')) {
@@ -349,7 +349,7 @@ final class UriTest extends TestCase
         $newUri = $uri->withPath($path);
         self::assertSame($expectedRawPath, $newUri->getRawPath());
         self::assertSame($expectedPath, $newUri->getPath());
-        self::assertSame($expectedRawUriString, $newUri->toRawString());
+        self::assertSame($expectedUriRawString, $newUri->toRawString());
         self::assertSame($expectedUriString, $newUri->toString());
     }
 
@@ -360,7 +360,7 @@ final class UriTest extends TestCase
             'path' => '/foo/bar',
             'expectedRawPath' => '/foo/bar',
             'expectedPath' => '/foo/bar',
-            'expectedRawUriString' => 'http://example.com/foo/bar',
+            'expectedUriRawString' => 'http://example.com/foo/bar',
             'expectedUriString' => 'http://example.com/foo/bar',
         ];
 
@@ -369,7 +369,7 @@ final class UriTest extends TestCase
             'path' => '/bar/foo',
             'expectedRawPath' => '/bar/foo',
             'expectedPath' => '/bar/foo',
-            'expectedRawUriString' => 'http://example.com/bar/foo',
+            'expectedUriRawString' => 'http://example.com/bar/foo',
             'expectedUriString' => 'http://example.com/bar/foo',
         ];
 
@@ -378,7 +378,7 @@ final class UriTest extends TestCase
             'path' => 'bar/foo',
             'expectedRawPath' => 'bar/foo',
             'expectedPath' => 'bar/foo',
-            'expectedRawUriString' => 'bar/foo',
+            'expectedUriRawString' => 'bar/foo',
             'expectedUriString' => 'bar/foo',
         ];
 
@@ -387,7 +387,7 @@ final class UriTest extends TestCase
             'path' => 'bar/foo',
             'expectedRawPath' => 'bar/foo',
             'expectedPath' => 'bar/foo',
-            'expectedRawUriString' => 'scheme:bar/foo',
+            'expectedUriRawString' => 'scheme:bar/foo',
             'expectedUriString' => 'scheme:bar/foo',
         ];
 
@@ -396,17 +396,17 @@ final class UriTest extends TestCase
             'path' => 'bar/foo',
             'expectedRawPath' => 'bar/foo',
             'expectedPath' => 'bar/foo',
-            'expectedRawUriString' => 'bar/foo',
+            'expectedUriRawString' => 'bar/foo',
             'expectedUriString' => 'bar/foo',
         ];
 
         yield 'adding a relative path on a URI with a scheme but without authority' => [
-            'uri' => new Uri('data:foo'),
+            'uri' => new Uri('scheme:foo'),
             'path' => 'bar/foo',
             'expectedRawPath' => 'bar/foo',
             'expectedPath' => 'bar/foo',
-            'expectedRawUriString' => 'data:bar/foo',
-            'expectedUriString' => 'data:bar/foo',
+            'expectedUriRawString' => 'scheme:bar/foo',
+            'expectedUriString' => 'scheme:bar/foo',
         ];
 
         yield 'adding a path with colon on an empty URI' => [
@@ -414,7 +414,7 @@ final class UriTest extends TestCase
             'path' => ':/',
             'expectedRawPath' => './:/',
             'expectedPath' => './:/',
-            'expectedRawUriString' => './:/',
+            'expectedUriRawString' => './:/',
             'expectedUriString' => './:/',
         ];
 
@@ -422,27 +422,27 @@ final class UriTest extends TestCase
             'uri' => new Uri('foo/bar'),
             'path' => '//foo',
             'expectedRawPath' => '/.//foo',
-            'expectedPath' => '//foo',
-            'expectedRawUriString' => '/.//foo',
+            'expectedPath' => '/.//foo',
+            'expectedUriRawString' => '/.//foo',
             'expectedUriString' => '/.//foo',
         ];
 
         yield 'adding an absolute double slash path on a scheme but authorityless URI' => [
-            'uri' => new Uri('data:foo'),
+            'uri' => new Uri('scheme:foo'),
             'path' => '//foo',
             'expectedRawPath' => '/.//foo',
-            'expectedPath' => '//foo',
-            'expectedRawUriString' => 'data:/.//foo',
-            'expectedUriString' => 'data:/.//foo',
+            'expectedPath' => '/.//foo',
+            'expectedUriRawString' => 'scheme:/.//foo',
+            'expectedUriString' => 'scheme:/.//foo',
         ];
 
         yield 'adding a absolute double slash path without dot segment includedd but authorityless URI' => [
-            'uri' => new Uri('data:foo'),
+            'uri' => new Uri('scheme:foo'),
             'path' => '//foo/../bar/./baz',
             'expectedRawPath' => '/.//foo/../bar/./baz',
-            'expectedPath' => '//bar/baz',
-            'expectedRawUriString' => 'data:/.//foo/../bar/./baz',
-            'expectedUriString' => 'data:/.//bar/baz',
+            'expectedPath' => '/.//bar/baz',
+            'expectedUriRawString' => 'scheme:/.//foo/../bar/./baz',
+            'expectedUriString' => 'scheme:/.//bar/baz',
         ];
     }
 
