@@ -21,6 +21,7 @@ use Uri\InvalidUriException;
 use Uri\UriComparisonMode;
 
 use function explode;
+use function strpos;
 
 use const PHP_VERSION_ID;
 
@@ -126,10 +127,20 @@ if (PHP_VERSION_ID < 80500) {
                 return;
             }
 
-            $this->normalizedComponents = [
+            $components = [
                 ...self::addUserInfoComponent(UriString::parseNormalized($this->rawUri)),
                 ...['host' => Encoder::normalizeHost($this->rawComponents['host'])],
             ];
+
+            $authority = UriString::buildAuthority($components);
+            // preserving the first `/./` segment in case of normalization
+            // when no authority is present,
+            // see https://github.com/php/php-src/issues/19897
+            if (str_starts_with($this->rawComponents['path'], '/./') && null === $authority) {
+                $components['path'] = '/.'.$components['path'];
+            }
+
+            $this->normalizedComponents = $components;
             $this->isNormalized = true;
         }
 
@@ -164,11 +175,19 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function withScheme(?string $scheme): self
         {
-            return match (true) {
-                $scheme === $this->getRawScheme() => $this,
-                UriString::isValidScheme($scheme) => $this->withComponent(['scheme' => $scheme]),
-                default => throw new InvalidUriException('The scheme string component `'.$scheme.'` is an invalid scheme.'),
-            };
+            if ($scheme === $this->getRawScheme()) {
+                return $this;
+            }
+
+            if (!UriString::isValidScheme($scheme)) {
+                throw new InvalidUriException('The scheme string component `'.$scheme.'` is an invalid scheme.');
+            }
+
+            $components = $this->rawComponents;
+            $components['scheme'] = $scheme;
+            $components['path'] = $this->preparePathForModification($components['path'], $components);
+
+            return  $this->withComponent($components);
         }
 
         public function getRawUserInfo(): ?string
@@ -236,11 +255,19 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function withHost(?string $host): self
         {
-            return match (true) {
-                $host === $this->getRawHost() => $this,
-                UriString::isValidHost($host) => $this->withComponent(['host' => $host]),
-                default => throw new InvalidUriException('The host component value `'.$host.'` is not a valid host.'),
-            };
+            if ($host === $this->getRawHost()) {
+                return $this;
+            }
+
+            if (!UriString::isValidHost($host)) {
+                throw new InvalidUriException('The host component value `'.$host.'` is not a valid host.');
+            }
+
+            $components = $this->rawComponents;
+            $components['host'] = $host;
+            $components['path'] = $this->preparePathForModification($components['path'], $components);
+
+            return  $this->withComponent($components);
         }
 
         public function getPort(): ?int
@@ -271,13 +298,19 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
+         * A path segment that contains a colon character (e.g., "this:that")
+         * cannot be used as the first segment of a relative-path reference, as
+         * it would be mistaken for a scheme name. Such a segment must be
+         * preceded by a dot-segment (e.g., "./this:that") to make a relative-path
+         * reference.
+         *
          * @throws InvalidUriException
          */
         public function withPath(string $path): self
         {
             return match (true) {
                 $path === $this->getRawPath() => $this,
-                Encoder::isPathEncoded($path) => $this->withComponent(['path' => $path]),
+                Encoder::isPathEncoded($path) => $this->withComponent(['path' => $this->preparePathForModification($path, $this->rawComponents)]),
                 default => throw new InvalidUriException('The encoded path component `'.$path.'` contains invalid characters.'),
             };
         }
@@ -394,6 +427,42 @@ if (PHP_VERSION_ID < 80500) {
                 'query' => $this->rawComponents['query'],
                 'fragment' => $this->rawComponents['fragment'],
             ];
+        }
+
+        /**
+         * Formatting the path when setting the path to avoid
+         * exception to be thrown on an invalid path.
+         * see https://github.com/php/php-src/issues/19897.
+         *
+         * @param InputComponentMap $components
+         */
+        private function preparePathForModification(string $path, array $components): string
+        {
+            $isAbsolute = str_starts_with($path, '/');
+            $authority = UriString::buildAuthority($components);
+            if (null !== $authority) {
+                // If there is an authority, the path must start with a `/`
+                return $isAbsolute ? $path : '/'.$path;
+            }
+
+            // If there is no authority, the path cannot start with `//`
+            if ($isAbsolute) {
+                return '/.'.$path;
+            }
+
+            $colonPos = strpos($path, ':');
+            if (false === $colonPos) {
+                return $path;
+            }
+
+            // In the absence of a scheme and of an authority,
+            // the first path segment cannot contain a colon (":") character.'
+            $slashPos = strpos($path, '/');
+            if (false === $slashPos || $colonPos < $slashPos) {
+                return './'.$path;
+            }
+
+            return $path;
         }
     }
 }

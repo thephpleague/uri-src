@@ -15,12 +15,17 @@ namespace League\Uri\Polyfill;
 
 use Error;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Uri\InvalidUriException;
 use Uri\Rfc3986\Uri;
 use Uri\UriComparisonMode;
+
+use function version_compare;
+
+use const PHP_VERSION;
 
 #[CoversClass(Uri::class)]
 #[CoversClass(InvalidUriException::class)]
@@ -41,11 +46,12 @@ final class UriTest extends TestCase
     public function it_will_throw_an_error_if_the_instance_is_not_correctly_initialized(): void
     {
         if (PHP_VERSION_ID < 80500) {
+            /** @var Uri $uri */
             $uri = (new ReflectionClass(Uri::class))->newInstanceWithoutConstructor();
             $this->expectException(Error::class);
             $uri->toRawString();
         } else {
-            $this->markTestSkipped('This test requires PHP < 8.5');
+            self::markTestSkipped('This test requires PHP < 8.5');
         }
     }
 
@@ -189,6 +195,7 @@ final class UriTest extends TestCase
     public function it_can_be_unserialized(): void
     {
         $uri = new Uri('HTTPS://EXAMPLE.COM/foo/../bar/');
+        /** @var Uri $uriB */
         $uriB = unserialize(serialize($uri));
 
         self::assertSame($uri->toRawString(), $uriB->toRawString());
@@ -317,33 +324,126 @@ final class UriTest extends TestCase
     }
 
     #[Test]
-    public function it_fails_to_update_the_uri_if_the_path_is_invalid_example1(): void
+    public function it_updates_the_uri_if_the_path_is_relative_and_a_host_is_set(): void
     {
-        $this->markTestSkipped('Waiting for a php-src issue relative to URI path normalization be resolved.');
-
-        $this->expectException(InvalidUriException::class);
-
-        (new Uri('data:foo'))->withPath('//foo');
+        self::assertSame(
+            (new Uri('relative_path'))->withHost('host')->toString(),
+            '//host/relative_path'
+        );
     }
 
     #[Test]
-    public function it_fails_to_update_the_uri_if_the_path_is_invalid_example2(): void
-    {
-        $this->markTestSkipped('Waiting for a php-src issue relative to URI path normalization be resolved.');
+    #[DataProvider('providesPathNormalizationTest')]
+    public function it_should_enable_working_around_path_manipulation_on_uri_update(
+        Uri $uri,
+        string $path,
+        string $expectedRawPath,
+        string $expectedPath,
+        string $expectedUriRawString,
+        string $expectedUriString,
+    ): void {
+        if (version_compare(PHP_VERSION, '8.5.0-dev', '>=')) {
+            self::markTestSkipped('Waiting for the path resolution update on the upstream uriparser library.');
+        }
 
-        $this->expectException(InvalidUriException::class);
-
-        (new Uri(''))->withPath(':/')->toString();
+        $newUri = $uri->withPath($path);
+        self::assertSame($expectedRawPath, $newUri->getRawPath());
+        self::assertSame($expectedPath, $newUri->getPath());
+        self::assertSame($expectedUriRawString, $newUri->toRawString());
+        self::assertSame($expectedUriString, $newUri->toString());
     }
 
-    #[Test]
-    public function it_fails_to_update_the_uri_if_the_path_is_invalid_example3(): void
+    public static function providesPathNormalizationTest(): iterable
     {
-        $this->markTestSkipped('Waiting for a php-src issue relative to URI path normalization be resolved.');
+        yield 'changing with the same path' => [
+            'uri' => new Uri('http://example.com/foo/bar'),
+            'path' => '/foo/bar',
+            'expectedRawPath' => '/foo/bar',
+            'expectedPath' => '/foo/bar',
+            'expectedUriRawString' => 'http://example.com/foo/bar',
+            'expectedUriString' => 'http://example.com/foo/bar',
+        ];
 
-        $this->expectException(InvalidUriException::class);
+        yield 'changing with the a different absolute path' => [
+            'uri' => new Uri('http://example.com/foo/bar'),
+            'path' => '/bar/foo',
+            'expectedRawPath' => '/bar/foo',
+            'expectedPath' => '/bar/foo',
+            'expectedUriRawString' => 'http://example.com/bar/foo',
+            'expectedUriString' => 'http://example.com/bar/foo',
+        ];
 
-        (new Uri('relative_path'))->withHost('host')->toString();
+        yield 'changing a relative path with another relative path' => [
+            'uri' => new Uri('foo/bar'),
+            'path' => 'bar/foo',
+            'expectedRawPath' => 'bar/foo',
+            'expectedPath' => 'bar/foo',
+            'expectedUriRawString' => 'bar/foo',
+            'expectedUriString' => 'bar/foo',
+        ];
+
+        yield 'changing a relative path with no authority with a relative path' => [
+            'uri' => new Uri('scheme:foo/bar'),
+            'path' => 'bar/foo',
+            'expectedRawPath' => 'bar/foo',
+            'expectedPath' => 'bar/foo',
+            'expectedUriRawString' => 'scheme:bar/foo',
+            'expectedUriString' => 'scheme:bar/foo',
+        ];
+
+        yield 'adding a relative path on a URI without authority' => [
+            'uri' => new Uri(''),
+            'path' => 'bar/foo',
+            'expectedRawPath' => 'bar/foo',
+            'expectedPath' => 'bar/foo',
+            'expectedUriRawString' => 'bar/foo',
+            'expectedUriString' => 'bar/foo',
+        ];
+
+        yield 'adding a relative path on a URI with a scheme but without authority' => [
+            'uri' => new Uri('scheme:foo'),
+            'path' => 'bar/foo',
+            'expectedRawPath' => 'bar/foo',
+            'expectedPath' => 'bar/foo',
+            'expectedUriRawString' => 'scheme:bar/foo',
+            'expectedUriString' => 'scheme:bar/foo',
+        ];
+
+        yield 'adding a path with colon on an empty URI' => [
+            'uri' => new Uri(''),
+            'path' => ':/',
+            'expectedRawPath' => './:/',
+            'expectedPath' => './:/',
+            'expectedUriRawString' => './:/',
+            'expectedUriString' => './:/',
+        ];
+
+        yield 'replace a relative path with a double slash path on a URI without authority' => [
+            'uri' => new Uri('foo/bar'),
+            'path' => '//foo',
+            'expectedRawPath' => '/.//foo',
+            'expectedPath' => '/.//foo',
+            'expectedUriRawString' => '/.//foo',
+            'expectedUriString' => '/.//foo',
+        ];
+
+        yield 'adding an absolute double slash path on a scheme but authorityless URI' => [
+            'uri' => new Uri('scheme:foo'),
+            'path' => '//foo',
+            'expectedRawPath' => '/.//foo',
+            'expectedPath' => '/.//foo',
+            'expectedUriRawString' => 'scheme:/.//foo',
+            'expectedUriString' => 'scheme:/.//foo',
+        ];
+
+        yield 'adding a absolute double slash path without dot segment includedd but authorityless URI' => [
+            'uri' => new Uri('scheme:foo'),
+            'path' => '//foo/../bar/./baz',
+            'expectedRawPath' => '/.//foo/../bar/./baz',
+            'expectedPath' => '/.//bar/baz',
+            'expectedUriRawString' => 'scheme:/.//foo/../bar/./baz',
+            'expectedUriString' => 'scheme:/.//bar/baz',
+        ];
     }
 
     #[Test]

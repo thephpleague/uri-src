@@ -19,7 +19,6 @@ use ReflectionClass;
 use ReflectionProperty;
 use Rowbot\Idna\Idna;
 use Rowbot\URL\BasicURLParser;
-use Rowbot\URL\Component\Host\NullHost;
 use Rowbot\URL\Component\Host\StringHost;
 use Rowbot\URL\ParserState;
 use Rowbot\URL\String\Utf8String;
@@ -233,7 +232,7 @@ if (PHP_VERSION_ID < 80500) {
             $collector = new UrlValidationErrorCollector();
             $parser = new BasicUrlParser($collector);
             $result = $parser->parse(
-                input: null === $host ? new NullHost() : new StringHost($host),
+                input: new StringHost((string) $host),
                 url: $urlRecord,
                 stateOverride: ParserState::HOST
             );
@@ -259,7 +258,7 @@ if (PHP_VERSION_ID < 80500) {
 
             if (null === $port || (self::PORT_RANGE_MIN <= $port && self::PORT_RANGE_MAX >= $port)) {
                 $copy = $this->copy();
-                $copy->url->port = $port;
+                $copy->url->port = (string) $port;
 
                 return $copy;
             }
