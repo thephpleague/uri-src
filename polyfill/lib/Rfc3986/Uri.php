@@ -21,6 +21,7 @@ use Uri\InvalidUriException;
 use Uri\UriComparisonMode;
 
 use function explode;
+use function strpos;
 
 use const PHP_VERSION_ID;
 
@@ -164,11 +165,19 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function withScheme(?string $scheme): self
         {
-            return match (true) {
-                $scheme === $this->getRawScheme() => $this,
-                UriString::isValidScheme($scheme) => $this->withComponent(['scheme' => $scheme]),
-                default => throw new InvalidUriException('The scheme string component `'.$scheme.'` is an invalid scheme.'),
-            };
+            if ($scheme === $this->getRawScheme()) {
+                return $this;
+            }
+
+            if (!UriString::isValidScheme($scheme)) {
+                throw new InvalidUriException('The scheme string component `'.$scheme.'` is an invalid scheme.');
+            }
+
+            $components = $this->rawComponents;
+            $components['scheme'] = $scheme;
+            $components['path'] = $this->filterPathForModification($components['path'], $components);
+
+            return  $this->withComponent($components);
         }
 
         public function getRawUserInfo(): ?string
@@ -236,11 +245,19 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function withHost(?string $host): self
         {
-            return match (true) {
-                $host === $this->getRawHost() => $this,
-                UriString::isValidHost($host) => $this->withComponent(['host' => $host]),
-                default => throw new InvalidUriException('The host component value `'.$host.'` is not a valid host.'),
-            };
+            if ($host === $this->getRawHost()) {
+                return $this;
+            }
+
+            if (!UriString::isValidHost($host)) {
+                throw new InvalidUriException('The host component value `'.$host.'` is not a valid host.');
+            }
+
+            $components = $this->rawComponents;
+            $components['host'] = $host;
+            $components['path'] = $this->filterPathForModification($components['path'], $components);
+
+            return  $this->withComponent($components);
         }
 
         public function getPort(): ?int
@@ -271,15 +288,25 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
+         * A path segment that contains a colon character (e.g., "this:that")
+         * cannot be used as the first segment of a relative-path reference, as
+         * it would be mistaken for a scheme name. Such a segment must be
+         * preceded by a dot-segment (e.g., "./this:that") to make a relative-path
+         * reference.
+         *
          * @throws InvalidUriException
          */
         public function withPath(string $path): self
         {
-            return match (true) {
-                $path === $this->getRawPath() => $this,
-                Encoder::isPathEncoded($path) => $this->withComponent(['path' => $path]),
-                default => throw new InvalidUriException('The encoded path component `'.$path.'` contains invalid characters.'),
-            };
+            if ($path === $this->getRawPath()) {
+                return $this;
+            }
+
+            if (!Encoder::isPathEncoded($path)) {
+                throw new InvalidUriException('The encoded path component `'.$path.'` contains invalid characters.');
+            }
+
+            return $this->withComponent(['path' => $this->filterPathForModification($path, $this->rawComponents)]);
         }
 
         public function getRawQuery(): ?string
@@ -343,7 +370,13 @@ if (PHP_VERSION_ID < 80500) {
         public function toString(): string
         {
             $this->setNormalizedComponents();
-            $this->normalizedUri ??= UriString::build($this->normalizedComponents);
+            $components = $this->normalizedComponents;
+            $authority = UriString::buildAuthority($components);
+            if (str_starts_with($components['path'], '/') && null === $authority) {
+                $components['host'] = '';
+            }
+
+            $this->normalizedUri ??= UriString::build($components);
 
             return $this->normalizedUri;
         }
@@ -394,6 +427,30 @@ if (PHP_VERSION_ID < 80500) {
                 'query' => $this->rawComponents['query'],
                 'fragment' => $this->rawComponents['fragment'],
             ];
+        }
+
+        /**
+         * @param InputComponentMap $components
+         *
+         */
+        private function filterPathForModification(string $path, array $components): string
+        {
+            $isAbsolute = str_starts_with($path, '/');
+            $authority = UriString::buildAuthority($components);
+            if (null !== $authority) {
+                return $isAbsolute ? $path : '/'.$path;
+            }
+
+            if (!$isAbsolute) {
+                $colonPos = strpos($path, ':');
+                $slashPos = strpos($path, '/');
+                if (false === $colonPos || (false !== $slashPos && $colonPos > $slashPos)) {
+                    return $path;
+                }
+                return './'.$path;
+            }
+
+            return '/.'.$path;
         }
     }
 }
