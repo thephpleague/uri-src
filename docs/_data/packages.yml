@@ -12,7 +12,7 @@ package:
         name: 'uri'
         description: 'The URI manipulation package'
         version: '7.0'
-        latest: '7.4.1'
+        latest: '7.5.1'
         status: maintained
         documentation:
             - '7.0'
@@ -23,12 +23,20 @@ package:
         name: 'uri-components'
         description: 'The URI components package'
         version: '7.0'
-        latest: '7.4.1'
+        latest: '7.5.1'
         status: maintained
         documentation:
             - '7.0'
             - '2.0'
             - '1.0'
+    'polyfill':
+        name: 'uri-polyfill'
+        description: 'Polyfill for PHP Native URI extension'
+        version: '7.0'
+        lastest: '7.6'
+        status: maintained
+        documentation:
+            - '7.0'
     'schemes':
         name: 'uri-schemes'
         description: 'The URI-scheme specific package'
