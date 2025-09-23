@@ -23,6 +23,10 @@ use Uri\InvalidUriException;
 use Uri\Rfc3986\Uri;
 use Uri\UriComparisonMode;
 
+use function version_compare;
+
+use const PHP_VERSION;
+
 #[CoversClass(Uri::class)]
 #[CoversClass(InvalidUriException::class)]
 #[CoversClass(UriComparisonMode::class)]
@@ -336,6 +340,10 @@ final class UriTest extends TestCase
         string $expectedRawUriString,
         string $expectedUriString,
     ): void {
+        if (version_compare(PHP_VERSION, '8.5.0-dev', '>=')) {
+            $this->markTestSkipped('Waiting for the path resolution update on the upstream uriparser library.');
+        }
+
         $newUri = $uri->withPath($path);
         self::assertSame($expectedRawPath, $newUri->getRawPath());
         self::assertSame($expectedPath, $newUri->getPath());
