@@ -24,10 +24,6 @@ use Uri\WhatWg\Url;
 use Uri\WhatWg\UrlValidationError;
 use Uri\WhatWg\UrlValidationErrorType;
 
-use function version_compare;
-
-use const PHP_VERSION;
-
 #[CoversClass(Url::class)]
 #[CoversClass(InvalidUrlException::class)]
 #[CoversClass(UriComparisonMode::class)]
@@ -122,10 +118,6 @@ final class UrlTest extends TestCase
     #[Test]
     public function it_fails_when_trying_to_update_an_valid_host_on_a_opaque_url(): void
     {
-        if (version_compare(PHP_VERSION, '8.5.0-dev', '>=')) {
-            self::markTestSkipped('Waiting for the update of the upstream lexbor library.');
-        }
-
         $url = new Url('mailto:toto@example.com');
         $urlbis = $url->withHost('example.com');
 
@@ -144,10 +136,6 @@ final class UrlTest extends TestCase
     #[Test]
     public function it_succeed_when_updating_an_invalid_ipv4_host(): void
     {
-        if (version_compare(PHP_VERSION, '8.5.0-dev', '>=')) {
-            self::markTestSkipped('Waiting for the update of the upstream lexbor library.');
-        }
-
         $invalidIpv4Host = '255.255.255.256';
         $url = new Url('scheme://host/path');
         $urlBis = $url->withHost($invalidIpv4Host);
