@@ -258,10 +258,7 @@ if (PHP_VERSION_ID < 80500) {
 
             null === $port ||
             (self::PORT_RANGE_MIN <= $port && self::PORT_RANGE_MAX >= $port) ||
-            throw new InvalidUrlException(
-                'The specified port is malformed.',
-                [new UrlValidationError((string) $port, UrlValidationErrorType::PortOutOfRange, true)]
-            );
+            throw new InvalidUrlException('The specified port is malformed.');
 
             $copy = $this->copy();
             $copy->url->port = (string) $port;
