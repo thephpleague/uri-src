@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace League\Uri\Polyfill;
 
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Uri\InvalidUriException;
@@ -148,7 +149,7 @@ final class UrlTest extends TestCase
         }
 
         $invalidIpv4Host = '255.255.255.256';
-        $url = new Url('schem://host/path');
+        $url = new Url('scheme://host/path');
         $urlBis = $url->withHost($invalidIpv4Host);
 
         self::assertSame($invalidIpv4Host, $urlBis->getAsciiHost());
@@ -247,12 +248,18 @@ final class UrlTest extends TestCase
     }
 
     #[Test]
-    public function it_will_fail_to_update_with_an_invalid_port(): void
+    #[DataProvider('providesInvalidPort')]
+    public function it_will_fail_to_update_with_an_invalid_port(int $port): void
     {
         $this->expectException(InvalidUrlException::class);
 
-        $url = new Url('https://user:pass@example.com/foo/bar');
-        $url->withPort(12345678);
+        (new Url('https://user:pass@example.com/foo/bar'))->withPort($port);
+    }
+
+    public static function providesInvalidPort(): iterable
+    {
+        yield 'Port is too high' => ['port' => 65536];
+        yield 'Port is too low' => ['port' => -1];
     }
 
     #[Test]
@@ -260,8 +267,7 @@ final class UrlTest extends TestCase
     {
         $this->expectException(InvalidUrlException::class);
 
-        $url = new Url('https://user:pass@example.com/foo/bar');
-        $url->withHost('::1');
+        (new Url('https://user:pass@example.com/foo/bar'))->withHost('::1');
     }
 
     #[Test]
@@ -338,5 +344,19 @@ final class UrlTest extends TestCase
             self::assertInstanceOf(InvalidUrlException::class, $e);
             self::assertSame($e->errors[0]->type, UrlValidationErrorType::PortOutOfRange);
         }
+    }
+
+    #[Test]
+    public function it_will_update_the_port_and_the_scheme(): void
+    {
+        $uri = new Url('https://example.com:432');
+        $resScheme = $uri->withScheme('http')->withPort(8080);
+        $resSchemeDot = $uri->withScheme('http:')->withPort(8080);
+        $resSchemeDotSlashes = $uri->withScheme('HtTp://')->withPort(8080);
+
+        self::assertSame('http', $resScheme->getScheme());
+        self::assertSame(8080, $resScheme->getPort());
+        self::assertTrue($resScheme->equals($resSchemeDot));
+        self::assertTrue($resSchemeDot->equals($resSchemeDotSlashes));
     }
 }

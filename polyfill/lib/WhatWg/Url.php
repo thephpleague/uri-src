@@ -21,7 +21,6 @@ use Rowbot\Idna\Idna;
 use Rowbot\URL\BasicURLParser;
 use Rowbot\URL\Component\Host\StringHost;
 use Rowbot\URL\ParserState;
-use Rowbot\URL\String\Utf8String;
 use Rowbot\URL\URL as WhatWgURL;
 use Rowbot\URL\URLRecord;
 use SensitiveParameter;
@@ -111,16 +110,17 @@ if (PHP_VERSION_ID < 80500) {
             }
 
             $copy = $this->copy();
-            $urlRecord = self::urlRecord($copy);
-            $collector = new UrlValidationErrorCollector();
-            $parser = new BasicUrlParser($collector);
-            $result = $parser->parse(
-                input: Utf8String::fromUnsafe($scheme),
-                url: $urlRecord,
-                stateOverride: ParserState::SCHEME
-            );
+            if ('' === $scheme) {
+                $copy->url->protocol = '';
 
-            false !== $result || throw new InvalidUrlException('Can not set the scheme', $collector->errors());
+                return $copy;
+            }
+
+            static $regexp = ',^(?<scheme>[a-zA-Z][a-zA-Z0-9+\-.]*)(:(?://?)?)?$,';
+
+            1 === preg_match($regexp, $scheme, $matches) || throw new InvalidUrlException('The specified scheme is malformed.');
+
+            $copy->url->protocol = $matches['scheme'];
 
             return $copy;
         }
@@ -237,7 +237,7 @@ if (PHP_VERSION_ID < 80500) {
                 stateOverride: ParserState::HOST
             );
 
-            false !== $result || throw new InvalidUrlException('Can not set the host', $collector->errors());
+            false !== $result || throw new InvalidUrlException('The specified host is malformed', $collector->errors());
 
             return $copy;
         }
@@ -263,7 +263,7 @@ if (PHP_VERSION_ID < 80500) {
                 return $copy;
             }
 
-            throw new InvalidUrlException('Port must be between '.self::PORT_RANGE_MIN.' and '.self::PORT_RANGE_MAX, [new UrlValidationError((string) $port, UrlValidationErrorType::PortOutOfRange, true)]);
+            throw new InvalidUrlException('The specified port is malformed. Port must be between '.self::PORT_RANGE_MIN.' and '.self::PORT_RANGE_MAX, [new UrlValidationError((string) $port, UrlValidationErrorType::PortOutOfRange, true)]);
         }
 
         public function getPath(): string

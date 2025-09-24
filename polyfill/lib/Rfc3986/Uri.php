@@ -151,13 +151,58 @@ if (PHP_VERSION_ID < 80500) {
          */
         private function withComponent(array $components): self
         {
-            try {
-                $uri = UriString::build([...$this->rawComponents, ...$components]);
-            } catch (Exception $exception) {
-                throw new InvalidUriException($exception->getMessage(), previous: $exception);
+            return new self(UriString::build(
+                $this->prepareModification([...$this->rawComponents, ...$components])
+            ));
+        }
+
+        /**
+         * Formatting the path when setting the path to avoid
+         * exception to be thrown on an invalid path.
+         * see https://github.com/php/php-src/issues/19897.
+         *
+         * @param InputComponentMap $components
+         *
+         * @return InputComponentMap
+         */
+        private function prepareModification(array $components): array
+        {
+            if (!isset($components['path']) || '' === $components['path']) {
+                return $components;
             }
 
-            return new self($uri);
+            $path = $components['path'];
+            $isAbsolute = str_starts_with($path, '/');
+            $authority = UriString::buildAuthority($components);
+            if (null !== $authority) {
+                // If there is an authority, the path must start with a `/`
+                $components['path'] = $isAbsolute ? $path : '/'.$path;
+
+                return $components;
+            }
+
+            // If there is no authority, the path cannot start with `//`
+            if ($isAbsolute) {
+                $components['path'] = '/.'.$path;
+
+                return $components;
+            }
+
+            $colonPos = strpos($path, ':');
+            if (false === $colonPos) {
+                $components['path'] = $path;
+
+                return $components;
+            }
+
+            // In the absence of a scheme and of an authority,
+            // the first path segment cannot contain a colon (":") character.'
+            $slashPos = strpos($path, '/');
+            if (false === $slashPos || $colonPos < $slashPos) {
+                $components['path'] =  './'.$path;
+            }
+
+            return $components;
         }
 
         public function getRawScheme(): ?string
@@ -175,19 +220,11 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function withScheme(?string $scheme): self
         {
-            if ($scheme === $this->getRawScheme()) {
-                return $this;
-            }
-
-            if (!UriString::isValidScheme($scheme)) {
-                throw new InvalidUriException('The scheme string component `'.$scheme.'` is an invalid scheme.');
-            }
-
-            $components = $this->rawComponents;
-            $components['scheme'] = $scheme;
-            $components['path'] = $this->preparePathForModification($components['path'], $components);
-
-            return  $this->withComponent($components);
+            return match (true) {
+                $scheme === $this->getRawScheme() => $this,
+                UriString::isValidScheme($scheme) => $this->withComponent(['scheme' => $scheme]),
+                default => throw new InvalidUriException('The scheme string component `'.$scheme.'` is an invalid scheme.'),
+            };
         }
 
         public function getRawUserInfo(): ?string
@@ -255,19 +292,11 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function withHost(?string $host): self
         {
-            if ($host === $this->getRawHost()) {
-                return $this;
-            }
-
-            if (!UriString::isValidHost($host)) {
-                throw new InvalidUriException('The host component value `'.$host.'` is not a valid host.');
-            }
-
-            $components = $this->rawComponents;
-            $components['host'] = $host;
-            $components['path'] = $this->preparePathForModification($components['path'], $components);
-
-            return  $this->withComponent($components);
+            return match (true) {
+                $host === $this->getRawHost() => $this,
+                UriString::isValidHost($host) => $this->withComponent(['host' => $host]),
+                default => throw new InvalidUriException('The host component value `'.$host.'` is not a valid host.'),
+            };
         }
 
         public function getPort(): ?int
@@ -310,7 +339,7 @@ if (PHP_VERSION_ID < 80500) {
         {
             return match (true) {
                 $path === $this->getRawPath() => $this,
-                Encoder::isPathEncoded($path) => $this->withComponent(['path' => $this->preparePathForModification($path, $this->rawComponents)]),
+                Encoder::isPathEncoded($path) => $this->withComponent(['path' => $path]),
                 default => throw new InvalidUriException('The encoded path component `'.$path.'` contains invalid characters.'),
             };
         }
@@ -427,42 +456,6 @@ if (PHP_VERSION_ID < 80500) {
                 'query' => $this->rawComponents['query'],
                 'fragment' => $this->rawComponents['fragment'],
             ];
-        }
-
-        /**
-         * Formatting the path when setting the path to avoid
-         * exception to be thrown on an invalid path.
-         * see https://github.com/php/php-src/issues/19897.
-         *
-         * @param InputComponentMap $components
-         */
-        private function preparePathForModification(string $path, array $components): string
-        {
-            $isAbsolute = str_starts_with($path, '/');
-            $authority = UriString::buildAuthority($components);
-            if (null !== $authority) {
-                // If there is an authority, the path must start with a `/`
-                return $isAbsolute ? $path : '/'.$path;
-            }
-
-            // If there is no authority, the path cannot start with `//`
-            if ($isAbsolute) {
-                return '/.'.$path;
-            }
-
-            $colonPos = strpos($path, ':');
-            if (false === $colonPos) {
-                return $path;
-            }
-
-            // In the absence of a scheme and of an authority,
-            // the first path segment cannot contain a colon (":") character.'
-            $slashPos = strpos($path, '/');
-            if (false === $slashPos || $colonPos < $slashPos) {
-                return './'.$path;
-            }
-
-            return $path;
         }
     }
 }
