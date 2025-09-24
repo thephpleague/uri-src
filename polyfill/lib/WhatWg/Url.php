@@ -256,14 +256,17 @@ if (PHP_VERSION_ID < 80500) {
                 return $this;
             }
 
-            if (null === $port || (self::PORT_RANGE_MIN <= $port && self::PORT_RANGE_MAX >= $port)) {
-                $copy = $this->copy();
-                $copy->url->port = (string) $port;
+            null === $port ||
+            (self::PORT_RANGE_MIN <= $port && self::PORT_RANGE_MAX >= $port) ||
+            throw new InvalidUrlException(
+                'The specified port is malformed.',
+                [new UrlValidationError((string) $port, UrlValidationErrorType::PortOutOfRange, true)]
+            );
 
-                return $copy;
-            }
+            $copy = $this->copy();
+            $copy->url->port = (string) $port;
 
-            throw new InvalidUrlException('The specified port is malformed. Port must be between '.self::PORT_RANGE_MIN.' and '.self::PORT_RANGE_MAX, [new UrlValidationError((string) $port, UrlValidationErrorType::PortOutOfRange, true)]);
+            return $copy;
         }
 
         public function getPath(): string
