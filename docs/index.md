@@ -60,5 +60,11 @@ The URI components package
 - URLSearchParams for PHP
 - Partial modifiers for URI.
 
+### [URI-POLYFILL](/uri-polyfill/7.0/)
+
+The URI Polyfill package
+
+- Provides Polyfill for PHP's native URI extension
+
 **Once a new major version is released, the previous stable release remains supported
 for six more months with patches and security fixes.**

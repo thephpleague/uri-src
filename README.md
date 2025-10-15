@@ -9,6 +9,7 @@ The `uri-src` is the monorepo which enables the development of the different lea
 - [URI](https://github.com/thephpleague/uri)
 - [URI Components](https://github.com/thephpleague/uri-components)
 - [URI Interfaces](https://github.com/thephpleague/uri-interfaces)
+- [URI Polyfill](https://github.com/thephpleague/uri-polyfill)
 
 System Requirements
 -------
