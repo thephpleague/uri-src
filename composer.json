@@ -85,7 +85,7 @@
         "phpunit:min": "phpunit --no-coverage",
         "test": [
             "@phpunit",
-            "@phpstan",
+            "@phpstan-build",
             "@phpcs"
         ]
     },
