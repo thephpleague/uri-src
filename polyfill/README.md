@@ -32,7 +32,7 @@ To use the package, you require:
 Install the package using Composer.
 
 ```bash
-composer require leagye/uri-polyfill:^7.6
+composer require league/uri-polyfill:^7.6
 ```
 
 ## Documentation

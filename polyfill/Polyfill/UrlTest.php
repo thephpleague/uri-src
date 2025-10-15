@@ -121,7 +121,7 @@ final class UrlTest extends TestCase
         $url = new Url('mailto:toto@example.com');
         $urlbis = $url->withHost('example.com');
 
-        self::assertSame($url, $urlbis);
+        self::assertSame($url->toAsciiString(), $urlbis->toAsciiString());
     }
 
     #[Test]
