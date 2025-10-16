@@ -3,6 +3,7 @@ build
 docs/_site
 docs/output.css
 docs/tailwindcss
+docs/.jekyll-metadata
 composer.lock
 .idea
 .php_cs.cache
