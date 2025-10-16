@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace League\Uri\Polyfill;
 
 use Error;
+use League\Uri\UriString;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -26,6 +27,7 @@ use Uri\UriComparisonMode;
 #[CoversClass(Uri::class)]
 #[CoversClass(InvalidUriException::class)]
 #[CoversClass(UriComparisonMode::class)]
+#[CoversClass(UriString::class)]
 final class UriTest extends TestCase
 {
     #[Test]
@@ -485,10 +487,22 @@ final class UriTest extends TestCase
         self::assertSame('https://example.com:443/bar/baz?#fragment', $uri->toString());
     }
 
-    public function testConstructorErrorHandling(): void
+    public function test_constructor_error_handling(): void
     {
         $this->expectException(InvalidUriException::class);
 
         new Uri('foo', new Uri('bar'));
     }
+
+    #[Test]
+    public function it_does_resolve_uri_with_edge_case_path(): void
+    {
+        $input = 'boo:///../path?q';
+        $normalized = 'boo:///path?q';
+
+        $uri = Uri::parse($input);
+        self::assertSame($input, $uri->toRawString());
+        self::assertSame($normalized, $uri->toString());
+    }
+
 }
