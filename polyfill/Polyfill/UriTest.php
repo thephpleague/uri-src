@@ -500,9 +500,8 @@ final class UriTest extends TestCase
         $input = 'boo:///../path?q';
         $normalized = 'boo:///path?q';
 
-        $uri = Uri::parse($input);
+        $uri = new Uri($input);
         self::assertSame($input, $uri->toRawString());
         self::assertSame($normalized, $uri->toString());
     }
-
 }
