@@ -19,6 +19,8 @@ parameters:
 		- identifier: missingType.iterableValue
 		- '#Attribute class Deprecated does not exist.#'
 		- '#deprecated class League\\Uri\\BaseUri#'
+		- '#deprecated method getUriString\(\)#'
+		- '#deprecated method getUri\(\)#'
 		- '#\Dom\\HTMLDocument#'
 	reportUnmatchedIgnoredErrors: true
 	treatPhpDocTypesAsCertain: false
