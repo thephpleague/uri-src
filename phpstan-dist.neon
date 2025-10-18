@@ -17,8 +17,7 @@ parameters:
 		  path: interfaces/IPv4/GMPCalculator.php
 		- identifier: missingType.iterableValue
 		- '#deprecated class League\\Uri\\BaseUri#'
-		- '#deprecated method getUriString\(\)#'
-		- '#deprecated method getUri\(\)#'
+		- '#deprecated interface League\\Uri\\Contracts\\UriAccess#'
 		- '#\Dom\\HTMLDocument#'
 	reportUnmatchedIgnoredErrors: true
 	treatPhpDocTypesAsCertain: false
