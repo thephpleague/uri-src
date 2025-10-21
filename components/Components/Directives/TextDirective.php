@@ -143,7 +143,7 @@ final class TextDirective implements Directive
      *  This method MUST retain the state of the current instance, and return
      *  an instance that contains the new start portion.
      */
-    public function startsAt(string $start): self
+    public function startingOn(string $start): self
     {
         if ($this->start === $start) {
             return $this;
@@ -158,7 +158,7 @@ final class TextDirective implements Directive
      *  This method MUST retain the state of the current instance, and return
      *  an instance that contains the new end portion.
      */
-    public function endsAt(?string $end): self
+    public function endingOn(?string $end): self
     {
         if ($this->end === $end) {
             return $this;
@@ -173,7 +173,7 @@ final class TextDirective implements Directive
      *  This method MUST retain the state of the current instance, and return
      *  an instance that contains the new suffix portion.
      */
-    public function suffixWith(?string $suffix): self
+    public function trailedBy(?string $suffix): self
     {
         if ($this->suffix === $suffix) {
             return $this;
@@ -188,7 +188,7 @@ final class TextDirective implements Directive
      *  This method MUST retain the state of the current instance, and return
      *  an instance that contains the new prefix portion.
      */
-    public function prefixWith(?string $prefix): self
+    public function leadBy(?string $prefix): self
     {
         if ($this->prefix === $prefix) {
             return $this;

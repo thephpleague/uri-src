@@ -38,12 +38,15 @@ use function array_keys;
 use function array_map;
 use function array_slice;
 use function count;
+use function explode;
 use function filter_var;
 use function implode;
 use function in_array;
 use function is_bool;
 use function sprintf;
 use function str_replace;
+use function strlen;
+use function substr;
 
 use const ARRAY_FILTER_USE_BOTH;
 use const ARRAY_FILTER_USE_KEY;
@@ -118,17 +121,28 @@ final class FragmentDirective implements FragmentInterface, IteratorAggregate, C
     /**
      * Append one or more Directives to the fragment.
      */
-    public function append(Directive ...$directives): self
+    public function append(Directive|Stringable|string ...$directives): self
     {
-        return new self(...$this->directives, ...$directives);
+        return new self(...$this->directives, ...array_map(self::filterDirective(...), $directives));
+    }
+
+    private static function filterDirective(Directive|Stringable|string $directive): Directive
+    {
+        if ($directive instanceof Directive) {
+            return $directive;
+        }
+
+        $directive = (string) $directive;
+
+        return str_starts_with($directive, 'text=') ? TextDirective::fromString($directive) : GenericDirective::fromString($directive);
     }
 
     /**
      * Prepend one or more Directives to the fragment.
      */
-    public function prepend(Directive ...$directives): self
+    public function prepend(Directive|Stringable|string ...$directives): self
     {
-        return new self(...$directives, ...$this->directives);
+        return new self(...array_map(self::filterDirective(...), $directives), ...$this->directives);
     }
 
     /**
@@ -216,11 +230,12 @@ final class FragmentDirective implements FragmentInterface, IteratorAggregate, C
      *
      * If no Directive is found to the specified offset, an exception is thrown
      */
-    public function replace(int $offset, Directive $directive): self
+    public function replace(int $offset, Directive|Stringable|string $directive): self
     {
         $currentDirective = $this->nth($offset);
-
         null !== $currentDirective || throw new OffsetOutOfBounds(sprintf('The key `%s` is invalid.', $offset));
+
+        $directive = self::filterDirective($directive);
         if ($currentDirective->toString() === $directive->toString() && $directive::class === $currentDirective::class) {
             return $this;
         }
@@ -277,15 +292,14 @@ final class FragmentDirective implements FragmentInterface, IteratorAggregate, C
         $value = (string) $value;
         str_starts_with($value, self::DELIMITER) || throw new SyntaxError('The value "'.$value.'" is not a valid fragment directive.');
 
-        $value = substr($value, strlen(self::DELIMITER));
-        $directives = [];
-        foreach (explode(self::SEPARATOR, $value) as $directive) {
-            $directives[] = str_starts_with($directive, 'text=') ? TextDirective::fromString($directive) : GenericDirective::fromString($directive);
-        };
-
-        return new self(...$directives);
+        return new self(...array_map(
+            self::filterDirective(...),
+            explode(
+                self::SEPARATOR,
+                substr($value, strlen(self::DELIMITER))
+            )
+        ));
     }
-
 
     public static function tryNew(Stringable|string|null $value): ?self
     {

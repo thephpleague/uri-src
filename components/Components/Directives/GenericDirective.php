@@ -22,7 +22,7 @@ use function str_replace;
 
 final class GenericDirective implements Directive
 {
-    public function __construct(private string $name, private ?string $value)
+    public function __construct(private string $name, private ?string $value = null)
     {
     }
 

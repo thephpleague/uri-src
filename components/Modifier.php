@@ -1034,6 +1034,40 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
         return UriString::build($components);
     }
 
+    /*********************************
+     * Fragment modifier methods
+     *********************************/
+
+    public function appendDirectives(Directive ...$directives): static
+    {
+        return $this->withFragment(FragmentDirective::fromUri($this->uri())->append(...$directives));
+    }
+
+    public function prependDirectives(Directive ...$directives): static
+    {
+        return $this->withFragment(FragmentDirective::fromUri($this->uri())->prepend(...$directives));
+    }
+
+    public function removeDirectives(int ...$offset): static
+    {
+        return $this->withFragment(FragmentDirective::fromUri($this->uri())->remove(...$offset));
+    }
+
+    public function replaceDirective(int $offset, Directive $directive): static
+    {
+        return $this->withFragment(FragmentDirective::fromUri($this->uri())->replace($offset, $directive));
+    }
+
+    public function sliceDirectives(int $offset, ?int $length): static
+    {
+        return $this->withFragment(FragmentDirective::fromUri($this->uri())->slice($offset, $length));
+    }
+
+    public function filterDirectives(callable $callback): static
+    {
+        return $this->withFragment(FragmentDirective::fromUri($this->uri())->filter($callback));
+    }
+
     /**
      * DEPRECATION WARNING! This method will be removed in the next major point release.
      *
