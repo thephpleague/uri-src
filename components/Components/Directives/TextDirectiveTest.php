@@ -67,4 +67,16 @@ final class TextDirectiveTest extends TestCase
         self::assertSame('prefix', $directive->prefix);
         self::assertSame('suffix', $directive->suffix);
     }
+
+    public function test_it_can_return_the_default_properties(): void
+    {
+        $directive = new TextDirective('st&art', prefix: 'prefix', suffix: 'suffix');
+        self::assertSame('text', $directive->name());
+        self::assertSame('st&art', $directive->start);
+        self::assertSame('prefix', $directive->prefix);
+        self::assertSame('suffix', $directive->suffix);
+        self::assertNull($directive->end);
+        self::assertSame('prefix-,st&art,-suffix', $directive->value());
+        self::assertSame('text=prefix-,st%26art,-suffix', $directive->toString());
+    }
 }
