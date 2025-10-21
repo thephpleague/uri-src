@@ -39,7 +39,6 @@ use function array_map;
 use function array_slice;
 use function count;
 use function explode;
-use function filter_var;
 use function implode;
 use function in_array;
 use function is_bool;
@@ -49,8 +48,6 @@ use function strlen;
 use function substr;
 
 use const ARRAY_FILTER_USE_BOTH;
-use const ARRAY_FILTER_USE_KEY;
-use const FILTER_VALIDATE_INT;
 
 /**
  * @implements IteratorAggregate<int, Directive>
@@ -68,9 +65,93 @@ final class FragmentDirective implements FragmentInterface, IteratorAggregate, C
         $this->directives = array_values($directives);
     }
 
+    /**
+     * Create a new instance.
+     *
+     * @throws SyntaxError
+     */
+    public static function new(Stringable|string|null $value): self
+    {
+        if (null === $value) {
+            return new self();
+        }
+
+        $value = (string) $value;
+        str_starts_with($value, self::DELIMITER) || throw new SyntaxError('The value "'.$value.'" is not a valid fragment directive.');
+
+        return new self(...array_map(
+            self::filterDirective(...),
+            explode(
+                self::SEPARATOR,
+                substr($value, strlen(self::DELIMITER))
+            )
+        ));
+    }
+
+    private static function filterDirective(Directive|Stringable|string $directive): Directive
+    {
+        if ($directive instanceof Directive) {
+            return $directive;
+        }
+
+        $directive = (string) $directive;
+
+        return str_starts_with($directive, 'text=') ? TextDirective::fromString($directive) : GenericDirective::fromString($directive);
+    }
+
+    public static function tryNew(Stringable|string|null $value): ?self
+    {
+        try {
+            return self::new($value);
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     *  Create a new instance from a URI string or object.
+     */
+    public static function fromUri(WhatWgUrl|Rfc3986Uri|Stringable|string $uri): self
+    {
+        if ($uri instanceof Modifier) {
+            $uri = $uri->uri();
+        }
+
+        if ($uri instanceof Rfc3986Uri) {
+            return self::new($uri->getRawFragment());
+        }
+
+        if ($uri instanceof Psr7UriInterface) {
+            $fragment = $uri->getFragment();
+
+            return self::new('' === $fragment ? null : $fragment);
+        }
+
+        if (!$uri instanceof UriInterface && !$uri instanceof WhatWgUrl) {
+            $uri = Uri::new($uri);
+        }
+
+        return self::new($uri->getFragment());
+    }
+
     public function count(): int
     {
         return count($this->directives);
+    }
+
+    public function getIterator(): Traversable
+    {
+        yield from $this->directives;
+    }
+
+    public function __toString(): string
+    {
+        return $this->toString();
+    }
+
+    public function jsonSerialize(): string
+    {
+        return $this->toString();
     }
 
     public function value(): ?string
@@ -85,16 +166,6 @@ final class FragmentDirective implements FragmentInterface, IteratorAggregate, C
     public function toString(): string
     {
         return (string) $this->value();
-    }
-
-    public function __toString(): string
-    {
-        return $this->toString();
-    }
-
-    public function jsonSerialize(): string
-    {
-        return $this->toString();
     }
 
     public function getUriComponent(): string
@@ -113,9 +184,55 @@ final class FragmentDirective implements FragmentInterface, IteratorAggregate, C
         return  str_replace('%20', ' ', (string) Encoder::decodeFragment($this->toString()));
     }
 
-    public function getIterator(): Traversable
+    /**
+     * Returns the Directive at a specified offset or null if none is defined.
+     *
+     * Negative offsets are supported.
+     */
+    public function nth(int $offset): ?Directive
     {
-        yield from $this->directives;
+        if ($offset < 0) {
+            $offset += count($this->directives);
+        }
+
+        return $this->directives[$offset] ?? null;
+    }
+
+    /**
+     * The first Directive defined on the fragment or null if none are defined.
+     */
+    public function first(): ?Directive
+    {
+        return $this->nth(0);
+    }
+
+    /**
+     * The last Directive defined on the fragment or null if none are defined.
+     */
+    public function last(): ?Directive
+    {
+        return $this->nth(-1);
+    }
+
+    /**
+     * Tells whether all the submitted keys are present in the collection.
+     *
+     * Negative offsets are supported.
+     */
+    public function has(int ...$offsets): bool
+    {
+        $nbDirectives = count($this->directives);
+        foreach ($offsets as $offset) {
+            if ($offset < 0) {
+                $offset += $nbDirectives;
+            }
+
+            if (! isset($this->directives[$offset])) {
+                return false;
+            }
+        }
+
+        return [] !== $offsets;
     }
 
     /**
@@ -124,17 +241,6 @@ final class FragmentDirective implements FragmentInterface, IteratorAggregate, C
     public function append(Directive|Stringable|string ...$directives): self
     {
         return new self(...$this->directives, ...array_map(self::filterDirective(...), $directives));
-    }
-
-    private static function filterDirective(Directive|Stringable|string $directive): Directive
-    {
-        if ($directive instanceof Directive) {
-            return $directive;
-        }
-
-        $directive = (string) $directive;
-
-        return str_starts_with($directive, 'text=') ? TextDirective::fromString($directive) : GenericDirective::fromString($directive);
     }
 
     /**
@@ -155,32 +261,20 @@ final class FragmentDirective implements FragmentInterface, IteratorAggregate, C
         }
 
         $nbDirectives = count($this->directives);
-        $options = ['options' => ['min_range' => - $nbDirectives, 'max_range' => $nbDirectives - 1]];
         $deletedKeys = [];
-        foreach ($keys as $value) {
-            /** @var false|int $offset */
-            $offset = filter_var($value, FILTER_VALIDATE_INT, $options);
-            false !== $offset || throw new OffsetOutOfBounds(sprintf('The key `%s` is invalid.', $value));
-
-            if ($offset < 0) {
-                $offset += $nbDirectives;
+        foreach ($keys as $key) {
+            $value = $key;
+            if ($value < 0) {
+                $value += $nbDirectives;
             }
 
-            $deletedKeys[] = $offset;
+            isset($this->directives[$value]) || throw new OffsetOutOfBounds(sprintf('The key `%s` is invalid.', $key));
+            $deletedKeys[] = $value;
         }
 
         $deletedKeys = array_keys(array_count_values($deletedKeys));
-        $directives = array_filter(
-            array: $this->directives,
-            callback: fn ($key): bool => !in_array($key, $deletedKeys, true),
-            mode: ARRAY_FILTER_USE_KEY
-        );
 
-        if ($directives === $this->directives) {
-            return $this;
-        }
-
-        return new self(...$this->directives);
+        return $this->filter(fn (Directive $directive, int $offset): bool => !in_array($offset, $deletedKeys, true)); /* @phpstan-ignore-line */
     }
 
     /**
@@ -198,14 +292,6 @@ final class FragmentDirective implements FragmentInterface, IteratorAggregate, C
         }
 
         return new self(...$directives);
-    }
-
-    /**
-     * Filter the Directives to return a new instance containing a single type of Directives.
-     */
-    public function byName(string $name): self
-    {
-        return $this->filter(fn (Directive $directive): bool => $name === $directive->name());
     }
 
     /**
@@ -248,96 +334,6 @@ final class FragmentDirective implements FragmentInterface, IteratorAggregate, C
         $directives[$offset] = $directive;
 
         return new self(...$directives);
-    }
-
-    /**
-     * Returns the Directive at a specified offset or null if none is defined.
-     */
-    public function nth(int $offset): ?Directive
-    {
-        if ($offset < 0) {
-            $offset += count($this->directives);
-        }
-
-        return $this->directives[$offset] ?? null;
-    }
-
-    /**
-     * The first Directive defined on the fragment or null if none are defined.
-     */
-    public function first(): ?Directive
-    {
-        return $this->nth(0);
-    }
-
-    /**
-     * The last Directive defined on the fragment or null if none are defined.
-     */
-    public function last(): ?Directive
-    {
-        return $this->nth(-1);
-    }
-
-    /**
-     * Create a new instance.
-     *
-     * @throws SyntaxError
-     */
-    public static function new(Stringable|string|null $value): self
-    {
-        if (null === $value) {
-            return new self();
-        }
-
-        $value = (string) $value;
-        str_starts_with($value, self::DELIMITER) || throw new SyntaxError('The value "'.$value.'" is not a valid fragment directive.');
-
-        return new self(...array_map(
-            self::filterDirective(...),
-            explode(
-                self::SEPARATOR,
-                substr($value, strlen(self::DELIMITER))
-            )
-        ));
-    }
-
-    public static function tryNew(Stringable|string|null $value): ?self
-    {
-        try {
-            return self::new($value);
-        } catch (Throwable $exception) {
-            return null;
-        }
-    }
-
-    /**
-     *  Create a new instance from a URI string or object.
-     */
-    public static function fromUri(WhatWgUrl|Rfc3986Uri|Stringable|string $uri): self
-    {
-        if ($uri instanceof Modifier) {
-            $uri = $uri->uri();
-        }
-
-        if ($uri instanceof Rfc3986Uri) {
-            return self::new($uri->getRawFragment());
-        }
-
-        if ($uri instanceof WhatWgUrl) {
-            return self::new($uri->getFragment());
-        }
-
-        if ($uri instanceof Psr7UriInterface) {
-            $fragment = $uri->getFragment();
-
-            return self::new('' === $fragment ? null : $fragment);
-        }
-
-        if (!$uri instanceof UriInterface) {
-            $uri = Uri::new($uri);
-        }
-
-        return self::new($uri->getFragment());
     }
 
     final public function when(callable|bool $condition, callable $onSuccess, ?callable $onFail = null): static
