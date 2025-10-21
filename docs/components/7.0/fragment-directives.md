@@ -10,7 +10,7 @@ title: The Fragment Directive component
 This specialized fragment component contains a list of `Directives` that can be used by user-agent
 to further improve UX when navigating to or inside a website. As of time of this writing, only
 the **Text Directive** is defined by the [URL Fragment Text Directives](https://wicg.github.io/scroll-to-text-fragment/)
-but nothing preclute the addition of other directives in the future.
+but nothing preclude the addition of other directives in the future.
 
 The component on itself includes the same public API as the generic [Fragment](/components/7.0/fragment/) class
 and, in addition, provides methods to handle directives.
@@ -85,7 +85,7 @@ The package supports the following directives the text and the generic directive
 
 ### Text Directive
 
-The text directive is used in browsers to highlights section of a page:
+The text directive is used in browsers to highlight page fragments:
 
 ```php
 use League\Uri\Components\Directives\TextDirective;
@@ -103,20 +103,20 @@ Apart from the `start` argument all the other arguments are optionals.
 Once you have a `TextDirective` instance you can change any of its property using the following `wither-` methods.
 
 ```php
-TextDirective::startingOn(string $start): self; //change the starting text
-TextDirective::endingOn(?string $start): self; //change the optional ending text
-TextDirective::leadedBy(?string $prefix): self; //change the prefix text
-TextDirective::trailedBy(?string $suffix): self; //change the suffix text
+TextDirective::startsWith(string $text): self;  //change the starting text
+TextDirective::endsWith(?string $text): self;   //change the optional ending text
+TextDirective::precededBy(?string $text): self; //change the optional prefix context
+TextDirective::followedBy(?string $text): self; //change the optional suffix context
 ```
 
 All the methods return a new instance making the class immutable.
 
 ```php
 echo new TextDirective('foo')
-        ->startingOn('y&lo')
-        ->endingOn('bar')
-        ->leadBy('john')
-        ->trailedBy('doe')
+        ->startsWith('y&lo')
+        ->endsWith('bar')
+        ->precededBy('john')
+        ->followedBy('doe')
         ->toString();
 // returns "text=john-,y%26lo,bar,-doe"
 ```

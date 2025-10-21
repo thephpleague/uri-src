@@ -56,11 +56,8 @@ final class TextDirective implements Directive
      */
     public static function fromValue(Stringable|string $text): self
     {
-        if ('' === $text) {
-            return new self('');
-        }
-
-        1 === preg_match(self::REGEXP_PATTERN, (string) $text, $matches) || throw new SyntaxError('The submitted text is not a text directive.');
+        '' !== $text || throw new SyntaxError('The text directive value can not be the empty string.');
+        1 === preg_match(self::REGEXP_PATTERN, (string) $text, $matches) || throw new SyntaxError('The text directive is malformed.');
         if ('' === $matches['prefix']) {
             $matches['prefix'] = null;
         }
@@ -96,12 +93,11 @@ final class TextDirective implements Directive
 
     public function value(): string
     {
-        $str = '';
+        $str = $this->start;
         if (null !== $this->prefix) {
-            $str .= $this->prefix.'-,';
+            $str = $this->prefix.'-,'.$str;
         }
 
-        $str .= $this->start;
         if (null !== $this->end) {
             $str .= ','.$this->end;
         }
@@ -115,18 +111,21 @@ final class TextDirective implements Directive
 
     public function toString(): string
     {
-        $encodedValue = '';
-        if (null !== $this->prefix) {
-            $encodedValue .= self::encode($this->prefix).'-,';
+        $encodedValue = (string) self::encode($this->start);
+
+        $prefix = self::encode($this->prefix);
+        if (null !== $prefix) {
+            $encodedValue = $prefix.'-,'.$encodedValue;
         }
 
-        $encodedValue .= self::encode($this->start);
-        if (null !== $this->end) {
-            $encodedValue .= ','.self::encode($this->end);
+        $end = self::encode($this->end);
+        if (null !== $end) {
+            $encodedValue .= ','.$end;
         }
 
-        if (null !== $this->suffix) {
-            $encodedValue .= ',-'.self::encode($this->suffix);
+        $suffix = self::encode($this->suffix);
+        if (null !== $suffix) {
+            $encodedValue .= ',-'.$suffix;
         }
 
         return self::NAME.'='.$encodedValue;
@@ -140,46 +139,52 @@ final class TextDirective implements Directive
     /**
      * Returns a new instance with a new start portion.
      *
-     *  This method MUST retain the state of the current instance, and return
-     *  an instance that contains the new start portion.
+     * The submitted string must be in its decoded form
+     *
+     * This method MUST retain the state of the current instance, and return
+     * an instance that contains the new start portion.
      */
-    public function startingOn(string $start): self
+    public function startsWith(string $text): self
     {
-        if ($this->start === $start) {
+        if ($this->start === $text) {
             return $this;
         }
 
-        return new self($start, $this->end, $this->prefix, $this->suffix);
+        return new self($text, $this->end, $this->prefix, $this->suffix);
     }
 
     /**
      * Returns a new instance with a new end portion.
      *
-     *  This method MUST retain the state of the current instance, and return
-     *  an instance that contains the new end portion.
+     * The submitted string must be in its decoded form
+     *
+     * This method MUST retain the state of the current instance, and return
+     * an instance that contains the new end portion.
      */
-    public function endingOn(?string $end): self
+    public function endsWith(?string $text): self
     {
-        if ($this->end === $end) {
+        if ($this->end === $text) {
             return $this;
         }
 
-        return new self($this->start, $end, $this->prefix, $this->suffix);
+        return new self($this->start, $text, $this->prefix, $this->suffix);
     }
 
     /**
      * Returns a new instance with a new suffix portion.
      *
-     *  This method MUST retain the state of the current instance, and return
-     *  an instance that contains the new suffix portion.
+     * The submitted string must be in its decoded form
+     *
+     * This method MUST retain the state of the current instance, and return
+     * an instance that contains the new suffix portion.
      */
-    public function trailedBy(?string $suffix): self
+    public function followedBy(?string $text): self
     {
-        if ($this->suffix === $suffix) {
+        if ($this->suffix === $text) {
             return $this;
         }
 
-        return new self($this->start, $this->end, $this->prefix, $suffix);
+        return new self($this->start, $this->end, $this->prefix, $text);
     }
 
     /**
@@ -188,12 +193,12 @@ final class TextDirective implements Directive
      *  This method MUST retain the state of the current instance, and return
      *  an instance that contains the new prefix portion.
      */
-    public function leadBy(?string $prefix): self
+    public function precededBy(?string $text): self
     {
-        if ($this->prefix === $prefix) {
+        if ($this->prefix === $text) {
             return $this;
         }
 
-        return new self($this->start, $this->end, $prefix, $this->suffix);
+        return new self($this->start, $this->end, $text, $this->suffix);
     }
 }

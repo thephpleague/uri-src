@@ -53,14 +53,14 @@ final class TextDirectiveTest extends TestCase
     public static function testClasswithers(): void
     {
         $directive = (new TextDirective('foo'))
-            ->startingOn('start')
-            ->startingOn('start')
-            ->endingOn('end')
-            ->endingOn('end')
-            ->trailedBy('suffix')
-            ->trailedBy('suffix')
-            ->leadBy('prefix')
-            ->leadBy('prefix');
+            ->startsWith('start')
+            ->startsWith('start')
+            ->endsWith('end')
+            ->endsWith('end')
+            ->followedBy('suffix')
+            ->followedBy('suffix')
+            ->precededBy('prefix')
+            ->precededBy('prefix');
 
         self::assertSame('start', $directive->start);
         self::assertSame('end', $directive->end);

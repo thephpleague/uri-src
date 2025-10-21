@@ -15,6 +15,9 @@ namespace League\Uri\Components\Directives;
 
 use Stringable;
 
+/**
+ * @see https://wicg.github.io/scroll-to-text-fragment/#the-fragment-directive
+ */
 interface Directive extends Stringable
 {
     /**
@@ -37,6 +40,8 @@ interface Directive extends Stringable
     /**
      * The encoded string representation of the fragment using
      * the Stringable interface.
+     *
+     * @see Directive::toString()
      */
     public function __toString(): string;
 }
