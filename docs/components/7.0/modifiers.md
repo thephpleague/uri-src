@@ -169,6 +169,16 @@ to apply the following changes to the submitted URI.
   <li><a href="#modifierdatapathtoascii">dataPathToAscii</a></li>
 </ul>
 </div>
+<div>
+<ul>
+  <li><a href="#modifierappenddirectives">appendDirectives</a></li>
+  <li><a href="#modifierprependdirectives">prependDirectives</a></li>
+  <li><a href="#modifierremovedirectives">removeDirectives</a></li>
+  <li><a href="#modifierreplacedirective">replaceDirective</a></li>
+  <li><a href="#modifierfilterdirectives">filterDirectives</a></li>
+  <li><a href="#modifierslicedirectives">sliceDirectives</a></li>
+</ul>
+</div>
 </div>
 
 ## Query modifiers
@@ -875,14 +885,118 @@ Converts a data URI path from text to its base64 encoded version
 $uri = Uri::new("data:text/plain;charset=US-ASCII;base64,SGVsbG8gV29ybGQh");
 echo Modifier::from($uri)
     ->dataPathToAscii()
-    ->getUri()
+    ->uri()
     ->getPath();
 //display "text/plain;charset=US-ASCII,Hello%20World!"
 ~~~
 
+## Fragment Modifiers
+
+### Modifier::appendDirectives
+
+<p class="message-notice">available since version <code>7.6.0</code></p>
+
+Appends one or more directives to the current URI fragment.
+
+~~~php
+$uri = Http::new("http://www.example.com/path/to/the/sky/");
+echo Modifier::from($uri)
+    ->appendDirectives(new TextDirective(start:"foo", end:"bar"))
+    ->appendDirectives('unknownDirective')
+    ->uri()
+    ->getFragment();
+// display ":~:text=foo,bar&unknownDirective"
+~~~
+
+### Modifier::prependDirectives
+
+<p class="message-notice">available since version <code>7.6.0</code></p>
+
+Prepends one or more directives to the current URI fragment.
+
+~~~php
+use Uri\WhatWg\Url;
+
+$uri = new Url("http://www.example.com/path/to/the/sky/");
+echo Modifier::from($uri)
+    ->prependDirectives(new TextDirective(start:"foo", end:"bar"))
+    ->prependDirectives('unknownDirective')
+    ->uri()
+    ->getFragment();
+// display ":~:text=foo,bar&unknownDirective"
+~~~
+
+### Modifier::replaceDirective
+
+<p class="message-notice">available since version <code>7.6.0</code></p>
+
+Replace a specific directive from the fragment.
+
+~~~php
+use Uri\WhatWg\Url;
+
+$uri = new Url("http://www.example.com/path/to/the/sky/#:~:text=foo,bar&unknownDirective");
+echo Modifier::from($uri)
+    ->replaceDirective(1, new TextDirective(start:"bar", end:"foo"))
+    ->uri()
+    ->getFragment();
+// display ":~:text=foo,bar&text=bar,foo"
+~~~
+
+### Modifier::removeDirectives
+
+<p class="message-notice">available since version <code>7.6.0</code></p>
+
+Remove directives from the fragment using their offsets.
+
+~~~php
+use Uri\WhatWg\Url;
+
+$uri = new Url("http://www.example.com/path/to/the/sky/#:~:text=foo,bar&unknownDirective");
+echo Modifier::from($uri)
+    ->removeDirectives(1)
+    ->uri()
+    ->getFragment();
+// display ":~:text=foo,bar"
+~~~
+
+### Modifier::sliceDirectives
+
+<p class="message-notice">available since version <code>7.6.0</code></p>
+
+Slice directives from the fragment using their offsets.
+
+~~~php
+use Uri\WhatWg\Url;
+
+$uri = new Url("http://www.example.com/path/to/the/sky/#:~:text=foo,bar&unknownDirective&text=yes");
+echo Modifier::from($uri)
+    ->sliceDirective(0, 2)
+    ->uri()
+    ->getFragment();
+// display ":~:text=yes"
+~~~
+
+### Modifier::filterDirectives
+
+<p class="message-notice">available since version <code>7.6.0</code></p>
+
+Remove directives from the fragment using a callback.
+
+~~~php
+use Uri\WhatWg\Url;
+
+$uri = new Url("http://www.example.com/path/to/the/sky/#:~:text=foo,bar&unknownDirective&text=yes");
+echo Modifier::from($uri)
+    ->filterDirectives(fn (Directive $directive, int $offset) => $directive->name() !== 'text')
+    ->uri()
+    ->getFragment();
+// display ":~:text=foo,bar&text=yes"
+~~~
+
 ### General modification
 
-<p class="message-notice">The <code>when</code> methods is available since version <code>7.6.0</code></p>
+<p class="message-notice">available since version <code>7.6.0</code></p>
 
 To ease modifying URI since version 7.6.0 you can directly access the modifier methods from the underlying
 URI object.

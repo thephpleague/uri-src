@@ -57,6 +57,7 @@ packages:
                 Query: '/components/7.0/query/'
                 URLSearchParams: '/components/7.0/urlsearchparams/'
                 Fragment: '/components/7.0/fragment/'
+                Fragment Directives: '/components/7.0/fragment-directives/'
         '2.0':
             Documentation:
                 Getting Started: '/components/2.0/'
