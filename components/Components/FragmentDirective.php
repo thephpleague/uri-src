@@ -60,9 +60,9 @@ final class FragmentDirective implements FragmentInterface, IteratorAggregate, C
     /** @var list<Directive> */
     private array $directives;
 
-    public function __construct(Directive ...$directives)
+    public function __construct(Directive|Stringable|string ...$directives)
     {
-        $this->directives = array_values($directives);
+        $this->directives = array_values(array_map(self::filterDirective(...), $directives));
     }
 
     /**
@@ -233,6 +233,23 @@ final class FragmentDirective implements FragmentInterface, IteratorAggregate, C
         }
 
         return [] !== $offsets;
+    }
+
+    public function indexOf(Directive|Stringable|string $directive): ?int
+    {
+        $directive = self::filterDirective($directive)->toString();
+        foreach ($this->directives as $offset => $innerDirective) {
+            if ($innerDirective->toString() === $directive) {
+                return $offset;
+            }
+        }
+
+        return null;
+    }
+
+    public function contains(Directive|Stringable|string $directive): bool
+    {
+        return null !== $this->indexOf($directive);
     }
 
     /**
