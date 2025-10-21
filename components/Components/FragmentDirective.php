@@ -238,17 +238,43 @@ final class FragmentDirective implements FragmentInterface, IteratorAggregate, C
     /**
      * Append one or more Directives to the fragment.
      */
-    public function append(Directive|Stringable|string ...$directives): self
+    public function append(FragmentDirective|Directive|Stringable|string ...$directives): self
     {
-        return new self(...$this->directives, ...array_map(self::filterDirective(...), $directives));
+        $items = [];
+        foreach ($directives as $directive) {
+            if ($directive instanceof FragmentDirective) {
+                $items = [...$items, ...$directive];
+                continue;
+            }
+            $items[] = $directive;
+        }
+
+        if ([] === $items) {
+            return $this;
+        }
+
+        return new self(...$this->directives, ...array_map(self::filterDirective(...), $items));
     }
 
     /**
      * Prepend one or more Directives to the fragment.
      */
-    public function prepend(Directive|Stringable|string ...$directives): self
+    public function prepend(FragmentDirective|Directive|Stringable|string ...$directives): self
     {
-        return new self(...array_map(self::filterDirective(...), $directives), ...$this->directives);
+        $items = [];
+        foreach ($directives as $directive) {
+            if ($directive instanceof FragmentDirective) {
+                $items = [...$items, ...$directive];
+                continue;
+            }
+            $items[] = $directive;
+        }
+
+        if ([] === $items) {
+            return $this;
+        }
+
+        return new self(...array_map(self::filterDirective(...), $items), ...$this->directives);
     }
 
     /**
@@ -336,7 +362,7 @@ final class FragmentDirective implements FragmentInterface, IteratorAggregate, C
         return new self(...$directives);
     }
 
-    final public function when(callable|bool $condition, callable $onSuccess, ?callable $onFail = null): static
+    public function when(callable|bool $condition, callable $onSuccess, ?callable $onFail = null): self
     {
         if (!is_bool($condition)) {
             $condition = $condition($this);

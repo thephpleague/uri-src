@@ -26,6 +26,12 @@ final class TextDirectiveTest extends TestCase
         self::assertSame($expected, (string) $fragmentTextDirective);
     }
 
+    #[DataProvider('provideValidFragmentTextDirectives')]
+    public function test_it_can_be_created_from_string(TextDirective $fragmentTextDirective, string $expected): void
+    {
+        self::assertEquals($fragmentTextDirective, TextDirective::fromString($expected));
+    }
+
     public function testToStringEncodesSpecialCharacters(): void
     {
         $fragmentTextDirective = new TextDirective('st&rt', 'e,nd', 'prefix-', '-&suffix');
@@ -48,8 +54,12 @@ final class TextDirectiveTest extends TestCase
     {
         $directive = (new TextDirective('foo'))
             ->startingOn('start')
+            ->startingOn('start')
+            ->endingOn('end')
             ->endingOn('end')
             ->trailedBy('suffix')
+            ->trailedBy('suffix')
+            ->leadBy('prefix')
             ->leadBy('prefix');
 
         self::assertSame('start', $directive->start);

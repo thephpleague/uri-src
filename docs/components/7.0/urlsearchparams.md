@@ -29,14 +29,14 @@ in the following aspects:
 | `URLSearchParams::size` property | `URLSearchParams::size()`method |
 | `URLSearchParams::forEach()`     | `URLSearchParams::each()`       |
 
-<p class="message-notice">As per the specification the class is mutable.</p>
-<p class="message-notice">As per the specification encoding is done following the <code>application/x-www-form-urlencoded</code> rules</p> 
+<p class="message-notice">As per the specification, the class is mutable.</p>
+<p class="message-notice">As per the specification, encoding is done following the <code>application/x-www-form-urlencoded</code> rules</p> 
 
 ## Usage
 
 ### Instantiation
 
-To instantiate a new instance you can use the default constructor which follow the specification
+To get a new instance, you can use the default constructor, which follows the specification
 or one of the more specialized named constructors to avoid subtle bugs described below:
 
 - The `URLSearchParams::new` instantiate from a query; the `?` delimiter if present will be ignored.

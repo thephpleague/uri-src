@@ -26,10 +26,10 @@ final class TextDirective implements Directive
     private const NAME = 'text';
 
     private const REGEXP_PATTERN = '/^
-        (?:(?<prefix>.+?)-,)?  # optional prefix up to first "-,"
-        (?<start>[^,]+?)       # required start (up to "," or end)
-        (?:,(?<end>.+?))?      # optional end (up to ",-" or end)
-        (?:,-(?<suffix>.+))?   # optional suffix (to end)
+        (?:(?<prefix>.+?)-,)?    # optional prefix up to first "-,"
+        (?<start>[^,]+?)         # required start (up to "," or end)
+        (?:,(?<end>[^,-]*),?)?   # optional end, stop before ",-" if present
+        (?:,-(?<suffix>.+))?     # optional suffix (to end)
     $/x';
 
     public function __construct(
@@ -45,7 +45,7 @@ final class TextDirective implements Directive
      */
     public static function fromString(Stringable|string $value): self
     {
-        [$name, $value] = explode('=', (string) $value, 2) + [1 => null];
+        [$name, $value] = explode('=', (string) $value, 2) + [1 => ''];
         self::NAME === $name || throw new SyntaxError('The submitted text is not a text directive.');
 
         return self::fromValue($value);
@@ -54,9 +54,9 @@ final class TextDirective implements Directive
     /**
      * Create a new instance from a string without the Directive name and the separator (=).
      */
-    public static function fromValue(Stringable|string|null $text): self
+    public static function fromValue(Stringable|string $text): self
     {
-        if (null === $text) {
+        if ('' === $text) {
             return new self('');
         }
 
