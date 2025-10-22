@@ -69,11 +69,9 @@ echo $info;  //displays login:pass
 echo $info->withUser('john')->withPass('doe'); //displays john:doe
 ~~~
 
-<p class="message-warning">If the user part is `null`, trying to give the password any other value than the `null` value with throw an Exception.</p>
+<p class="message-notice">Since version <code>7.6.0</code>The user part being <code>null</code>, no longer throws an Exception.</p>
 
 ~~~php
 new UserInfo(null, 'bar');  // throws a SyntaxError
 UserInfo::fromAuthority('thephpleague:443')->withPass('foo'); // throws a SyntaxError
 ~~~
-
-<p class="message-warning">If the submitted value is not valid a <code>League\Uri\Exceptions\SyntaxError</code> exception is thrown.</p>
