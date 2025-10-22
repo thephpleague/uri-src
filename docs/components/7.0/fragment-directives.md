@@ -26,7 +26,7 @@ use League\Uri\Components\Directives\TextDirective;
 
 $fragment = new FragmentDirectives(
     new TextDirective(start: 'attributes', end: 'attribute', prefix: 'Deprecated'),
-    new GenericDirective(name: 'foo', value: 'bar'),
+    GenericDirective::fromString('foo=bar'),
     'unknownDirective'
 ));
 
@@ -52,8 +52,7 @@ count($fragment); //returns 3; the number of parsed directives.
 You can use the following methods to navigate around the `Directives` container:
 
 ```php
-use League\Uri\Components\Directives\Directive;use League\Uri\Components\FragmentDirectives;
-
+FragmentDirectives::isEmpty(): bool;
 FragmentDirectives::count(): int;
 FragmentDirectives::first(): ?Directive;
 FragmentDirectives::last(): ?Directive;
@@ -69,7 +68,7 @@ the `IteratorAggregate` interface to allow iterating over all the `Directives`, 
 ```php
 $fragment = new FragmentDirectives(
     new TextDirective(start: 'attributes', end: 'attribute', prefix: 'Deprecated'),
-    new GenericDirective(name: 'foo', value: 'bar').
+    GenericDirective::fromString('foo=bar').
 ));
 
 foreach ($fragment as $directive) {
@@ -95,20 +94,35 @@ FragmentDirectives::filter(callabck $callback): self;
 ```php
 $fragment = new FragmentDirectives();
 $newFragment = $fragment
-    ->append(new GenericDirective(name: 'foo', value: 'bar'))
-    ->prepend( new TextDirective(start: 'attributes', end: 'attribute', prefix: 'Deprecated'))
+    ->append(GenericDirective::fromString('foo=bar'))
+    ->prepend(new TextDirective(start: 'attributes', end: 'attribute', prefix: 'Deprecated'))
 ));
 
-var_dump($fragment === $newFragment); // false
+$fragment->equals($newFragment); //returns false
 ```
 
 ## The supported Directives
 
-The package supports the Text Directive and the Generic Directive.
+The package supports the Text Directive and the Generic Directive. Both directives implement
+the `Directive` interface.
+
+```php
+Directive::name(): string
+Directive::value(): ?string
+Directive::equals(mixed $value): ?string
+Directive::toString(): string
+Directive::__toString(): string
+```
+
+A directive is composed of two parts separated by the `=` separator. The name is required as it
+defines the directive syntax, while its value **MAY** be optional. The `name()` and `value()`
+methods return the **decoded** value of the directive part whereas the `toString()` method
+returns the encoded string representation of the full directive. The `__toString()` method
+is an alias of the `toString()` method.
 
 ### Text Directive
 
-The text directive is used in browsers to highlight page fragments:
+The text directive is used in browsers to highlight page fragments. It is represented by the `TextDirective` class.
 
 ```php
 use League\Uri\Components\Directives\TextDirective;
@@ -119,7 +133,9 @@ $directive = new TextDirective(
     prefix: 'Deprecated',
     suffix: 'instead'
 );
-echo $directive; //display "text=Deprecated-,attributes,attribute,-instead"
+echo $directive->name();  //display "text"
+echo $directive->value(); //display "Deprecated-,attributes,attribute,-instead"
+echo $directive;          //display "text=Deprecated-,attributes,attribute,-instead"
 ```
 
 when added in a fragment directive and applied on a webpage the text range which
@@ -143,24 +159,54 @@ TextDirective::followedBy(?string $text): self; //change the optional suffix con
 All the methods return a new instance making the class immutable.
 
 ```php
-echo new TextDirective('foo')
+$directive = new TextDirective('foo')
         ->startsWith('y&lo')
         ->endsWith('bar')
         ->precededBy('john')
-        ->followedBy('doe')
-        ->toString();
-// returns "text=john-,y%26lo,bar,-doe"
+        ->followedBy('doe');
+
+$directive->name();     // returns 'text';
+$directive->value();    // returns "john-,y&lo,bar,-doe" the decoded value
+$directive->toString(); // returns "text=john-,y%26lo,bar,-doe"
 ```
 
 ### Generic Directive
 
 This directive is marked generic because it has no special effect.
+If can only be instantiated from a directive string representation.
 
 ```php
 use League\Uri\Components\Directives\GenericDirective;
 
-$directive = new GenericDirective(name: 'foo', value: 'bar');
+$directive = GenericDirective::fromString('fo%26o=bar');
+$directive->value(); //returns "bar"
+$directive->name();  //returns "fo&o"
 ```
 
 This class holds the minimum information needed to generate a `Directive`. It's use case
 is to handle all the other `Directives` as long as they don't have their own specific syntax.
+
+
+### Directive equality
+
+the `equals()` method allows comparing two directives against their string representation.
+If the string representation is identical then the `equals()` method will return `true`; 
+otherwise `false` will be returned.
+
+```php
+use League\Uri\Components\Directives\GenericDirective;
+use League\Uri\Components\Directives\TextDirective;
+
+$directive1 = GenericDirective::fromString('fo%26o=bar');
+$directive2 = new TextDirective('foo')
+        ->startsWith('y&lo')
+        ->endsWith('bar')
+        ->precededBy('john')
+        ->followedBy('doe');
+
+$directive3 = GenericDirective::fromString($directive2);
+
+$directive1->equals($directive2);  // returns false
+$directive1->equals($directive3);  // returns true
+$directive1->equals('fo%26o=bar'); // returns true
+```
