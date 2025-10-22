@@ -52,14 +52,17 @@ count($fragment); //returns 3; the number of parsed directives.
 You can use the following methods to navigate around the `Directives` container:
 
 ```php
-use League\Uri\Components\Directives\Directive;
+use League\Uri\Components\Directives\Directive;use League\Uri\Components\FragmentDirectives;
 
 FragmentDirectives::count(): int;
 FragmentDirectives::first(): ?Directive;
 FragmentDirectives::last(): ?Directive;
 FragmentDirectives::nth(int $offset): ?Directive;
 FragmentDirectives::has(int ...$offset): bool;
+FragmentDirectives::contains(Directive|Stringable|string $directive): bool;
+FragmentDirectives::indexOf(Directive|Stringable|string $directive): ?int;
 ```
+
 Apart from implementing the `Countable` interface, the `FragmentDirectives` class implements
 the `IteratorAggregate` interface to allow iterating over all the `Directives`, if needed.
 
@@ -154,7 +157,7 @@ echo new TextDirective('foo')
 This directive is marked generic because it has no special effect.
 
 ```php
-use League\Uri\Components\Directives\TextDirective;
+use League\Uri\Components\Directives\GenericDirective;
 
 $directive = new GenericDirective(name: 'foo', value: 'bar');
 ```

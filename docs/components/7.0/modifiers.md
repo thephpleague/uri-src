@@ -110,8 +110,9 @@ $uri->toDisplayString();      // returns 'https://shop.bébé.be?foo[]=bar'
 Under the hood the `Modifier` class intensively uses the [URI components objects](/components/7.0/)
 to apply the following changes to the submitted URI.
 
-<div class="flex flex-row flex-wrap">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 <div>
+<h4>Query modifiers</h4>
 <ul>
   <li><a href="#modifierencodequery">encodeQuery</a></li>
   <li><a href="#modifiersortquery">sortQuery</a></li>
@@ -127,6 +128,18 @@ to apply the following changes to the submitted URI.
 </ul>
 </div>
 <div>
+<h4>Fragment modifiers <span class="text-red-800 text-sm">since <code class="text-sm">7.6.0</code></span></h4>
+<ul>
+  <li><a href="#modifierappenddirectives">appendDirectives</a></li>
+  <li><a href="#modifierprependdirectives">prependDirectives</a></li>
+  <li><a href="#modifierremovedirectives">removeDirectives</a></li>
+  <li><a href="#modifierreplacedirective">replaceDirective</a></li>
+  <li><a href="#modifierfilterdirectives">filterDirectives</a></li>
+  <li><a href="#modifierslicedirectives">sliceDirectives</a></li>
+</ul>
+</div>
+<div>
+<h4>Host modifiers</h4>
 <ul>
   <li><a href="#modifiernormalizehost">normalizeHost</a></li>
   <li><a href="#modifierhosttoascii">hostToAscii</a></li>
@@ -147,6 +160,7 @@ to apply the following changes to the submitted URI.
 </ul>
 </div>
 <div>
+<h4>Path modifiers</h4>
 <ul>
   <li><a href="#modifierremovedotsegments">removeDotSegments</a></li>
   <li><a href="#modifierremoveemptysegments">removeEmptySegments</a></li>
@@ -167,16 +181,6 @@ to apply the following changes to the submitted URI.
   <li><a href="#modifierreplacedatauriparameters">replaceDataUriParameters</a></li>
   <li><a href="#modifierdatapathtobinary">dataPathToBinary</a></li>
   <li><a href="#modifierdatapathtoascii">dataPathToAscii</a></li>
-</ul>
-</div>
-<div>
-<ul>
-  <li><a href="#modifierappenddirectives">appendDirectives</a></li>
-  <li><a href="#modifierprependdirectives">prependDirectives</a></li>
-  <li><a href="#modifierremovedirectives">removeDirectives</a></li>
-  <li><a href="#modifierreplacedirective">replaceDirective</a></li>
-  <li><a href="#modifierfilterdirectives">filterDirectives</a></li>
-  <li><a href="#modifierslicedirectives">sliceDirectives</a></li>
 </ul>
 </div>
 </div>
