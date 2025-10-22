@@ -6,7 +6,7 @@ title: URI components Common API
 Common API
 =======
 
-The League URI components provides at the same time a unified way to access all URI
+The League URI components provide at the same time a unified way to access all URI
 components while exposing more specific methods to regularly used components like
 URI queries, URI domains and URI paths.
 
@@ -30,12 +30,12 @@ Port::fromAuthority('example.com')->value(); // displays null
 Path::new()->value();                        // displays ''
 ~~~ 
 
-Because URI component can be formatted differently depending on the context, each object exposes
+Because URI components can be formatted differently depending on the context, each object exposes
 different representations:
 
 ~~~php
 use League\Uri\Components\Domain;
-use League\Uri\Components\Path;
+use League\Uri\Components\Fragment;use League\Uri\Components\Path;
 use League\Uri\Components\Port;
 use League\Uri\Components\Query;
 use League\Uri\Components\Scheme;
@@ -66,14 +66,23 @@ echo $query->getUriComponent(); //displays ''
 $port = Port::fromUri($uri);
 echo $port->value();           //displays '23'
 echo $port->getUriComponent(); //displays ':23'
+
+$fragment = Fragment::fromUri($uri);
+echo $fragment->value();           //displays 'fragment'
+echo $fragment->getUriComponent(); //displays '#fragment'
+
+$host->equals($query);           // returns false
+$host->equals('bébé.be');        // returns true
+$host->equals('xn--bb-bjab.be'); // returns true
 ~~~
 
 The `value()` method returns the normalized and RFC3986 encoded string version of the component or `null` if not value exists
 while the `getUriComponent()` returns the URI component value cast as a string with its optional delimiter if it exists.
 
-To allow better interoperability all objects implements PHP's `Stringable` and `JsonSerializable` interface and provide
+To allow better interoperability, all objects implements PHP's `Stringable` and `JsonSerializable` interface and provide
 an explicit `toString()` method to cast the URI component to a string.
 
+<p class="message-notice">The <code>equals()</code> method is available since version <code>7.6.0</code> and is based on the <code>getUriComponent</code> value.</p>
 <p class="message-notice">Normalization and encoding are component specific.</p>
 <p class="message-notice"><code>JsonSerializable</code> encoding <strong>may</strong> differ to improve interoperability with current specification.</p>
 
@@ -96,7 +105,7 @@ echo Query::fromUri('https://uri.thephpleague.com/components/7.0/modifiers/')
 
 ## List of URI component objects
 
-Because each component modification is specific there is no generic way of changing
+Because each component modification is specific, there is no generic way of changing
 the component content. However, the package provides the following URI
 component objects with modifying capabilities.
 
