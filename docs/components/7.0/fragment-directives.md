@@ -103,8 +103,12 @@ $fragment->equals($newFragment); //returns false
 
 ## The supported Directives
 
-The package supports the Text Directive and the Generic Directive. Both directives implement
-the `Directive` interface.
+While the `FragmentDirectives` class allows submitting Directives as string, it is highly recommended to
+use a dedicated class to do so, as the grammar around building or parsing directives may be complex in
+regard to encoding characters and/or delimiters usage.
+
+The `FragmentDirectives` class supports the `TextDirective` and the `GenericDirective` classes. Both classes implement
+the following `Directive` interface.
 
 ```php
 Directive::name(): string
@@ -115,10 +119,10 @@ Directive::__toString(): string
 ```
 
 A directive is composed of two parts separated by the `=` separator. The name is required as it
-defines the directive syntax, while its value **MAY** be optional. The `name()` and `value()`
-methods return the **decoded** value of the directive part whereas the `toString()` method
-returns the encoded string representation of the full directive. The `__toString()` method
-is an alias of the `toString()` method.
+defines the directive syntax, while its value **MAY** be optional. When the value is not defined,
+the separator is omitted. The `name()` and `value()` methods return the **decoded** value of
+the directive part whereas the `toString()` method returns its encoded string representation.
+The `__toString()` method is an alias of the `toString()` method.
 
 ### Text Directive
 
@@ -137,6 +141,9 @@ echo $directive->name();  //display "text"
 echo $directive->value(); //display "Deprecated-,attributes,attribute,-instead"
 echo $directive;          //display "text=Deprecated-,attributes,attribute,-instead"
 ```
+
+<p class="message-notice">the <code>-</code>, <code>&</code> and <code>,</code> characters
+are special and <strong>must</strong> be encoded if found in the text to avoid parsing errors.</p>
 
 when added in a fragment directive and applied on a webpage the text range which
 starts with `attributes` and ends with `attribute` and which is preceded by
@@ -172,8 +179,9 @@ $directive->toString(); // returns "text=john-,y%26lo,bar,-doe"
 
 ### Generic Directive
 
-This directive is marked generic because it has no special effect.
-If can only be instantiated from a directive string representation.
+This directive is considered **generic** because it only meets the minimal syntax requirements of a Directive.
+Unlike the `TextDirective` class, it does not perform any additional parsing or validation around the directive value.
+As a result, it can only be instantiated from a directive’s string representation.
 
 ```php
 use League\Uri\Components\Directives\GenericDirective;
@@ -183,15 +191,12 @@ $directive->value(); //returns "bar"
 $directive->name();  //returns "fo&o"
 ```
 
-This class holds the minimum information needed to generate a `Directive`. It's use case
-is to handle all the other `Directives` as long as they don't have their own specific syntax.
-
+It's use case is to handle all the other `Directives` as long as they don't have their own specific syntax.
 
 ### Directive equality
 
-the `equals()` method allows comparing two directives against their string representation.
-If the string representation is identical then the `equals()` method will return `true`; 
-otherwise `false` will be returned.
+The `equals()` method compares two directives based on their string representations.
+It returns `true` if both representations are identical, and `false` otherwise.
 
 ```php
 use League\Uri\Components\Directives\GenericDirective;
