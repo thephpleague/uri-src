@@ -21,8 +21,8 @@ and, in addition, it provides methods to handle directives.
 
 ```php
 use League\Uri\Components\FragmentDirectives;
-use League\Uri\Components\Directives\GenericDirective;
-use League\Uri\Components\Directives\TextDirective;
+use League\Uri\Components\FragmentDirectives\GenericDirective;
+use League\Uri\Components\FragmentDirectives\TextDirective;
 
 $fragment = new FragmentDirectives(
     new TextDirective(start: 'attributes', end: 'attribute', prefix: 'Deprecated'),
@@ -107,8 +107,8 @@ While the `FragmentDirectives` class allows submitting Directives as string, it 
 use a dedicated class to do so, as the grammar around building or parsing directives may be complex in
 regard to encoding characters and/or delimiters usage.
 
-The `FragmentDirectives` class supports the `TextDirective` and the `GenericDirective` classes. Both classes implement
-the following `Directive` interface.
+The `FragmentDirectives` class supports the `TextDirective` and the `GenericDirective` classes. Both classes
+implement the following `Directive` interface.
 
 ```php
 Directive::name(): string
@@ -129,7 +129,7 @@ The `__toString()` method is an alias of the `toString()` method.
 The text directive is used in browsers to highlight page fragments. It is represented by the `TextDirective` class.
 
 ```php
-use League\Uri\Components\Directives\TextDirective;
+use League\Uri\Components\FragmentDirectives\TextDirective;
 
 $directive = new TextDirective(
     start: 'attributes',
@@ -184,7 +184,7 @@ Unlike the `TextDirective` class, it does not perform any additional parsing or 
 As a result, it can only be instantiated from a directive’s string representation.
 
 ```php
-use League\Uri\Components\Directives\GenericDirective;
+use League\Uri\Components\FragmentDirectives\GenericDirective;
 
 $directive = GenericDirective::fromString('fo%26o=bar');
 $directive->value(); //returns "bar"
@@ -199,8 +199,8 @@ The `equals()` method compares two directives based on their string representati
 It returns `true` if both representations are identical, and `false` otherwise.
 
 ```php
-use League\Uri\Components\Directives\GenericDirective;
-use League\Uri\Components\Directives\TextDirective;
+use League\Uri\Components\FragmentDirectives\GenericDirective;
+use League\Uri\Components\FragmentDirectives\TextDirective;
 
 $directive1 = GenericDirective::fromString('fo%26o=bar');
 $directive2 = new TextDirective('foo')

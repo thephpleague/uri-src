@@ -59,7 +59,7 @@ resulting in cleaner and more expressive code.
 ~~~php
 <?php
 
-use League\Uri\Components\Directives\TextDirective;
+use League\Uri\Components\FragmentDirectives\TextDirective;
 use League\Uri\Modifier;
 use Uri\WhatWg\Url;
 
