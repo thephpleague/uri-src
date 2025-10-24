@@ -23,9 +23,15 @@ $template = 'https://example.com/hotels/{hotel}/bookings/{booking}';
 $params = ['booking' => '42', 'hotel' => 'Rest & Relax'];
 
 $uriTemplate = new UriTemplate($template);
-$uri = $uriTemplate->expand($params); // instance of League\Uri\Uri
+$uri = $uriTemplate->expand($params);             // instance of League\Uri\Uri
+$rfc3986Uri = $uriTemplate->expandToUri($params); // instance of Uri\Rfc3986\Uri
+$whatWgUrl = $uriTemplate->expandToUrl($params);  // instance of Uri\Whatwg\Url
+
 echo $uri; //display https://example.com/hotels/Rest%20%26%20Relax/bookings/42"
 ~~~
+
+<p class="message-notice"><code>expandToUri()</code> and <code>expandToUrl()</code> are available since
+version <code>7.6.0</code></p>
 
 ## Template variables
 
@@ -70,6 +76,30 @@ $params = [
 $uriTemplate = new UriTemplate($template, ['version' => '1.1']);
 echo $uriTemplate->expand($params), PHP_EOL;
 //displays https://api.twitter.com/2.0/search/j/john/?q=a&q=b&limit=10
+~~~
+
+The `expandToUri()`  and the `expandToUrl()` methods will act exactly like the `expand()` method
+but will instead return a `Uri\Rfc3986\Uri` and a `Uri\Whatwg\Url` object respectively.
+
+<p class="message-warning">a WHATWG URL must always be absolute if the URI template is not you
+should provide to <code>expandToUrl()</code> a base URL otherwise an <code>Uri\WhatWg\InvalidUrlException</code>
+exception will be thrown.</p>
+
+~~~php
+$template = '/{version}/search/{term:1}/{term}/{?q*,limit}';
+//the template represents a non-absolute URL
+
+$params = [
+    'term' => 'john',
+    'q' => ['a', 'b'],
+    'limit' => '10',
+    'version' => '2.0'
+];
+
+$uriTemplate = new UriTemplate($template, ['version' => '1.1']);
+
+echo $uriTemplate->expandToUrl($params, 'https://api.twitter.com')->toAsciiString(); //works
+echo $uriTemplate->expandToUrl($params); //will throw
 ~~~
 
 ### Updating the default variables
@@ -162,11 +192,14 @@ echo $uriTemplate->expandOrFail($params);
 // Missing variables `version`
 ~~~
 
+<p class="message-notice"><code>expandToUriOrFail()</code> and <code>expandToUrlOrFail()</code> are available since
+version <code>7.6.0</code></p>
+
 ## Expressions
 
 ### Using braces in your template
 
-The following implementation disallow the use of braces `{` or  `}` outside of being URI
+The following implementation disallows the use of braces `{` or  `}` outside of being URI
 template expression delimiters. If not used as the boundary of an expression an
 exception will be triggered. 
 
