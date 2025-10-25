@@ -102,6 +102,10 @@ echo $uriTemplate->expandToUrl($params, 'https://api.twitter.com')->toAsciiStrin
 echo $uriTemplate->expandToUrl($params); //will throw
 ~~~
 
+<p class="message-info">The same feature of adding a base URI is also supported for the
+other two methods <code>expand()</code> and <code>expandToUri</code> but only if the
+baseURI variable is not <code>null</code>.</p>
+
 ### Updating the default variables
 
 At any given time you may update your default variables but since the `UriTemplate`
@@ -124,7 +128,7 @@ $newUriTemplate = $uriTemplate->withDefaultVariables(['version' => '1.1']);
 $newUriTemplate->getDefaultVariables(); //returns  new VariableBag(['version' => '1.1'])
 ~~~
 
-<p class="message-warning">Following  RFC6570 requirements means not support for
+<p class="message-warning">Following RFC6570 requirements means not support for
 nested array like the one used with <code>http_build_query</code></p>
 
 ~~~php
