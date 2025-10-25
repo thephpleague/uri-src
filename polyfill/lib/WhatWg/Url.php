@@ -27,6 +27,7 @@ use SensitiveParameter;
 use Uri\UriComparisonMode;
 
 use function in_array;
+use function preg_match;
 use function substr;
 
 use const PHP_VERSION_ID;
@@ -44,11 +45,17 @@ if (PHP_VERSION_ID < 80500) {
     {
         private const PORT_RANGE_MIN = 0;
         private const PORT_RANGE_MAX = 65535;
+        private const REGEXP_IDNA_PATTERN = '/[^\x20-\x7f]/';
 
         private WhatWgURL $url;
+
         private ?string $unicodeHost = null;
         private bool $unicodeHostInitialized = false;
         private ?string $urlUnicodeString = null;
+
+        private ?string $asciiHost = null;
+        private bool $asciiHostInitialized = false;
+        private ?string $urlAsciiString = null;
 
         /**
          * @param list<UrlValidationError> $errors
@@ -167,7 +174,14 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getAsciiHost(): ?string
         {
-            return $this->url->hostname;
+            if ($this->asciiHostInitialized) {
+                return $this->asciiHost;
+            }
+
+            $this->asciiHost = $this->setAsciiHost();
+            $this->asciiHostInitialized = true;
+
+            return $this->asciiHost;
         }
 
         public function getUnicodeHost(): ?string
@@ -195,6 +209,29 @@ if (PHP_VERSION_ID < 80500) {
             }
 
             $result = Idna::toUnicode($host, [
+                'CheckHyphens' => false,
+                'CheckBidi' => true,
+                'CheckJoiners' => true,
+                'UseSTD3ASCIIRules' => false,
+                'Transitional_Processing' => false,
+                'IgnoreInvalidPunycode' => false,
+            ]);
+
+            if ($result->hasErrors()) {
+                return $host;
+            }
+
+            return $result->getDomain();
+        }
+
+        private function setAsciiHost(): ?string
+        {
+            $host = $this->url->hostname;
+            if ('' === $host || null === $host || 1 !== preg_match(self::REGEXP_IDNA_PATTERN, $host)) {
+                return $host;
+            }
+
+            $result = Idna::toAscii($host, [
                 'CheckHyphens' => false,
                 'CheckBidi' => true,
                 'CheckJoiners' => true,
@@ -355,7 +392,22 @@ if (PHP_VERSION_ID < 80500) {
 
         public function toAsciiString(): string
         {
-            return $this->url->href;
+            if (null !== $this->urlAsciiString) {
+                return $this->urlAsciiString;
+            }
+
+            $asciiHost = $this->getAsciiHost();
+            if (null === $asciiHost || $this->getUnicodeHost() === $asciiHost) {
+                $this->urlAsciiString = $this->url->href;
+
+                return $this->urlAsciiString;
+            }
+
+            $urlRecord = self::urlRecord($this);
+            $urlRecord->host = new StringHost($asciiHost);
+            $this->urlAsciiString = $urlRecord->serializeURL();
+
+            return $this->urlAsciiString;
         }
 
         public function toUnicodeString(): string

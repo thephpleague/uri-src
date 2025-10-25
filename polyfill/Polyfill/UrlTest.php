@@ -347,4 +347,24 @@ final class UrlTest extends TestCase
         self::assertTrue($resScheme->equals($resSchemeDot));
         self::assertTrue($resSchemeDot->equals($resSchemeDotSlashes));
     }
+
+    public function test_it_will_return_the_host_correct_format(): void
+    {
+        $uri = new Url('https://bébé.be');
+
+        self::assertSame('https://xn--bb-bjab.be/', $uri->toAsciiString());
+        self::assertSame('https://bébé.be/', $uri->toUnicodeString());
+
+        self::assertSame('xn--bb-bjab.be', $uri->getAsciiHost());
+        self::assertSame('bébé.be', $uri->getUnicodeHost());
+
+        $uri = new Url('https://xn--bb-bjab.be');
+
+        self::assertSame('https://xn--bb-bjab.be/', $uri->toAsciiString());
+        self::assertSame('https://bébé.be/', $uri->toUnicodeString());
+
+        self::assertSame('xn--bb-bjab.be', $uri->getAsciiHost());
+        self::assertSame('bébé.be', $uri->getUnicodeHost());
+    }
+
 }
