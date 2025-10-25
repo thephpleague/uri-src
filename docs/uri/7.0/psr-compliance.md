@@ -131,30 +131,3 @@ $uriFactory = new HttpFactory();
 $uri = $uriFactory->createUri('http://example.com/path/to?q=foo%20bar#section-42');
 echo $uri::class; // display League\Uri\Http
 ~~~
-
-## PSR-13 compatibility
-
-<p class="message-notice">Available since <code>version 7.6</code></p>
-
-To allow easier integration with other PHP packages and especially [PSR-13](https://www.php-fig.org/psr/psr-13/)
-the `UriTemplate` class implements the `Stringable` interface.
-
-~~~php
-use League\Uri\UriTemplate;
-use Symfony\Component\WebLink\Link;
-
-$uriTemplate = new UriTemplate('https://google.com/search{?q*}');
-
-$link = (new Link())
-    ->withHref($uriTemplate)
-    ->withRel('next')
-    ->withAttribute('me', 'you');
-
-// Once serialized will return
-// '<https://google.com/search{?q*}>; rel="next"; me="you"'
-~~~
-
-The `Symfony\Component\WebLink\Link` package implements `PSR-13` interfaces.
-
-<p class="message-info">You could already use a <code>Uri</code> instance if the link must use a
-concrete URI instead as the class also implements the <code>Stringable</code> interface.</p>
