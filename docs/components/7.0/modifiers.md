@@ -78,14 +78,19 @@ echo $uri->toAsciiString(), PHP_EOL;
 ### Returned URI object and string representations
 
 <p class="message-warning">While the class does manipulate URIs it does not implement any URI related interface.</p>
-<p class="message-notice">If an <code>UriInterface</code> implementing instance is given, then the returned URI object will also be of the same <code>UriInterface</code> type.</p>
+<p class="message-notice">If an <code>Uri</code> instance is given, then the returned object will also be of the same type.</p>
 
 The `Modifier` can return different URI results depending on the context and your usage.
 
 The `Modifier::uri` method returns a League URI `Uri` instance unless you instantiated the modifier
 with a supported Uri object in which case an instance of the same URI class is returned. If you
 are not interested in the returned URI but only on its underlying string representation, you can instead use
-the `Modifier::toString`.
+the following methods:
+
+- `Modifier::toString` : returns the URI object underlying string representation. 
+- `Modifier::toDisplayString` : returns an RFC3987 like string representation (this **MAY** not be a valid URL as all the components are decoded)
+- `Modifier::toMarkdownAnchor` : returns a Markdown representation of the URI, you can optionally set the anchor text.
+- `Modifier::toHtmlAnchor` : returns a HTML anchor tag `<a>` pre-filled with its `href` pre-filled; you can optionally set the anchor text and attributes.
 
 The result of `Modifier::toString` is the representation used by the `Stringable` and the `JsonSerializable` interface to improve interoperability.
 
@@ -96,13 +101,17 @@ at all.
 ```php
 use GuzzleHttp\Psr7\Utils;
 
-$uri = Modifier::from(Utils::uriFor('https://bébé.be?foo[]=bar'))->prepend('shop');
+$uri = Modifier::from(Utils::uriFor('https://bébé.be?foo[]=bar'))->prependLabel('shop');
 $uri->uri()::class;        // returns 'GuzzleHttp\Psr7\Uri'
 $uri->uri()->__toString(); // returns 'https://shop.bébé.be?foo%5B%5D=bar'
 $uri->toString();          // returns 'https://shop.bébé.be?foo%5B%5D=bar'
 $uri->toDisplayString();   // returns 'https://shop.bébé.be?foo[]=bar'
+$uri->toMarkdownAnchor('My Shop'); // returns [My Shop](https://shop.bébé.be?foo%5B%5D=bar)
+$uri->toHtmlAnchor('My Shop', ['class' => ['text-center', 'text-6xl']]);
+// returns <a href="https://shop.b%C3%A9b%C3%A9.be?foo%5B%5D=bar" class="text-center text-6xl">My Shop</a>
 ```
 
+<p class="message-info">The <code>toDisplayString()</code>, <code>toMarkdownAnchor()</code> and <code>toHtmlAnchor()</code> methods are available since version <code>7.6.0</code>.</p>
 <p class="message-notice">The <code>getUri()</code>, <code>getUriString()</code> and <code>getIdnUriString()</code> methods are deprecated since version <code>7.6.0</code>.</p>
 
 ### Available modifiers
