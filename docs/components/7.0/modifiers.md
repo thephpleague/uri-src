@@ -48,7 +48,7 @@ echo Modifier::from($uriString)->mergeQuery($queryToMerge);
 
 In addition to merging the query, `mergeQuery` has:
 
-- enforced `RFC3986` encoding throughout the modifications;
+- enforced standard compliant encoding throughout the modifications;
 - not mangle your data during merging;
 - returned a valid URI object;
 
@@ -113,6 +113,126 @@ $uri->toHtmlAnchor('My Shop', ['class' => ['text-center', 'text-6xl']]);
 
 <p class="message-info">The <code>toDisplayString()</code>, <code>toMarkdownAnchor()</code> and <code>toHtmlAnchor()</code> methods are available since version <code>7.6.0</code>.</p>
 <p class="message-notice">The <code>getUri()</code>, <code>getUriString()</code> and <code>getIdnUriString()</code> methods are deprecated since version <code>7.6.0</code>.</p>
+
+## General Modifiers
+
+<p class="message-notice">available since version <code>7.6.0</code></p>
+
+With the addition of (2) two new native PHP URI representations, it can become complex to
+remember which URI method to use and which type of argument is expected. The `Modifier` can
+ease this by wrapping the underlying URI object is a common and predicable public API.
+
+Apart from partially modifying an URI component, since version `7.6.0`, you can directly:
+
+- completely change a URI component;
+- resolve URIs;
+- normalize URIs;
+
+### Modifier complete URI component replacement
+
+The `Modifier` class will perform some sanity checks and/or formatting before
+handing over the changed value to the underlying object to perform the action.
+Unless the input data is invalid, the exception thrown will be the ones from the
+underlying URI object.
+
+Here's an example:
+
+```php
+use Uri\Rfc3986\Uri;
+
+echo new Uri('http://example.com/foo/bar')
+    ->withHost('bébé.be') 
+    ->toString(), PHP_EOL;
+// this will throw because
+// the host contains unsupported characters
+// according to RFC3986
+```
+
+In contrast, when using the `Modifier` the result is different:
+
+```php
+use League\Uri\Modifier;
+use Uri\Rfc3986\Uri;
+
+echo Modifier::from(new Uri('http://example.com/foo/bar'))
+    ->withHost('bébé.be')
+    ->uri()
+    ->toString(), PHP_EOL;
+// the `uri()` methods returns a valid Uri\Rfc3986\Uri instance 
+// its `toString()` method returns http://xn--bb-bjab.be/foo/bar
+// the modifier has converted the host into its ascii representation
+// to avoid the exception to be thrown.
+```
+
+### URI resolution
+
+Apart from modifying a URI component, the `Modifier` can also normalize or
+resolve URI. Resolving and Normalizing URI is supported by `League\Uri\Uri`,
+and PHP's native URI object **but** not by PSR-7 `UriInterface` and the
+public API diverge. using the `Modifier` class you get a single method for
+all the URI objects and add the missing support for any PSR-7 implementing class
+
+```php
+use Uri\Whatwg\Url;
+
+echo new Url('http://example.com/foo/bar')
+    ->resolve('./../bar')
+    ->toAsciiString(), PHP_EOL;
+// returns http://example.com/bar
+// there is no equivalent in PSR-7
+```
+using the `Modifier` you can do the following:
+
+```php
+use League\Uri\Modifier;
+use GuzzleHttp\Psr7\Utils;
+
+echo Modifier::from(Utils::uriFor('http://example.com/foo/bar'))
+    ->resolve('./../bar')
+    ->uri()
+    ->__toString(), PHP_EOL;
+// `uri()` returns a Guzzle PSR-7 URI object
+// returns "http://example.com/bar"
+```
+
+### URI normalization
+
+RFC3986 and WHATWG URL specification both allow normalizing URIs. But both
+specification do it in a different way and capacity. Normalization is
+mandatory when using a WHATWG URL but optional with RFC3986. It is
+not covered in PSR-7. Which again may leave the developer in a challenging
+situation. To ease developer experience, the `Modifier` class exposes a
+new `normalize` method which guarantee normalization regardless of the
+underlying URI object.
+
+```php
+use League\Uri\Url;
+use Uri\Rfc3986\Uri as Rfc3986Uri;
+use Uri\Whatwg\Url as WhatwgUrl;
+
+$uriString = 'HttP://ExamPle.com/./../foo/bar';
+echo (new WhatwgUrl($uriString))->toAsciiString(), PHP_EOL;
+echo (new Rfc3986Uri($uriString))->toString(), PHP_EOL;
+echo Uri::new($uriString)->normalize()->toString(), PHP_EOL;
+// returns 'http://example.com/foo/bar
+// PSR-7 UriInterface does not have a method for that
+```
+
+Again using the `Modifier` class you will get a unified and predicable returned URI
+
+```php
+use League\Uri\Modifier;
+use GuzzleHttp\Psr7\Utils;
+
+$uriString = 'HttP://ExamPle.com/./../foo/bar';
+echo Modifier::from(Utils::uriFor($uriString))
+    ->normalize()
+    ->uri() 
+    ->__toString();
+// returns 'http://example.com/foo/bar
+```
+
+## Partial Modifiers
 
 ### Available modifiers
 
@@ -202,11 +322,9 @@ to apply the following changes to the submitted URI.
     <li><a href="#modifierwithscheme">withScheme</a></li>
     <li><a href="#modifierwithuserinfo">withUserInfo</a></li>
     <li><a href="#modifierwithport">withPort</a></li>
-    <li><a href="#modifierresovlve">URI resolve</a></li>
 </ul>
 </div>
 </div>
-
 
 ## Query Modifiers
 
@@ -1086,42 +1204,59 @@ echo Modifier::from($uri)
 // display ":~:text=foo,bar&text=yes"
 ~~~
 
-## General modifications
+## Other available modifiers
+
+### Modifier::withUserInfo
 
 <p class="message-notice">available since version <code>7.6.0</code></p>
 
-To ease modifying URI since version `7.6.0` you can directly access:
+Allow modifying the user info component
 
-- the modifier methods from the underlying URI object or 
-- resolve an URI base on the underlying URI object rules or
-- normalize an URI base on the underlying URI object rules.
+~~~php
+use League\Uri\Modifier;
+use Uri\Rfc3986\Uri;
 
-The difference being that the `Modifier` class will perform the correct conversion
-to handle the differences between URI object signature.
+$uri = new Uri("http://www.example.com/path/to/the/sky");
+echo Modifier::from($uri)
+    ->withUserInfo(username: null, password: 'pa@ss')
+    ->uri()
+    ->getUserInfo();
+// display ":pa%40ss"
+// for information the Uri::withUserInfo method only takes a single variable.
+~~~
 
-```php
+### Modifier::withScheme
+
+<p class="message-notice">available since version <code>7.6.0</code></p>
+
+Allow modifying the URI scheme
+
+~~~php
+use League\Uri\Modifier;
+use Uri\Rfc3986\Uri;
+
+$uri = new Uri("http://www.example.com/path/to/the/sky");
+$newUri = Modifier::from($uri)->withScheme('HtTp')->uri();
+$newUri->getRawScheme(); // returns 'HtTp'
+$newUri->getScheme(); // returns 'http'
+~~~
+
+The stored scheme value will depend on the underlying URI object.
+
+### Modifier::withPort
+
+<p class="message-notice">available since version <code>7.6.0</code></p>
+
+Allow modifying the URI port. Added for completeness. This
+method works the same across all the URI objects, but may throw
+depending on the restriction from the underlying URI object on
+port range.
+
+~~~php
 use League\Uri\Modifier;
 use Uri\WhatWg\Url;
 
-$foo = '';
-echo Modifier::from('http://bébé.be')
-    ->when(
-        '' !== $foo, 
-        fn (Modifier $uri) => $uri->withQuery('fname=jane&lname=Doe'),  //on true
-        fn (Modifier $uri) => $uri->mergeQueryParameters(['fname' => 'john', 'lname' => 'Doe']), //on false
-    )
-    ->appendSegment('toto')
-    ->addRootLabel()
-    ->prependLabel('shop')
-    ->appendQuery('foo=toto&foo=tata')
-    ->withFragment('chapter1')
-    ->toDisplayString();
-// returns 'http://shop.bébé.be./toto?fname=john&lname=Doe&foo=toto&foo=tata#chapter1';
-
-echo Modifier::from(new Url('http://bébé.be/../do/it'))
-    ->appendSegment('toto')
-    ->resolve('./foo/../bar')
-    ->uri()
-    ->toAsciiString(), PHP_EOL;
-// returns http://xn--bb-bjab.be/do/it/bar
-```
+$uri = new Url("http://www.example.com/path/to/the/sky");
+$newUri = Modifier::from($uri)->withPort(433)->uri();
+$newUri->getPort(); // returns 433
+~~~
