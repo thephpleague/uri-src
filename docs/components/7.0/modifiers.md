@@ -123,6 +123,7 @@ to apply the following changes to the submitted URI.
 <div>
 <h4>Query modifiers</h4>
 <ul>
+  <li><a href="#modifierwithquery">withQuery</a></li>
   <li><a href="#modifierencodequery">encodeQuery</a></li>
   <li><a href="#modifiersortquery">sortQuery</a></li>
   <li><a href="#modifiermergequery">mergeQuery</a></li>
@@ -137,19 +138,9 @@ to apply the following changes to the submitted URI.
 </ul>
 </div>
 <div>
-<h4>Fragment modifiers <span class="text-red-800 text-sm">since <code class="text-sm">7.6.0</code></span></h4>
-<ul>
-  <li><a href="#modifierappendfragmentdirectives">appendFragmentDirectives</a></li>
-  <li><a href="#modifierprependfragmentdirectives">prependFragmentDirectives</a></li>
-  <li><a href="#modifierremovefragmentdirectives">removeFragmentDirectives</a></li>
-  <li><a href="#modifierreplacefragmentdirective">replaceFragmentDirective</a></li>
-  <li><a href="#modifierfilterfragmentdirectives">filterFragmentDirectives</a></li>
-  <li><a href="#modifierslicefragmentdirectives">sliceFragmentDirectives</a></li>
-</ul>
-</div>
-<div>
 <h4>Host modifiers</h4>
 <ul>
+  <li><a href="#modifierwithhost">withHost</a></li>
   <li><a href="#modifiernormalizehost">normalizeHost</a></li>
   <li><a href="#modifierhosttoascii">hostToAscii</a></li>
   <li><a href="#modifierhosttounicode">hostToUnicode</a></li>
@@ -171,6 +162,7 @@ to apply the following changes to the submitted URI.
 <div>
 <h4>Path modifiers</h4>
 <ul>
+  <li><a href="#modifierwithpath">withPath</a></li>
   <li><a href="#modifierremovedotsegments">removeDotSegments</a></li>
   <li><a href="#modifierremoveemptysegments">removeEmptySegments</a></li>
   <li><a href="#modifierremovetrailingslash">removeTrailingSlash</a></li>
@@ -192,15 +184,53 @@ to apply the following changes to the submitted URI.
   <li><a href="#modifierdatapathtoascii">dataPathToAscii</a></li>
 </ul>
 </div>
+<div>
+<h4>Fragment modifiers <span class="text-red-800 text-sm">since <code class="text-sm">7.6.0</code></span></h4>
+<ul>
+  <li><a href="#modifierwithfragment">withFragment</a></li>
+  <li><a href="#modifierappendfragmentdirectives">appendFragmentDirectives</a></li>
+  <li><a href="#modifierprependfragmentdirectives">prependFragmentDirectives</a></li>
+  <li><a href="#modifierremovefragmentdirectives">removeFragmentDirectives</a></li>
+  <li><a href="#modifierreplacefragmentdirective">replaceFragmentDirective</a></li>
+  <li><a href="#modifierfilterfragmentdirectives">filterFragmentDirectives</a></li>
+  <li><a href="#modifierslicefragmentdirectives">sliceFragmentDirectives</a></li>
+</ul>
+</div>
+<div>
+<h4>Component modifiers <span class="text-red-800 text-sm">since <code class="text-sm">7.6.0</code></span></h4>
+<ul>
+    <li><a href="#modifierwithscheme">withScheme</a></li>
+    <li><a href="#modifierwithuserinfo">withUserInfo</a></li>
+    <li><a href="#modifierwithport">withPort</a></li>
+    <li><a href="#modifierresovlve">URI resolve</a></li>
+</ul>
+</div>
 </div>
 
-## Query modifiers
 
-The following modifiers update and normalize the URI query component.
+## Query Modifiers
+
+Following modifiers update and normalize the URI query component.
 
 <p class="message-notice">Because each modification is done after parsing and building, the 
 resulting query string may update the component character encoding. These changes are expected because of 
 the rules governing parsing and building query string.</p>
+
+### Modifier::withQuery
+
+<p class="message-notice">since version <code>7.6.0</code></p>
+
+Change the full query component.
+
+~~~php
+use League\Uri\Modifier;
+
+echo Modifier::from("https://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
+    ->withQuery('foo=bar')
+    ->uri()
+    ->getQuery(); 
+//display "foo=bar"
+~~~
 
 ### Modifier::encodeQuery
 
@@ -384,7 +414,23 @@ echo $newUri->uri()->getQuery(); //display "kingkong=toto&fo.o=champion&fo_o=bar
 
 ## Host modifiers
 
-The following modifiers update and normalize the URI host component according to RFC3986 or RFC3987.
+The following methods update and normalize the URI host component according to the underlying URI object.
+
+### Modifier::withHost
+
+<p class="message-notice">since version <code>7.6.0</code></p>
+
+Change the full query component.
+
+~~~php
+use League\Uri\Modifier;
+
+echo Modifier::from("https://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
+    ->withHost('hello.be')
+    ->uri()
+    ->getHost(); 
+//display "hello.be"
+~~~
 
 ### Modifier::hostToAscii
 
@@ -664,6 +710,22 @@ echo Modifier::from($uri)->sliceLabels(1, 1)->toString();
 the resulting path may update the component character encoding. These changes are 
 expected because of the rules governing parsing and building path string.</p>
 
+### Modifier::withPath
+
+<p class="message-notice">since version <code>7.6.0</code></p>
+
+Change the full path component.
+
+~~~php
+use League\Uri\Modifier;
+
+echo Modifier::from("https://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
+    ->withPath('/path/to')
+    ->uri()
+    ->getPath(); 
+//display "/path/to"
+~~~
+
 ### Modifier::removeDotSegments
 
 Removes dot segments according to RFC3986:
@@ -906,6 +968,22 @@ echo Modifier::from($uri)
 
 ## Fragment Modifiers
 
+### Modifier::withFragment
+
+<p class="message-notice">since version <code>7.6.0</code></p>
+
+Change the full fragment component.
+
+~~~php
+use League\Uri\Modifier;
+
+echo Modifier::from("https://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
+    ->withFragment('/path/to')
+    ->uri()
+    ->getFragment(); 
+//display "/path/to"
+~~~
+
 ### Modifier::appendFragmentDirectives
 
 <p class="message-notice">available since version <code>7.6.0</code></p>
@@ -1008,15 +1086,22 @@ echo Modifier::from($uri)
 // display ":~:text=foo,bar&text=yes"
 ~~~
 
-### General modification
+## General modifications
 
 <p class="message-notice">available since version <code>7.6.0</code></p>
 
-To ease modifying URI since version 7.6.0 you can directly access the modifier methods from the underlying
-URI object.
+To ease modifying URI since version `7.6.0` you can directly access:
+
+- the modifier methods from the underlying URI object or 
+- resolve an URI base on the underlying URI object rules or
+- normalize an URI base on the underlying URI object rules.
+
+The difference being that the `Modifier` class will perform the correct conversion
+to handle the differences between URI object signature.
 
 ```php
 use League\Uri\Modifier;
+use Uri\WhatWg\Url;
 
 $foo = '';
 echo Modifier::from('http://bébé.be')
@@ -1032,4 +1117,11 @@ echo Modifier::from('http://bébé.be')
     ->withFragment('chapter1')
     ->toDisplayString();
 // returns 'http://shop.bébé.be./toto?fname=john&lname=Doe&foo=toto&foo=tata#chapter1';
+
+echo Modifier::from(new Url('http://bébé.be/../do/it'))
+    ->appendSegment('toto')
+    ->resolve('./foo/../bar')
+    ->uri()
+    ->toAsciiString(), PHP_EOL;
+// returns http://xn--bb-bjab.be/do/it/bar
 ```

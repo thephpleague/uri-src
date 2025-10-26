@@ -79,7 +79,6 @@ if (PHP_VERSION_ID < 80500) {
         public function __construct(string $uri, ?self $baseUrl = null, array &$softErrors = [])
         {
             $collector = new UrlValidationErrorCollector();
-
             try {
                 $this->url = new WhatWgURL($uri, $baseUrl?->url->href, ['logger' => $collector]);
             } catch (Exception $exception) {
