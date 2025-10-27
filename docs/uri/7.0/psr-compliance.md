@@ -119,6 +119,20 @@ echo (string) Uri::new('http://example.com/path/to?#');
 
 <p class="message-info">This improved compliance is available since version <code>7.5.0</code></p>
 
+Because `PSR-7` UriInterface implementing object `getPath` may be used in
+header. A security issue may rise if the path is not stripped of multiple starting `/`. 
+As such, `getPath` yield a different result depending on its raw value. 
+
+~~~php
+echo Http::new('https://example.com//miscillaneous.tld')->getPath();
+// returns '/miscillaneous.tld' the extra leading slashes are removed
+
+echo Uri::new('https://example.com//miscillaneous.tld')->getPath();
+// returns '//miscillaneous.tld' the leading slashes are preserved
+~~~
+
+<p class="message-notice">This behavior modification is related to <a href="https://framework.zend.com/security/advisory/ZF2015-05">Potential XSS and Open Redirect vectors</a></p>
+
 ## PSR-17 compatibility
 
 The package also provides an implementation of the `UriFactoryInterface` from [PSR-17](https://www.php-fig.org/psr/psr-17/)
