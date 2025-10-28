@@ -45,7 +45,7 @@ Out of the box, the `Path` object operates a number of non-destructive normaliza
 
 ### Removing dot segments
 
-To remove dot segment as per [RFC3986](https://tools.ietf.org/html/rfc3986#section-6) you need to explicitly call the `Path::withoutDotSegments` method as the result can be destructive. The method takes no argument and returns a new `Path` object which represents the current object without dot segments.
+To remove dot segments as per [RFC3986](https://tools.ietf.org/html/rfc3986#section-6) you need to explicitly call the `Path::withoutDotSegments` method as the result can be destructive. The method takes no argument and returns a new `Path` object which represents the current object without dot segments.
 
 ~~~php
 <?php

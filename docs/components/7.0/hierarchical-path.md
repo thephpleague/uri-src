@@ -116,7 +116,7 @@ HierarchicalPath::new()->prepend('sky')->prepend('path/to/the')->value(); //retu
 
 ### Replace and Remove segments
 
-To replace of remove segment you must specify the offset on which to act upon.
+To replace of remove segments, you must specify the offset on which to act upon.
 
 To replace a segment use the `HierarchicalPath::withSegment` and provide the offset of the segment to remove and
 the value used to replace it. Similarly, to remove segments from the current object and returns a new instance
