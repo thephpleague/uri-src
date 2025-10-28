@@ -33,6 +33,25 @@ echo $uri; //display https://example.com/hotels/Rest%20%26%20Relax/bookings/42"
 <p class="message-notice"><code>expandToUri()</code> and <code>expandToUrl()</code> are available since
 version <code>7.6.0</code></p>
 
+<p class="message-info">Since version <code>7.6</code> the method takes a second optional parameter
+which serves as a base URI. The generated URI is resolved against the Base URI.</p>
+
+~~~php
+<?php
+
+use League\Uri\UriTemplate;
+
+$template = '/hotels/{hotel}/bookings/{booking}';
+$params = ['booking' => '42', 'hotel' => 'Rest & Relax'];
+
+$uriTemplate = new UriTemplate($template);
+$uri = $uriTemplate->expand($params, 'https://example.com');             // instance of League\Uri\Uri
+$rfc3986Uri = $uriTemplate->expandToUri($params, 'https://example.com'); // instance of Uri\Rfc3986\Uri
+$whatWgUrl = $uriTemplate->expandToUrl($params, 'https://example.com');  // instance of Uri\Whatwg\Url
+
+echo $uri; //display https://example.com/hotels/Rest%20%26%20Relax/bookings/42"
+~~~
+
 ## Template variables
 
 <p class="message-notice">For maximum interoperability you should make sure your variables are 
@@ -78,11 +97,11 @@ echo $uriTemplate->expand($params), PHP_EOL;
 //displays https://api.twitter.com/2.0/search/j/john/?q=a&q=b&limit=10
 ~~~
 
-The `expandToUri()`  and the `expandToUrl()` methods will act exactly like the `expand()` method
+The `expandToUri()` and the `expandToUrl()` methods will act exactly like the `expand()` method
 but will instead return a `Uri\Rfc3986\Uri` and a `Uri\Whatwg\Url` object respectively.
 
 <p class="message-warning">a WHATWG URL must always be absolute if the URI template is not you
-should provide to <code>expandToUrl()</code> a base URL otherwise an <code>Uri\WhatWg\InvalidUrlException</code>
+MUST provide a base URL to <code>expandToUrl()</code> otherwise an <code>Uri\WhatWg\InvalidUrlException</code>
 exception will be thrown.</p>
 
 ~~~php
@@ -101,10 +120,6 @@ $uriTemplate = new UriTemplate($template, ['version' => '1.1']);
 echo $uriTemplate->expandToUrl($params, 'https://api.twitter.com')->toAsciiString(); //works
 echo $uriTemplate->expandToUrl($params); //will throw
 ~~~
-
-<p class="message-info">The same feature of adding a base URI is also supported for the
-other two methods <code>expand()</code> and <code>expandToUri</code> but only if the
-baseURI variable is not <code>null</code>.</p>
 
 ### Updating the default variables
 
