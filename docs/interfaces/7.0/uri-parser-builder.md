@@ -10,8 +10,11 @@ PHP has been relying on the `parse_url` function to split URI into its component
 function predates RFC3986 and as such does not fully comply to the specification. To work
 around the limitation the tooklit provides the `League\Uri\UriString` class. It is a
 user-land PHP URI parser and builder compliant with [RFC 3986](http://tools.ietf.org/html/rfc3986) and [RFC 3987](http://tools.ietf.org/html/rfc3987)
-The class act as a drop-in replacement for PHP's `parse_url` feature. And expand on
-the feature to provide RFC3986 features:
+The class act as a drop-in replacement for PHP's `parse_url` feature.
+The class provides other core features of RFC3986 like dot segment removal, URI resolution, 
+and URI normalization.
+
+## URI parsing
 
 The parser is:
 
@@ -20,8 +23,6 @@ The parser is:
 - the path component is never equal to `null`;
 - makes a distinction between empty and undefined components;
 - the parser throws a `League\Uri\Contracts\UriException` exception instead of returning `false` on error;
-
-## URI parsing
 
 The class covers parsing URI in different context:
 
@@ -184,6 +185,8 @@ echo $path;  //displays 'path/to/the/sky%7Bfoo%7D'
 ~~~
 
 ## Component and String Validation
+
+<p class="message-notice">Available since version <code>7.6</code></p>
 
 The class exposes static methods to validate that a string:
 
