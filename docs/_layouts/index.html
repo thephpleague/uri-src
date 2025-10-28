@@ -97,7 +97,7 @@
 <span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">getScheme</span><span class="p">();</span> <span class="c1">// returns 'http'</span>
 <span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">getHost</span><span class="p">();</span>   <span class="c1">// returns 'example.com'</span>
 
-<span class="nv">$newUri</span> <span class="o">=</span> <span class="nx">Modifier</span><span class="o">::</span><span class="na">from</span><span class="p">(</span><span class="nv">$uri</span><span class="p">)</span><span class="o">-&gt;</span><span class="s1"><span class="na">appendQuery</span><span class="p">(</span>'q=new.Value'</span><span class="p">);</span>
+<span class="nv">$newUri</span> <span class="o">=</span> <span class="nx">Modifier</span><span class="o">::</span><span class="na">wrap</span><span class="p">(</span><span class="nv">$uri</span><span class="p">)</span><span class="o">-&gt;</span><span class="s1"><span class="na">appendQuery</span><span class="p">(</span>'q=new.Value'</span><span class="p">);</span>
 <span class="k">echo</span> <span class="nv">$newUri</span><span class="p">;</span> <span class="c1">// 'https://example.com?q=value&amp;q=new.Value#fragment'</span>
 
 <span class="nv">$query</span> <span class="o">=</span> <span class="nx">Query</span><span class="o">::</span><span class="na">fromUri</span><span class="p">(</span><span class="nv">$newUri</span><span class="p">);</span>

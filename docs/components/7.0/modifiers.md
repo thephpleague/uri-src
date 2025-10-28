@@ -3,7 +3,7 @@ layout: default
 title: URI partial modifiers
 ---
 
-URI modifiers
+URI Modifiers
 =======
 
 In some cases, you may not need to modify an entire URI, but only a specific portion of one of its components.
@@ -42,7 +42,10 @@ use League\Uri\Modifier;
 $uriString = "http://www.example.com?fo.o=toto#~typo";
 $queryToMerge = 'fo.o=bar&taz=';
 
-echo Modifier::from($uriString)->mergeQuery($queryToMerge);
+echo Modifier::wrap($uriString)
+    ->mergeQuery($queryToMerge)
+    ->unwrap()
+    ->toString();
 // display http://www.example.com?fo.o=bar&taz=#~typo
 ~~~
 
@@ -63,26 +66,32 @@ use League\Uri\Components\FragmentDirectives\TextDirective;
 use League\Uri\Modifier;
 use Uri\WhatWg\Url;
 
-$uri = Modifier::from(new Url('https://www.mypoems.net/the-book-of-mwana-kupona/'))
+$uri = Modifier::wrap(new Url('https://www.mypoems.net/the-book-of-mwana-kupona/'))
     ->prependSegment('epic')
     ->removeLabels(-1)
     ->replaceLabel(1, "africanpoems")
     ->appendFragmentDirectives(new TextDirective(start: "Negema wangu binti", end: "neno lema kukwambia."))
-    ->uri();
+    ->unwrap();
 
 echo $uri::class, PHP_EOL; // displays Uri\WhatWg\Url
 echo $uri->toAsciiString(), PHP_EOL;
 // displays "https://africanpoems.net/epic/the-book-of-mwana-kupona/#:~:text=Negema%20wangu%20binti,neno%20lema%20kukwambia."
 ~~~
 
-### Returned URI object and string representations
+The `Modifier::wrao` method is the entry point from which the submitted URI will be processed. the method 
+accepts any `Stringable` URI object as well as PHP new URI extension from PHP8.5 as well as its polyfill.
+
+<p class="message-notice"><code>Modifier::from</code> ia deprecated since version <code>7.6.0</code></p>
+
+
+### Returned URI Object and String Representations
 
 <p class="message-warning">While the class does manipulate URIs it does not implement any URI related interface.</p>
 <p class="message-notice">If an <code>Uri</code> instance is given, then the returned object will also be of the same type.</p>
 
 The `Modifier` can return different URI results depending on the context and your usage.
 
-The `Modifier::uri` method returns a League URI `Uri` instance unless you instantiated the modifier
+The `Modifier::unwrap` method returns a League URI `Uri` instance unless you instantiated the modifier
 with a supported Uri object in which case an instance of the same URI class is returned. If you
 are not interested in the returned URI but only on its underlying string representation, you can instead use
 the following methods:
@@ -101,9 +110,9 @@ at all.
 ```php
 use GuzzleHttp\Psr7\Utils;
 
-$uri = Modifier::from(Utils::uriFor('https://bébé.be?foo[]=bar'))->prependLabel('shop');
-$uri->uri()::class;        // returns 'GuzzleHttp\Psr7\Uri'
-$uri->uri()->__toString(); // returns 'https://shop.bébé.be?foo%5B%5D=bar'
+$uri = Modifier::wrap(Utils::uriFor('https://bébé.be?foo[]=bar'))->prependLabel('shop');
+$uri->unwrap()::class;        // returns 'GuzzleHttp\Psr7\Uri'
+$uri->unwrap()->__toString(); // returns 'https://shop.bébé.be?foo%5B%5D=bar'
 $uri->toString();          // returns 'https://shop.bébé.be?foo%5B%5D=bar'
 $uri->toDisplayString();   // returns 'https://shop.bébé.be?foo[]=bar'
 $uri->toMarkdownAnchor('My Shop'); // returns [My Shop](https://shop.bébé.be?foo%5B%5D=bar)
@@ -113,10 +122,11 @@ $uri->toHtmlAnchor('My Shop', ['class' => ['text-center', 'text-6xl']]);
 
 <p class="message-info">The <code>toDisplayString()</code>, <code>toMarkdownAnchor()</code> and <code>toHtmlAnchor()</code> methods are available since version <code>7.6.0</code>.</p>
 <p class="message-notice">The <code>getUri()</code>, <code>getUriString()</code> and <code>getIdnUriString()</code> methods are deprecated since version <code>7.6.0</code>.</p>
+<p class="message-notice">The static method <code>from()</code> is deprecated since version <code>7.6.0</code> and replaced by the static method <code>wrap()</code>.</p>
 
 ## General Modifiers
 
-<p class="message-notice">available since version <code>7.6.0</code></p>
+<p class="message-notice">Available since version <code>7.6.0</code></p>
 
 With the addition of (2) two new native PHP URI representations, it can become complex to
 remember which URI method to use and which type of argument is expected. The `Modifier` can
@@ -128,7 +138,7 @@ Apart from partially modifying an URI component, since version `7.6.0`, you can 
 - resolve URIs;
 - normalize URIs;
 
-### Modifier complete URI component replacement
+### Complete URI Component Replacement
 
 The `Modifier` class will perform some sanity checks and/or formatting before
 handing over the changed value to the underlying object to perform the action.
@@ -154,9 +164,9 @@ In contrast, when using the `Modifier` the result is different:
 use League\Uri\Modifier;
 use Uri\Rfc3986\Uri;
 
-echo Modifier::from(new Uri('http://example.com/foo/bar'))
+echo Modifier::wrap(new Uri('http://example.com/foo/bar'))
     ->withHost('bébé.be')
-    ->uri()
+    ->unwrap()
     ->toString(), PHP_EOL;
 // the `uri()` methods returns a valid Uri\Rfc3986\Uri instance 
 // its `toString()` method returns http://xn--bb-bjab.be/foo/bar
@@ -164,7 +174,7 @@ echo Modifier::from(new Uri('http://example.com/foo/bar'))
 // to avoid the exception to be thrown.
 ```
 
-### URI resolution
+### URI Resolution
 
 Apart from modifying a URI component, the `Modifier` can also normalize or
 resolve URI. Resolving and Normalizing URI is supported by `League\Uri\Uri`,
@@ -187,18 +197,18 @@ using the `Modifier` you can do the following:
 use League\Uri\Modifier;
 use GuzzleHttp\Psr7\Utils;
 
-echo Modifier::from(Utils::uriFor('http://example.com/foo/bar'))
+echo Modifier::wrap(Utils::uriFor('http://example.com/foo/bar'))
     ->resolve('./../bar')
-    ->uri()
+    ->unwrap()
     ->__toString(), PHP_EOL;
 // `uri()` returns a Guzzle PSR-7 URI object
 // returns "http://example.com/bar"
 ```
 
-### URI normalization
+### URI Normalization
 
 RFC3986 and WHATWG URL specification both allow normalizing URIs. But both
-specification do it in a different way and capacity. Normalization is
+specifications do it in a different way and capacity. Normalization is
 mandatory when using a WHATWG URL but optional with RFC3986. It is
 not covered in PSR-7. Which again may leave the developer in a challenging
 situation. To ease developer experience, the `Modifier` class exposes a
@@ -225,16 +235,16 @@ use League\Uri\Modifier;
 use GuzzleHttp\Psr7\Utils;
 
 $uriString = 'HttP://ExamPle.com/./../foo/bar';
-echo Modifier::from(Utils::uriFor($uriString))
+echo Modifier::wrap(Utils::uriFor($uriString))
     ->normalize()
-    ->uri() 
+    ->unwrap() 
     ->__toString();
 // returns 'http://example.com/foo/bar
 ```
 
 ## Partial Modifiers
 
-### Available modifiers
+### Available Modifiers
 
 Under the hood the `Modifier` class intensively uses the [URI components objects](/components/7.0/)
 to apply the following changes to the submitted URI.
@@ -343,9 +353,9 @@ Change the full query component.
 ~~~php
 use League\Uri\Modifier;
 
-echo Modifier::from("https://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
+echo Modifier::wrap("https://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
     ->withQuery('foo=bar')
-    ->uri()
+    ->unwrap()
     ->getQuery(); 
 //display "foo=bar"
 ~~~
@@ -360,9 +370,9 @@ Change the encoding of the query string. You can either specify one of PHP's con
 ~~~php
 use League\Uri\Modifier;
 
-echo Modifier::from("https://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
+echo Modifier::wrap("https://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
     ->encodeQuery(PHP_QUERY_RFC1738)
-    ->uri()
+    ->unwrap()
     ->getQuery(); 
 //display "kingkong=toto&kingkong=ape&foo=bar+baz"
 ~~~
@@ -382,10 +392,10 @@ $converter = KeyValuePairConverter::new(';')
         '%3A' => ':',
     ]);
     
-Modifier::from(new Uri('https://example.com?foo[2]=bar#fragment'))
+Modifier::wrap(new Uri('https://example.com?foo[2]=bar#fragment'))
     ->appendQuery('url=https://example.com?foo[2]=bar#fragment')
     ->encodeQuery($converter)
-    ->uri()
+    ->unwrap()
     ->getQuery();
 //display "foo%5B2%5D=bar;url=https://example.com?foo%5B2%5D%3Dbar%23fragment"
 ~~~
@@ -397,9 +407,9 @@ Sorts the query according to its key values. The sorting rules are the same uses
 ~~~php
 use League\Uri\Modifier;
 
-echo Modifier::from("http://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
+echo Modifier::wrap("http://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
     ->sortQuery()
-    ->uri()
+    ->unwrap()
     ->getQuery(); 
 //display "kingkong=toto&kingkong=ape&foo=bar%20baz"
 ~~~
@@ -410,9 +420,9 @@ Merges a submitted query string to the URI object to be modified. When merging t
 
 ~~~php
 $uri = Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3");
-echo Modifier::from($uri)
+echo Modifier::wrap($uri)
     ->mergeQuery('kingkong=godzilla&toto')
-    ->uri()
+    ->unwrap()
     ->getQuery();
 //display "kingkong=godzilla&foo=bar%20baz&toto"
 ~~~
@@ -422,10 +432,10 @@ echo Modifier::from($uri)
 Appends a submitted query string to the URI object to be modified. When appending two query strings with the same key value the submitted query string value is added to the return query string without modifying the URI query string value.
 
 ~~~php
-Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3")
-echo Modifier::from($uri)
+$uri = Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3")
+echo Modifier::wrap($uri)
     ->appendQuery('kingkong=godzilla&toto')
-    ->uri()
+    ->unwrap()
     ->getQuery();
 //display "kingkong=toto&kingkong=godzilla&foo=bar%20baz&toto"
 ~~~
@@ -437,10 +447,10 @@ the same key value the submitted query string value is added to the return query
 string without modifying the URI query string value.
 
 ~~~php
-Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3")
-echo Modifier::from($uri)
+$uri = Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3")
+echo Modifier::wrap($uri)
     ->appendQueryPairs([['kingkong', 'godzilla'], ['toto', null]])
-    ->uri()
+    ->unwrap()
     ->getQuery();
 //display "kingkong=toto&kingkong=godzilla&foo=bar%20baz&toto"
 ~~~
@@ -452,10 +462,10 @@ with the same key value the submitted query string value is added to the return 
 string without modifying the URI query string value.
 
 ~~~php
-Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3")
-echo Modifier::from($uri)
+$uri = Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3")
+echo Modifier::wrap($uri)
     ->appendQueryParameters(['kingkong' => 'godzilla', 'toto' => ''])
-    ->uri()
+    ->unwrap()
     ->getQuery();
 //display "kingkong=toto&kingkong=godzilla&foo=bar%20baz&toto="
 ~~~
@@ -466,11 +476,11 @@ Removes query pairs from the current URI query string by providing the pairs key
 
 ~~~php
 $uri = "http://example.com/test.php?kingkong=toto&foo=bar+baz&bar=baz#doc3";
-$modifier = Modifier::from($uri);
-$newUri = $modifier->removeQueryPairs('foo', 'bar')->uri();
+$modifier = Modifier::wrap($uri);
+$newUri = $modifier->removeQueryPairs('foo', 'bar');
 
-echo $modifier->uri()->getQuery(); //display "kingkong=toto&foo=bar+baz&bar=baz"
-echo $newUri->uri()->getQuery();   //display "kingkong=toto"
+echo $modifier->unwrap()->getQuery(); //display "kingkong=toto&foo=bar+baz&bar=baz"
+echo $newUri->unwrap()->getQuery();   //display "kingkong=toto"
 ~~~
 
 ### Modifier::removeQueryParameters
@@ -481,11 +491,11 @@ Removes query params from the current URI query string by providing the param na
 
 ~~~php
 $uri = "http://example.com/test.php?kingkong=toto&fo.o=bar&fo_o=bar";
-$modifier = Modifier::from($uri);
+$modifier = Modifier::wrap($uri);
 $newUri = $modifier->removeQueryParameters('fo.o');
 
-echo $modifier->uri()->getQuery(); //display "kingkong=toto&fo.o=bar&fo_o=bar
-echo $newUri->uri()->getQuery();   //display "kingkong=toto&fo_o=bar"
+echo $modifier->unwrap()->getQuery(); //display "kingkong=toto&fo.o=bar&fo_o=bar
+echo $newUri->unwrap()->getQuery();   //display "kingkong=toto&fo_o=bar"
 ~~~
 
 
@@ -497,11 +507,11 @@ Removes query params numeric indices from the current URI query string. The remo
 
 ~~~php
 $uri = "http://example.com/test.php?kingkong[1]=toto&fkingkong[2]=toto";
-$modifier = Modifier::from($uri);
+$modifier = Modifier::wrap($uri);
 $newUri = $modifier->removeQueryParameterIndices();
 
-echo $modifier->uri()->getQuery(); //display "kingkong%5B1%5D=toto&fkingkong%5B2%5D=toto"
-echo $newUri->uri()->getQuery();   //display "kingkong%5B%5D=toto&fkingkong%5B%5D=toto"
+echo $modifier->unwrap()->getQuery(); //display "kingkong%5B1%5D=toto&fkingkong%5B2%5D=toto"
+echo $newUri->unwrap()->getQuery();   //display "kingkong%5B%5D=toto&fkingkong%5B%5D=toto"
 ~~~
 
 ### Modifier::mergeQueryParameters
@@ -512,9 +522,9 @@ Merge PHP query parameters with the current URI query string by providing the pa
 
 ~~~php
 $uri = "http://example.com/test.php?kingkong=toto&fo.o=bar&fo_o=bar";
-$newUri = Modifier::from($uri)->:mergeQueryParameters(['toto' => 'baz']);
+$newUri = Modifier::wrap($uri)->:mergeQueryParameters(['toto' => 'baz']);
 
-echo $newUri->uri()->getQuery(); //display "kingkong=tot&fo.o=bar&fo_o=bar&toto=baz"
+echo $newUri->unwrap()->getQuery(); //display "kingkong=tot&fo.o=bar&fo_o=bar&toto=baz"
 ~~~
 
 ### Modifier::mergeQueryPairs
@@ -525,9 +535,9 @@ Merge query paurs with the current URI query string by providing the pairs.
 
 ~~~php
 $uri = "http://example.com/test.php?kingkong=toto&fo.o=bar&fo_o=bar";
-$newUri = Modifier::from($uri)->:mergeQueryPairs([['fo.o', 'champion']]);
+$newUri = Modifier::wrap($uri)->mergeQueryPairs([['fo.o', 'champion']]);
 
-echo $newUri->uri()->getQuery(); //display "kingkong=toto&fo.o=champion&fo_o=bar"
+echo $newUri->unwrap()->getQuery(); //display "kingkong=toto&fo.o=champion&fo_o=bar"
 ~~~
 
 ## Host modifiers
@@ -543,9 +553,9 @@ Change the full query component.
 ~~~php
 use League\Uri\Modifier;
 
-echo Modifier::from("https://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
+echo Modifier::wrap("https://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
     ->withHost('hello.be')
-    ->uri()
+    ->unwrap()
     ->getHost(); 
 //display "hello.be"
 ~~~
@@ -561,7 +571,7 @@ use GuzzleHttp\Psr7\Uri;
 use League\Uri\Modifier;
 
 $uri = new Uri("http://스타벅스코리아.com/to/the/sky/");
-$newUri = Modifier::from($uri)->hostToAscii()->uri();
+$newUri = Modifier::wrap($uri)->hostToAscii()->unwrap();
 
 echo get_class($newUri); //display \GuzzleHttp\Psr7\Uri
 echo $newUri; //display "http://xn--oy2b35ckwhba574atvuzkc.com/to/the/sky/"
@@ -581,7 +591,7 @@ use League\Uri\Modifiers\HostToUnicode;
 
 $uriString = "http://xn--oy2b35ckwhba574atvuzkc.com/to/the/./sky/";
 $uri = new Uri($uriString);
-$newUri = Modifier::from($uri)->hostToUnicode();
+$newUri = Modifier::wrap($uri)->hostToUnicode();
 
 echo get_class($newUri); //display \GuzzleHttp\Psr7\Uri
 echo $newUri; //display "http://스타벅스코리아.com/to/the/sky/"
@@ -603,7 +613,7 @@ page for more information.
 use League\Uri\Modifier;
 
 $uri = 'http://0300.0250.0000.0001/path/to/the/sky.php';
-echo Modifier::from($uri)->hostToDecimal()->uri();
+echo Modifier::wrap($uri)->hostToDecimal()->unwrap();
 //display 'http://192.168.0.1/path/to/the/sky.php'
 ~~~
 
@@ -619,7 +629,7 @@ page for more information.
 use League\Uri\Modifier;
 
 $uri = 'http://192.168.0.1/path/to/the/sky.php';
-echo Modifier::from($uri)->hostToOctal()->uri();
+echo Modifier::wrap($uri)->hostToOctal()->unwrap();
 //display 'http://0300.0250.0000.0001/path/to/the/sky.php'
 ~~~
 
@@ -635,7 +645,7 @@ page for more information.
 use League\Uri\Modifier;
 
 $uri = 'http://192.168.257/path/to/the/sky.php';
-echo Modifier::from($uri)->hostToOctal()->uri();
+echo Modifier::wrap($uri)->hostToOctal()->unwrap();
 //display 'http://0xc0a811/path/to/the/sky.php'
 ~~~
 
@@ -650,7 +660,7 @@ See the [IPv6 Converter documentation](/components/7.0/ipv6/) page for more info
 use League\Uri\Modifier;
 
 $uri = 'http://[1050:0000:0000:0000:0005:0000:300c:326b]/path/to/the/sky.php';
-echo Modifier::from($uri)->hostToIpv6Compressed()->toString();
+echo Modifier::wrap($uri)->hostToIpv6Compressed()->toString();
 //display 'http://[1050::5:0:300c:326b]/path/to/the/sky.php'
 ~~~
 
@@ -665,7 +675,7 @@ See the [IPv6 Converter documentation](/components/7.0/ipv6/) page for more info
 use League\Uri\Modifier;
 
 $uri = 'http://[::1]/path/to/the/sky.php';
-echo Modifier::from($uri)->hostToIpv6Expanded()->toString();
+echo Modifier::wrap($uri)->hostToIpv6Expanded()->toString();
 //display 'http://[0000:0000:0000:0000:0000:0000:0000:0001]/path/to/the/sky.php'
 ~~~
 
@@ -680,7 +690,7 @@ use Zend\Diactoros\Uri;
 use League\Uri\Modifier;
 
 $uri = new Uri('http://[fe80::1234%25eth0-1]/path/to/the/sky.php');
-$newUri = Modifier::from($uri)->removeZoneIdentifier()->uri();
+$newUri = Modifier::wrap($uri)->removeZoneIdentifier()->unwrap();
 echo $newUri::class; //display \Zend\Diactoros\Uri
 
 echo $newUri; //display 'http://[fe80::1234]/path/to/the/sky.php'
@@ -697,7 +707,7 @@ Format the IP host:
 
 ~~~php
 $uri = "https://0:0@0:0";
-echo Modifier::from($uri)->normalizeIp()->toString();
+echo Modifier::wrap($uri)->normalizeIp()->toString();
 //display "https://0:0@0.0.0.0:0"
 ~~~
 
@@ -711,7 +721,7 @@ will try to convert the host into its ASCII format.
 
 ~~~php
 $uri = "https://0:0@0:0";
-echo Modifier::from($uri)->normalizeHost()->toString();
+echo Modifier::wrap($uri)->normalizeHost()->toString();
 //display "https://0:0@0.0.0.0:0"
 ~~~
 
@@ -724,7 +734,7 @@ Adds the root label if not present
 ~~~php
 use League\Uri\Modifier;
 
-echo Modifier::from('http://example.com:83')->addRootLabel(); //display 'http://example.com.:83'
+echo Modifier::wrap('http://example.com:83')->addRootLabel(); //display 'http://example.com.:83'
 ~~~
 
 ### Modifier::removeRootLabel
@@ -734,7 +744,7 @@ Removes the root label if present
 ~~~php
 use League\Uri\Modifier;
 
-echo Modifier::from('http://example.com.#yes')->removeRootLabel();  //display 'http://example.com#yes'
+echo Modifier::wrap('http://example.com.#yes')->removeRootLabel();  //display 'http://example.com#yes'
 ~~~
 
 ### Modifier::appendLabel
@@ -744,7 +754,7 @@ Appends a host to the current URI host.
 ~~~php
 use League\Uri\Modifier;
 
-echo Modifier::from("http://www.example.com/path/to/the/sky/")->appendLabel('fr'); 
+echo Modifier::wrap("http://www.example.com/path/to/the/sky/")->appendLabel('fr'); 
 //display "http://www.example.com.fr/path/to/the/sky/"
 ~~~
 
@@ -755,7 +765,7 @@ Prepends a host to the current URI path.
 ~~~php
 use League\Uri\Modifier;
 
-echo Modifier::from("http://www.example.com/path/to/the/sky/")->prependLabel('shop');
+echo Modifier::wrap("http://www.example.com/path/to/the/sky/")->prependLabel('shop');
 //display "http://shop.www.example.com/path/to/the/sky/and/above"
 ~~~
 
@@ -769,7 +779,7 @@ Replaces a label from the current URI host with a host.
 use League\Uri\Modifier;
 
 $uri = "http://www.example.com/path/to/the/sky/";
-echo Modifier::from($uri)->replaceLabel(2, 'admin.shop');
+echo Modifier::wrap($uri)->replaceLabel(2, 'admin.shop');
 //display "http://admin.shop.example.com/path/to/the/sky"
 ~~~
 
@@ -781,7 +791,7 @@ The previous example can be rewritten using negative offset:
 use League\Uri\Modifier;
 
 $uri = "http://www.example.com/path/to/the/sky/";
-echo Modifier::from($uri)->replaceLabel(-1, 'admin.shop');
+echo Modifier::wrap($uri)->replaceLabel(-1, 'admin.shop');
 //display "http://admin.shop.example.com/path/to/the/sky"
 ~~~
 
@@ -794,7 +804,7 @@ Removes selected labels from the current URI host. Labels are indicated string v
 ~~~php
 
 $uri = "http://www.localhost.com/path/to/the/sky/";
-echo Modifier::from($uri)->removeLabels(2, 0);
+echo Modifier::wrap($uri)->removeLabels(2, 0);
 //display "http://localhost/path/the/sky/"
 ~~~
 
@@ -804,7 +814,7 @@ The previous example can be rewritten using negative offset:
 
 ~~~php
 $uri = "http://www.example.com/path/to/the/sky/";
-Modifier::from($uri)->removeLabels(-1, -3)->toString();
+Modifier::wrap($uri)->removeLabels(-1, -3)->toString();
 //return "http://localhost/path/the/sky/"
 ~~~
 
@@ -816,7 +826,7 @@ Slice the host from the current URI host. Negative offset are also supported.
 
 ~~~php
 $uri = "http://www.localhost.com/path/to/the/sky/";
-echo Modifier::from($uri)->sliceLabels(1, 1)->toString();
+echo Modifier::wrap($uri)->sliceLabels(1, 1)->toString();
 //display "http://localhost/path/the/sky/"
 ~~~
 
@@ -837,9 +847,9 @@ Change the full path component.
 ~~~php
 use League\Uri\Modifier;
 
-echo Modifier::from("https://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
+echo Modifier::wrap("https://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
     ->withPath('/path/to')
-    ->uri()
+    ->unwrap()
     ->getPath(); 
 //display "/path/to"
 ~~~
@@ -850,7 +860,7 @@ Removes dot segments according to RFC3986:
 
 ~~~php
 $uri = "http://www.example.com/path/../to/the/./sky/";
-echo Modifier::from($uri)->removeDotSegments();
+echo Modifier::wrap($uri)->removeDotSegments();
 //display "http://www.example.com/to/the/sky/"
 ~~~
 
@@ -860,7 +870,7 @@ Removes adjacent separators with empty segment.
 
 ~~~php
 $uri = "http://www.example.com/path//to/the//sky/";
-echo Modifier::from($uri)->removeEmptySegments();
+echo Modifier::wrap($uri)->removeEmptySegments();
 //display "http://www.example.com/path/to/the/sky/"
 ~~~
 
@@ -870,7 +880,7 @@ Removes the path trailing slash if present
 
 ~~~php
 $uri = Uri::new("http://www.example.com/path/?foo=bar");
-echo Modifier::from($uri)->removeTrailingSlash();
+echo Modifier::wrap($uri)->removeTrailingSlash();
 //display "http://www.example.com/path?foo=bar"
 ~~~
 
@@ -880,7 +890,7 @@ Adds the path trailing slash if not present
 
 ~~~php
 $uri = "http://www.example.com/sky#top";
-echo Modifier::from($uri)->addTrailingSlash();
+echo Modifier::wrap($uri)->addTrailingSlash();
 //display "http://www.example.com/sky/#top"
 ~~~
 
@@ -890,7 +900,7 @@ Remove the path leading slash if present.
 
 ~~~php
 $uri = "/path/to/the/sky/";
-echo Modifier::from($uri)->removeLeadingSlash();
+echo Modifier::wrap($uri)->removeLeadingSlash();
 //display "path/to/the/sky"
 ~~~
 
@@ -899,7 +909,7 @@ echo Modifier::from($uri)->removeLeadingSlash();
 Add the path leading slash if not present.
 
 ~~~php
-echo Modifier::from("path/to/the/sky/")->addLeadingSlash();
+echo Modifier::wrap("path/to/the/sky/")->addLeadingSlash();
 //display "/path/to/the/sky"
 ~~~
 
@@ -908,9 +918,9 @@ echo Modifier::from("path/to/the/sky/")->addLeadingSlash();
 Adds, updates and/or removes the path dirname from the current URI path.
 
 ~~~php
-echo Modifier::from("http://www.example.com/path/to/the/sky")
+echo Modifier::wrap("http://www.example.com/path/to/the/sky")
     ->replaceDirname('/road/to')
-    ->uri()
+    ->unwrap()
     ->getPath(); //display "/road/to/sky"
 ~~~
 
@@ -920,9 +930,9 @@ Adds, updates and or removes the path basename from the current URI path.
 
 ~~~php
 $uri = Http::new("http://www.example.com/path/to/the/sky");
-echo Modifier::from($uri)
+echo Modifier::wrap($uri)
     ->replaceBasename("paradise.xml")
-    ->uri()
+    ->unwrap()
     ->getPath();
      //display "/path/to/the/paradise.xml"
 ~~~
@@ -933,7 +943,7 @@ Adds, updates and or removes the path extension from the current URI path.
 
 ~~~php
 $uri = Http::new("http://www.example.com/export.html");
-echo Modifier::from($uri)->replaceExtension('csv')->uri()->getPath();
+echo Modifier::wrap($uri)->replaceExtension('csv')->unwrap()->getPath();
 //display "/export.csv"
 ~~~
 
@@ -943,9 +953,9 @@ Adds the basepath to the current URI path.
 
 ~~~php
 $uri = Http::new("http://www.example.com/path/to/the/sky");
-echo Modifier::from($uri)
+echo Modifier::wrap($uri)
     ->addBasePath('/the/real')
-    ->uri()
+    ->unwrap()
     ->getPath();
 //display "/the/real/path/to/the/sky"
 ~~~
@@ -956,9 +966,9 @@ Removes the basepath from the current URI path.
 
 ~~~php
 $uri = Http::new("http://www.example.com/path/to/the/sky");
-echo Modifier::from($uri)
+echo Modifier::wrap($uri)
     ->removeBasePath("/path/to/the")
-    ->uri()
+    ->unwrap()
     ->getPath();
 //display "/sky"
 ~~~
@@ -969,9 +979,9 @@ Appends a path to the current URI path.
 
 ~~~php
 $uri = Http::new("http://www.example.com/path/to/the/sky/");
-echo Modifier::from($uri)
+echo Modifier::wrap($uri)
     ->appendSegment("and/above")
-    ->uri()
+    ->unwrap()
     ->getPath();
  //display "/path/to/the/sky/and/above"
 ~~~
@@ -982,9 +992,9 @@ Prepends a path to the current URI path.
 
 ~~~php
 $uri = Http::new("http://www.example.com/path/to/the/sky/");
-echo Modifier::from($uri)
+echo Modifier::wrap($uri)
     ->prependSegment("and/above")
-    ->uri()
+    ->unwrap()
     ->getPath();
  //display "/and/above/path/to/the/sky/"
 ~~~
@@ -995,9 +1005,9 @@ Replaces a segment from the current URI path with a new path.
 
 ~~~php
 $uri = Http::new("http://www.example.com/path/to/the/sky/");
-echo Modifier::from($uri)
+echo Modifier::wrap($uri)
     ->replaceSegment(3, "sea")
-    ->uri()
+    ->unwrap()
     ->getPath();
  //display "/path/to/the/sea/"
 ~~~
@@ -1007,7 +1017,7 @@ echo Modifier::from($uri)
 The previous example can be rewritten using negative offset:
 
 ~~~php
-echo Modifier::from("http://www.example.com/path/to/the/sky/")
+echo Modifier::wrap("http://www.example.com/path/to/the/sky/")
     ->replaceSegment(-1, "sea")
     ->getPath();
 //display "/path/to/the/sea/"
@@ -1018,9 +1028,9 @@ echo Modifier::from("http://www.example.com/path/to/the/sky/")
 Removes selected segments from the current URI path by providing the segments offset.
 
 ~~~php
-echo Modifier::from("http://www.example.com/path/to/the/sky/")
+echo Modifier::wrap("http://www.example.com/path/to/the/sky/")
     ->removeSegments(1, 3)
-    ->uri()
+    ->unwrap()
     ->getPath();
 //display "/path/the/"
 ~~~
@@ -1028,9 +1038,9 @@ echo Modifier::from("http://www.example.com/path/to/the/sky/")
 <p class="message-info">This modifier supports negative offset</p>
 
 ~~~php
-echo Modifier::from("http://www.example.com/path/to/the/sky/")
+echo Modifier::wrap("http://www.example.com/path/to/the/sky/")
     ->removeSegments(-1, -2])
-    ->uri()
+    ->unwrap()
     ->getPath();
 //display "/path/the/"
 ~~~
@@ -1041,7 +1051,7 @@ Slice the path from the current URI path. Negative offset are also supported.
 
 ~~~php
 $uri = "http://www.localhost.com/path/to/the/sky/";
-echo Modifier::from($uri)->sliceSegments(2, 2)->toString();
+echo Modifier::wrap($uri)->sliceSegments(2, 2)->toString();
 //display "http://www.localhost.com/the/sky/"
 ~~~
 
@@ -1051,9 +1061,9 @@ Update Data URI parameters
 
 ~~~php
 $uri = Uri::new("data:text/plain;charset=US-ASCII,Hello%20World!");
-echo Modifier::from($uri)
+echo Modifier::wrap($uri)
     ->replaceDataUriParameters("charset=utf-8")
-    ->uri()
+    ->unwrap()
     ->getPath();
 //display "text/plain;charset=utf-8,Hello%20World!"
 ~~~
@@ -1064,9 +1074,9 @@ Converts a data URI path from text to its base64 encoded version
 
 ~~~php
 $uri = Uri::new("data:text/plain;charset=US-ASCII,Hello%20World!");
-echo Modifier::from($uri)
+echo Modifier::wrap($uri)
     ->dataPathToBinary()
-    ->uri()
+    ->unwrap()
     ->getPath();
 //display "text/plain;charset=US-ASCII;base64,SGVsbG8gV29ybGQh"
 ~~~
@@ -1077,9 +1087,9 @@ Converts a data URI path from text to its base64 encoded version
 
 ~~~php
 $uri = Uri::new("data:text/plain;charset=US-ASCII;base64,SGVsbG8gV29ybGQh");
-echo Modifier::from($uri)
+echo Modifier::wrap($uri)
     ->dataPathToAscii()
-    ->uri()
+    ->unwrap()
     ->getPath();
 //display "text/plain;charset=US-ASCII,Hello%20World!"
 ~~~
@@ -1095,9 +1105,9 @@ Change the full fragment component.
 ~~~php
 use League\Uri\Modifier;
 
-echo Modifier::from("https://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
+echo Modifier::wrap("https://example.com/?kingkong=toto&foo=bar%20baz&kingkong=ape")
     ->withFragment('/path/to')
-    ->uri()
+    ->unwrap()
     ->getFragment(); 
 //display "/path/to"
 ~~~
@@ -1110,10 +1120,10 @@ Appends one or more directives to the current URI fragment.
 
 ~~~php
 $uri = Http::new("http://www.example.com/path/to/the/sky/");
-echo Modifier::from($uri)
+echo Modifier::wrap($uri)
     ->appendFragmentDirectives(new TextDirective(start:"foo", end:"bar"))
     ->appendFragmentDirectives('unknownDirective')
-    ->uri()
+    ->unwrap()
     ->getFragment();
 // display ":~:text=foo,bar&unknownDirective"
 ~~~
@@ -1128,10 +1138,10 @@ Prepends one or more directives to the current URI fragment.
 use Uri\WhatWg\Url;
 
 $uri = new Url("http://www.example.com/path/to/the/sky/");
-echo Modifier::from($uri)
+echo Modifier::wrap($uri)
     ->prependFragmentDirectives(new TextDirective(start:"foo", end:"bar"))
     ->prependFragmentDirectives('unknownDirective')
-    ->uri()
+    ->unwrap()
     ->getFragment();
 // display ":~:text=foo,bar&unknownDirective"
 ~~~
@@ -1146,9 +1156,9 @@ Replace a specific directive from the fragment.
 use Uri\WhatWg\Url;
 
 $uri = new Url("http://www.example.com/path/to/the/sky/#:~:text=foo,bar&unknownDirective");
-echo Modifier::from($uri)
+echo Modifier::wrap($uri)
     ->replaceFragmentDirective(1, new TextDirective(start:"bar", end:"foo"))
-    ->uri()
+    ->unwrap()
     ->getFragment();
 // display ":~:text=foo,bar&text=bar,foo"
 ~~~
@@ -1163,9 +1173,9 @@ Remove directives from the fragment using their offsets.
 use Uri\WhatWg\Url;
 
 $uri = new Url("http://www.example.com/path/to/the/sky/#:~:text=foo,bar&unknownDirective");
-echo Modifier::from($uri)
+echo Modifier::wrap($uri)
     ->removeFragmentDirectives(1)
-    ->uri()
+    ->unwrap()
     ->getFragment();
 // display ":~:text=foo,bar"
 ~~~
@@ -1180,9 +1190,9 @@ Slice directives from the fragment using their offsets.
 use Uri\WhatWg\Url;
 
 $uri = new Url("http://www.example.com/path/to/the/sky/#:~:text=foo,bar&unknownDirective&text=yes");
-echo Modifier::from($uri)
+echo Modifier::wrap($uri)
     ->sliceDirective(0, 2)
-    ->uri()
+    ->unwrap()
     ->getFragment();
 // display ":~:text=yes"
 ~~~
@@ -1197,9 +1207,9 @@ Remove directives from the fragment using a callback.
 use Uri\WhatWg\Url;
 
 $uri = new Url("http://www.example.com/path/to/the/sky/#:~:text=foo,bar&unknownDirective&text=yes");
-echo Modifier::from($uri)
+echo Modifier::wrap($uri)
     ->filterFragmentDirectives(fn (Directive $directive, int $offset) => $directive->name() !== 'text')
-    ->uri()
+    ->unwrap()
     ->getFragment();
 // display ":~:text=foo,bar&text=yes"
 ~~~
@@ -1217,9 +1227,9 @@ use League\Uri\Modifier;
 use Uri\Rfc3986\Uri;
 
 $uri = new Uri("http://www.example.com/path/to/the/sky");
-echo Modifier::from($uri)
+echo Modifier::wrap($uri)
     ->withUserInfo(username: null, password: 'pa@ss')
-    ->uri()
+    ->unwrap()
     ->getUserInfo();
 // display ":pa%40ss"
 // for information the Uri::withUserInfo method only takes a single variable.
@@ -1236,7 +1246,7 @@ use League\Uri\Modifier;
 use Uri\Rfc3986\Uri;
 
 $uri = new Uri("http://www.example.com/path/to/the/sky");
-$newUri = Modifier::from($uri)->withScheme('HtTp')->uri();
+$newUri = Modifier::wrap($uri)->withScheme('HtTp')->unwrap();
 $newUri->getRawScheme(); // returns 'HtTp'
 $newUri->getScheme(); // returns 'http'
 ~~~
@@ -1257,6 +1267,6 @@ use League\Uri\Modifier;
 use Uri\WhatWg\Url;
 
 $uri = new Url("http://www.example.com/path/to/the/sky");
-$newUri = Modifier::from($uri)->withPort(433)->uri();
+$newUri = Modifier::wrap($uri)->withPort(433)->unwrap();
 $newUri->getPort(); // returns 433
 ~~~

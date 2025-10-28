@@ -26,7 +26,7 @@ user experience to your developers.
 use League\Uri\Components\Query;
 use League\Uri\Modifier;
 
-$newUri = Modifier::from('http://example.com?q=value#fragment')
+$newUri = Modifier::wrap('http://example.com?q=value#fragment')
     ->appendQuery('q=new.Value');
 echo $newUri; // 'http://example.com?q=value&q=new.Value#fragment';
 

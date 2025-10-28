@@ -22,7 +22,7 @@ $uri = Uri::new('https://example.com?q=value#fragment');
 $uri->getScheme(); // returns 'http'
 $uri->getHost();   // returns 'example.com'
 
-$newUri = Modifier::from($uri)->appendQuery('q=new.Value');
+$newUri = Modifier::wrap($uri)->appendQuery('q=new.Value');
 echo $newUri; // 'https://example.com?q=value&q=new.Value#fragment'
 
 $query = Query::fromUri($newUri);
