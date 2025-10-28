@@ -23,17 +23,18 @@ $template = 'https://example.com/hotels/{hotel}/bookings/{booking}';
 $params = ['booking' => '42', 'hotel' => 'Rest & Relax'];
 
 $uriTemplate = new UriTemplate($template);
-$uri = $uriTemplate->expand($params);             // instance of League\Uri\Uri
-$rfc3986Uri = $uriTemplate->expandToUri($params); // instance of Uri\Rfc3986\Uri
-$whatWgUrl = $uriTemplate->expandToUrl($params);  // instance of Uri\Whatwg\Url
+$uri = $uriTemplate->expand($params);              // instance of League\Uri\Uri
+$rfc3986Uri = $uriTemplate->expandToUri($params);  // instance of Uri\Rfc3986\Uri
+$whatWgUrl = $uriTemplate->expandToUrl($params);   // instance of Uri\Whatwg\Url
+$psr7Uri = $uriTemplate->expandToPsr7Uri($params); // instance of Psr7 UriInterface
 
 echo $uri; //display https://example.com/hotels/Rest%20%26%20Relax/bookings/42"
 ~~~
 
-<p class="message-notice"><code>expandToUri()</code> and <code>expandToUrl()</code> are available since
+<p class="message-notice"><code>expandToUri()</code>, <code>expandToUrl()</code> and <code>expandToPsr7Uri()</code> are available since
 version <code>7.6.0</code></p>
 
-<p class="message-info">Since version <code>7.6</code> the method takes a second optional parameter
+<p class="message-info">Since version <code>7.6</code> the <code>expand()</code> method takes a second optional parameter
 which serves as a base URI. The generated URI is resolved against the Base URI.</p>
 
 ~~~php
@@ -48,6 +49,7 @@ $uriTemplate = new UriTemplate($template);
 $uri = $uriTemplate->expand($params, 'https://example.com');             // instance of League\Uri\Uri
 $rfc3986Uri = $uriTemplate->expandToUri($params, 'https://example.com'); // instance of Uri\Rfc3986\Uri
 $whatWgUrl = $uriTemplate->expandToUrl($params, 'https://example.com');  // instance of Uri\Whatwg\Url
+$whatWgUrl = $uriTemplate->expandToPsr7Uri($params, 'https://example.com');  // instance of League\Uri\Http
 
 echo $uri; //display https://example.com/hotels/Rest%20%26%20Relax/bookings/42"
 ~~~
@@ -97,8 +99,8 @@ echo $uriTemplate->expand($params), PHP_EOL;
 //displays https://api.twitter.com/2.0/search/j/john/?q=a&q=b&limit=10
 ~~~
 
-The `expandToUri()` and the `expandToUrl()` methods will act exactly like the `expand()` method
-but will instead return a `Uri\Rfc3986\Uri` and a `Uri\Whatwg\Url` object respectively.
+The `expandToUri()`, `expandToUrl()` and `expandToPsr7Uri()` methods will act exactly like the `expand()` method
+but will instead return a `Uri\Rfc3986\Uri`, a `Uri\Whatwg\Url` or a `Psr7\Http\Message\UriInterface` object respectively.
 
 <p class="message-warning">a WHATWG URL must always be absolute if the URI template is not you
 MUST provide a base URL to <code>expandToUrl()</code> otherwise an <code>Uri\WhatWg\InvalidUrlException</code>
@@ -120,6 +122,31 @@ $uriTemplate = new UriTemplate($template, ['version' => '1.1']);
 echo $uriTemplate->expandToUrl($params, 'https://api.twitter.com')->toAsciiString(); //works
 echo $uriTemplate->expandToUrl($params); //will throw
 ~~~
+
+<p class="message-info">You may return a different <code>Psr7\Http\Message\UriInterface</code> object if you
+provide to the <code>expandToPsr7Uri</code> your own <code>Psr\Http\Message\UriFactoryInterface</code> class
+as the third optional argument.</p>
+
+~~~php
+use League\Uri\UriTemplate;
+use Laminas\Diactoros\UriFactory;
+
+$template = '/{version}/search/{term:1}/{term}/{?q*,limit}';
+//the template represents a non-absolute URL
+
+$params = [
+    'term' => 'john',
+    'q' => ['a', 'b'],
+    'limit' => '10',
+    'version' => '2.0'
+];
+
+$uriTemplate = new UriTemplate($template, ['version' => '1.1']);
+$uri = $uriTemplate->expandToPsr7Uri($params, 'https://api.twitter.com', new UriFactory());
+$uri::class; // returns 'Laminas\Diactoros\Uri'
+~~~
+
+By default, if no factory is provided, the returned PSR-7 `UriInterface` object is a `League\Uri\Http` instance.
 
 ### Updating the default variables
 
