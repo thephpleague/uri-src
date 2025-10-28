@@ -6,11 +6,11 @@ title: URI component encoder and decoder
 URI component encoder and decoder
 =======
 
-In order to safely encode and/or decode a URI component, we need a tool to correctly perform the conversion.
-To do so the package provides an enhanced OOP wrapper around PHP's `rawurlencode` and `rawurldecode` functions
+To safely encode and/or decode a URI component, we need a tool to correctly perform the conversion.
+To do so, the package provides an enhanced OOP wrapper around PHP's `rawurlencode` and `rawurldecode` functions
 using the `League\Uri\Encoder` helper class.
 
-The class provides encoding mechanism for the following URI components:
+The class provides an encoding mechanism for the following URI components:
 
 ```php
 <?php
@@ -26,7 +26,7 @@ echo Encoder::encodePath($component);        // returns "/thi:s/is/a%3Fsimple=pa
 echo Encoder::encodeQueryOrFragment($query); // returns "simple%23=path&k%C3%A9?=23"
 ````
 
-The class also provides a more specific encodage used for query string key/value pair.
+The class also provides a more specific encoding mechanism used for query-string key/value pair.
 
 ```php
 <?php
@@ -37,7 +37,7 @@ echo Encoder::encodeQueryKeyValue($queryKey);   // returns "k%C3%A9%23"
 echo Encoder::encodeQueryKeyValue($queryValue); // returns "%26foobar"
 ````
 
-Each static encoding method is component aware and will prevent encoding component special characters that must or 
+Each static encoding method is component-aware and will prevent encoding component special characters that must or 
 must not be encoded in the context of a full URI.
 
 To complete the encoding methods, the class also exposes static decoding methods to safely decode URI components:
@@ -56,7 +56,8 @@ echo Encoder::decodePath($component);                 // returns "%2Fthi:s%2Fis%
 echo Encoder::decodeQuery($component);                // returns "/thi:s/is/a?simple%23=%20path"
 echo Encoder::decodeFragment($component);             // returns "/thi:s/is/a?simple#=%20path"
 ````
-Each static decoding method is component aware and will prevent decoding component specific characters in the context
+
+Each static decoding method is component-aware and will prevent decoding component-specific characters in the context
 of a full URI.
 
 <p class="message-info">The <code>scheme</code> and <code>port</code> do not requires a specific class to be correctly
