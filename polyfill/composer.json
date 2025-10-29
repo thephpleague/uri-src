@@ -35,6 +35,9 @@
         "league/uri-interfaces": ">=7.6",
         "rowbot/url": "^4.1.0"
     },
+    "provide": {
+        "ext-uri": "*"
+    },
     "suggest": {
         "ext-intl": "to handle IDN host with the best performance",
         "jeremykendall/php-domain-parser": "to resolve Public Suffix and Top Level Domain",
