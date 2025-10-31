@@ -223,7 +223,7 @@ if (PHP_VERSION_ID < 80500) {
             return $result->getDomain();
         }
 
-        private function setAsciiHost(): ?string
+        private function setAsciiHost(): string
         {
             $host = $this->url->hostname;
             if ('' === $host || null === $host || 1 !== preg_match(self::REGEXP_IDNA_PATTERN, $host)) {

@@ -8,6 +8,7 @@ parameters:
 		- uri
 		- components
 		- interfaces
+		- polyfill
 	ignoreErrors:
 		- message: '#Cannot cast mixed to string.#'
 		  path: interfaces/IPv4/BCMathCalculator.php
@@ -18,6 +19,5 @@ parameters:
 		- identifier: missingType.iterableValue
 		- '#deprecated class League\\Uri\\BaseUri#'
 		- '#deprecated interface League\\Uri\\Contracts\\UriAccess#'
-		- '#\Dom\\HTMLDocument#'
 	reportUnmatchedIgnoredErrors: true
 	treatPhpDocTypesAsCertain: false
