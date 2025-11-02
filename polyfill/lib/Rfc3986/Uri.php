@@ -19,8 +19,10 @@ use League\Uri\UriString;
 use SensitiveParameter;
 use Uri\InvalidUriException;
 use Uri\UriComparisonMode;
+use ValueError;
 
 use function explode;
+use function str_contains;
 use function strpos;
 
 use const PHP_VERSION_ID;
@@ -65,6 +67,7 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function __construct(string $uri, ?self $baseUri = null)
         {
+            !str_contains($uri, "\0") || throw new ValueError('Argument #1 ($uri) must not contain any null bytes');
             UriString::containsValidRfc3986Characters($uri) || throw new InvalidUriException('The URI `'.$uri.'` contains invalid RFC3986 characters.');
 
             try {
@@ -221,6 +224,7 @@ if (PHP_VERSION_ID < 80500) {
         public function withScheme(?string $scheme): self
         {
             return match (true) {
+                null !== $scheme && str_contains($scheme, "\0") => throw new ValueError('Argument #1 ($scheme) must not contain any null bytes'),
                 $scheme === $this->getRawScheme() => $this,
                 UriString::isValidScheme($scheme) => $this->withComponent(['scheme' => $scheme]),
                 default => throw new InvalidUriException('The scheme string component `'.$scheme.'` is an invalid scheme.'),
@@ -242,6 +246,7 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function withUserInfo(#[SensitiveParameter] ?string $userInfo): self
         {
+            null === $userInfo || !str_contains($userInfo, "\0") || throw new ValueError('Argument #1 ($userInfo) must not contain any null bytes');
             if ($this->getRawUserInfo() === $userInfo) {
                 return $this;
             }
@@ -293,6 +298,7 @@ if (PHP_VERSION_ID < 80500) {
         public function withHost(?string $host): self
         {
             return match (true) {
+                null !== $host && str_contains($host, "\0") => throw new ValueError('Argument #1 ($host) must not contain any null bytes'),
                 $host === $this->getRawHost() => $this,
                 UriString::isValidHost($host) => $this->withComponent(['host' => $host]),
                 default => throw new InvalidUriException('The host component value `'.$host.'` is not a valid host.'),
@@ -338,6 +344,7 @@ if (PHP_VERSION_ID < 80500) {
         public function withPath(string $path): self
         {
             return match (true) {
+                str_contains($path, "\0") => throw new ValueError('Argument #1 ($path) must not contain any null bytes'),
                 $path === $this->getRawPath() => $this,
                 Encoder::isPathEncoded($path) => $this->withComponent(['path' => $path]),
                 default => throw new InvalidUriException('The encoded path component `'.$path.'` contains invalid characters.'),
@@ -360,6 +367,7 @@ if (PHP_VERSION_ID < 80500) {
         public function withQuery(?string $query): self
         {
             return match (true) {
+                null !== $query && str_contains($query, "\0") => throw new ValueError('Argument #1 ($query) must not contain any null bytes'),
                 $query === $this->getRawQuery() => $this,
                 Encoder::isQueryEncoded($query) => $this->withComponent(['query' => $query]),
                 default => throw new InvalidUriException('The encoded query string component `'.$query.'` contains invalid characters.'),
@@ -382,6 +390,7 @@ if (PHP_VERSION_ID < 80500) {
         public function withFragment(?string $fragment): self
         {
             return match (true) {
+                null !== $fragment && str_contains($fragment, "\0") => throw new ValueError('Argument #1 ($fragment) must not contain any null bytes'),
                 $fragment === $this->getRawFragment() => $this,
                 Encoder::isFragmentEncoded($fragment) => $this->withComponent(['fragment' => $fragment]),
                 default => throw new InvalidUriException('The encoded fragment string component `'.$fragment.'` contains invalid characters.'),

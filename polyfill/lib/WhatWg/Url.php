@@ -25,6 +25,7 @@ use Rowbot\URL\URL as WhatWgURL;
 use Rowbot\URL\URLRecord;
 use SensitiveParameter;
 use Uri\UriComparisonMode;
+use ValueError;
 
 use function in_array;
 use function preg_match;
@@ -60,8 +61,9 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @param list<UrlValidationError> $errors
          */
-        public static function parse(string $uri, ?self $baseUrl = null, array &$errors = []): ?self
+        public static function parse(string $uri, ?self $baseUrl = null, array|null &$errors = []): ?self
         {
+            $errors ??= [];
             try {
                 return new self($uri, $baseUrl, $errors);
             } catch (InvalidUrlException $exception) {
@@ -76,8 +78,10 @@ if (PHP_VERSION_ID < 80500) {
          *
          * @throws InvalidUrlException
          */
-        public function __construct(string $uri, ?self $baseUrl = null, array &$softErrors = [])
+        public function __construct(string $uri, ?self $baseUrl = null, array|null &$softErrors = [])
         {
+            !str_contains($uri, "\0") || throw new ValueError('Argument #1 ($uri) must not contain any null bytes');
+            $softErrors ??= [];
             $collector = new UrlValidationErrorCollector();
             try {
                 $this->url = new WhatWgURL($uri, $baseUrl?->url->href, ['logger' => $collector]);
@@ -115,6 +119,7 @@ if (PHP_VERSION_ID < 80500) {
                 return $this;
             }
 
+            !str_contains($scheme, "\0") || throw new ValueError('Argument #1 ($scheme) must not contain any null bytes');
             $copy = $this->copy();
             if ('' === $scheme) {
                 $copy->url->protocol = '';
@@ -145,6 +150,7 @@ if (PHP_VERSION_ID < 80500) {
                 return $this;
             }
 
+            null === $username || !str_contains($username, "\0") || throw new ValueError('Argument #1 ($username) must not contain any null bytes');
             $copy = $this->copy();
             $copy->url->username = (string) $username;
 
@@ -165,6 +171,7 @@ if (PHP_VERSION_ID < 80500) {
                 return $this;
             }
 
+            null === $password || !str_contains($password, "\0") || throw new ValueError('Argument #1 ($password) must not contain any null bytes');
             $copy = $this->copy();
             $copy->url->password = (string) $password;
 
@@ -261,6 +268,7 @@ if (PHP_VERSION_ID < 80500) {
                 return $this;
             }
 
+            null === $host || !str_contains($host, "\0") || throw new ValueError('Argument #1 ($host) must not contain any null bytes');
             $copy = $this->copy();
             $urlRecord = self::urlRecord($copy);
 
@@ -316,6 +324,7 @@ if (PHP_VERSION_ID < 80500) {
                 return $this;
             }
 
+            !str_contains($path, "\0") || throw new ValueError('Argument #1 ($path) must not contain any null bytes');
             $copy = $this->copy();
             $copy->url->pathname = $path;
 
@@ -336,6 +345,7 @@ if (PHP_VERSION_ID < 80500) {
                 return $this;
             }
 
+            null === $query || !str_contains($query, "\0") || throw new ValueError('Argument #1 ($query) must not contain any null bytes');
             $copy = $this->copy();
             $copy->url->search = (string) $query;
 
@@ -356,6 +366,7 @@ if (PHP_VERSION_ID < 80500) {
                 return $this;
             }
 
+            null === $fragment || !str_contains($fragment, "\0") || throw new ValueError('Argument #1 ($fragment) must not contain any null bytes');
             $copy = $this->copy();
             $copy->url->hash = (string) $fragment;
 
