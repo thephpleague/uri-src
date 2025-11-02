@@ -95,3 +95,4 @@ Because each URI component has specific needs most have specialized interface wh
 - `League\Uri\Contract\PortInterface`
 - `League\Uri\Contract\QueryInterface`
 - `League\Uri\Contract\SegmentedPathInterface`
+- `League\Uri\Contract\FragmentDirective` **since version 7.6**

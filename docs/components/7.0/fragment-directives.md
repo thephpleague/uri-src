@@ -5,7 +5,7 @@ title: The Fragment Directive component
 
 # The Fragment Directives component
 
-<p class="message-notice">available since version <code>7.6.0</code></p>
+<p class="message-notice">Available since version <code>7.6.0</code></p>
 
 ## The Component
 
@@ -58,8 +58,8 @@ FragmentDirectives::first(): ?Directive;
 FragmentDirectives::last(): ?Directive;
 FragmentDirectives::nth(int $offset): ?Directive;
 FragmentDirectives::has(int ...$offset): bool;
-FragmentDirectives::contains(Directive|Stringable|string $directive): bool;
-FragmentDirectives::indexOf(Directive|Stringable|string $directive): ?int;
+FragmentDirectives::contains(FragmentDirective|Stringable|string $directive): bool;
+FragmentDirectives::indexOf(FragmentDirective|Stringable|string $directive): ?int;
 ```
 
 Apart from implementing the `Countable` interface, the `FragmentDirectives` class implements
@@ -81,9 +81,9 @@ foreach ($fragment as $directive) {
 The `FragmentDirectives` allows you to manipulate its content using the following methods:
 
 ```php
-FragmentDirectives::append(Directive|Stringable|string ...$directives): self;
-FragmentDirectives::prepend(Directive|Stringable|string ...$directives): self;
-FragmentDirectives::replace(int $offset, Directive|Stringable|string $directive): self;
+FragmentDirectives::append(FragmentDirective|Stringable|string ...$directives): self;
+FragmentDirectives::prepend(FragmentDirective|Stringable|string ...$directives): self;
+FragmentDirectives::replace(int $offset, FragmentDirective|Stringable|string $directive): self;
 FragmentDirectives::remove(int ...$offset): self;
 FragmentDirectives::slice(int $offset, ?int $length = null): self;
 FragmentDirectives::filter(callabck $callback): self;
@@ -108,14 +108,14 @@ use a dedicated class to do so, as the grammar around building or parsing direct
 regard to encoding characters and/or delimiters usage.
 
 The `FragmentDirectives` class supports the `TextDirective` and the `GenericDirective` classes. Both classes
-implement the following `Directive` interface.
+implement the following `FragmentDirective` interface.
 
 ```php
-Directive::name(): string
-Directive::value(): ?string
-Directive::equals(mixed $value): ?string
-Directive::toString(): string
-Directive::__toString(): string
+FragmentDirective::name(): string
+FragmentDirective::value(): ?string
+FragmentDirective::equals(mixed $value): ?string
+FragmentDirective::toString(): string
+FragmentDirective::__toString(): string
 ```
 
 A directive is composed of two parts separated by the `=` separator. The name is required as it

@@ -11,14 +11,14 @@
 
 declare(strict_types=1);
 
-namespace League\Uri\Components\FragmentDirectives;
+namespace League\Uri\Contracts;
 
 use Stringable;
 
 /**
  * @see https://wicg.github.io/scroll-to-text-fragment/#the-fragment-directive
  */
-interface Directive extends Stringable
+interface FragmentDirective extends Stringable
 {
     /**
      * The decoded Directive name.
@@ -41,7 +41,7 @@ interface Directive extends Stringable
      * The encoded string representation of the fragment using
      * the Stringable interface.
      *
-     * @see Directive::toString()
+     * @see FragmentDirective::toString()
      */
     public function __toString(): string;
 
