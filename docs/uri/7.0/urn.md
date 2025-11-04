@@ -37,7 +37,7 @@ The `fromRfc2141()` named constructor allows creating URNs using the legacy [RFC
 While all the previous methods would throw a `SyntaxError` on malformed URN, the `parse()` method returns `null`
 to enable using the method during input validation.
 
-## URN string representation
+## URN String Representation
 
 The `Urn` class handles URI according to RFC8141, as such you can retrieve its string representation using
 the `toString` method. the `__toString()` method is an alias of the `toString()` method.
@@ -55,11 +55,10 @@ An `Urn` instance can be JSON-encoded using its string representation to allow b
 $urn = Urn::fromString('urn:example:animal:nose?+foo=bar&fo%26o=b%3Far');
 json_encode($urn); //returns "urn:example:animal:nose?+foo=bar&fo%26o=b%3Far"
 ```
-
-The `toDisplayString` returns a human-readable representation of the URI, which represents its IRI 
-representation as defined by RFC3987. The returned value may represent an invalid URN but can be
-used to display the URN to the client, for instance, as the content of the `href` attribute
-used for the `a` HTML tag.
+The `toDisplayString()` method returns a human-readable representation of the URI,
+corresponding to its IRI form as defined in RFC 3987. Although the resulting
+value may not constitute a syntactically valid URN, it is intended for
+presentation purposes — for example, as the textual content of an HTML `<a>` element.
 
 ```php
 $urn = Urn::fromString('urn:example:%F0%9F%98%88');
