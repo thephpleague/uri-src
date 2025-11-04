@@ -6,6 +6,8 @@ title: URN
 URN Value Object
 =======
 
+<p class="message-notice">Available since version <code>7.6.0</code></p>
+
 The `League\Uri\Urn` is a specific class developped around URN creation and manipulation
 as defined in [RFC8141](https://datatracker.ietf.org/doc/html/rfc8141).
 
