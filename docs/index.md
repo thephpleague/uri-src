@@ -49,8 +49,9 @@ The URI manipulation package
 
 - URI object with complete validation
 - Resolves and Relativizes URIs
-- Expands URI Templates
+- Expand URI Templates
 - PSR-7 and PSR-17 URI adapters
+- Specific URN object
 
 ### [URI-COMPONENTS](/uri-components/7.0/)
 

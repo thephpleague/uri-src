@@ -3,7 +3,7 @@ layout: default
 title: URI partial modifiers
 ---
 
-URI Modifiers
+Universal URI Modifier
 =======
 
 In some cases, you may not need to modify an entire URI, but only a specific portion of one of its components.

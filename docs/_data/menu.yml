@@ -115,9 +115,10 @@ packages:
             Documentation:
                 Getting Started: '/uri/7.0/'
                 URI Object: '/uri/7.0/rfc3986/'
+                URN Object: '/uri/7.0/urn/'
                 URI Template: '/uri/7.0/uri-template/'
-                URI Manipulation: '/uri/7.0/base-uri/'
                 PSR Compliance: '/uri/7.0/psr-compliance/'
+                URI Manipulation (Deprecated): '/uri/7.0/base-uri/'
                 From 6.x to 7.x: '/uri/7.0/upgrading/'
         '6.0':
             Documentation:

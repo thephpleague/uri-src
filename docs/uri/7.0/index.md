@@ -14,13 +14,14 @@ Overview
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)<br>
 [![Total Downloads](https://img.shields.io/packagist/dt/league/uri.svg?style=flat-square)](https://packagist.org/packages/league/uri)
 
-This package contains features and capabilities to ease manipulating URIs.
+`league\uri` offers a clear and consistent API for building, parsing, and modifying URIs.
+It includes classes for [URI](/uri/7.0/rfc3986/), [URN](/uri/7.0/urn/) and [UriTemplate](/uri/7.0/uri-template) handling:
 
-`league\uri` allows straightforward URI manipulation and exposes a complete API around
-URI creation and modification using the [UriTemplate](/uri/7.0/uri-template) and the [URI](/uri/7.0/rfc3986/) class.
-The latter represents a generic RFC3986 compliant URI object with support for RFC3987 IDN host.
+- The **Uri class** is fully RFC 3986–compliant with RFC 3987 IDN support and scheme validation.
+- The **Urn class** implements RFC 8141 for managing Uniform Resource Names.
+- The **UriTemplate class** implements RFC 6570 for expanding and resolving URI templates.
 
-For interoperability, the package also provide [PSR-7 and PSR-17](/uri/7.0/psr-compliance/) compliant implementations
+For interoperability, the package also provides [PSR-7 and PSR-17](/uri/7.0/psr-compliance/) compliant implementations
 around URI access and creation. 
 
 System Requirements
