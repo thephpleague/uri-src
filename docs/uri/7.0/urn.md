@@ -81,9 +81,11 @@ It is possible to convert your `League\Uri\Urn` instance into a `League\Uri\Uri`
 `toUri()` method. The method returns a `League\Uri\Uri` instance.
 
 ```php
+use Uri\UriComparisonMode;
+
 $urn = Urn::fromString('urn:example:animal:nose?+foo=bar&fo%26o=b%3Far');
 $uri = $urn->toUri(); // returns a League\Uri\Uri instance
-$uri->equals($urn);   // returns true
+$uri->equals($urn, UriComparisonMode::IncludeFragment);   // returns true
 ```
 
 <p class="message-warning">There is no <code>Uri::toUrn()</code> method attached to the <code>League\Uri\Uri</code>
@@ -187,3 +189,20 @@ $urn->equals($urnBis, UrnComparisonMode::IncludeComponents); // returns false
 
 <p class="message-info">By default, if no <code>UrnComparisonMode</code> is used, optional components are
 not taken into account during comparison.</p>
+
+<p class="message-warning"> The <code>Urn::equals()</code> method applies URN-specific
+comparison rules that differ from those of <code>Uri::equals()</code>. Consequently,
+two values may be considered equal when compared as URNs but not as URIs.</p>
+
+```php
+use League\Uri\Urn;
+
+$urn = Urn::fromRfc2141('ExamPLe', 'animal:Nose');
+$urnBis = Urn::fromRfc2141('example', 'animal:Nose');
+$uri =  $urn->toUri();
+
+$urn->equals($uri);     // returns true comparing using URN rules
+$urn->equals($urnBis);  // returns true comparing using URN rules
+$uri->equals($urn);     // return true comparing using URI rules
+$uri->equals($urnBis);  // returns false comparing using URI rules
+```
