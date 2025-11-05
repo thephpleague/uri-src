@@ -192,8 +192,8 @@ The class exposes static methods to validate that a string:
 
 - represents a valid scheme with the `isValidScheme()` method
 - represents a valid host according to RFC3986/RFC3987 with the `isValidHost()` method
-- contains RFC3986 characters only with the `containsValidRfc3986Characters()` method
-- contains RFC3987 characters only with the `containsValidRfc3987Characters()` method
+- only contains valid RFC3986 characters with the `containsRfc3986Chars()` method
+- only contains valid RFC3987 characters with the `containsRfc3987Chars()` method
 
 ~~~php
 <?php
@@ -202,6 +202,6 @@ use League\Uri\Uri;use League\Uri\UriString;
 
 UriString::isValidScheme('foo '); //returns false because of the trailing space
 UriString::isValidHost('333.333.333.1.333'); //returns true
-UriString::containsValidRfc3986Characters('http://bébé.be'); //returns false non-ascii character are not allowed
-UriString::containsValidRfc3987Characters('http://bébé.be'); //returns true
+UriString::containsRfc3986Chars('http://bébé.be'); //returns false non-ascii character are not allowed
+UriString::containsRfc3987Chars('http://bébé.be'); //returns true
 ~~~
