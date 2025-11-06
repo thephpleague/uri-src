@@ -9,7 +9,7 @@ URI Template
 The `League\Uri\UriTemplate` class enables expanding a URI object based on a URI template and its 
 submitted parameters following [RFC 6570 URI Template](http://tools.ietf.org/html/rfc6570).
 
-## Template expansion
+## Template Expansion
 
 The `UriTemplate::expand` public method expands a URI template to generate a valid URI conforming
 to RFC3986.
@@ -54,16 +54,16 @@ $whatWgUrl = $uriTemplate->expandToPsr7Uri($params, 'https://example.com');  // 
 echo $uri; //display https://example.com/hotels/Rest%20%26%20Relax/bookings/42"
 ~~~
 
-## Template variables
+## Template Variables
 
 <p class="message-notice">For maximum interoperability you should make sure your variables are 
 strings or stringable objects otherwise the value will be cast to string following PHP rules 
 except for boolean values <code>true</code> and <code>false</code> which will be converted 
 to <code>1</code> and <code>0</code> respectively.</p>
 
-### Default variables can be set using the constructor
+### Default Variables
 
-The constructor takes a optional set of default variables that can be applied by default when
+The constructor takes an optional set of default variables that can be applied by default when
 expanding the URI template.
 
 ~~~php
@@ -80,7 +80,7 @@ echo $uriTemplate->expand($params);
 //displays https://api.twitter.com/1.1/search/j/john/?q=a&q=b&limit=10
 ~~~
 
-### Applying variables with the expand method
+### Runtime Variables
 
 The default variables are overwritten by those supplied to the `expand` method.
 
@@ -148,7 +148,7 @@ $uri::class; // returns 'Laminas\Diactoros\Uri'
 
 By default, if no factory is provided, the returned PSR-7 `UriInterface` object is a `League\Uri\Http` instance.
 
-### Updating the default variables
+### Updating the Default Variables
 
 At any given time you may update your default variables but since the `UriTemplate`
 is an immutable object instead of modifying the current instance, a new
@@ -190,9 +190,9 @@ $uriTemplate->expand($params);
 // will throw a League\Uri\UriTemplate\TemplateCanNotBeExpanded when trying to expand the `period` value.
 ~~~
 
-### Using the prefix modifier on a list will trigger an exception.
+### Prefix Modifier Limitations
 
-While this is not forbidden by the RFC, the `UriTemplate` class will throw an exception 
+While the RFC does not forbid this, the `UriTemplate` class will throw an exception 
 if an attempt is made to use the prefix modifier with a list of value. Other 
 implementations will silently ignore the modifier **but** this package will
 trigger the exception to alert the user that something might be wrong and 
@@ -213,7 +213,7 @@ echo $uriTemplate->expand($params), PHP_EOL;
 // throw a League\Uri\UriTemplate\TemplateCanNotBeExpanded because the term variable is a list and not a string.
 ~~~
 
-### Strict expansion with expandOrFail
+### Strict Expansion
 
 By default, if variables are missing or are not provided an empty string is used as replacement
 string as per the RFC. If you want to force correct expansion you can use the `expandOrFail` 
@@ -243,7 +243,7 @@ version <code>7.6.0</code></p>
 
 ## Expressions
 
-### Using braces in your template
+### Braces Usage
 
 The following implementation disallows the use of braces `{` or  `}` outside of being URI
 template expression delimiters. If not used as the boundary of an expression an

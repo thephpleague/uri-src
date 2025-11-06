@@ -39,7 +39,7 @@ The `fromRfc2141()` named constructor allows creating URNs using the legacy [RFC
 While all the previous methods would throw a `SyntaxError` on malformed URN, the `parse()` method returns `null`
 to enable using the method during input validation.
 
-## URN String Representation
+## String Representations
 
 The `Urn` class handles URI according to RFC8141, as such you can retrieve its string representation using
 the `toString` method. the `__toString()` method is an alias of the `toString()` method.
@@ -91,7 +91,7 @@ $uri->equals($urn, UriComparisonMode::IncludeFragment);   // returns true
 <p class="message-warning">There is no <code>Uri::toUrn()</code> method attached to the <code>League\Uri\Uri</code>
 class because every URN is an URI but not all URIs are URNs.</p>
 
-## Accessing The URN properties
+## Accessing Properties
 
 Let’s examine the result of building an URN:
 
@@ -107,7 +107,7 @@ echo $urn->getFComponent(); // displays 'section2'
 ```
 <p class="message-notice">The returned value of each component is kept encoded.</p>
 
-### URN information
+## URN Information
 
 The `components` related properties `r-component`, `q-component` and `f-component` are optional, as such,
 they can be `null` if they have no value or be a non-empty string. They can never be the empty string.
@@ -154,7 +154,7 @@ The following modifier methods exist:
 <p class="message-notice">To remove any of the component you can give to their respective wither methods
 the <code>null</code> value. It will remove any non empty-string attached to the component if it exists.</p>
 
-## Normalization and Comparison
+## Normalization
 
 Out-of-the-box, the only normalization that will occur it that the scheme will be lowercased to `urn`. But
 you can improve normalization by lowercasing the URN NIS part. This is done if you call the `normalize()` method.
@@ -171,6 +171,8 @@ echo $newUrn; //returns "urn:example:Animal:NOSE"
 ```
 
 <p class="message-info">The NSS and the optional components are not affected by the normalization.</p>
+
+## Equivalence
 
 By default, when comparing two URN only the NIS and the NSS parts are considered as per the requirements of
 the RFC. However, depending on the specificity of some URN namespace, the optional component may be used. To
