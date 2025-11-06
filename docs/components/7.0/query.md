@@ -12,10 +12,7 @@ The library provides a `League\Uri\Components\Query` class to ease query string 
 
 <p class="message-warning">If the submitted value is not valid a <code>League\Uri\Exceptions\SyntaxError</code> exception is thrown.</p>
 
-## Standard instantiation
-
-### Using an RFC compliant algorithm
-
+## Instantiation
 
 ~~~php
 <?php
@@ -47,7 +44,7 @@ $query = Query::fromFormData('foo=bar&bar=baz+bar*', '&');
 $query->get('bar'); // returns 'baz bar*'
 ~~~
 
-### Query separator
+## Query separator
 
 The query separator is essential to query manipulation. The `Query` object provides two (2) simple methods to interact with its separator:
 
@@ -65,7 +62,7 @@ $newQuery = $query->withSeparator('|');
 $newQuery->__toString(); //return foo=bar|baz=toto
 ~~~
 
-## Component representations
+## Component Representations
 
 In addition to the common methods from the [package common API](/components/7.0/), the following methods are available.
 
@@ -109,7 +106,7 @@ If the query is undefined, this method returns `null`.
 
 <p class="message-info"><code>Query::jsonSerialize()</code> is an alias of <code>Query::toFormData()</code> to improve interoperability with JavaScript.</p>
 
-## Modifying the query
+## Modifying the Query
 
 ### Query::merge
 
@@ -171,7 +168,7 @@ $newQuery->__toString(); //return baz=toto&foo=bar&foo=toto
 
 <p class="message-notice">since version <code>7.3.0</code>, the sorting algorithm has been updated to match <a href="https://url.spec.whatwg.org/#dom-urlsearchparams-sort">WHATG group specification</a></p>
 
-## Using the Query as a PHP data transport layer
+## The Query as a PHP Data Transport Layer
 
 ~~~php
 public static Query::fromVariable($params, string $separator = '&'): self
@@ -186,7 +183,7 @@ public Query::withoutParameter(...string $offsets): self
 <code>Query::fromParameters</code> named constructor which was 
 not inconsistent against <code>http_build_query</code> algorithm.</p>
 
-### Using PHP data structure to instantiate a new Query object
+### Instantiate a new object
 
 Historically, the query string has been used as a data transport layer of PHP variables. The `fromParams` uses
 PHP own data structure to generate a query string *à la* `http_build_query`.
@@ -268,7 +265,7 @@ $query->parameters(); //return ['foo' => ['bar', 'baz']]
 $new_query->parameters(); //return ['foo' => ['bar', 'baz']]
 ~~~
 
-## Using the Query as a collection of query pairs
+## The Query as a collection of query pairs
 
 This class mainly represents the query string as a collection of key/value pairs.
 
@@ -305,8 +302,6 @@ Returns a new `Query` object from an `array` or a `Traversable` object.
 
 * `$pairs` : The submitted data must be an `array` or a `Traversable` key/value structure similar to the result of [Query::parse](#parsing-the-query-string-into-an-array).
 * `$separator` : The query string separator used for string representation, by default, equals to `&`;
-
-#### Examples
 
 ~~~php
 $query =  Query::fromPairs([

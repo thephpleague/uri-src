@@ -12,7 +12,7 @@ exposes basic properties and method to manipulate its different component.
 <p class="message-notice">If the modifications do not change the current object, it is returned as is, otherwise, a new modified object is returned.</p>
 <p class="message-warning">If the submitted value is not valid a <code>League\Uri\Exceptions\SyntaxError</code> exception is thrown.</p>
 
-## Creating a new object
+## Instantiation
 
 The `UserInfo` class comes with named constructors to ease instantiation. The following examples show
 how to instantiate the class:
@@ -39,7 +39,7 @@ UserInfo::fromComponents(
 <p class="message-notice">submitted string is normalized to be <code>RFC3986</code> compliant.</p>
 <p class="message-warning">If the submitted value is not valid a <code>League\Uri\Exceptions\SyntaxError</code> exception is thrown.</p>
 
-## Accessing User information content
+## Accessing Properties
 
 To access the user login and password information you need to call the respective `UserInfo::getUser`
 and `UserInfo::getPass` methods like shown below.
@@ -57,7 +57,7 @@ $info->components(); //returns array {"user" => "user", "pass" => "p@ss"}
 
 <p class="message-notice"><code>getUsername</code> and <code>getPassword</code> are added in version <code>7.5.0</code></p>
 
-## Modifying the user information
+## Modifying Properties
 
 <p class="message-notice">If the modifications do not change the current object, it is returned as is, otherwise, a new modified object is returned.</p>
 

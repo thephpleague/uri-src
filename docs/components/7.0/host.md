@@ -12,7 +12,7 @@ exposes basic properties and method to manipulate any type of host whether it is
 <p class="message-notice">If the modifications do not change the current object, it is returned as is, otherwise, a new modified object is returned.</p>
 <p class="message-warning">If the submitted value is not valid a <code>League\Uri\Exceptions\SyntaxError</code> exception is thrown.</p>
 
-## Host types
+## Host Types
 
 If you don't have an IP then you are dealing with a registered name. A registered name can be a [domain name](http://tools.ietf.org/html/rfc1034) subset
 if it follows [RFC1123](http://tools.ietf.org/html/rfc1123#section-2.1), but it is not a requirement as stated in [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.2.2)
@@ -38,7 +38,7 @@ $registeredName->isDomain();          //return false
 $registeredName->isIp();              //return false
 ~~~
 
-### Normalization
+## Normalization
 
 Whenever you create a new host your submitted data is normalized using non-destructive operations:
 
@@ -61,7 +61,7 @@ echo $host->toUnicode();  //displays bébé.be
 echo $host->toAscii();    //displays 'xn--bb-bjab.be'
 ~~~
 
-## Host as IP address
+## Host as IP Address
 
 ~~~php
 public static Host::fromIp(string $ip, string $version = ''): self
@@ -72,7 +72,7 @@ public Host::hasZoneIdentifier(): bool
 public Host::withoutZoneIdentifier(): self
 ~~~
 
-### Host::fromIp
+### Instantiation
 
 This method allows creating a Host object from an IP.
 
@@ -149,7 +149,7 @@ $domain->getIpVersion(); //return null
 
 ### Zone Identifier
 
-#### Detecting the presence of the Zone Identifier
+#### Detecting the Zone Identifier
 
 The object can also detect if the IPv6 has a zone identifier or not. This can be handy if you want to know if you need to remove it or not for security reason.
 
@@ -175,7 +175,7 @@ $newHost = $host->withoutZoneIdentifier();
 echo $newHost; //displays '[fe80::1]';
 ~~~
 
-### Getting the IP string representation
+### IP String Representation
 
 You can retrieve the IP string representation from the Host object using the `getIp` method. If the Host is not an IP `null` will be returned instead.
 

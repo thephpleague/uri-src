@@ -12,7 +12,7 @@ work with segments-type URI path components.
 <p class="message-notice">If the modifications do not change the current object, it is returned as is, otherwise, a new modified object is returned.</p>
 <p class="message-warning">When a modification fails a <code>League\Uri\Contracts\UriException</code> exception is thrown.</p>
 
-## Manipulating the path as a filesystem path
+## The Path as a Filesystem Path
 
 The `HierarchicalPath` allows you to access and manipulate the path as if it was a filesystem path.
 
@@ -33,13 +33,13 @@ echo $path->withBasename('paradise.html'); // display /path/to/the/paradise.html
 <p class="message-info"><code>getBasename</code> and <code>withBasename</code> do not alter or return the path parameters (the part after and including the <code>;</code>).</p>
 <p class="message-warning"><code>withExtension</code> will throw an <code>League\Uri\Components\Exception</code> exception if the extension contains the path delimiter.</p>
 
-## Manipulating the path as an ordered list of segments
+## The Path as an Ordered List of Segments
 
 A hierarchical path can be represented as an ordered list of segments.
 
 <p class="message-info">A path ending with a slash will have an empty string as the last member of its array representation.</p>
 
-### Instantiation using a collection of path segments.
+### Instantiation
 
 A path is a ordered list of segment delimited by the path delimiter `/`. So it is possible to 
 create a `HierarchicalPath` object using a collection of segments with two specific named constructors
@@ -75,7 +75,7 @@ foreach ($path as $offset => $segment) {
 [...HierarchicalPath::new('path/to/the/sky/')];  //return ['path', 'to', 'the', 'sky', ''];
 ~~~
 
-### Accessing the path segments and keys
+### Accessing the Segments
 
 Since we are manipulating the path as an ordered list we can use known methods to acces the path segments and keys 
 as with normal lists.
@@ -101,7 +101,7 @@ $path->get(-23, 'now'); //return 'now'
 <p class="message-notice">If the offset does not exist <code>get</code> will return <code>null</code>.</p>
 <p class="message-info"><code>get</code> supports negative offsets</p>
 
-### Append and prepend segments
+### Append and Prepend Segments
 
 To append segments to the current object you need to use the `HierarchicalPath::append` method. This method accept a single argument which represents the data to be appended:
 
@@ -114,7 +114,7 @@ HierarchicalPath::new()->append('path')->append('to/the/sky')->value();   //retu
 HierarchicalPath::new()->prepend('sky')->prepend('path/to/the')->value(); //return path/to/the/sky
 ~~~
 
-### Replace and Remove segments
+### Replace and Remove Segments
 
 To replace of remove segments, you must specify the offset on which to act upon.
 
@@ -135,7 +135,7 @@ HierarchicalPath::fromAbsolute('path','to', 'the', 'sky')->withoutSegment(0, 1)-
 <p class="message-info">Just like the <code>HierarchicalPath::get</code> this method supports negative offset.</p>
 <p class="message-notice">if the specified offset does not exist, no modification is performed and the current object is returned.</p>
 
-### Removing empty segments
+### Removing Empty Segments
 
 Sometimes your path may contain multiple adjacent delimiters. Since removing them may result in a semantically
 different URI, this normalization can not be applied by default. To remove adjacent delimiters you can call

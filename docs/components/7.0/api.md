@@ -109,23 +109,23 @@ Because each component modification is specific, there is no generic way of chan
 the component content. However, the package provides the following URI
 component objects with modifying capabilities.
 
-#### For Paths:
+#### Path Objects
 
 - [Path](/components/7.0/path/)
 - [DataPath](/components/7.0/path/data/)
 - [HierarchicalPath](/components/7.0/path/segmented/)
 
-#### For Hosts:
+#### Host Objects
 
 - [Host](/components/7.0/host/)
 - [Domain](/components/7.0/host/domain/)
 
-#### For Queries:
+#### Query Objects
 
 - [Query](/components/7.0/query/)
 - [URLSearchParams](/components/7.0/urlsearchparams/)
 
-#### For Fragments:
+#### Fragment Objects
 
 - [Fragment](/components/7.0/fragment/)
 - [FragmentDirectives](/components/7.0/fragment-directives/)

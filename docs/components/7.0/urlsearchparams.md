@@ -32,9 +32,7 @@ in the following aspects:
 <p class="message-notice">As per the specification, the class is mutable.</p>
 <p class="message-notice">As per the specification, encoding is done following the <code>application/x-www-form-urlencoded</code> rules</p> 
 
-## Usage
-
-### Instantiation
+## Instantiation
 
 To get a new instance, you can use the default constructor, which follows the specification
 or one of the more specialized named constructors to avoid subtle bugs described below:
@@ -84,7 +82,7 @@ echo (new URLSearchParams('?a=b'))->toString();
 [...(new URLSearchParams('%3Fa=b'))];  // returns [['?a', 'b']]
 `````
 
-### Accessing and manipulating the data
+## Accessing and manipulating the data
 
 While the class implements all the methods define in the RFC, the following methods are added to ease usage.
 

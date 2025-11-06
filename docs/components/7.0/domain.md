@@ -13,7 +13,7 @@ work with Domain name labels and logic.
 <p class="message-notice">If the modifications do not change the current object, it is returned as is, otherwise, a new modified object is returned.</p>
 <p class="message-warning">If the submitted value is not valid a <code>League\Uri\Exceptions\SyntaxError</code> exception is thrown.</p>
 
-## Partial or fully qualified domain name
+## Partial or Fully Qualified Domain Name
 
 A host is absolute or a fully qualified domain name (FQDN) if it contains a <strong>root label</strong>, its string
 representation ends with a `.`, otherwise it is known as being a relative or a partially qualified domain name (PQDN).
@@ -34,7 +34,7 @@ $pqdn = $fqdn->withoutRootLabel(); //display 'www.11.be'
 $pqdn->isAbsolute(); // return false
 ~~~
 
-## Manipulating the domain name as an ordered list of labels
+## The Domain Name as an Ordered List of Labels
 
 A domain is an ordered list of labels delimited by the host separator `.`. So it is possible to create a `Domain`
 object using a collection of labels with the `Domain::fromLabels` method.
@@ -63,7 +63,7 @@ foreach ($host as $offset => $label) {
 [...Domain::new('uri.thephpleague.com')];  //return ['com', 'thephpleague', 'uri'];
 ~~~
 
-### Accessing the host labels and keys
+### Accessing the Labels
 
 Since we are manipulating the domain name as an ordered list we can use known methods to access the labels and their keys
 as with normal lists.
@@ -84,17 +84,17 @@ $path->get(-23);        //return null
 <p class="message-notice">If the offset does not exist <code>get</code> will return <code>null</code>.</p>
 <p class="message-info"><code>get</code> supports negative offsets</p>
 
-### Appending and Prepending labels
+### Append and Prepend Labels
 
 You can append or prepend labels to the current instance using the `Domain::append` and/or the `Domain::prepend` methods.
-Both method accepts a single argument which represents the data to be appended or prepended.
+Both methods accept a single argument which represents the data to be appended or prepended.
 
 ~~~php
 echo Domain::new('toto')->append('example.com'); //return toto.example.com
 echo Domain::new('example.com')->prepend('toto'); //return toto.example.com
 ~~~
 
-#### Replacing and removing labels
+### Replace and Remove Labels
 
 Replacing or removing labels is done on the basis of the label offsets by using the `Domain::replaceLabel` and/or
 the `Domain::withoutLabels` methods.

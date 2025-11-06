@@ -11,6 +11,8 @@ submitted parameters following [RFC 6570 URI Template](http://tools.ietf.org/htm
 
 ## Template Expansion
 
+### RFC Expansion
+
 The `UriTemplate::expand` public method expands a URI template to generate a valid URI conforming
 to RFC3986.
 
@@ -53,6 +55,34 @@ $whatWgUrl = $uriTemplate->expandToPsr7Uri($params, 'https://example.com');  // 
 
 echo $uri; //display https://example.com/hotels/Rest%20%26%20Relax/bookings/42"
 ~~~
+
+### Strict Expansion
+
+By default, if variables are missing or are not provided an empty string is used as replacement
+string as per the RFC. If you want to force correct expansion you can use the `expandOrFail`
+method. It behaves exactly like the `expand` method but will additionnally throw an
+exception if there are missing required variables.
+
+~~~php
+$template = 'https://api.twitter.com/{version}/search/{term}/{?q*,limit}';
+
+$params = [
+    'term' => ['john', 'doe'],
+    'q' => ['a', 'b'],
+    'limit' => '10',
+];
+
+$uriTemplate = new UriTemplate($template);
+echo $uriTemplate->expand($params), PHP_EOL;
+// display https://api.twitter.com//search/john,doe/?q=a&q=b&limit=10 with missing version
+
+echo $uriTemplate->expandOrFail($params);
+// will throw a TemplateCanNotBeExpanded exception with the following message
+// Missing variables `version`
+~~~
+
+<p class="message-notice"><code>expandToUriOrFail()</code> and <code>expandToUrlOrFail()</code> are available since
+version <code>7.6.0</code></p>
 
 ## Template Variables
 
@@ -212,34 +242,6 @@ $uriTemplate = new UriTemplate($template);
 echo $uriTemplate->expand($params), PHP_EOL;
 // throw a League\Uri\UriTemplate\TemplateCanNotBeExpanded because the term variable is a list and not a string.
 ~~~
-
-### Strict Expansion
-
-By default, if variables are missing or are not provided an empty string is used as replacement
-string as per the RFC. If you want to force correct expansion you can use the `expandOrFail` 
-method. It behaves exactly like the `expand` method but will additionnally throw an
-exception if there are missing required variables.
-
-~~~php
-$template = 'https://api.twitter.com/{version}/search/{term}/{?q*,limit}';
-
-$params = [
-    'term' => ['john', 'doe'],
-    'q' => ['a', 'b'],
-    'limit' => '10',
-];
-
-$uriTemplate = new UriTemplate($template);
-echo $uriTemplate->expand($params), PHP_EOL;
-// display https://api.twitter.com//search/john,doe/?q=a&q=b&limit=10 with missing version
-
-echo $uriTemplate->expandOrFail($params);
-// will throw a TemplateCanNotBeExpanded exception with the following message
-// Missing variables `version`
-~~~
-
-<p class="message-notice"><code>expandToUriOrFail()</code> and <code>expandToUrlOrFail()</code> are available since
-version <code>7.6.0</code></p>
 
 ## Expressions
 

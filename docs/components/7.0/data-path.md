@@ -36,7 +36,7 @@ echo DataPath::fromFileContents('path/to/my/png/image.png');
 //where '...' represent the base64 representation of the file
 ~~~
 
-## Accessing the path properties
+## Accessing the Properties
 
 The DataPath class exposes the following specific methods:
 
@@ -60,13 +60,13 @@ $binaryPath = DataPath::fromFileContents('path/to/my/png/image.png');
 $binaryPath->isBinaryData(); //returns true
 ~~~
 
-## Modifying the path properties
+## Modifying the Properties
 
-### Update the Data URI parameters
+### Data URI Parameters Update
 
 Since we are dealing with a data and not just a URI, the only property that can be modified are its optional parameters.
 
-To set new parameters you should use the `withParameters` method:
+To set new parameters, you should use the `withParameters` method:
 
 ~~~php
 $path = DataPath::new('text/plain;charset=us-ascii,Hello%20World%21');
@@ -74,9 +74,9 @@ $newPath = $path->withParameters('charset=utf-8');
 echo $newPath; //returns 'text/plain;charset=utf-8,Hello%20World%21'
 ~~~
 
-<p class="message-notice">Of note the data should be urlencoded if needed.</p>
+<p class="message-notice">Of note, the data should be urlencoded if needed.</p>
 
-### Transcode the data between its binary and ascii representation
+### Binary and Ascii representation
 
 Another manipulation is to transcode the data from ASCII to is base64 encoded (or binary) version. If no conversion is possible the former object is returned otherwise a new valid data uri object is created.
 
@@ -89,7 +89,7 @@ $newPath->isBinaryData(); // return true;
 $newPath->toAscii()->toString() === $path->toString(); // return true;
 ~~~
 
-## Saving the data path
+## Saving the Data
 
 Since the path can be interpreted as a file, it is possible to save it to a specified path using the dedicated `save` method. This method accepts two parameters:
 
