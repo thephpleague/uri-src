@@ -37,15 +37,31 @@ echo $fragment->getUriComponent();
 ```
 As you can see with the example the `FragmentDirectives` acts as a container for distinct directives.
 
-Directives can be submitted as specialized `Directive` class or as simple **encoded** directive string.
-For ease of usage you can also create a new instance from a submitted URI:
+Directives can be provided either as a specialized`Directive` object or as simple **encoded** directive string.
+
+For convenience, a `FragmentDirectives` instance can be created using one of the named constructors:
+
+- `fromUri()` — creates an instance from a full URI.
+- `fromFragment()` — creates an instance from a fragment component.
+- `new()` — creates an instance from a raw string.
 
 ```php
 use League\Uri\Components\FragmentDirectives;
 
-$fragment = FragmentDirectives::fromUri('https://example.com#:~:text=Deprecated-,attributes,attribute&foo=bar&unknownDirective');
+$fragment = FragmentDirectives::fromUri('https://example.com#section2:~:text=Deprecated-,attributes,attribute&foo=bar&unknownDirective');
 count($fragment); //returns 3; the number of parsed directives.
 ```
+
+The `fromUri()` method extracts the fragment component from the given URI and initializes a new
+`FragmentDirectives` object.
+
+<p class="message-info">The fragment directive does not need to represent the entire fragment value.
+As shown in the example above, the directive’s delimiter (<code>:~:</code>) does not need to appear
+at the start of the fragment.</p> 
+
+Both `fromUri()` and `fromFragment()` allow the delimiter to appear anywhere in the input string.
+In contrast, the `new()` constructor expects a string **without any delimiter**; providing an
+invalid input will result in an exception.
 
 ### Component Accessor Methods
 
@@ -101,7 +117,7 @@ $newFragment = $fragment
 $fragment->equals($newFragment); //returns false
 ```
 
-## The supported Directives
+## The Supported Directives
 
 While the `FragmentDirectives` class allows submitting Directives as string, it is highly recommended to
 use a dedicated class to do so, as the grammar around building or parsing directives may be complex in
@@ -215,3 +231,18 @@ $directive1->equals($directive2);  // returns false
 $directive1->equals($directive3);  // returns true
 $directive1->equals('fo%26o=bar'); // returns true
 ```
+
+### Directive Resolver
+
+The `DirectivString` class ease resolving to the correct `Directive` object on
+creation.
+
+```php
+use League\Uri\Components\FragmentDirectives\DirectiveString;
+
+$directive = DirectiveString::resolve('fo%26o=bar'); // returns a GenericDirective instance
+$directive = DirectiveString::resolve('text=start,end'); // returns a TextDirective instance
+```
+
+If and when a new type of directives is created or added, the class will automatically
+use it once it is implemented.
