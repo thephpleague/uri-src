@@ -2,8 +2,8 @@
   let contentHeaders= document.querySelectorAll("main h2[id]");
   if (!document.querySelector('html').classList.contains('homepage')  && contentHeaders) {
     const headings = [...document.querySelector('article.content').querySelectorAll('h2, h3, h4, h5, h6')];
-    console.log(headings.length);
     if (headings.length > 0) {
+      // on page aside generation
       const aside = document.createElement('aside');
       const tocParent = document.createElement('nav');
       aside.setAttribute("class", "sticky top-[4.5rem] h-[calc(100vh-4.5rem)] w-72 overflow-y-auto pr-8 text-sm xl:pr-16 self-start hidden lg:block");
@@ -18,7 +18,7 @@
       headings.forEach(h => {
         const level = parseInt(h.tagName.slice(1), 10);
 
-        // Going deeper (h2 -> h4)
+        // Going deeper
         while (level > currentLevel) {
           const newList = document.createElement('ul');
           newList.classList.add("pl-3", "mt-3", "space-y-2");
@@ -34,7 +34,7 @@
           currentLevel++;
         }
 
-        // Going shallower (h4 -> h2)
+        // Going shallower
         while (level < currentLevel) {
           currentList = currentList.parentElement.closest('ul');
           currentLevel--;
@@ -53,9 +53,7 @@
         a.classList.add("block", "hover:underline");
         li.appendChild(a);
         currentList.appendChild(li);
-
       });
-
 
       tocParent.append(tocParentTitle, toc);
       aside.append(tocParent);
@@ -63,6 +61,7 @@
     }
 
     const uri = new URL(location.href);
+    // adding a pointer for headers
     contentHeaders.forEach((header) => {
       uri.hash = header.id;
       let link = document.createElement("a");
@@ -74,6 +73,7 @@
     });
   }
 
+  // generate code snippet copy/paste
   let codeSnippet = document.querySelectorAll('.content .language-php.highlighter-rouge');
   codeSnippet.forEach((snippet) => {
     let notification = document.createElement("div");
@@ -110,6 +110,7 @@
     snippet.appendChild(link);
   });
 
+  //package menu dropdown
   const dropDownList = document.getElementById('packageDropdownList');
   const dropDownButton = document.getElementById('packageDropdown');
 
