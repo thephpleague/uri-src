@@ -328,6 +328,8 @@ to apply the following changes to the submitted URI.
   <li><a href="#modifierreplacefragmentdirective">replaceFragmentDirective</a></li>
   <li><a href="#modifierfilterfragmentdirectives">filterFragmentDirectives</a></li>
   <li><a href="#modifierslicefragmentdirectives">sliceFragmentDirectives</a></li>
+  <li><a href="#modifierstripfragmentdirectives">stripFragmentDirectives</a></li>
+  <li><a href="#modifierretainfragmentdirectives">retainFragmentDirectives</a></li>
 </ul>
 </div>
 <div>
@@ -707,7 +709,7 @@ Format the IP host:
 - it will compress the IP representation if the host is an IPv6 address
 - it will convert the host to its IPv4 decimal format if possible
 
-<p class="message-notice">available since version <code>7.6.0</code></p>
+<p class="message-notice">Available since version <code>7.6.0</code></p>
 
 ~~~php
 $uri = "https://0:0@0:0";
@@ -721,7 +723,7 @@ If the host is an IP address or a registrable domain that can be assimilated to
 an IPv4 address it will use the `Modifier::normalizeIp` method. Otherwise, it
 will try to convert the host into its ASCII format.
 
-<p class="message-notice">available since version <code>7.6.0</code></p>
+<p class="message-notice">Available since version <code>7.6.0</code></p>
 
 ~~~php
 $uri = "https://0:0@0:0";
@@ -1118,7 +1120,7 @@ echo Modifier::wrap("https://example.com/?kingkong=toto&foo=bar%20baz&kingkong=a
 
 ### Modifier::appendFragmentDirectives
 
-<p class="message-notice">available since version <code>7.6.0</code></p>
+<p class="message-notice">Available since version <code>7.6.0</code></p>
 
 Appends one or more directives to the current URI fragment.
 
@@ -1134,7 +1136,7 @@ echo Modifier::wrap($uri)
 
 ### Modifier::prependFragmentDirectives
 
-<p class="message-notice">available since version <code>7.6.0</code></p>
+<p class="message-notice">Available since version <code>7.6.0</code></p>
 
 Prepends one or more directives to the current URI fragment.
 
@@ -1152,7 +1154,7 @@ echo Modifier::wrap($uri)
 
 ### Modifier::replaceFragmentDirective
 
-<p class="message-notice">available since version <code>7.6.0</code></p>
+<p class="message-notice">Available since version <code>7.6.0</code></p>
 
 Replace a specific directive from the fragment.
 
@@ -1169,7 +1171,7 @@ echo Modifier::wrap($uri)
 
 ### Modifier::removeFragmentDirectives
 
-<p class="message-notice">available since version <code>7.6.0</code></p>
+<p class="message-notice">Available since version <code>7.6.0</code></p>
 
 Remove directives from the fragment using their offsets.
 
@@ -1186,7 +1188,7 @@ echo Modifier::wrap($uri)
 
 ### Modifier::sliceFragmentDirectives
 
-<p class="message-notice">available since version <code>7.6.0</code></p>
+<p class="message-notice">Available since version <code>7.6.0</code></p>
 
 Slice directives from the fragment using their offsets.
 
@@ -1203,7 +1205,7 @@ echo Modifier::wrap($uri)
 
 ### Modifier::filterFragmentDirectives
 
-<p class="message-notice">available since version <code>7.6.0</code></p>
+<p class="message-notice">Available since version <code>7.6.0</code></p>
 
 Remove directives from the fragment using a callback.
 
@@ -1218,11 +1220,45 @@ echo Modifier::wrap($uri)
 // display ":~:text=foo,bar&text=yes"
 ~~~
 
+### Modifier::stripFragmentDirectives
+
+<p class="message-notice">Available since version <code>7.6.0</code></p>
+
+Remove the fragment directives part of the fragment if it exists.
+
+~~~php
+use Uri\WhatWg\Url;
+
+$uri = new Url("http://www.example.com/path/to/the/sky/#section2:~:text=foo,bar&unknownDirective&text=yes");
+echo Modifier::wrap($uri)
+    ->stripFragmentDirectives()
+    ->unwrap()
+    ->getFragment();
+// display "section2"
+~~~
+
+### Modifier::retainFragmentDirectives
+
+<p class="message-notice">Available since version <code>7.6.0</code></p>
+
+Remove everything from the fragment excepts its fragment directives part if it exists.
+
+~~~php
+use Uri\WhatWg\Url;
+
+$uri = new Url("http://www.example.com/path/to/the/sky/#section2:~:text=foo,bar&unknownDirective&text=yes");
+echo Modifier::wrap($uri)
+    ->retainFragmentDirectives(fn ()
+    ->unwrap()
+    ->getFragment();
+// display ":~:text=foo,bar&text=yes"
+~~~
+
 ## Other available modifiers
 
 ### Modifier::withUserInfo
 
-<p class="message-notice">available since version <code>7.6.0</code></p>
+<p class="message-notice">Available since version <code>7.6.0</code></p>
 
 Allow modifying the user info component
 
@@ -1241,7 +1277,7 @@ echo Modifier::wrap($uri)
 
 ### Modifier::withScheme
 
-<p class="message-notice">available since version <code>7.6.0</code></p>
+<p class="message-notice">Available since version <code>7.6.0</code></p>
 
 Allow modifying the URI scheme
 
@@ -1259,7 +1295,7 @@ The stored scheme value will depend on the underlying URI object.
 
 ### Modifier::withPort
 
-<p class="message-notice">available since version <code>7.6.0</code></p>
+<p class="message-notice">Available since version <code>7.6.0</code></p>
 
 Allow modifying the URI port. Added for completeness. This
 method works the same across all the URI objects, but may throw
