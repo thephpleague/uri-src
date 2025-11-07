@@ -63,7 +63,7 @@ Both `fromUri()` and `fromFragment()` allow the delimiter to appear anywhere in 
 In contrast, the `new()` constructor expects a string **without any delimiter**; providing an
 invalid input will result in an exception.
 
-### Component Accessor Methods
+### Accessing Properties
 
 You can use the following methods to navigate around the `Directives` container:
 
@@ -92,7 +92,7 @@ foreach ($fragment as $directive) {
 }
 ```
 
-### Component Manipulation Methods
+### Modifying Properties
 
 The `FragmentDirectives` allows you to manipulate its content using the following methods:
 
@@ -209,7 +209,7 @@ $directive->name();  //returns "fo&o"
 
 It's use case is to handle all the other `Directives` as long as they don't have their own specific syntax.
 
-### Directive equality
+### Directive equivalence
 
 The `equals()` method compares two directives based on their string representations.
 It returns `true` if both representations are identical, and `false` otherwise.

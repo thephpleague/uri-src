@@ -178,7 +178,7 @@ $uri::class; // returns 'Laminas\Diactoros\Uri'
 
 By default, if no factory is provided, the returned PSR-7 `UriInterface` object is a `League\Uri\Http` instance.
 
-### Updating the Default Variables
+### Updating Variables
 
 At any given time you may update your default variables but since the `UriTemplate`
 is an immutable object instead of modifying the current instance, a new
@@ -220,7 +220,9 @@ $uriTemplate->expand($params);
 // will throw a League\Uri\UriTemplate\TemplateCanNotBeExpanded when trying to expand the `period` value.
 ~~~
 
-### Prefix Modifier Limitations
+## Limitations
+
+### Prefix Modifier
 
 While the RFC does not forbid this, the `UriTemplate` class will throw an exception 
 if an attempt is made to use the prefix modifier with a list of value. Other 
@@ -242,8 +244,6 @@ $uriTemplate = new UriTemplate($template);
 echo $uriTemplate->expand($params), PHP_EOL;
 // throw a League\Uri\UriTemplate\TemplateCanNotBeExpanded because the term variable is a list and not a string.
 ~~~
-
-## Expressions
 
 ### Braces Usage
 

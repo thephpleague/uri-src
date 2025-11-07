@@ -149,7 +149,7 @@ $domain->getIpVersion(); //return null
 
 ### Zone Identifier
 
-#### Detecting the Zone Identifier
+#### Detection
 
 The object can also detect if the IPv6 has a zone identifier or not. This can be handy if you want to know if you need to remove it or not for security reason.
 
@@ -161,7 +161,7 @@ $ipv4 = Host::new('127.0.0.1');
 $ipv4->hasZoneIdentifier(); //return false
 ~~~
 
-#### Removing the Zone Identifier
+#### Removal
 
 According to [RFC6874](http://tools.ietf.org/html/rfc6874#section-4):
 
@@ -175,7 +175,7 @@ $newHost = $host->withoutZoneIdentifier();
 echo $newHost; //displays '[fe80::1]';
 ~~~
 
-### IP String Representation
+#### String Representation
 
 You can retrieve the IP string representation from the Host object using the `getIp` method. If the Host is not an IP `null` will be returned instead.
 

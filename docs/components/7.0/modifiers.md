@@ -6,6 +6,10 @@ title: URI partial modifiers
 Universal URI Modifier
 =======
 
+## Universal Modifier
+
+### Why it exists ?
+
 In some cases, you may not need to modify an entire URI, but only a specific portion of one of its components.
 In PHP, performing such partial updates can quickly become complex and error-prone. For example,
 the following illustrates how to update the query string of an existing URI object:
@@ -44,7 +48,6 @@ $queryToMerge = 'fo.o=bar&taz=';
 
 echo Modifier::wrap($uriString)
     ->mergeQuery($queryToMerge)
-    ->unwrap()
     ->toString();
 // display http://www.example.com?fo.o=bar&taz=#~typo
 ~~~
@@ -55,9 +58,68 @@ In addition to merging the query, `mergeQuery` has:
 - not mangle your data during merging;
 - returned a valid URI object;
 
-Since the `Modifier` class is immutable and each modification method returns
-a new instance, you can seamlessly chain multiple calls together,
-resulting in cleaner and more expressive code.
+### Supported URI Objects
+
+The `Modifier::wrap` method is the entry point from which the submitted URI will be processed.
+The method accepts any `Stringable` URI object as well as PHP new URI extension.
+
+<p class="message-notice"><code>Modifier::from</code> is deprecated since version <code>7.6.0</code></p>
+
+<p class="message-warning">While the class does manipulate URIs it does not implement any URI related interface.</p>
+<p class="message-notice">If an <code>Uri</code> instance is given, then the returned object will also be of the same type.</p>
+
+The `Modifier` can return different URI results depending on the context and your usage.
+
+The `Modifier::unwrap` method returns a League URI `Uri` instance unless you instantiated the modifier
+with a supported Uri object in which case an instance of the same URI class is returned.
+
+```php
+use GuzzleHttp\Psr7\Utils;
+use League\Uri\Modifier;
+use Uri\Rfc3986\Uri;
+
+Modifier::wrap('https://example,com')->unwrap(); // returns a League\Uri\Uri object
+Modifier::wrap(Uri::parse('https://example,com'))->unwrap(); //returns a Uri\Rfc3986\Uri object
+Modifier::wrap(Utils::uriFor('https://example,com'))->unwrap(); // returns a GuzzleHttp\Psr7\Uri object
+```
+
+This ensures that throughout all modifications after using `unwrap` the developer gets a URI object
+with the same instance as the one that was provided to the `wrap` method.
+
+### String Representations
+
+If you are not interested in the returned URI but only on its underlying string representation, you can instead use
+the following methods:
+
+- `Modifier::toString` : returns the URI object underlying string representation. 
+- `Modifier::toDisplayString` : returns an RFC3987 like string representation (this **MAY** not be a valid URL as all the components are decoded)
+- `Modifier::toMarkdownAnchor` : returns a Markdown representation of the URI, you can optionally set the anchor text.
+- `Modifier::toHtmlAnchor` : returns a HTML anchor tag `<a>` pre-filled with its `href` pre-filled; you can optionally set the anchor text and attributes.
+
+The result of `Modifier::toString` is the representation used by the `Stringable` and the `JsonSerializable` interface to improve interoperability.
+
+```php
+use GuzzleHttp\Psr7\Utils;
+
+$uri = Modifier::wrap(Utils::uriFor('https://bébé.be?foo[]=bar'))->prependLabel('shop');
+$uri->unwrap()::class;        // returns 'GuzzleHttp\Psr7\Uri'
+$uri->unwrap()->__toString(); // returns 'https://shop.bébé.be?foo%5B%5D=bar'
+$uri->toString();          // returns 'https://shop.bébé.be?foo%5B%5D=bar'
+$uri->toDisplayString();   // returns 'https://shop.bébé.be?foo[]=bar'
+$uri->toMarkdownAnchor('My Shop'); // returns [My Shop](https://shop.bébé.be?foo%5B%5D=bar)
+$uri->toHtmlAnchor('My Shop', ['class' => ['text-center', 'text-6xl']]);
+// returns <a href="https://shop.b%C3%A9b%C3%A9.be?foo%5B%5D=bar" class="text-center text-6xl">My Shop</a>
+```
+
+<p class="message-info">The <code>toDisplayString()</code>, <code>toMarkdownAnchor()</code> and <code>toHtmlAnchor()</code> methods are available since version <code>7.6.0</code>.</p>
+<p class="message-notice">The <code>getUri()</code>, <code>getUriString()</code> and <code>getIdnUriString()</code> methods are deprecated since version <code>7.6.0</code>.</p>
+<p class="message-notice">The static method <code>from()</code> is deprecated since version <code>7.6.0</code> and replaced by the static method <code>wrap()</code>.</p>
+
+### Chaining Modifications
+
+The `Modifier` class is immutable, and each modification method returns
+a new `Modifier` instance. This means you can seamlessly chain multiple
+calls together, resulting in cleaner and more expressive code.
 
 ~~~php
 <?php
@@ -78,67 +140,7 @@ echo $uri->toAsciiString(), PHP_EOL;
 // displays "https://africanpoems.net/epic/the-book-of-mwana-kupona/#:~:text=Negema%20wangu%20binti,neno%20lema%20kukwambia."
 ~~~
 
-The `Modifier::wrao` method is the entry point from which the submitted URI will be processed. the method 
-accepts any `Stringable` URI object as well as PHP new URI extension from PHP8.5 as well as its polyfill.
-
-<p class="message-notice"><code>Modifier::from</code> ia deprecated since version <code>7.6.0</code></p>
-
-
-### Returned URI Object and String Representations
-
-<p class="message-warning">While the class does manipulate URIs it does not implement any URI related interface.</p>
-<p class="message-notice">If an <code>Uri</code> instance is given, then the returned object will also be of the same type.</p>
-
-The `Modifier` can return different URI results depending on the context and your usage.
-
-The `Modifier::unwrap` method returns a League URI `Uri` instance unless you instantiated the modifier
-with a supported Uri object in which case an instance of the same URI class is returned. If you
-are not interested in the returned URI but only on its underlying string representation, you can instead use
-the following methods:
-
-- `Modifier::toString` : returns the URI object underlying string representation. 
-- `Modifier::toDisplayString` : returns an RFC3987 like string representation (this **MAY** not be a valid URL as all the components are decoded)
-- `Modifier::toMarkdownAnchor` : returns a Markdown representation of the URI, you can optionally set the anchor text.
-- `Modifier::toHtmlAnchor` : returns a HTML anchor tag `<a>` pre-filled with its `href` pre-filled; you can optionally set the anchor text and attributes.
-
-The result of `Modifier::toString` is the representation used by the `Stringable` and the `JsonSerializable` interface to improve interoperability.
-
-The `Modifier::toDisplayString` method returns a RFC3987 like string representation which is more suited for
-displaying the URI and should not be used to interact with an API as the produced URI may not be URI compliant
-at all.
-
-```php
-use GuzzleHttp\Psr7\Utils;
-
-$uri = Modifier::wrap(Utils::uriFor('https://bébé.be?foo[]=bar'))->prependLabel('shop');
-$uri->unwrap()::class;        // returns 'GuzzleHttp\Psr7\Uri'
-$uri->unwrap()->__toString(); // returns 'https://shop.bébé.be?foo%5B%5D=bar'
-$uri->toString();          // returns 'https://shop.bébé.be?foo%5B%5D=bar'
-$uri->toDisplayString();   // returns 'https://shop.bébé.be?foo[]=bar'
-$uri->toMarkdownAnchor('My Shop'); // returns [My Shop](https://shop.bébé.be?foo%5B%5D=bar)
-$uri->toHtmlAnchor('My Shop', ['class' => ['text-center', 'text-6xl']]);
-// returns <a href="https://shop.b%C3%A9b%C3%A9.be?foo%5B%5D=bar" class="text-center text-6xl">My Shop</a>
-```
-
-<p class="message-info">The <code>toDisplayString()</code>, <code>toMarkdownAnchor()</code> and <code>toHtmlAnchor()</code> methods are available since version <code>7.6.0</code>.</p>
-<p class="message-notice">The <code>getUri()</code>, <code>getUriString()</code> and <code>getIdnUriString()</code> methods are deprecated since version <code>7.6.0</code>.</p>
-<p class="message-notice">The static method <code>from()</code> is deprecated since version <code>7.6.0</code> and replaced by the static method <code>wrap()</code>.</p>
-
-## General Modifiers
-
-<p class="message-notice">Available since version <code>7.6.0</code></p>
-
-With the addition of (2) two new native PHP URI representations, it can become complex to
-remember which URI method to use and which type of argument is expected. The `Modifier` can
-ease this by wrapping the underlying URI object is a common and predicable public API.
-
-Apart from partially modifying an URI component, since version `7.6.0`, you can directly:
-
-- completely change a URI component;
-- resolve URIs;
-- normalize URIs;
-
-### Complete URI Component Replacement
+### Context Aware Changes
 
 The `Modifier` class will perform some sanity checks and/or formatting before
 handing over the changed value to the underlying object to perform the action.
@@ -168,7 +170,7 @@ echo Modifier::wrap(new Uri('http://example.com/foo/bar'))
     ->withHost('bébé.be')
     ->unwrap()
     ->toString(), PHP_EOL;
-// the `uri()` methods returns a valid Uri\Rfc3986\Uri instance 
+// the `unwrap()` method returns a valid Uri\Rfc3986\Uri instance 
 // its `toString()` method returns http://xn--bb-bjab.be/foo/bar
 // the modifier has converted the host into its ascii representation
 // to avoid the exception to be thrown.
@@ -176,11 +178,13 @@ echo Modifier::wrap(new Uri('http://example.com/foo/bar'))
 
 ### URI Resolution
 
-Apart from modifying a URI component, the `Modifier` can also normalize or
-resolve URI. Resolving and Normalizing URI is supported by `League\Uri\Uri`,
-and PHP's native URI object **but** not by PSR-7 `UriInterface` and the
-public API diverge. using the `Modifier` class you get a single method for
-all the URI objects and add the missing support for any PSR-7 implementing class
+<p class="message-notice">Available since version <code>7.6.0</code></p>
+
+The `Modifier` can normalize or resolve URI. Resolving and Normalizing URI is 
+supported by `League\Uri\Uri`, and PHP's native URI object **but** not by PSR-7
+`UriInterface` and the public API diverge. Using the `Modifier` class you get
+a single method for all the URI objects and add the missing support for any
+PSR-7 implementing class.
 
 ```php
 use Uri\Whatwg\Url;
@@ -206,6 +210,8 @@ echo Modifier::wrap(Utils::uriFor('http://example.com/foo/bar'))
 ```
 
 ### URI Normalization
+
+<p class="message-notice">Available since version <code>7.6.0</code></p>
 
 RFC3986 and WHATWG URL specification both allow normalizing URIs. But both
 specifications do it in a different way and capacity. Normalization is
@@ -242,16 +248,14 @@ echo Modifier::wrap(Utils::uriFor($uriString))
 // returns 'http://example.com/foo/bar
 ```
 
-## Partial Modifiers
-
-### Available Modifiers
+## Available Modifiers
 
 Under the hood the `Modifier` class intensively uses the [URI components objects](/components/7.0/)
 to apply the following changes to the submitted URI.
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 <div>
-<h4>Query modifiers</h4>
+<p class="font-bold text-blue-700">Query modifiers</p>
 <ul>
   <li><a href="#modifierwithquery">withQuery</a></li>
   <li><a href="#modifierencodequery">encodeQuery</a></li>
@@ -268,7 +272,7 @@ to apply the following changes to the submitted URI.
 </ul>
 </div>
 <div>
-<h4>Host modifiers</h4>
+<p class="font-bold text-blue-700">Host modifiers</p>
 <ul>
   <li><a href="#modifierwithhost">withHost</a></li>
   <li><a href="#modifiernormalizehost">normalizeHost</a></li>
@@ -290,7 +294,7 @@ to apply the following changes to the submitted URI.
 </ul>
 </div>
 <div>
-<h4>Path modifiers</h4>
+<p class="font-bold text-blue-700">Path modifiers</p>
 <ul>
   <li><a href="#modifierwithpath">withPath</a></li>
   <li><a href="#modifierremovedotsegments">removeDotSegments</a></li>
@@ -315,7 +319,7 @@ to apply the following changes to the submitted URI.
 </ul>
 </div>
 <div>
-<h4>Fragment modifiers <span class="text-red-800 text-sm">since <code class="text-sm">7.6.0</code></span></h4>
+<p class="font-bold text-blue-700">Fragment modifiers</p>
 <ul>
   <li><a href="#modifierwithfragment">withFragment</a></li>
   <li><a href="#modifierappendfragmentdirectives">appendFragmentDirectives</a></li>
@@ -327,7 +331,7 @@ to apply the following changes to the submitted URI.
 </ul>
 </div>
 <div>
-<h4>Component modifiers <span class="text-red-800 text-sm">since <code class="text-sm">7.6.0</code></span></h4>
+<p class="font-bold text-blue-700">Component modifiers</p>
 <ul>
     <li><a href="#modifierwithscheme">withScheme</a></li>
     <li><a href="#modifierwithuserinfo">withUserInfo</a></li>

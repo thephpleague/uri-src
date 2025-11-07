@@ -213,9 +213,9 @@ their value once instantiated.
 + Fragment::new('header2')->getUriComponent(); // returns '#header2'
 ````
 
-To modify such component you are now required to create a new instance.
+To modify the component content, you are now required to create a new instance.
 
-### other notable changes
+### Other Notable Changes
 
 - Support for `__set_state` with no replacement;
 - Support for `float` type as possible argument for components;

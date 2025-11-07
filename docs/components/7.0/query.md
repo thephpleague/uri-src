@@ -62,11 +62,11 @@ $newQuery = $query->withSeparator('|');
 $newQuery->__toString(); //return foo=bar|baz=toto
 ~~~
 
-## Component Representations
+## String Representations
 
 In addition to the common methods from the [package common API](/components/7.0/), the following methods are available.
 
-### RFC3986 representation
+### RFC3986 Representation
 
 The `Query` object can return the query encoded using the [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) query component rules
 
@@ -80,7 +80,7 @@ If the query is undefined, this method returns `null`.
 
 <p class="message-info"><code>Query::toRFC3986()</code> is a alias of <code>Query::value()</code></p>
 
-### RFC1738 representation
+### RFC1738 Representation
 
 The `Query` object returns the query encoded using the [RFC1738](https://tools.ietf.org/html/rfc1738) query component rules
 
@@ -92,7 +92,7 @@ $query->jsonSerialize(); //returns 'foo=bar&bar=baz+bar'
 
 If the query is undefined, this method returns `null`.
 
-### FormData representation
+### FormData Representation
 
 The `Query` object returns the query encoded using the [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) query component rules
 

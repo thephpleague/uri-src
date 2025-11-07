@@ -9,7 +9,7 @@ Path Component
 The `Path` class represents a generic path component. Apart from the [package common API](/components/7.0/) the class
 exposes basic properties and method to manipulate any type of path.
 
-## Path Leading and Trailing Slash
+## Leading and Trailing Slash
 
 Most of the time, regardless of the type of Path, you will want to get information around the nature of your path. Is it
 absolute or relative? Does it expose a trailing slash or not ? To answer those questions and to manipulate its statuses

@@ -39,7 +39,7 @@ Authority::fromComponents(
 <p class="message-notice">if no string is given a instance is returns using the empty string.</p>
 <p class="message-warning">If you supply your own hash to <code>fromComponents</code>, you are responsible for providing well parsed components without their URI delimiters.</p>
 
-Accessing properties
+Accessing Properties
 -------
 
 You can access the authority string, its individual parts and components using their respective getter methods. This lead to the following result for a simple HTTP URI:
@@ -64,10 +64,10 @@ $authority->components();
 // }
 ~~~
 
-Modifying properties
+Modifying Properties
 -------
 
-To replace one of the URI component you can use the modifying methods exposed by all URI object. If the modifications do not alter the current object, it is returned as is, otherwise, a new modified object is returned.
+To replace one of the URI components, you can use the modifying methods exposed by all URI object. If the modifications do not alter the current object, it is returned as is, otherwise, a new modified object is returned.
 <p class="message-notice">Any modification method can trigger a <code>League\Uri\Contracts\UriException</code> exception if the resulting URI is not valid. Just like with the instantiation methods, validation is scheme dependant.</p>
 Since All URI object are immutable you can chain each modifying methods to simplify URI creation and/or modification.
 

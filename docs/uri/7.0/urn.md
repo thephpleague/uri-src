@@ -126,7 +126,7 @@ $urn->hasFComponent();        // returns false
 $urn->hasRComponent();        // returns true
 ```
 
-## Modifying URN Properties
+## Modifying Properties
 
 Use the modifying methods exposed by all URN instances to replace one of the URN part or component.
 If the modifications do not alter the current object, it is returned as is, otherwise,
@@ -152,7 +152,19 @@ The following modifier methods exist:
 
 <p class="message-info">All methods will correctly encode your input before updating the URN.</p>
 <p class="message-notice">To remove any of the component you can give to their respective wither methods
-the <code>null</code> value. It will remove any non empty-string attached to the component if it exists.</p>
+the <code>null</code> value. It will remove any non-empty string attached to the component if it exists.</p>
+
+To ease building or modifying the instance, the `when()` method is added to conditionally create your component.
+
+```php
+echo Urn::fromString('urn:example:animal:nose?+foo=bar')
+    ->when(
+        fn (Urn $urn): bool => $urn->getNid() === 'example',
+        fn (Urn $urn): Urn => $urn->withRComponent(null),
+    )
+    ->toString();
+// returns 'urn:example:animal:nose'
+```
 
 ## Normalization
 

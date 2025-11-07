@@ -36,7 +36,7 @@ echo DataPath::fromFileContents('path/to/my/png/image.png');
 //where '...' represent the base64 representation of the file
 ~~~
 
-## Accessing the Properties
+## Accessing Properties
 
 The DataPath class exposes the following specific methods:
 
@@ -60,9 +60,9 @@ $binaryPath = DataPath::fromFileContents('path/to/my/png/image.png');
 $binaryPath->isBinaryData(); //returns true
 ~~~
 
-## Modifying the Properties
+## Modifying Properties
 
-### Data URI Parameters Update
+### Parameters Update
 
 Since we are dealing with a data and not just a URI, the only property that can be modified are its optional parameters.
 
@@ -76,7 +76,7 @@ echo $newPath; //returns 'text/plain;charset=utf-8,Hello%20World%21'
 
 <p class="message-notice">Of note, the data should be urlencoded if needed.</p>
 
-### Binary and Ascii representation
+### Binary and Ascii Representation
 
 Another manipulation is to transcode the data from ASCII to is base64 encoded (or binary) version. If no conversion is possible the former object is returned otherwise a new valid data uri object is created.
 
