@@ -1,27 +1,24 @@
 (() => {
   let contentHeaders= document.querySelectorAll("main h2[id]");
   if (!document.querySelector('html').classList.contains('homepage')  && contentHeaders) {
-    const headings = [...document.querySelector('article.content').querySelectorAll('h2, h3, h4, h5, h6')];
+    const sections = document.querySelector('article.content').querySelectorAll('h2, h3, h4, h5, h6');
+    const headings = [...sections];
     if (headings.length > 0) {
       // on page aside generation
       const aside = document.createElement('aside');
+      aside.setAttribute('id', 'onthispage');
       const tocParent = document.createElement('nav');
-      aside.setAttribute("class", "sticky top-[4.5rem] h-[calc(100vh-4.5rem)] w-72 overflow-y-auto pr-8 text-sm xl:pr-16 self-start hidden lg:block");
       const tocParentTitle = document.createElement('h3');
-      tocParentTitle.textContent = 'On this page';
-      tocParentTitle.classList.add("font-semibold", "tracking-tight", "text-slate-900");
+      tocParentTitle.textContent = 'On This Page';
       const toc = document.createElement('ul');
-      toc.classList.add("pl-3", "mt-3", "space-y-2");
       let currentLevel = 1;
       let currentList = toc;
-
       headings.forEach(h => {
         const level = parseInt(h.tagName.slice(1), 10);
 
         // Going deeper
         while (level > currentLevel) {
           const newList = document.createElement('ul');
-          newList.classList.add("pl-3", "mt-3", "space-y-2");
 
           // If there is no lastElementChild, create a dummy parent <li>
           if (!currentList.lastElementChild) {
@@ -50,7 +47,6 @@
 
         a.href = `#${h.id}`;
         a.textContent = h.textContent;
-        a.classList.add("block", "hover:underline");
         li.appendChild(a);
         currentList.appendChild(li);
       });
@@ -71,6 +67,24 @@
       link.innerHTML = "&#182;";
       header.appendChild(link);
     });
+
+    const menuLinks = document.querySelectorAll('#onthispage a');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const id = entry.target.getAttribute("id");
+        const link = document.querySelector(`#onthispage a[href="#${id}"]`);
+
+        if (entry.isIntersecting) {
+          menuLinks.forEach(a => a.classList.remove("active"));
+          link.classList.add("active");
+        }
+      });
+    }, {
+      rootMargin: "-50% 0px -50% 0px", // trigger when the section is centered in viewport
+      threshold: 0
+    });
+
+    sections.forEach(section => observer.observe(section));
   }
 
   // generate code snippet copy/paste
