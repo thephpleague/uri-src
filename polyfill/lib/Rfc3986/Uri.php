@@ -15,6 +15,7 @@ namespace Uri\Rfc3986;
 
 use Exception;
 use League\Uri\Encoder;
+use League\Uri\Exceptions\SyntaxError;
 use League\Uri\UriString;
 use SensitiveParameter;
 use Uri\InvalidUriException;
@@ -154,9 +155,13 @@ if (PHP_VERSION_ID < 80500) {
          */
         private function withComponent(array $components): self
         {
-            return new self(UriString::build(
-                $this->prepareModification([...$this->rawComponents, ...$components])
-            ));
+            try {
+                $uri = UriString::build($this->prepareModification($components));
+            } catch (SyntaxError $exception) {
+                throw new InvalidUriException($exception->getMessage(), previous: $exception);
+            }
+
+            return new self($uri);
         }
 
         /**
@@ -164,28 +169,30 @@ if (PHP_VERSION_ID < 80500) {
          * exception to be thrown on an invalid path.
          * see https://github.com/php/php-src/issues/19897.
          *
-         * @param InputComponentMap $components
+         * @param InputComponentMap $newComponents
          *
          * @return InputComponentMap
          */
-        private function prepareModification(array $components): array
+        private function prepareModification(array $newComponents): array
         {
+            $components = [...$this->rawComponents, ...$newComponents];
             if (!isset($components['path']) || '' === $components['path']) {
                 return $components;
             }
 
             $path = $components['path'];
-            $isAbsolute = str_starts_with($path, '/');
             $authority = UriString::buildAuthority($components);
             if (null !== $authority) {
-                // If there is an authority, the path must start with a `/`
-                $components['path'] = $isAbsolute ? $path : '/'.$path;
+                if (null === UriString::buildAuthority($this->rawComponents)) {
+                    // If there is an authority, the path must start with a `/`
+                    $components['path'] = str_starts_with($path, '/') ? $path : '/'.$path;
+                }
 
                 return $components;
             }
 
             // If there is no authority, the path cannot start with `//`
-            if ($isAbsolute) {
+            if (str_starts_with($path, '//')) {
                 $components['path'] = '/.'.$path;
 
                 return $components;

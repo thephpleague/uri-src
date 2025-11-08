@@ -504,4 +504,51 @@ final class UriTest extends TestCase
         self::assertSame($input, $uri->toRawString());
         self::assertSame($normalized, $uri->toString());
     }
+
+    #[Test]
+    public function it_fails_modification_if_a_relative_path_is_given_to_an_uri_with_an_authority(): void
+    {
+        $uri = new Uri('scheme://host');
+        $this->expectException(InvalidUriException::class);
+
+        $uri->withPath('foo/bar');
+    }
+
+    #[Test]
+    public function it_does_not_guarantee_roundtripping_on_modification_part_1(): void
+    {
+        $uri1 = new Uri('path1');
+        $uri2 = $uri1->withHost('host');
+        $uri2 = $uri2->withHost(null);
+
+        self::assertSame('path1', $uri1->getRawPath());
+        self::assertSame('/path1', $uri2->getRawPath());
+        self::assertSame('/path1', $uri2->toRawString());
+        self::assertSame('/path1', $uri2->getPath());
+        self::assertSame('/path1', $uri2->toString());
+    }
+
+    #[Test]
+    public function it_does_not_guarantee_roundtripping_on_modification_part_2(): void
+    {
+        $uri1 = new Uri('scheme:path1:');
+        $uri2 = $uri1->withScheme(null);
+        $uri2 = $uri2->withScheme('scheme');
+
+        self::assertSame('scheme:path1:', $uri1->toRawString());
+        self::assertSame('scheme:./path1:', $uri2->toRawString());
+        self::assertSame('scheme:path1:', $uri2->toString());
+    }
+
+    #[Test]
+    public function it_does_not_guarantee_roundtripping_on_modification_part_3(): void
+    {
+        $uri1 = new Uri('//host//path');
+        $uri2 = $uri1->withHost(null);
+        $uri2 = $uri2->withHost('host');
+
+        self::assertSame('//host//path', $uri1->toRawString());
+        self::assertSame('//host/.//path', $uri2->toRawString());
+        self::assertSame('//host//path', $uri2->toString());
+    }
 }
