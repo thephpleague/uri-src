@@ -8,48 +8,42 @@ Universal URI Modifier
 
 ## Universal Modifier
 
-### Why it exists ?
+### Why does it exist?
 
-In some cases, you may not need to modify an entire URI, but only a specific portion of one of its components.
-In PHP, performing such partial updates can quickly become complex and error-prone. For example,
-the following illustrates how to update the query string of an existing URI object:
+Most of the time, you only want to change or modify a specific portion of a URI.
+In PHP, performing such partial updates can quickly become complex and error-prone.
+For example, the following illustrates how to update the query string of an
+existing URI object:
 
 ~~~php
-<?php
-
-use GuzzleHttp\Psr7\Uri;
-
 $uriString = "http://www.example.com?fo.o=toto#~typo";
 $queryToMerge = 'fo.o=bar&taz=';
+$uri = new GuzzleHttp\Psr7\Uri($uriString);
 
-$uri = new Uri($uriString);
 parse_str($uri->getQuery(), $params);
-parse_str($queryToMerge, $paramsToMerge);
 $query = http_build_query(
-    array_merge($params, $paramsToMerge),
-    '',
-    '&',
-    PHP_QUERY_RFC3986
+    data: array_merge($params, $paramsToMerge),
+    encoding_type: PHP_QUERY_RFC3986,
 );
-
 $newUri = $uri->withQuery($query);
+
+echo $newUri::class; // display GuzzleHttp\Psr7\Uri
 echo $newUri; // display http://www.example.com?fo_o=bar&taz=#~typo
 ~~~
 
 In contrast, using the provided `League\Uri\Modifier::mergeQuery` modifier the code becomes
 
 ~~~php
-<?php
-
-use League\Uri\Modifier;
-
 $uriString = "http://www.example.com?fo.o=toto#~typo";
 $queryToMerge = 'fo.o=bar&taz=';
+$uri = new GuzzleHttp\Psr7\Uri($uriString);
 
-echo Modifier::wrap($uriString)
+$newUri = League\Uri\Modifier::wrap($uri)
     ->mergeQuery($queryToMerge)
-    ->toString();
-// display http://www.example.com?fo.o=bar&taz=#~typo
+    ->unwrap();
+
+echo $newUri::class; // display GuzzleHttp\Psr7\Uri
+echo $newUri; // display http://www.example.com?fo.o=bar&taz=#~typo
 ~~~
 
 In addition to merging the query, `mergeQuery` has:
@@ -61,17 +55,22 @@ In addition to merging the query, `mergeQuery` has:
 ### Supported URI Objects
 
 The `Modifier::wrap` method is the entry point from which the submitted URI will be processed.
-The method accepts any `Stringable` URI object as well as PHP new URI extension.
+The method accepts:
+
+- `League\Uri\Uri` objects
+- `PSR-7` UriInterface implementing objects
+- PHP native URI objects
+- any `Stringable` object
+- a `string`
 
 <p class="message-notice"><code>Modifier::from</code> is deprecated since version <code>7.6.0</code></p>
+<p class="message-warning">While the class does manipulate URI, it does not implement any URI related getter methods.</p>
 
-<p class="message-warning">While the class does manipulate URIs it does not implement any URI related interface.</p>
-<p class="message-notice">If an <code>Uri</code> instance is given, then the returned object will also be of the same type.</p>
+The `Modifier::unwrap` returns a URI object, but its type depends on the value passed to `Modifier::wrap`.
 
-The `Modifier` can return different URI results depending on the context and your usage.
-
-The `Modifier::unwrap` method returns a League URI `Uri` instance unless you instantiated the modifier
-with a supported Uri object in which case an instance of the same URI class is returned.
+By default, it returns a League URI `Uri` instance unless you used
+a supported URI object with the `Modifier::wrap` method, in which case,
+an instance of that same URI class is returned.
 
 ```php
 use GuzzleHttp\Psr7\Utils;
@@ -94,18 +93,19 @@ the following methods:
 - `Modifier::toString` : returns the URI object underlying string representation. 
 - `Modifier::toDisplayString` : returns an RFC3987 like string representation (this **MAY** not be a valid URL as all the components are decoded)
 - `Modifier::toMarkdownAnchor` : returns a Markdown representation of the URI, you can optionally set the anchor text.
-- `Modifier::toHtmlAnchor` : returns a HTML anchor tag `<a>` pre-filled with its `href` pre-filled; you can optionally set the anchor text and attributes.
+- `Modifier::toHtmlAnchor` : returns an HTML anchor tag `<a>` with its `href` pre-filled; you can optionally set the anchor text and attributes.
 
 The result of `Modifier::toString` is the representation used by the `Stringable` and the `JsonSerializable` interface to improve interoperability.
 
 ```php
-use GuzzleHttp\Psr7\Utils;
+use League\Uri\Modifier;
+use Uri\Whatwg\Url;
 
-$uri = Modifier::wrap(Utils::uriFor('https://bébé.be?foo[]=bar'))->prependLabel('shop');
+$uri = Modifier::wrap(new Url('https://bébé.be?foo[]=bar'))->prependLabel('shop');
 $uri->unwrap()::class;        // returns 'GuzzleHttp\Psr7\Uri'
 $uri->unwrap()->__toString(); // returns 'https://shop.bébé.be?foo%5B%5D=bar'
-$uri->toString();          // returns 'https://shop.bébé.be?foo%5B%5D=bar'
-$uri->toDisplayString();   // returns 'https://shop.bébé.be?foo[]=bar'
+$uri->toString();             // returns 'https://shop.bébé.be?foo%5B%5D=bar'
+$uri->toDisplayString();      // returns 'https://shop.bébé.be?foo[]=bar'
 $uri->toMarkdownAnchor('My Shop'); // returns [My Shop](https://shop.bébé.be?foo%5B%5D=bar)
 $uri->toHtmlAnchor('My Shop', ['class' => ['text-center', 'text-6xl']]);
 // returns <a href="https://shop.b%C3%A9b%C3%A9.be?foo%5B%5D=bar" class="text-center text-6xl">My Shop</a>
