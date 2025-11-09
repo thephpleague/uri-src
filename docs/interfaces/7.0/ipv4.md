@@ -21,9 +21,6 @@ $convertedHost = $converter->toDecimal($host);
 echo $convertedHost; // returns '192.168.0.1'
 ```
 
-Usage
---------
-
 The `Converter::toDecimal` method tries to convert a host into a valid IPv4 decimal dot-notation
 representation based on the algorithm used by the [WHATWG rules](https://url.spec.whatwg.org/#concept-ipv4-parser).
 The method only parameter should represent a host value.

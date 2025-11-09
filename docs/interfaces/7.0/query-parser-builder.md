@@ -27,9 +27,9 @@ $str = QueryString::build($pairs, '|');
 // returns 'module=home|action=show|page=😓'
 ```
 
-## Parsing the URI query string
+## Query String Parsing
 
-To parse a query string you can use the ` QueryString::parse` method as shown below:
+To parse a query string use the ` QueryString::parse` method as shown below:
 
 ```php
 $pairs = QueryString::parse('module=home&action=show&page=😓');
@@ -40,16 +40,10 @@ $pairs = QueryString::parse('module=home&action=show&page=😓');
 // ];
 ```
 
-### Description
-
-```php
-<?php
-use League\Uri\KeyValuePair\Converter;
-
-public static function QueryString::parse($query, string $separator = '&', int $enc_type = PHP_QUERY_RFC3986): array;
-```
-
-The returned array is a collection of key/value pairs. Each pair is represented as an array where the first element is the pair key and the second element the pair value. While the pair key is always a string, the pair value can be a string or the `null` value.
+The returned array is a collection of key/value pairs. Each pair is represented
+as an array where the first element is the pair key and the second element the
+pair value. While the pair key is always a string, the pair value can be a
+string or the `null` value.
 
 The `QueryString::parse` method parameters are:
 
@@ -75,11 +69,12 @@ $pairs = QueryString::parse(
 // ];
 ```
 
-<p class="message-warning">The <code>$separator</code> argument can not be the empty string.</p>
+<p class="message-warning">The <code>$separator</code> argument cannot be the empty string.</p>
 
-## Building the URI query string
+## Query String Building
 
-To convert back the collection of key/value pairs into a valid query string or the `null` value you can use the static public `QueryString::build` method.
+To convert back the collection of key/value pairs into a valid query string or the `null` value
+you can use the static public `QueryString::build` method.
 
 ```php
 $pairs = QueryString::build([
@@ -92,25 +87,17 @@ $pairs = QueryString::build([
 // returns 'module=home|action=show|page=toto%20bar|action=hide';
 ```
 
-### Description
-
-```php
-<?php
-
-public static function QueryString::build(iterable $pairs, string $separator = '&', int $enc_type = PHP_QUERY_RFC3986): ?string;
-```
-
 The static public `QueryString::build` method parameters are:
 
 - `$pairs` an iterable structure containing a collection of key/pair pairs as describe in the returned array of the `QueryString::parse` method.
-- `$separator` is a string; by default it is the `&` character;
+- `$separator` is a string; by default, it is the `&` character;
 - `$enc_type` is one of PHP's constant `PHP_QUERY_RFC3968` or `PHP_QUERY_RFC1738` which represented the supported encoding algoritm
     - If you specify `PHP_QUERY_RFC3968` encoding will be done using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) rules;
     - If you specify `PHP_QUERY_RFC1738` encoding will be done using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
 
 - the function returns the `null` value if the submitted collection is empty.
 
-<p class="message-warning">The <code>$separator</code> argument can not be the empty string.</p>
+<p class="message-warning">The <code>$separator</code> argument cannot be the empty string.</p>
 
 ## Extracting PHP variables
 

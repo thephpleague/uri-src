@@ -19,11 +19,8 @@ echo Converter::compress('[1050:0000:0000:0000:0005:0000:300c:326b]');
 // returns [1050::5:0:300c:326b]
 ```
 
-Usage
---------
-
 The `Converter::compress` static method converts an expanded IPv6 host into its compressed form.  
-The method only parameter should represent a host value. The `Converter::expand` method
+The method-only parameter should represent a host value. The `Converter::expand` method
 does the opposite.
 
 If you submit a host which is not an IPv6 one then, the submitted host value will be returned
@@ -39,7 +36,7 @@ echo Converter::expand('[1050:0000:0000:0000:0005:0000:300c:326b]');
 // returns [1050:0000:0000:0000:0005:0000:300c:326b]
 ```
 
-To complement the host related methods the class also provide stricter IPv6 compress and expand
+To complement the host related methods, the class also provide stricter IPv6 compress and expand
 methods using the  `Converter::compressIp` and  `Converter::expandId` methods. Those methods will
 throw if the submitted value is not a valid IPv6 representation.
 

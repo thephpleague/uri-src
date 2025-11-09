@@ -184,7 +184,7 @@ $path = UriString::removeDotSegments('path/to/./the/../the/sky%7bfoo%7d');
 echo $path;  //displays 'path/to/the/sky%7Bfoo%7D'
 ~~~
 
-## Component and String Validation
+## URI Validation
 
 <p class="message-notice">Available since version <code>7.6</code></p>
 

@@ -49,10 +49,10 @@ packages:
             Path components:
                 Path: '/components/7.0/path/'
                 DataPath: '/components/7.0/data-path/'
+                HierarchicalPath: '/components/7.0/hierarchical-path/'
             Host components:
                 Host: '/components/7.0/host/'
                 Domain: '/components/7.0/domain/'
-                HierarchicalPath: '/components/7.0/hierarchical-path/'
             Fragment components:
                 Fragment: '/components/7.0/fragment/'
                 Fragment Directives: '/components/7.0/fragment-directives/'
