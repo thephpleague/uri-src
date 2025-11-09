@@ -40,24 +40,27 @@ packages:
         '7.0':
             Getting Started:
                 Introduction: '/components/7.0/'
-                From 2.x to 7.x: '/components/7.0/upgrading/'
-            URI Manipulation:
-                URI Modifier: '/components/7.0/modifiers/'
-            URI components:
                 Common API: '/components/7.0/api/'
-                Scheme: '/components/7.0/scheme/'
-                Authority: '/components/7.0/authority/'
-                UserInfo: '/components/7.0/userinfo/'
-                Host: '/components/7.0/host/'
-                Domain: '/components/7.0/domain/'
-                Port: '/components/7.0/port/'
-                Path: '/components/7.0/path/'
-                DataPath: '/components/7.0/data-path/'
-                HierarchicalPath: '/components/7.0/hierarchical-path/'
+                Universal Modifier: '/components/7.0/modifiers/'
+                From 2.x to 7.x: '/components/7.0/upgrading/'
+            Query components:
                 Query: '/components/7.0/query/'
                 URLSearchParams: '/components/7.0/urlsearchparams/'
+            Path components:
+                Path: '/components/7.0/path/'
+                DataPath: '/components/7.0/data-path/'
+            Host components:
+                Host: '/components/7.0/host/'
+                Domain: '/components/7.0/domain/'
+                HierarchicalPath: '/components/7.0/hierarchical-path/'
+            Fragment components:
                 Fragment: '/components/7.0/fragment/'
                 Fragment Directives: '/components/7.0/fragment-directives/'
+            Others components:
+                Authority: '/components/7.0/authority/'
+                UserInfo: '/components/7.0/userinfo/'
+                Scheme: '/components/7.0/scheme/'
+                Port: '/components/7.0/port/'
         '2.0':
             Documentation:
                 Getting Started: '/components/2.0/'
