@@ -168,7 +168,7 @@ $newQuery->__toString(); //return baz=toto&foo=bar&foo=toto
 
 <p class="message-notice">since version <code>7.3.0</code>, the sorting algorithm has been updated to match <a href="https://url.spec.whatwg.org/#dom-urlsearchparams-sort">WHATG group specification</a></p>
 
-## The Query as a PHP Data Transport Layer
+## Query as a PHP Data Transporter
 
 ~~~php
 public static Query::fromVariable($params, string $separator = '&'): self
@@ -265,7 +265,7 @@ $query->parameters(); //return ['foo' => ['bar', 'baz']]
 $new_query->parameters(); //return ['foo' => ['bar', 'baz']]
 ~~~
 
-## The Query as a collection of query pairs
+## Query as a Collection of Key/Value Pairs
 
 This class mainly represents the query string as a collection of key/value pairs.
 
