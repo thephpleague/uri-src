@@ -168,7 +168,11 @@ $newQuery->__toString(); //return baz=toto&foo=bar&foo=toto
 
 <p class="message-notice">since version <code>7.3.0</code>, the sorting algorithm has been updated to match <a href="https://url.spec.whatwg.org/#dom-urlsearchparams-sort">WHATG group specification</a></p>
 
-## Query as a PHP Data Transporter
+## PHP Data Transporter
+
+Historically, the query string has been used as a data transport layer for PHP variables.
+The `Query` class can be seen as a PHP Data Transporter layer and a public API was built
+around this concept.
 
 ~~~php
 public static Query::fromVariable($params, string $separator = '&'): self
@@ -185,8 +189,7 @@ not inconsistent against <code>http_build_query</code> algorithm.</p>
 
 ### Instantiate a new object
 
-Historically, the query string has been used as a data transport layer of PHP variables. The `fromParams` uses
-PHP own data structure to generate a query string *à la* `http_build_query`.
+The `fromVariable` uses PHP own data structure to generate a query string *à la* `http_build_query`.
 
 ~~~php
 parse_str('foo=bar&bar=baz+bar', $params);
@@ -202,7 +205,8 @@ an object with public properties.</p>
 
 ### Query::parameters
 
-If you already have an instantiated `Query` object you can return all the query string deserialized arguments using the `Query::parameters` method:
+If you already have an instantiated `Query` object you can return all the query string deserialized 
+arguments using the `Query::parameters` method:
 
 ~~~php
 $query_string = 'foo.bar=bar&foo_bar=baz';
@@ -214,8 +218,11 @@ $arr = Query::fromRFC3986($query_string)->parameters();
 // $arr = ['foo.bar' => 'bar', 'foo_bar' => baz']];
 ~~~
 
+As you can see from the previous example, the data is not mangle hence using the `Query` object you
+get two distinctive properties instead of one, using PHP functions.
 
-If you are only interested in a given argument you can access it directly by supplyling the argument name as show below:
+If you are only interested in a given argument, you can access it directly by supplyling the argument
+name as show below:
 
 ~~~php
 $query = Query::fromRFC3986('foo[]=bar&foo[]=y+olo&z=');
@@ -265,9 +272,9 @@ $query->parameters(); //return ['foo' => ['bar', 'baz']]
 $new_query->parameters(); //return ['foo' => ['bar', 'baz']]
 ~~~
 
-## Query as a Collection of Key/Value Pairs
+## Key/Value Pairs Collection
 
-This class mainly represents the query string as a collection of key/value pairs.
+To better support interoperability, This class mainly represents the query string as a collection of key/value pairs.
 
 ~~~php
 public static Query::fromPairs(iterable $pairs, string $separator = '&'): self
