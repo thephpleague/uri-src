@@ -104,7 +104,7 @@ echo Http::new('https://uri.thephpleague.com/components/7.0/modifiers/')
 // returns 'https://uri.thephpleague.com/boo';
 ```
 
-### Differences with the Generic RFC3986 URI
+### Differences with RFC3986
 
 Because of its normalization rules a `PSR-7` UriInterface implementing object
 may return a different URI representation than a generic URI implementing class.
