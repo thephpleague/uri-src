@@ -468,3 +468,41 @@ $newQuery = $query->withoutEmptyPairs();
 echo $query; //displays '&&=toto&&&&=&'
 echo $newQuery; //displays '=toto&='
 ~~~
+
+### Query::indexOf
+
+<p class="message-notice">since version <code>7.6.0</code></p>
+
+
+`Query::indexOf` returns the key/value pair offset within the query.
+By default, if the key appears multiple times, the method returns the offset of its first occurrence.
+You can retrieve subsequent occurrences by specifying the desired index using the optional `nth` parameter.
+
+The method accepts negative offset.
+
+~~~php
+$query = Query::fromRFC3986('foo=bar&p=y+olo&z=&foo=jazz');
+$query->indexOf('foo');         //returns 0;
+$query->indexOf('foo', 1);      //returns 3;
+$query->indexOf('foo', -1);     //returns 3
+$query->indexOf('unknown', -1); //returns null
+~~~
+
+<p class="message-info">The occurrence is design with a <code>zero-based indexing</code> so the first
+occurrence is <code>0</code> instead of <code>1</code></p>
+
+### Query::replace
+
+<p class="message-notice">since version <code>7.6.0</code></p>
+
+`Query::replace` replaces a key/value pair at a specific offset.
+The `$offset` parameter is zero-based: `0` refers to the first pair, `1` to the second, and so on.
+Negative offsets are also supported and count from the end (`-1` targets the last pair).
+If the given offset does not exist, a `ValueError` is thrown.
+If the new pair is identical to the existing one, the current instance is returned unchanged.
+
+~~~php
+$query = Query::fromRFC3986('foo=bar&p=y+olo&z=&foo=jazz');
+$query->replace(1, 'toto', 'foobar')->toString(); 
+//returns 'foo=bar&toto=foobar&z=&foo=jazz'
+~~~
