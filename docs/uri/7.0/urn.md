@@ -41,7 +41,7 @@ to enable using the method during input validation.
 
 ## String Representations
 
-The `Urn` class handles URI according to RFC8141, as such you can retrieve its string representation using
+The `Urn` class handles URN according to RFC8141, as such you can retrieve its string representation using
 the `toString` method. the `__toString()` method is an alias of the `toString()` method.
 
 ```php
@@ -51,13 +51,13 @@ echo $uri;             // displays 'urn:example:animal:nose?+foo=bar&fo%26o=b%3F
 ```
 
 An `Urn` instance can be JSON-encoded using its string representation to allow better interoperability with
-`Javascript`.
+JSON supporting languages.
 
 ```php
 $urn = Urn::fromString('urn:example:animal:nose?+foo=bar&fo%26o=b%3Far');
 json_encode($urn); //returns "urn:example:animal:nose?+foo=bar&fo%26o=b%3Far"
 ```
-The `toDisplayString()` method returns a human-readable representation of the URI,
+The `toDisplayString()` method returns a human-readable representation of the URN,
 corresponding to its IRI form as defined in RFC 3987. Although the resulting
 value may not constitute a syntactically valid URN, it is intended for
 presentation purposes — for example, as the textual content of an HTML `<a>` element.
@@ -76,20 +76,6 @@ echo $urn->toRfc2141(); // displays 'urn:example:animal:nose'
 ```
 
 The optional components as defined by RFC8141 are stripped if present.
-
-It is possible to convert your `League\Uri\Urn` instance into a `League\Uri\Uri` object using the
-`toUri()` method. The method returns a `League\Uri\Uri` instance.
-
-```php
-use Uri\UriComparisonMode;
-
-$urn = Urn::fromString('urn:example:animal:nose?+foo=bar&fo%26o=b%3Far');
-$uri = $urn->toUri(); // returns a League\Uri\Uri instance
-$uri->equals($urn, UriComparisonMode::IncludeFragment);   // returns true
-```
-
-<p class="message-warning">There is no <code>Uri::toUrn()</code> method attached to the <code>League\Uri\Uri</code>
-class because every URN is an URI but not all URIs are URNs.</p>
 
 ## Accessing Properties
 
@@ -220,3 +206,38 @@ $urn->equals($urnBis);  // returns true comparing using URN rules
 $uri->equals($urn);     // return true comparing using URI rules
 $uri->equals($urnBis);  // returns false comparing using URI rules
 ```
+
+## URI resolution
+
+It is possible to convert your `League\Uri\Urn` instance into a `League\Uri\Uri` object using the
+`resolve()` method. The method returns a `League\Uri\Uri` instance.
+
+```php
+use Uri\UriComparisonMode;
+
+$urn = Urn::fromString('urn:example:animal:nose?+foo=bar&fo%26o=b%3Far');
+$uri = $urn->resolve(); // returns a League\Uri\Uri instance
+$uri->equals($urn, UriComparisonMode::IncludeFragment);   // returns true
+```
+
+<p class="message-warning">There is no <code>Uri::toUrn()</code> method attached to the <code>League\Uri\Uri</code>
+class because every URN is a URI but not all URIs are URNs.</p>
+
+The `resolve()` method can also take a URI template as its single parameter allowing to specify the
+URN to URI resolution based on some URN resolvers. For instance, if we want to resolve an ISBN URN
+against the `openlibrary.org` service you can do the following
+
+```php
+$urn = Urn::new("urn:isbn:9782266178945");
+$urn->resolve(); //returns a League\Uri\Uri instance with the same string representation
+$urn->resolve("https://openlibrary.org/isbn/{nss}")->toString();
+//returns the League\Uri\Uri instance for "https://openlibrary.org/isbn/9782266178945"
+```
+
+The following URI Template variables are available:
+
+- `nid`: the namespace identifier
+- `nss`: the namespace specific string
+- `r_component`: the encoded `r-component` value
+- `q_component`: the encoded `q-component` value
+- `f_component`: the encoded `f-component` value
