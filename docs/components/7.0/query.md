@@ -151,7 +151,20 @@ This method expects a single argument which is a string, a scalar or an object w
 ~~~php
 $query    = Query::fromRFC3986('foo=bar&john=doe');
 $newQuery = $query->append('foo=baz');
-$newQuery->__toString(); //return foo=jane&foo=baz&john=doe
+$newQuery->__toString(); //return foo=bar&foo=baz&john=doe
+// a new foo parameter is added
+~~~
+
+### Query::prepend
+
+<p class="message-info">Available since version <code>7.6.0</code></p>
+
+This method expects a single argument which is a string, a scalar or an object with the `__toString` method.
+
+~~~php
+$query    = Query::fromRFC3986('foo=bar&john=doe');
+$newQuery = $query->prepend('foo=baz');
+$newQuery->__toString(); //return foo=baz&foo=bar&john=doe
 // a new foo parameter is added
 ~~~
 
