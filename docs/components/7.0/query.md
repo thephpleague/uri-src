@@ -416,6 +416,28 @@ $query->getAll('foo');   //return ['bar', 'BAZ']
 $query->getAll('gweta');  //return null
 ~~~
 
+### Query::withPair
+
+This method will add a new key/value pair to the string:
+
+- if no pair exists with the same name the pair is appended at the end of the pair list;
+- if they are already presents, the value will be updated on the first occurrence and all the other pairs with the same key will be removed.
+
+~~~php
+Query::new('foo=bar&foo=BAZ&p=y+olo&z=')->withPair('foo', 'new')->toString(); //return 'foo=new&p=y+olo&z='
+Query::new('p=y+olo&z=')->withPair('foo', 'new')->toString();  //return p=y+olo&z=&foo=new
+~~~
+
+### Query::appendTo
+
+This method will append a new pair to the key/pair list regardless of the presence
+of other pairs sharing the same key.
+
+~~~php
+Query::new('foo=bar&p=y+olo&z=')->appendTo('foo', 'new')->toString(); 
+//return 'foo=bar&p=y+olo&z=&foo=new'
+~~~
+
 ### Query::withoutPairByKey, Query::withoutPairByValue, Query::withoutPairByKeyAndValue
 
 <p class="message-notice">since version <code>7.3.0</code></p>

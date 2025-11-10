@@ -528,7 +528,7 @@ Merge PHP query parameters with the current URI query string by providing the pa
 
 ~~~php
 $uri = "http://example.com/test.php?kingkong=toto&fo.o=bar&fo_o=bar";
-$newUri = Modifier::wrap($uri)->:mergeQueryParameters(['toto' => 'baz']);
+$newUri = Modifier::wrap($uri)->mergeQueryParameters(['toto' => 'baz']);
 
 echo $newUri->unwrap()->getQuery(); //display "kingkong=tot&fo.o=bar&fo_o=bar&toto=baz"
 ~~~
