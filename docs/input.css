@@ -551,7 +551,7 @@ img {
 }
 
 #onthispage {
-  @apply sticky top-[4.5rem] h-[calc(100vh-4.5rem)] w-72 overflow-y-auto pr-8 text-sm xl:pr-16 self-start hidden lg:block;
+  @apply sticky top-[4.5rem] h-[calc(100vh-4.5rem)] w-72 overflow-y-auto pr-8 pb-16 text-sm xl:pr-16 self-start hidden lg:block shrink-0;
 }
 
 #onthispage nav h3 {
@@ -563,19 +563,15 @@ img {
 }
 
 #onthispage a {
-  display:block;
-  border-left: 2px solid transparent;
-  padding-left: 0.5rem;
-  text-decoration: none;
+  @apply block border-l-2 border-transparent pl-2 no-underline;
 }
 
 #onthispage a:hover {
-  text-decoration: underline;
+  @apply underline text-uri-dark;
 }
 
 #onthispage .active {
-  color: #2563eb; /* Tailwind blue-600 */
-  border-left-color: #2563eb;
+  @apply text-uri-dark border-l-uri-dark;
 }
 
 html {
