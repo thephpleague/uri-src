@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Onest:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
-    <link href="{{ site.data.manifest['docs.css'] }}" rel="stylesheet">
+    <link href="{{ site.data.manifest['docs.css'] }}?v={{ site.time | date:'%s' }}" rel="stylesheet">
     <script async src="https://www.googletagmanager.com/gtag/js?id={{  site.data.project.google_analytics_tracking_id }}"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -220,6 +220,6 @@
         </div>
     </footer>
 </div>
-<script src="{{ site.data.manifest['docs.js'] }}"></script>
+<script src="{{ site.data.manifest['docs.js'] }}?v={{ site.time | date:'%s' }}"></script>
 </body>
 </html>
