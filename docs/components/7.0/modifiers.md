@@ -269,6 +269,8 @@ to apply the following changes to the submitted URI.
   <li><a href="#modifierappendquerypairs">appendQueryPairs</a></li>
   <li><a href="#modifierremovequerypairs">removeQueryPairs</a></li>
   <li><a href="#modifiermergequerypairs">mergeQueryPairs</a></li>
+  <li><a href="#modifiermreplacequerypair">replaceQueryPair</a></li>
+  <li><a href="#modifiermreplacequeryparameter">replaceQueryParameter</a></li>
 </ul>
 </div>
 <div>
@@ -545,6 +547,37 @@ $newUri = Modifier::wrap($uri)->mergeQueryPairs([['fo.o', 'champion']]);
 
 echo $newUri->unwrap()->getQuery(); //display "kingkong=toto&fo.o=champion&fo_o=bar"
 ~~~
+
+### Modifier::replaceQueryPair
+
+<p class="message-notice">since version <code>7.6.0</code></p>
+
+Replace a single query pair from the current URI by providing its offset.
+
+~~~php
+$uri = "http://example.com/test.php?kingkong=toto&fo.o=bar&fo_o=bar";
+$newUri = Modifier::wrap($uri)->replaceQueryPair(1, 'name', 'john');
+
+echo $newUri->unwrap()->getQuery(); //display "kingkong=toto&name=john&fo_o=bar"
+~~~
+
+<p class="message-info">Negative offsets are supported</p>
+<p class="message-warning">If the offset does not exist, a <code>ValueError</code> will be thrown</p>
+
+### Modifier::replaceQueryParameter
+
+<p class="message-notice">since version <code>7.6.0</code></p>
+
+Replace a single query parameter from the current URI by providing its name.
+
+~~~php
+$uri = "http://example.com/test.php?kingkong=toto&fo.o=bar&fo_o=bar";
+$newUri = Modifier::wrap($uri)->replaceQueryParameter('fo.o', ['name' => 'john']);
+
+echo $newUri->unwrap()->getQuery(); //display "kingkong=toto&fo.o%5Bname%5D=john&fo_o=bar"
+~~~
+
+<p class="message-warning">If the name does not exist, a <code>ValueError</code> will be thrown</p>
 
 ## Host modifiers
 

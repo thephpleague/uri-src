@@ -256,6 +256,38 @@ $query->hasParameter('foo', 'z');     //return true
 $query->hasParameter('foo', 'gweta'); //return false
 ~~~
 
+### Query::mergeParameters
+
+<p class="message-notice">Available since <code>7.6</code></p>
+
+This `mergeParameters()` method allows merging new parameters to your query using the `http_build_query` algorithm.
+The method expects an `array` or an `object` and you can optionally provide a `$prefix` like with the `http_build_query`.
+The new data will be merged with the current available PHP parameters.
+
+~~~php
+$query = Query::fromRFC3986('foo[]=bar&foo[]=y+olo&z=');
+$newQuery = $query->mergeParameters(['foo' => ['when' => 'today', 'where' => 'here']]);
+$newQuery->params('foo'); //return ['when' => 'today', 'where' => 'here']
+echo $newQuery->value();  //return 'foo%5Bwhen%5D=today&foo%5Bwhere%5D=here&z='
+~~~
+
+### Query::replaceParameter
+
+<p class="message-notice">Available since <code>7.6</code></p>
+
+This `replaceParameter()` method allows changing a single parameter from your query using
+the `http_build_query` algorithm. The method expects a parameter string as a name and its
+new value. The data will replace the value in the current query.
+
+~~~php
+$query = Query::fromRFC3986('foo[]=bar&foo[]=y+olo&z=');
+$newQuery = $query->replaceParameter('foo', 1);
+$newQuery->params('foo'); //return 1
+echo $newQuery->value();  //return 'foo=1&z='
+~~~
+
+<p class="message-warning">If the name does not exist, a <code>ValueError</code> will be thrown</p>
+
 ### Query::withoutParameter
 
 If you want to remove PHP's variable from the query string you can use the `Query::withoutParams` method as shown below
