@@ -40,9 +40,15 @@ packages:
         '7.0':
             Getting Started:
                 Introduction: '/components/7.0/'
-                Common API: '/components/7.0/api/'
-                Universal Modifier: '/components/7.0/modifiers/'
                 From 2.x to 7.x: '/components/7.0/upgrading/'
+            URI manipulation:
+                Universal Modifier: '/components/7.0/modifiers/'
+            URI components:
+                Common API: '/components/7.0/api/'
+                Scheme: '/components/7.0/scheme/'
+                UserInfo: '/components/7.0/userinfo/'
+                Port: '/components/7.0/port/'
+                Authority: '/components/7.0/authority/'
             Query components:
                 Query: '/components/7.0/query/'
                 URLSearchParams: '/components/7.0/urlsearchparams/'
@@ -56,11 +62,6 @@ packages:
             Fragment components:
                 Fragment: '/components/7.0/fragment/'
                 Fragment Directives: '/components/7.0/fragment-directives/'
-            Others components:
-                Authority: '/components/7.0/authority/'
-                UserInfo: '/components/7.0/userinfo/'
-                Scheme: '/components/7.0/scheme/'
-                Port: '/components/7.0/port/'
         '2.0':
             Documentation:
                 Getting Started: '/components/2.0/'
