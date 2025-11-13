@@ -6,12 +6,11 @@ title: The URI toolkit For PHP Developers
 The URI toolkit For PHP Developers
 ---
 
-Suite of packages which provide intuitive features to parse, validate, format and manipulate URIs and 
-their components. Built to enable working with any kind of [RFC3986](https://tools.ietf.org/html/rfc3986)
-compliant URI and follow closely the latest [WHATWG URL Living Standard](https://url.spec.whatwg.org/)
-specification. It provides an enhanced replacement for PHP's `parse_url`, `http_build_query`, PECL's
-`http_build_url` functions, as well as [PSR-7](https://www.php-fig.org/psr/psr-7/)
-and [PSR-17](https://www.php-fig.org/psr/psr-17/) adapters.
+A complete PHP toolkit for working with URIs. Parse, validate, format, and manipulate 
+any [RFC 3986](https://tools.ietf.org/html/rfc3986) or
+r [RFC 8141](https://tools.ietf.org/html/rfc8141)–compliant identifier in a consistent,
+standards-based way. Aligned with the [WHATWG URL Living Standard](https://url.spec.whatwg.org/). Includes polyfills, 
+[PSR-7](https://www.php-fig.org/psr/psr-7/) and [PSR-17](https://www.php-fig.org/psr/psr-17/) adapters, and modern replacements for PHP’s legacy URL functions.
 
 ```php
 use League\Uri\Components\Query;
@@ -41,31 +40,33 @@ The URI utility package
 - URI parser and builder
 - Query parser and builder
 - IDNA, IPv4 and IPv6 converter
-- Encode/decode URI components
+- Encoder/decoder for URI components
 
 ### [URI](/uri/7.0/)
 
 The URI manipulation package
 
-- URI object with complete validation
-- Resolves and Relativizes URIs
-- Expand URI Templates
-- PSR-7 and PSR-17 URI adapters
-- Specific URN object
+- Full validation of common URI schemes
+- URN support following **RFC 8141**
+- URI Template expansion **RFC 6570**
+- **PSR-7** and **PSR-17** URI adapters
+- Resolves, Normalizes and Relativizes URIs
 
 ### [URI-COMPONENTS](/uri-components/7.0/)
 
 The URI components package
 
 - Provides URI components objects
-- URLSearchParams for PHP
-- Partial modifiers for URI.
+- **URLSearchParams** for PHP
+- **FragmentDirectives** for PHP
+- Universal URI Modifier
 
 ### [URI-POLYFILL](/uri-polyfill/7.0/)
 
 The URI Polyfill package
 
-- Provides Polyfill for PHP's native URI extension
+- **Uri\Rfc3986\Uri** for PHP8.1+
+- **Uri\WhatWg\Url** for PHP8.1+
 
 **Once a new major version is released, the previous stable release remains supported
 for six more months with patches and security fixes.**
