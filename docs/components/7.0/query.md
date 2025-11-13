@@ -433,8 +433,9 @@ If you are seeking the presence of a specific pair you may include the pair valu
 
 ~~~php
 $query = Query::fromRFC3986('foo=bar&p&z=');
-$query->hasPair('foo', 'p');  //return false
-$query->has('foo', 'bar');    //return true
+$query->hasPair('foo', 'bar');  //return true
+$query->hasPair('foo', 'p');    //return false
+$query->has('foo', 'p');        //return true
 ~~~
 
 ### Query::get
