@@ -39,7 +39,7 @@ echo $alt_scheme->getUriComponent(); //display 'email'
 
 ## Scheme Information
 
-Starting with version `7.5.0` the scheme object give a bit more information around the selected scheme. It will let you know:
+Starting with version `7.5.0` the scheme object gives a bit more information around the selected scheme. It will let you know:
 
 if you are using an HTTP protocol via its `Scheme::isHttp` method:
 
@@ -62,10 +62,10 @@ Scheme::new('wss')->isSsl(); // return true
 Scheme::new('Http')->isWebsocket(); // return false
 ~~~
 
-if you are using a special scheme via its `Scheme::isSpecial` method:
+if you are using a special scheme via its `Scheme::isSpecial` or `Scheme::isWhatWgSpecial` method:
 
 ~~~php
-Scheme::new('ldap')->isSpecial(); // return false
+Scheme::new('file')->isWhatWgSpecial(); // return false
 Scheme::new('file')->isSpecial(); // return true
 ~~~
 
