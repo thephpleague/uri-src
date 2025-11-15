@@ -1,6 +1,6 @@
 ---
 layout: default
-title: URI template
+title: RFC 6570 compliant URI template
 ---
 
 URI Template

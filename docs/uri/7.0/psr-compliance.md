@@ -1,9 +1,9 @@
 ---
 layout: default
-title: PSR-7 compliant URI Object API
+title: PSR Interoperability
 ---
 
-PSR interoperability
+PSR Interoperability
 =======
 
 As we are dealing with URI, the package provides classes compliant

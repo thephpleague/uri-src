@@ -1,6 +1,6 @@
 ---
 layout: default
-title: URN
+title: RFC8141 compliant URN Object API
 ---
 
 URN Value Object
