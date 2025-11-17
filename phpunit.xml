@@ -17,7 +17,7 @@
     </report>
   </coverage>
   <testsuites>
-    <testsuite name="URI Test Suite">
+    <testsuite name="PHP URI ToolKit Test Suite">
       <directory suffix="Test.php">uri</directory>
       <directory suffix="Test.php">components</directory>
       <directory suffix="Test.php">interfaces</directory>
@@ -37,7 +37,6 @@
     <exclude>
       <directory suffix="Bench.php">uri</directory>
       <directory suffix="Test.php">uri</directory>
-      <directory suffix="TestCase.php">uri</directory>
       <directory suffix="Bench.php">components</directory>
       <directory suffix="Test.php">components</directory>
       <directory suffix="Bench.php">interfaces</directory>
