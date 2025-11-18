@@ -551,4 +551,12 @@ final class UriTest extends TestCase
         self::assertSame('//host/.//path', $uri2->toRawString());
         self::assertSame('//host//path', $uri2->toString());
     }
+
+    public function test_it_fails_using_exception_with_null_bytes(): void
+    {
+        $uri = new Uri("https://example.com");
+
+        $this->expectException(InvalidUriException::class);
+        $uri->resolve("/f\0o");
+    }
 }

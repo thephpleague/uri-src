@@ -367,4 +367,64 @@ final class UrlTest extends TestCase
         self::assertSame('bébé.be', $uri->getUnicodeHost());
     }
 
+    public function test_it_can_handle_null_bytes_in_fragment(): void
+    {
+        $url1 = new Url("https://example.com");
+        $url2 = $url1->withFragment("frag\0ment");
+
+        self::assertSame("frag%00ment", $url2->getFragment());
+        self::assertSame("https://example.com/#frag%00ment", $url2->toAsciiString());
+    }
+
+    public function test_it_can_handle_null_bytes_in_query(): void
+    {
+        $url1 = new Url("https://example.com");
+        $url2 = $url1->withQuery("f\0o=bar&baz=q\0x");
+
+        self::assertSame("f%00o=bar&baz=q%00x", $url2->getQuery());
+        self::assertSame("https://example.com/?f%00o=bar&baz=q%00x", $url2->toAsciiString());
+    }
+
+    public function test_it_can_handle_null_bytes_in_path(): void
+    {
+        $url1 = new Url("https://example.com");
+        $url2 = $url1->withPath("/p\0th\0");
+
+        self::assertSame("/p%00th%00", $url2->getPath());
+        self::assertSame("https://example.com/p%00th%00", $url2->toAsciiString());
+    }
+
+    public function test_it_can_handle_null_bytes_in_password(): void
+    {
+        $url1 = new Url("https://example.com");
+        $url2 = $url1->withPassword("pass\0word");
+
+        self::assertSame("pass%00word", $url2->getPassword());
+        self::assertSame("https://:pass%00word@example.com/", $url2->toAsciiString());
+    }
+
+    public function test_it_can_handle_null_bytes_in_username(): void
+    {
+        $url1 = new Url("https://example.com");
+        $url2 = $url1->withUsername("usern\0me");
+
+        self::assertSame("usern%00me", $url2->getUsername());
+        self::assertSame("https://usern%00me@example.com/", $url2->toAsciiString());
+    }
+
+    public function test_it_cannot_handle_null_bytes_in_host(): void
+    {
+        $url1 = new Url("https://example.com");
+        $this->expectException(InvalidUrlException::class);
+
+        $url1->withHost("usern\0me");
+    }
+
+    public function test_it_cannot_handle_null_bytes_in_scheme(): void
+    {
+        $url1 = new Url("https://example.com");
+        $this->expectException(InvalidUrlException::class);
+
+        $url1->withScheme("usern\0me");
+    }
 }

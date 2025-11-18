@@ -2,6 +2,24 @@
 
 All Notable changes to `League\Uri` will be documented in this file
 
+## [Next](https://github.com/thephpleague/uri-polyfill/compare/7.6.0...master) - TBD
+
+### Added
+
+- None
+
+### Fixed
+
+- Null byte handling see [GH-20366](https://github.com/php/php-src/pull/20489)
+
+### Deprecated
+
+- None
+
+### Removed
+
+- None
+
 ## 7.6.0 - 2025-11-18
 
 First Stable Release

@@ -68,8 +68,7 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function __construct(string $uri, ?self $baseUri = null)
         {
-            !str_contains($uri, "\0") || throw new ValueError('Argument #1 ($uri) must not contain any null bytes');
-            UriString::containsRfc3986Chars($uri) || throw new InvalidUriException('The URI `'.$uri.'` contains invalid RFC3986 characters.');
+            UriString::containsRfc3986Chars($uri) || throw new InvalidUriException('The URI `'.str_replace("\0", "\\x00", $uri).'` contains invalid RFC3986 characters.');
 
             try {
                 $uri = null !== $baseUri ? UriString::resolve($uri, $baseUri->toRawString()) : $uri;
