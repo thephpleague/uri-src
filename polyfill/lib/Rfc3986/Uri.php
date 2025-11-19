@@ -22,7 +22,9 @@ use Uri\InvalidUriException;
 use Uri\UriComparisonMode;
 use ValueError;
 
+use function bin2hex;
 use function explode;
+use function preg_replace_callback;
 use function str_contains;
 use function strpos;
 
@@ -68,7 +70,11 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function __construct(string $uri, ?self $baseUri = null)
         {
-            UriString::containsRfc3986Chars($uri) || throw new InvalidUriException('The URI `'.str_replace("\0", "\\x00", $uri).'` contains invalid RFC3986 characters.');
+            if (!UriString::containsRfc3986Chars($uri)) {
+                $formatter = fn (string $input): ?string => preg_replace_callback('/[\x00-\x1F\x7F]/', fn (array $m): string => '\\x' . bin2hex($m[0]), $input);
+
+                throw new InvalidUriException('The URI `'.$formatter($uri).'` contains invalid RFC3986 characters.');
+            }
 
             try {
                 $uri = null !== $baseUri ? UriString::resolve($uri, $baseUri->toRawString()) : $uri;
