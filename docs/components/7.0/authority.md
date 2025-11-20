@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Authority URI part Object API
+description: The Authority class represents a URI authority component.
 ---
 
 The Authority part

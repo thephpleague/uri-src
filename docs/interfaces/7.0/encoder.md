@@ -1,6 +1,7 @@
 ---
 layout: default
 title: URI component encoder and decoder
+description: Helpers to safely encode and/or decode URI and URI components
 ---
 
 URI component encoder and decoder

@@ -1,6 +1,7 @@
 ---
 layout: default
 title: The Data Uri Path component
+description: The DataPath class handles the Path URI component associated with a Data Scheme URI.
 ---
 
 # Data URI Path

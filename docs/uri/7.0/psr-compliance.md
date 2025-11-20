@@ -1,6 +1,7 @@
 ---
 layout: default
 title: PSR Interoperability
+description: The Package provides classes compliant with PHP-FIG PSR specification to improve interoperability.
 ---
 
 PSR Interoperability

@@ -1,6 +1,7 @@
 ---
 layout: default
 title: The Port component
+description: The Port class represents a generic port component.
 ---
 
 # The Port component

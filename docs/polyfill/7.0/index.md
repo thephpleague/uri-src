@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Polyfill for PHP Native URI extension
+description: This package provides a polyfill for the new native PHP URI extension for PHP8.1+
 redirect_from:
     - /polyfill/
 ---

@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Path Component
+description: The Path class represents a generic path component.
 ---
 
 Path Component

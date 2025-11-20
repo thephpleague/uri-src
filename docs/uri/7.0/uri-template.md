@@ -1,6 +1,7 @@
 ---
 layout: default
 title: RFC 6570 compliant URI template
+description: The UriTemplate class enables expanding a URI template and its submitted parameters into an URI object.
 ---
 
 URI Template

@@ -1,6 +1,7 @@
 ---
 layout: default
 title: URI common interfaces and tools
+description: Helpers to parse or build URIs in a compliant and standard-based way,
 redirect_from:
 - /interfaces/
 ---

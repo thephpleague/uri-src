@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Uri Objects
+description: The package offers a clear and consistent API for building, parsing, and modifying URIs.
 redirect_from:
     - /uri/
 ---

@@ -1,6 +1,7 @@
 ---
 layout: default
 title: URI components Common API
+description: An unified API to access all URI components 
 ---
 
 Common API

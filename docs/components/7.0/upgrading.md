@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Upgrading from 2.x to 7.x
+description: This guide will help you migrate from a 2.x version to the package 7.0 version
 ---
 
 # Upgrading from 2.x to 7.x

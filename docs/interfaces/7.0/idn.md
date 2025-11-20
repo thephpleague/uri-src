@@ -1,6 +1,7 @@
 ---
 layout: default
 title: IDN - Domain Internationalization
+description: Helpers to safely encode and/or decode internationalized domain names.
 ---
 
 IDN Conversion

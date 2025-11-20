@@ -1,6 +1,7 @@
 ---
 layout: default
 title: IPv4 Converter
+description: Helpers to handle and manipulate IPv4 host in the context of URIs.
 ---
 
 IPv4 Converter

@@ -1,6 +1,7 @@
 ---
 layout: default
 title: URI context aware wrapper
+description: The BaseURI object is build to ease gathering information regarding a specific URI
 ---
 
 URI info and full manipulation

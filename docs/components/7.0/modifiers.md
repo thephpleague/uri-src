@@ -1,6 +1,7 @@
 ---
 layout: default
 title: URI partial modifiers
+description: The Modifier enables modifying URI objects in a compliant and standard way.
 ---
 
 Universal URI Modifier

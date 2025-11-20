@@ -1,6 +1,7 @@
 ---
 layout: default
 title: The Domain component
+description: The Domain class handles the Domain Host component.
 ---
 
 The Domain Host

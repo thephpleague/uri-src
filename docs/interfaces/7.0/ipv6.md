@@ -1,6 +1,7 @@
 ---
 layout: default
 title: IPv6 Converter
+description: Helpers to handle and manipulate IPv6 host in the context of URIs.
 ---
 
 IPv6 Converter

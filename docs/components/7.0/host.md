@@ -1,6 +1,7 @@
 ---
 layout: default
 title: The Host component
+description: The Host class represents a generic host component.
 ---
 
 The Host

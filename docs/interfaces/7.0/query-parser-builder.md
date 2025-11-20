@@ -1,6 +1,7 @@
 ---
 layout: default
 title: URI Query string parser
+description: a URI query parser and builder in PHP. 
 ---
 
 Query Parser and Builder

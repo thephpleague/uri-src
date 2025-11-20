@@ -1,6 +1,7 @@
 ---
 layout: default
 title: URI common interfaces and tools
+description: Interfaces to help represent URI objects according to standard specifications
 ---
 
 Uri Interfaces

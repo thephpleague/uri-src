@@ -1,6 +1,7 @@
 ---
 layout: default
 title: The Query component
+description: The Query class ease query string creation and manipulation.
 ---
 
 The Query

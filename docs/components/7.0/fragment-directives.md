@@ -1,6 +1,7 @@
 ---
 layout: default
 title: The Fragment Directive component
+description: This specialized fragment component handles Directives used by user-agent to improve browser UX.
 ---
 
 # The Fragment Directives component

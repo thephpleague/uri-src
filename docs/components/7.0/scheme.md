@@ -1,6 +1,7 @@
 ---
 layout: default
 title: The Scheme component
+description: The Scheme class ease working with URI Scheme component.
 ---
 
 # The Scheme component

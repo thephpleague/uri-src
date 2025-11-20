@@ -1,6 +1,7 @@
 ---
 layout: default
-title: URL Search Params
+title: URLSearchParams implementation in PHP
+description: The URLSearchParams class enable query string creation and manipulation in compliance with the WHATWG URL specification.
 ---
 
 URLSearchParams

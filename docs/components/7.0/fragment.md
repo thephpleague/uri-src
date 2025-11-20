@@ -1,6 +1,7 @@
 ---
 layout: default
 title: The Fragment component
+description: The Fragment class handles the generic URI Fragment component.
 ---
 
 # The Fragment component

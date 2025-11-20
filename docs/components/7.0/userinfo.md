@@ -1,12 +1,13 @@
 ---
 layout: default
 title: The User information component
+description: The UserInfo class handles the generic user information URI component.
 ---
 
 The UserInfo
 =======
 
-The `UserInfo` class represents a URI authority component. Apart from the [package common API](/components/7.0/) the class
+The `UserInfo` class represents a URI component handling the user information component. Apart from the [package common API](/components/7.0/) the class
 exposes basic properties and method to manipulate its different component.
 
 <p class="message-notice">If the modifications do not change the current object, it is returned as is, otherwise, a new modified object is returned.</p>

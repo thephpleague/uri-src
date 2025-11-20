@@ -1,6 +1,7 @@
 ---
 layout: default
 title: URI components
+description: The URI component package allows to parse, create, manipulate URI components
 redirect_from:
     - /components/
 ---

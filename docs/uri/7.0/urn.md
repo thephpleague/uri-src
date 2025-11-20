@@ -1,6 +1,7 @@
 ---
 layout: default
 title: RFC8141 compliant URN Object API
+description: The Urn object is a specific class developed around URN creation and manipulation as defined in RFC8141.
 ---
 
 URN Value Object
@@ -8,7 +9,7 @@ URN Value Object
 
 <p class="message-notice">Available since version <code>7.6.0</code></p>
 
-The `League\Uri\Urn` is a specific class developped around URN creation and manipulation
+The `League\Uri\Urn` is a specific class developed around URN creation and manipulation
 as defined in [RFC8141](https://datatracker.ietf.org/doc/html/rfc8141).
 
 <p class="message-notice">The class handles a subset of URI schemes as defined by <a href="https://datatracker.ietf.org/doc/html/rfc8141">RF8141</a>.

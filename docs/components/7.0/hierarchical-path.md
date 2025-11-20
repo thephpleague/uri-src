@@ -1,6 +1,7 @@
 ---
 layout: default
 title: The Hierarchical Path component
+description: This specialized Hierarchical Path component handles Segmented based Path component used in HTTP schemed URI.
 ---
 
 # The Hierarchical Path component
