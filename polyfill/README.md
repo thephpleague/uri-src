@@ -2,7 +2,7 @@
 
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
-[![Latest Version](https://img.shields.io/github/release/thephpleague/uri-pollyfill.svg?style=flat-square)](https://github.com/thephpleague/uri-interfaces/releases)
+[![Latest Version](https://img.shields.io/github/release/thephpleague/uri-polyfill.svg?style=flat-square)](https://github.com/thephpleague/uri-interfaces/releases)
 [![Total Downloads](https://img.shields.io/packagist/dt/league/uri-polyfill.svg?style=flat-square)](https://packagist.org/packages/league/uri-interfaces)
 
 ````php

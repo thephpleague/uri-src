@@ -296,8 +296,8 @@ final class UriTest extends TestCase
 
         self::assertSame('apple', $uriWithUser->getUserInfo());
         self::assertSame('apple', $uriWithUser->getUsername());
-        self::assertNull($uriWithUser->getPassword());
-        self::assertNull($uriWithUser->getRawPassword());
+        self::assertSame('', $uriWithUser->getPassword());
+        self::assertSame('', $uriWithUser->getRawPassword());
 
         $uriWithUserAndPassword = $uriWithUser->withUserInfo('banana:cream');
         self::assertSame('banana:cream', $uriWithUserAndPassword->getUserInfo());
@@ -554,9 +554,63 @@ final class UriTest extends TestCase
 
     public function test_it_fails_using_exception_with_null_bytes(): void
     {
-        $uri = new Uri("https://example.com");
+        $uri = new Uri('https://example.com');
 
         $this->expectException(InvalidUriException::class);
         $uri->resolve("/f\0o");
+    }
+
+    public function test_userinfo_password_is_always_set_when_userinfo_is_set(): void
+    {
+        $uri = new Uri('http://example.com#foobar');
+        $uri1 = $uri->withUserInfo('appple');
+        $uri2 = $uri1->withUserInfo(null);
+
+        self::assertNull($uri->getPassword());
+        self::assertSame('', $uri1->getPassword());
+        self::assertNull($uri2->getPassword());
+    }
+
+    #[DataProvider('providesUriWithUserInfoAndPassword')]
+    public function test_uri_is_not_affected_by_password_value(
+        string $input,
+        ?string $password,
+        ?string $username
+    ): void {
+        $uri = new Uri($input);
+
+        self::assertSame($password, $uri->getPassword());
+        self::assertSame($password, $uri->__debugInfo()['password']);
+        self::assertSame($username, $uri->getUsername());
+        self::assertSame($username, $uri->__debugInfo()['username']);
+        self::assertSame($input, $uri->toRawString());
+        self::assertSame($input, $uri->toString());
+    }
+
+    public static function providesUriWithUserInfoAndPassword(): iterable
+    {
+        yield 'userinfo is missing' => [
+            'input' => 'http://example.com#foobar',
+            'password' => null,
+            'username' => null,
+        ];
+
+        yield 'userinfo password is missing' => [
+            'input' => 'http://user@example.com#foobar',
+            'password' => '',
+            'username' => 'user',
+        ];
+
+        yield 'userinfo user is missing' => [
+            'input' => 'http://:password@example.com#foobar',
+            'password' => 'password',
+            'username' => '',
+        ];
+
+        yield 'userinfo all components are presents' => [
+            'input' => 'http://user:password@example.com#foobar',
+            'password' => 'password',
+            'username' => 'user',
+        ];
     }
 }

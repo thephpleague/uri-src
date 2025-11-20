@@ -71,7 +71,7 @@ if (PHP_VERSION_ID < 80500) {
         public function __construct(string $uri, ?self $baseUri = null)
         {
             if (!UriString::containsRfc3986Chars($uri)) {
-                $formatter = fn (string $input): ?string => preg_replace_callback('/[\x00-\x1F\x7F]/', fn (array $m): string => '\\x' . bin2hex($m[0]), $input);
+                $formatter = fn (string $input): ?string => preg_replace_callback('/[\x00-\x1F\x7F]/', fn (array $m): string => '\\x'.bin2hex($m[0]), $input);
 
                 throw new InvalidUriException('The URI `'.$formatter($uri).'` contains invalid RFC3986 characters.');
             }
@@ -286,12 +286,22 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getRawPassword(): ?string
         {
-            return $this->getComponent(self::TYPE_RAW, 'pass');
+            $parsedValue = $this->getComponent(self::TYPE_RAW, 'pass');
+            if (null !== $this->getUsername()) {
+                return (string) $parsedValue;
+            }
+
+            return $parsedValue;
         }
 
         public function getPassword(): ?string
         {
-            return $this->getComponent(self::TYPE_NORMALIZED, 'pass');
+            $parsedValue = $this->getComponent(self::TYPE_NORMALIZED, 'pass');
+            if (null !== $this->getUsername()) {
+                return (string) $parsedValue;
+            }
+
+            return $parsedValue;
         }
 
         public function getRawHost(): ?string
@@ -470,7 +480,7 @@ if (PHP_VERSION_ID < 80500) {
             return [
                 'scheme' => $this->rawComponents['scheme'],
                 'username' => $this->rawComponents['user'],
-                'password' => $this->rawComponents['pass'],
+                'password' => null !== $this->rawComponents['user'] ? ((string) $this->rawComponents['pass']) : $this->rawComponents['pass'],
                 'host' => $this->rawComponents['host'],
                 'port' => $this->rawComponents['port'],
                 'path' => $this->rawComponents['path'],

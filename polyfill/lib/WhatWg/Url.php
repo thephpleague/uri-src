@@ -25,7 +25,6 @@ use Rowbot\URL\URL as WhatWgURL;
 use Rowbot\URL\URLRecord;
 use SensitiveParameter;
 use Uri\UriComparisonMode;
-use ValueError;
 
 use function in_array;
 use function preg_match;
