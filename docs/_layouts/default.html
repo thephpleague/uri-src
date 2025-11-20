@@ -6,23 +6,8 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{{ site.data.project.description }}">
-    <meta name="docsearch:version" content="{{ version }}">
     <title>{{ page.title }} - {{ site.data.project.title }}</title>
-    <link rel="icon" href="/assets/img/uri-logo.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon-precomposed" href="//theme.thephpleague.com/img/apple-touch-icon-precomposed.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Onest:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
-    <link href="{{ site.data.manifest['docs.css'] }}?v={{ site.time | date:'%s' }}" rel="stylesheet">
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{  site.data.project.google_analytics_tracking_id }}"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', '{{  site.data.project.google_analytics_tracking_id }}');
-    </script>
+    {% include meta.html %}
 </head>
 <body class="bg-white text-dark font-onest antialiased relative">
 <div class="relative z-10">

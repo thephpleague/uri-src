@@ -1,7 +1,8 @@
 # Documentation website
 title: "URI"
 tagline: "Modern API to process URIs in PHP."
-description: "Modern API to process URIs in PHP"
+description: "A complete PHP toolkit for working with URIs. Parse, validate, format, and manipulate any RFC 3986, RFC 3987, RFC 8141–compliant identifier in a consistent, standards-based way. Aligned with the WHATWG URL Living Standard. Includes polyfills, PSR-7 and PSR-17 adapters, and modern replacements for PHP’s legacy URL functions."
+keywords: "URI, URL, URN, RFC3986, RFC3987, RFC6570, RFC2141, RFC8141, WHATWG URL, URI Template, Fragment Text Directives, RFC, PHP URI Polyfill, URI modifiers, URI components, IDNA, Query String"
 google_analytics_tracking_id: UA-46050814-14
 # Github repository
 author:
