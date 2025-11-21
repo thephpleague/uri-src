@@ -14,9 +14,8 @@ declare(strict_types=1);
 namespace League\Uri\Polyfill;
 
 use Error;
-use League\Uri\UriString;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -24,10 +23,7 @@ use Uri\InvalidUriException;
 use Uri\Rfc3986\Uri;
 use Uri\UriComparisonMode;
 
-#[CoversClass(Uri::class)]
-#[CoversClass(InvalidUriException::class)]
-#[CoversClass(UriComparisonMode::class)]
-#[CoversClass(UriString::class)]
+#[Group('uri-polyfill')]
 final class UriTest extends TestCase
 {
     #[Test]

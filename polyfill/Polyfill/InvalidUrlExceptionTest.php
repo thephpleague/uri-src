@@ -13,11 +13,13 @@ declare(strict_types=1);
 
 namespace League\Uri\Polyfill;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Uri\WhatWg\InvalidUrlException;
 use ValueError;
 
+#[Group('uri-polyfill')]
 final class InvalidUrlExceptionTest extends TestCase
 {
     #[Test]

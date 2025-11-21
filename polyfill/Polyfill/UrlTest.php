@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace League\Uri\Polyfill;
 
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Uri\InvalidUriException;
@@ -24,12 +24,7 @@ use Uri\WhatWg\Url;
 use Uri\WhatWg\UrlValidationError;
 use Uri\WhatWg\UrlValidationErrorType;
 
-#[CoversClass(Url::class)]
-#[CoversClass(InvalidUrlException::class)]
-#[CoversClass(UriComparisonMode::class)]
-#[CoversClass(UrlValidationError::class)]
-#[CoversClass(UrlValidationErrorCollector::class)]
-#[CoversClass(UrlValidationErrorType::class)]
+#[Group('uri-polyfill')]
 final class UrlTest extends TestCase
 {
     #[Test]

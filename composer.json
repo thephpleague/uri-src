@@ -81,11 +81,11 @@
         "phpcs:fix": "php-cs-fixer fix -vvv --allow-risky=yes --ansi",
         "phpstan": "phpstan analyse -l max -c phpstan.neon --ansi --memory-limit=512M",
         "phpstan:stable": "phpstan analyse -l max -c phpstan-dist.neon --ansi --memory-limit=512M",
-        "phpunit:legacy": "XDEBUG_MODE=coverage phpunit --coverage-text --configuration phpunit-legacy.xml",
-        "phpunit:stable": "XDEBUG_MODE=coverage phpunit --coverage-text --configuration phpunit-modern.xml",
-        "phpunit:dev": "phpunit --no-coverage --configuration phpunit-modern.xml",
+        "phpunit": "XDEBUG_MODE=coverage phpunit --coverage-text",
+        "phpunit:no-polyfill": "XDEBUG_MODE=coverage phpunit --coverage-text --exclude-group=uri-polyfill",
+        "phpunit:no-coverage": "phpunit --no-coverage",
         "test": [
-            "@phpunit:stable",
+            "@phpunit",
             "@phpstan:stable",
             "@phpcs"
         ]
@@ -93,7 +93,9 @@
     "scripts-descriptions": {
         "phpcs": "Runs coding style test suite",
         "phpstan": "Runs complete codebase static analysis",
-        "phpunit:stable": "Runs unit and functional testing",
+        "phpunit": "Runs unit and functional testing",
+        "phpunit:no-polyfill": "Runs unit and functional testing without uri-polyfill",
+        "phpunit:no-coverage": "Runs unit and functional testing without code-coverage",
         "benchmark": "Runs performance benchmark on several key classes of the library",
         "test": "Runs full test suite except for the benchmark"
     },

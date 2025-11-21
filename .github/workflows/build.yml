@@ -42,7 +42,6 @@ jobs:
                       ${{ runner.os }}-vendor-
 
             # INSTALL logic
-            # ────────────────────────────────────────────────────────────────
             # 1. STABLE php + STABLE deps → composer install (NO updates)
             - name: Install dependencies (install)
               if: ${{ matrix.stability == 'prefer-stable' && matrix.php != '8.6' }}
@@ -58,20 +57,17 @@ jobs:
               if: ${{ matrix.php == '8.6' }}
               run: composer update --prefer-stable --prefer-dist --no-interaction --no-progress ${{ matrix.flags }}
 
-            # TEST logic
-            # ────────────────────────────────────────────────────────────────
             - name: Run Unit tests with coverage
-              if: ${{ matrix.php != '8.5' &&  matrix.php != '8.6' }}
-              run: composer phpunit:legacy
+              if: ${{ matrix.php != '8.5' && matrix.php != '8.6' }}
+              run: composer phpunit
 
-            - name: Run Unit tests with coverage (without polyfill)
+            - name: Run Unit tests without uri-polyfill
               if: ${{ matrix.php == '8.5' }}
-              run: composer phpunit:stable
-              continue-on-error: true
+              run: composer phpunit:no-polyfill
 
             - name: Run Unit tests without coverage (nightly)
               if: ${{ matrix.php == '8.6' }}
-              run: composer phpunit:dev
+              run: composer phpunit:no-coverage
               continue-on-error: true
 
             # STATIC ANALYSIS (only once)
