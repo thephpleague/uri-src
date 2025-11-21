@@ -8,6 +8,10 @@ redirect_from:
 
 # URI polyfill for PHP8.1+
 
+[![Author](https://img.shields.io/badge/author-@nyamsprod-blue.svg?style=flat-square)](https://twitter.com/nyamsprod)
+[![Latest Stable Version](https://img.shields.io/github/release/thephpleague/uri-polyfill.svg?style=flat-square)](https://packagist.org/packages/league/uri-polyfill)
+[![Total Downloads](https://img.shields.io/packagist/dt/league/uri-polyfill.svg?style=flat-square)](https://packagist.org/packages/league/uri-polyfill)
+
 This package provides a polyfill for the new native PHP URI
 parsing features to be included in **PHP8.5**. The polyfill
 works for PHP versions greater or equal to **PHP8.1**

@@ -9,6 +9,10 @@ redirect_from:
 Uri Common tools
 =======
 
+[![Author](https://img.shields.io/badge/author-@nyamsprod-blue.svg?style=flat-square)](https://twitter.com/nyamsprod)
+[![Latest Stable Version](https://img.shields.io/github/release/thephpleague/uri-interfaces.svg?style=flat-square)](https://packagist.org/packages/league/uri-interfaces)
+[![Total Downloads](https://img.shields.io/packagist/dt/league/uri-interfaces.svg?style=flat-square)](https://packagist.org/packages/league/uri-interfaces)
+
 This package contains:
 
 - interface to represent [URI and components objects](/interfaces/7.0/contracts/)
