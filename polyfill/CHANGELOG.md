@@ -12,6 +12,7 @@ All Notable changes to `League\Uri` will be documented in this file
 
 - Null byte handling see [GH-20366](https://github.com/php/php-src/pull/20489)
 - Align password component handling for the Uri class with `Uri\Rfc3986\Uri` implementation [GH-20545](https://github.com/php/php-src/issues/20545)
+- `Url::resolve` signature.
 
 ### Deprecated
 
