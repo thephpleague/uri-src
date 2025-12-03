@@ -1280,23 +1280,13 @@ final class ModifierTest extends TestCase
         );
     }
 
-    public function testRedactQueryParametersIgnoresMissingKeys(): void
-    {
-        $uri = Modifier::wrap('https://example.com/?a=1&b=2&b=3');
-
-        self::assertSame(
-            'https://example.com/?a=1&b=*****',
-            $uri->redactQueryParameters('missing', 'b')->toString()
-        );
-    }
-
     public function testRedactSegments(): void
     {
         $uri = Modifier::wrap('https://example.com/api/users/john/orders/55');
 
         self::assertSame(
             'https://example.com/api/users/*****/orders/*****',
-            $uri->redactSegments('john', '55')->toString()
+            $uri->redactPathSegments('john', '55')->toString()
         );
     }
 
@@ -1306,7 +1296,7 @@ final class ModifierTest extends TestCase
 
         self::assertSame(
             'https://example.com/api/users/john/*****/55/details',
-            $uri->redactNextSegment('john')->toString()
+            $uri->redactPathNextSegments('john')->toString()
         );
     }
 
@@ -1316,7 +1306,7 @@ final class ModifierTest extends TestCase
 
         self::assertSame(
             'https://example.com/api/users/john',
-            $uri->redactNextSegment('missing')->toString()
+            $uri->redactPathNextSegments('missing')->toString()
         );
     }
 
@@ -1325,7 +1315,7 @@ final class ModifierTest extends TestCase
         $uri = Modifier::wrap('https://example.com/api/users/john/orders/55/details');
 
         // segments: 0:api, 1:users, 2:john, 3:orders, 4:55, 5:details
-        $redacted = $uri->redactSegmentsByKey(2, 4);
+        $redacted = $uri->redactPathSegmentsByOffset(2, 4);
 
         self::assertSame(
             'https://example.com/api/users/*****/orders/*****/details',
@@ -1339,7 +1329,7 @@ final class ModifierTest extends TestCase
 
         self::assertNotSame(
             $uri->toString(),
-            $uri->redactSegments('john')->toString()
+            $uri->redactPathSegments('john')->toString()
         );
     }
 
@@ -1351,7 +1341,7 @@ final class ModifierTest extends TestCase
             'http://*****@example.com/api/user/*****?token=*****',
             $uri
                 ->redactUserInfo()
-                ->redactSegments('john')
+                ->redactPathSegments('john')
                 ->redactQueryPairs('token')
                 ->toString()
         );

@@ -497,41 +497,6 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
     }
 
     /**
-     * Returns a new instance with the specified query keys redacted.
-     *
-     * Only values are redacted. Missing keys are ignored.
-     *
-     * Example: redactQueryParameters(token)
-     *   ?token[]=abc123&mode=edit&token[]=def456 → token=[REDACTED]&mode=edit (when 'token' is passed)
-     */
-    public function redactQueryParameters(string ...$keys): static
-    {
-        if ([] === $keys) {
-            return $this;
-        }
-
-        $hasChanged = false;
-        $parameters = Query::fromUri($this->uri)->parameters();
-        foreach ($parameters as $parameter => $value) {
-            if (in_array($parameter, $keys, true)) {
-                $hasChanged = true;
-                $parameters[$parameter] = self::MASK;
-            }
-        }
-
-        if (!$hasChanged) {
-            return $this;
-        }
-
-        $pairs = [];
-        foreach ([...QueryString::parse(http_build_query($parameters))] as $pair) {
-            $pairs[] = $pair[0].'='.$pair[1];
-        }
-
-        return $this->withQuery(implode('&', $pairs));
-    }
-
-    /**
      * Merge query pairs with the existing URI query.
      *
      * @param iterable<int, array{0:string, 1:string|null}> $pairs
@@ -1144,29 +1109,29 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
      * Negative indexing is supported>
      * Out-of-range offsets are ignored.
      *
-     * Example: redactSegmentsByKey(2, -2)
+     * Example: redactPathSegmentsByOffset(2, -2)
      *   /api/users/john/orders/55/details → /api/users/[REDACTED]/orders/[REDACTED]/details
      */
-    public function redactSegmentsByKey(int ...$keys): static
+    public function redactPathSegmentsByOffset(int ...$offsets): static
     {
-        if ([] === $keys || [] === ($path = [...HierarchicalPath::fromUri($this->uri)])) {
+        if ([] === $offsets || [] === ($path = [...HierarchicalPath::fromUri($this->uri)])) {
             return $this;
         }
 
         $nbSegments = count($path);
         $hasChanged = false;
-        foreach ($keys as $key) {
-            if ($key < - $nbSegments - 1 || $key > $nbSegments) {
+        foreach ($offsets as $offset) {
+            if ($offset < - $nbSegments - 1 || $offset > $nbSegments) {
                 continue;
             }
 
-            if (0 > $key) {
-                $key += $nbSegments;
+            if (0 > $offset) {
+                $offset += $nbSegments;
             }
 
-            if (!in_array($path[$key] ?? null, [null, self::MASK], true)) {
+            if (!in_array($path[$offset] ?? null, [null, self::MASK], true)) {
                 $hasChanged = true;
-                $path[$key] = self::MASK;
+                $path[$offset] = self::MASK;
             }
         }
 
@@ -1178,10 +1143,10 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
      *
      * Matching is strict string comparison on raw (decoded) segments.
      *
-     * Example: redactSegment('john')
+     * Example: redactPathSegments('john')
      *  /api/user/john/orders -> /api/user/[REDACTED]/orders
      */
-    public function redactSegments(string ...$segments): static
+    public function redactPathSegments(string ...$segments): static
     {
         if ([] === $segments || [] === ($path = [...HierarchicalPath::fromUri($this->uri)])) {
             return $this;
@@ -1205,10 +1170,10 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
      * Only the next segment is masked — not all subsequent ones.
      * If no following segment exists, it is ignored.
      *
-     * Example: redactNextSegment('john')
+     * Example: redactPathNextSegments('john')
      *   /api/users/john/orders/55/details → /api/users/john/[REDACTED]/55/details
      */
-    public function redactNextSegment(string ...$segments): static
+    public function redactPathNextSegments(string ...$segments): static
     {
         if ([] === $segments || [] === ($path = [...HierarchicalPath::fromUri($this->uri)])) {
             return $this;
