@@ -21,6 +21,7 @@ use Uri\InvalidUriException;
 use function array_reduce;
 use function array_shift;
 use function count;
+use function dd;
 use function filter_var;
 use function in_array;
 use function inet_pton;
@@ -158,7 +159,7 @@ if (PHP_VERSION_ID < 80600) {
             $clone = clone $this;
             $clone->host = $host;
 
-            return $this;
+            return $clone;
         }
 
         /**
