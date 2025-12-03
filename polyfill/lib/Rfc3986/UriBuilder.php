@@ -114,7 +114,7 @@ if (PHP_VERSION_ID < 80600) {
         /**
          * @throws InvalidUriException
          */
-        public function scheme(?string $scheme): self
+        public function setScheme(?string $scheme): self
         {
             if ($scheme === $this->scheme) {
                 return $this;
@@ -131,7 +131,7 @@ if (PHP_VERSION_ID < 80600) {
         /**
          * @throws InvalidUriException
          */
-        public function userInfo(?string $userInfo): self
+        public function setUserInfo(?string $userInfo): self
         {
             if ($userInfo === $this->userInfo) {
                 return $this;
@@ -148,7 +148,7 @@ if (PHP_VERSION_ID < 80600) {
         /**
          * @throws InvalidUriException
          */
-        public function host(?string $host): self
+        public function setHost(?string $host): self
         {
             if ($host === $this->host) {
                 return $this;
@@ -234,7 +234,7 @@ if (PHP_VERSION_ID < 80600) {
         /**
          * @throws InvalidUriException
          */
-        public function port(?int $port): self
+        public function setPort(?int $port): self
         {
             if ($port === $this->port) {
                 return $this;
@@ -251,7 +251,7 @@ if (PHP_VERSION_ID < 80600) {
         /**
          * @throws InvalidUriException
          */
-        public function path(?string $path): self
+        public function setPath(?string $path): self
         {
             if ($path === $this->path) {
                 return $this;
@@ -270,7 +270,7 @@ if (PHP_VERSION_ID < 80600) {
          *
          * @throws InvalidUriException
          */
-        public function pathSegments(array $segments): self
+        public function setPathSegments(array $segments): self
         {
             /**
              * @param list<string> $carry
@@ -286,13 +286,13 @@ if (PHP_VERSION_ID < 80600) {
                 return $carry;
             };
 
-            return $this->path([] === $segments ? null : implode('/', array_reduce($segments, $formatSegments, [])));
+            return $this->setPath([] === $segments ? null : implode('/', array_reduce($segments, $formatSegments, [])));
         }
 
         /**
          * @throws InvalidUriException
          */
-        public function query(?string $query): self
+        public function setQuery(?string $query): self
         {
             if ($query === $this->query) {
                 return $this;
@@ -309,7 +309,7 @@ if (PHP_VERSION_ID < 80600) {
         /**
          * @throws InvalidUriException
          */
-        public function fragment(?string $fragment): self
+        public function setFragment(?string $fragment): self
         {
             if ($fragment === $this->fragment) {
                 return $this;
