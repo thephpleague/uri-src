@@ -17,15 +17,15 @@ use const PHP_VERSION_ID;
 
 if (PHP_VERSION_ID < 80600) {
     /**
-     * This is a user-land polyfill to the native Uri\Rfc3986\HostType Enum included in PHP8.6.
+     * This is a user-land polyfill to the native Uri\Rfc3986\UriType Enum included in PHP8.6.
      *
-     * @see https://wiki.php.net/rfc/uri_followup#host_type_detection
+     * @see https://wiki.php.net/rfc/uri_followup#uri_type_detection
      */
-    enum UriHostType
+    enum UriType
     {
-        case IPv4;
-        case IPv6;
-        case IPvFuture;
-        case RegisteredName;
+        case AbsolutePathReference;
+        case RelativePathReference;
+        case NetworkPathReference;
+        case Uri;
     }
 }

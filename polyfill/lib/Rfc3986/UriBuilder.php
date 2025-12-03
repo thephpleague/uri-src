@@ -18,14 +18,15 @@ use League\Uri\Idna\Converter as IdnaConverter;
 use League\Uri\UriString;
 use Uri\InvalidUriException;
 
+use function array_reduce;
 use function array_shift;
 use function count;
-use function explode;
 use function filter_var;
 use function in_array;
 use function inet_pton;
 use function preg_match;
 use function rawurldecode;
+use function str_replace;
 use function strpos;
 use function substr;
 
@@ -34,6 +35,11 @@ use const FILTER_VALIDATE_IP;
 use const PHP_VERSION_ID;
 
 if (PHP_VERSION_ID < 80600) {
+    /**
+     * This is a user-land polyfill to the native Uri\Rfc3986\UriBuilder clas included in PHP8.6.
+     *
+     * @see https://wiki.php.net/rfc/uri_followup#host_type_detection
+     */
     final class UriBuilder
     {
         /**
@@ -104,6 +110,9 @@ if (PHP_VERSION_ID < 80600) {
         private ?string $query = null;
         private ?string $fragment = null;
 
+        /**
+         * @throws InvalidUriException
+         */
         public function scheme(?string $scheme): self
         {
             if ($scheme === $this->scheme) {
@@ -118,6 +127,9 @@ if (PHP_VERSION_ID < 80600) {
             return $clone;
         }
 
+        /**
+         * @throws InvalidUriException
+         */
         public function userInfo(?string $userInfo): self
         {
             if ($userInfo === $this->userInfo) {
@@ -132,6 +144,9 @@ if (PHP_VERSION_ID < 80600) {
             return $clone;
         }
 
+        /**
+         * @throws InvalidUriException
+         */
         public function host(?string $host): self
         {
             if ($host === $this->host) {
@@ -215,6 +230,9 @@ if (PHP_VERSION_ID < 80600) {
                 && str_starts_with((string)inet_pton($host), self::ZONE_ID_ADDRESS_BLOCK);
         }
 
+        /**
+         * @throws InvalidUriException
+         */
         public function port(?int $port): self
         {
             if ($port === $this->port) {
@@ -229,6 +247,9 @@ if (PHP_VERSION_ID < 80600) {
             return $clone;
         }
 
+        /**
+         * @throws InvalidUriException
+         */
         public function path(?string $path): self
         {
             if ($path === $this->path) {
@@ -243,6 +264,33 @@ if (PHP_VERSION_ID < 80600) {
             return $clone;
         }
 
+        /**
+         * @param list<string> $segments
+         *
+         * @throws InvalidUriException
+         */
+        public function pathSegments(array $segments): self
+        {
+            /**
+             * @param list<string> $carry
+             * @param string $segment
+             *
+             * @throws InvalidUriException
+             * @return list<string>
+             */
+            $formatSegments = static function (array $carry, string $segment): array {
+                UriString::containsRfc3986Chars($segment) || throw new InvalidUriException('The path segment `'.$segment.'` contains invalid characters.');
+                $carry[] = str_replace('/', '%2F', $segment);
+
+                return $carry;
+            };
+
+            return $this->path([] === $segments ? null : implode('/', array_reduce($segments, $formatSegments, [])));
+        }
+
+        /**
+         * @throws InvalidUriException
+         */
         public function query(?string $query): self
         {
             if ($query === $this->query) {
@@ -257,6 +305,9 @@ if (PHP_VERSION_ID < 80600) {
             return $clone;
         }
 
+        /**
+         * @throws InvalidUriException
+         */
         public function fragment(?string $fragment): self
         {
             if ($fragment === $this->fragment) {
@@ -270,60 +321,73 @@ if (PHP_VERSION_ID < 80600) {
             return $clone;
         }
 
+        /**
+         * @throws InvalidUriException
+         */
         public function build(?Uri $baseUri = null): Uri
         {
-            [$authority, $path] = $this->prepareModification();
+            $authority = $this->buildAuthority();
 
-            return new Uri(UriString::buildUri(
-                $this->scheme,
-                $authority,
-                $path,
-                $this->query,
-                $this->fragment
-            ), $baseUri);
+            return new Uri(
+                UriString::buildUri(
+                    $this->scheme,
+                    $authority,
+                    $this->buildPath($authority),
+                    $this->query,
+                    $this->fragment
+                ),
+                $baseUri
+            );
         }
 
-        private function prepareModification(): array
+        private function buildAuthority(): ?string
         {
-            $user = null;
-            $pass = null;
-            if (null !== $this->userInfo) {
-                [$user, $pass] = explode(':', $this->userInfo, 2) + [1 => null];
+            if (null === $this->host) {
+                return null;
             }
 
-            $authority = UriString::buildAuthority([
-                'user' => $user,
-                'pass' => $pass,
-                'host' => $this->host,
-                'port' => $this->port,
-            ]);
+            $authority = '';
+            if (null !== $this->userInfo) {
+                $authority .= $this->userInfo.'@';
+            }
+
+            $authority .= $this->host;
+            if (null !== $this->port) {
+                $authority .= ':'.$this->port;
+            }
+
+            return $authority;
+        }
+
+        private function buildPath(?string $authority): string
+        {
             if (null === $this->path || '' === $this->path) {
-                return [$authority, $this->path];
+                return $this->path;
             }
 
             if (null !== $authority) {
                 // If there is an authority, the path must start with a `/`
-                return [$authority, str_starts_with($this->path, '/') ? $this->path : '/'.$this->path];
+                return str_starts_with($this->path, '/') ? $this->path : '/'.$this->path;
             }
 
             // If there is no authority, the path cannot start with `//`
             if (str_starts_with($this->path, '//')) {
-                return [$authority, '/.'.$this->path];
+                return '/.'.$this->path;
             }
 
             $colonPos = strpos($this->path, ':');
             if (false === $colonPos) {
-                return [$authority, $this->path];
+                return $this->path;
             }
 
             // In the absence of a scheme and of an authority,
             // the first path segment cannot contain a colon (":") character.'
             $slashPos = strpos($this->path, '/');
             if (false === $slashPos || $colonPos < $slashPos) {
-                return [$authority, './'.$this->path];
+                return './'.$this->path;
             }
 
-            return [$authority, $this->path];
+            return $this->path;
         }
     }
 }
