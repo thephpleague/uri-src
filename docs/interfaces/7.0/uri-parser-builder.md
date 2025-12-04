@@ -188,21 +188,22 @@ echo $path;  //displays 'path/to/the/sky%7Bfoo%7D'
 ## URI Validation
 
 <p class="message-notice">Available since version <code>7.6</code></p>
+<p class="message-notice"><code>UriString::isValidHost</code> is deprecated in favor of <code>HostRecord::validate</code> since <code>7.7</code></p>
 
 The class exposes static methods to validate that a string:
 
 - represents a valid scheme with the `isValidScheme()` method
-- represents a valid host according to RFC3986/RFC3987 with the `isValidHost()` method
 - only contains valid RFC3986 characters with the `containsRfc3986Chars()` method
 - only contains valid RFC3987 characters with the `containsRfc3987Chars()` method
 
 ~~~php
 <?php
 
-use League\Uri\Uri;use League\Uri\UriString;
+use League\Uri\Uri;
+use League\Uri\UriString;
 
 UriString::isValidScheme('foo '); //returns false because of the trailing space
-UriString::isValidHost('333.333.333.1.333'); //returns true
 UriString::containsRfc3986Chars('http://bébé.be'); //returns false non-ascii character are not allowed
 UriString::containsRfc3987Chars('http://bébé.be'); //returns true
 ~~~
+
