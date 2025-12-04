@@ -16,9 +16,11 @@ namespace Uri\Rfc3986;
 use League\Uri\Encoder;
 use League\Uri\HostRecord;
 use League\Uri\UriString;
+use SensitiveParameter;
 use Uri\InvalidUriException;
 
-use function array_reduce;
+use function array_map;
+use function implode;
 use function str_replace;
 use function strpos;
 
@@ -28,7 +30,7 @@ if (PHP_VERSION_ID < 80600) {
     /**
      * This is a user-land polyfill to the native Uri\Rfc3986\UriBuilder clas included in PHP8.6.
      *
-     * @see https://wiki.php.net/rfc/uri_followup#host_type_detection
+     * @see https://wiki.php.net/rfc/uri_followup#uri_building
      */
     final class UriBuilder
     {
@@ -45,33 +47,30 @@ if (PHP_VERSION_ID < 80600) {
          */
         public function setScheme(?string $scheme): self
         {
-            if ($scheme === $this->scheme) {
-                return $this;
+            if ($scheme !== $this->scheme) {
+                UriString::isValidScheme($scheme)
+                || throw new InvalidUriException('The scheme `'.$scheme.'` is invalid.');
+
+                $this->scheme = $scheme;
             }
 
-            UriString::isValidScheme($scheme) || throw new InvalidUriException('The scheme `'.$scheme.'` is invalid.');
-
-            $clone = clone $this;
-            $clone->scheme = $scheme;
-
-            return $clone;
+            return $this;
         }
 
         /**
          * @throws InvalidUriException
          */
-        public function setUserInfo(?string $userInfo): self
+        public function setUserInfo(#[SensitiveParameter] ?string $userInfo): self
         {
-            if ($userInfo === $this->userInfo) {
-                return $this;
+            if ($userInfo !== $this->userInfo) {
+                null === $userInfo
+                || (UriString::containsRfc3986Chars($userInfo) && Encoder::isUserInfoEncoded($userInfo))
+                || throw new InvalidUriException('The userInfo `'.$userInfo.'` contains invalid characters.');
+
+                $this->userInfo = $userInfo;
             }
 
-            null === $userInfo || (UriString::containsRfc3986Chars($userInfo) && Encoder::isUserInfoEncoded($userInfo)) || throw new InvalidUriException('The userInfo `'.$userInfo.'` contains invalid characters.');
-
-            $clone = clone $this;
-            $clone->userInfo = $userInfo;
-
-            return $clone;
+            return $this;
         }
 
         /**
@@ -79,16 +78,14 @@ if (PHP_VERSION_ID < 80600) {
          */
         public function setHost(?string $host): self
         {
-            if ($host === $this->host) {
-                return $this;
+            if ($host !== $this->host) {
+                HostRecord::validate($host)
+                || throw new InvalidUriException('The host `'.$host.'` is invalid.');
+
+                $this->host = $host;
             }
 
-            HostRecord::validate($host) || throw new InvalidUriException('The host `'.$host.'` is invalid.');
-
-            $clone = clone $this;
-            $clone->host = $host;
-
-            return $clone;
+            return $this;
         }
 
         /**
@@ -96,16 +93,15 @@ if (PHP_VERSION_ID < 80600) {
          */
         public function setPort(?int $port): self
         {
-            if ($port === $this->port) {
-                return $this;
+            if ($port !== $this->port) {
+                null === $port
+                || ($port >= 0 && $port < 65535)
+                || throw new InvalidUriException('The port value must be null or an integer between 0 and 65535.');
+
+                $this->port = $port;
             }
 
-            $port === null || ($port >= 0 && $port < 65535) || throw new InvalidUriException('The port value must be null or an integer between 0 and 65535.');
-
-            $clone = clone $this;
-            $clone->port = $port;
-
-            return $clone;
+            return $this;
         }
 
         /**
@@ -113,16 +109,16 @@ if (PHP_VERSION_ID < 80600) {
          */
         public function setPath(?string $path): self
         {
-            if ($path === $this->path) {
-                return $this;
+            if ($path !== $this->path) {
+                null === $path
+                || '' === $path
+                || (UriString::containsRfc3986Chars($path) && Encoder::isPathEncoded($path))
+                || throw new InvalidUriException('The path `'.$path.'` contains invalid characters.');
+
+                $this->path = $path;
             }
 
-            null === $path || '' === $path || (UriString::containsRfc3986Chars($path) && Encoder::isPathEncoded($path)) || throw new InvalidUriException('The path `'.$path.'` contains invalid characters.');
-
-            $clone = clone $this;
-            $clone->path = $path;
-
-            return $clone;
+            return $this;
         }
 
         /**
@@ -132,21 +128,12 @@ if (PHP_VERSION_ID < 80600) {
          */
         public function setPathSegments(array $segments): self
         {
-            /**
-             * @param list<string> $carry
-             * @param string $segment
-             *
-             * @throws InvalidUriException
-             * @return list<string>
-             */
-            $formatSegments = static function (array $carry, string $segment): array {
-                UriString::containsRfc3986Chars($segment) || throw new InvalidUriException('The path segment `'.$segment.'` contains invalid characters.');
-                $carry[] = str_replace('/', '%2F', $segment);
+            $segments = array_map(
+                fn (string $segment): string => str_replace('/', '%2F', $segment),
+                $segments
+            );
 
-                return $carry;
-            };
-
-            return $this->setPath([] === $segments ? null : implode('/', array_reduce($segments, $formatSegments, [])));
+            return $this->setPath([] === $segments ? null : implode('/', $segments));
         }
 
         /**
@@ -154,16 +141,15 @@ if (PHP_VERSION_ID < 80600) {
          */
         public function setQuery(?string $query): self
         {
-            if ($query === $this->query) {
-                return $this;
+            if ($query !== $this->query) {
+                null === $query
+                || (UriString::containsRfc3986Chars($query) && Encoder::isQueryEncoded($query))
+                || throw new InvalidUriException('The query string `'.$query.'` contains invalid characters.');
+
+                $this->query = $query;
             }
 
-            null === $query || (UriString::containsRfc3986Chars($query) && Encoder::isQueryEncoded($query)) || throw new InvalidUriException('The query string `'.$query.'` contains invalid characters.');
-
-            $clone = clone $this;
-            $clone->query = $query;
-
-            return $clone;
+            return $this;
         }
 
         /**
@@ -171,15 +157,15 @@ if (PHP_VERSION_ID < 80600) {
          */
         public function setFragment(?string $fragment): self
         {
-            if ($fragment === $this->fragment) {
-                return $this;
+            if ($fragment !== $this->fragment) {
+                null === $fragment
+                || (UriString::containsRfc3986Chars($fragment) && Encoder::isFragmentEncoded($fragment))
+                || throw new InvalidUriException('The fragment string `'.$fragment.'` contains invalid characters.');
+
+                $this->fragment = $fragment;
             }
 
-            null === $fragment || (UriString::containsRfc3986Chars($fragment) && Encoder::isFragmentEncoded($fragment)) || throw new InvalidUriException('The fragment string `'.$fragment.'` contains invalid characters.');
-            $clone = clone $this;
-            $clone->fragment = $fragment;
-
-            return $clone;
+            return $this;
         }
 
         /**
@@ -201,10 +187,14 @@ if (PHP_VERSION_ID < 80600) {
             );
         }
 
+        /**
+         * @throws InvalidUriException
+         */
         private function buildAuthority(): ?string
         {
             if (null === $this->host) {
-                null === $this->userInfo || throw new InvalidUriException('The UserInfo component is set without a host component being present.');
+                (null === $this->userInfo && null === $this->port)
+                || throw new InvalidUriException('The UserInfo and/or the port component are set without a host component being present.');
 
                 return null;
             }
@@ -222,6 +212,9 @@ if (PHP_VERSION_ID < 80600) {
             return $authority;
         }
 
+        /**
+         * @throws InvalidUriException
+         */
         private function buildPath(?string $authority): ?string
         {
             if (null === $this->path || '' === $this->path) {
@@ -239,15 +232,13 @@ if (PHP_VERSION_ID < 80600) {
             }
 
             $colonPos = strpos($this->path, ':');
-            if (false === $colonPos) {
-                return $this->path;
-            }
-
-            // In the absence of a scheme and of an authority,
-            // the first path segment cannot contain a colon (":") character.'
-            $slashPos = strpos($this->path, '/');
-            if (false === $slashPos || $colonPos < $slashPos) {
-                return './'.$this->path;
+            if (false !== $colonPos && null === $this->scheme) {
+                // In the absence of a scheme and of an authority,
+                // the first path segment cannot contain a colon (":") character.'
+                $slashPos = strpos($this->path, '/');
+                (false !== $slashPos && $colonPos > $slashPos) || throw new InvalidUriException(
+                    'In absence of the scheme and authority components, the first path segment cannot contain a colon (":") character.'
+                );
             }
 
             return $this->path;
