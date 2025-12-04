@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace League\Uri;
 
+use Exception;
+use JsonSerializable;
 use League\Uri\Exceptions\SyntaxError;
 use League\Uri\Idna\Converter as IdnConverter;
 use Stringable;
@@ -33,7 +35,10 @@ use const FILTER_FLAG_IPV4;
 use const FILTER_FLAG_IPV6;
 use const FILTER_VALIDATE_IP;
 
-final class HostRecord
+/**
+ * @phpstan-type HostRecordSerializedShape array{0: array{host: ?string}, 1: array{}}
+ */
+final class HostRecord implements JsonSerializable
 {
     /**
      * Maximum number of host cached.
@@ -106,6 +111,12 @@ final class HostRecord
 
     private ?bool $isDomainName = null;
     private ?bool $hasZoneIdentifier = null;
+    private bool $asciiIsLoaded = false;
+    private ?string $hostAsAscii = null;
+    private bool $unicodeIsLoaded = false;
+    private ?string $hostAsUnicode = null;
+    private bool $isIpVersionLoaded = false;
+    private ?string $ipVersion = null;
 
     private function __construct(
         public readonly ?string $value,
@@ -116,66 +127,126 @@ final class HostRecord
 
     public function hasZoneIdentifier(): bool
     {
-        $this->hasZoneIdentifier ??= HostType::Ipv6 === $this->type && str_contains((string) $this->value, '%');
-
-        return $this->hasZoneIdentifier;
+        return $this->hasZoneIdentifier ??= HostType::Ipv6 === $this->type && str_contains((string) $this->value, '%');
     }
 
     public function toAscii(): ?string
     {
-        if (HostType::RegisteredName !== $this->type || null === $this->value) {
-            return $this->value;
-        }
-        $formattedHost = rawurldecode($this->value);
-        if ($formattedHost === $this->value) {
-            return $this->isDomainName() ? IdnConverter::toAscii($this->value)->domain() : strtolower($formattedHost);
+        if (!$this->asciiIsLoaded) {
+            $generate = function (): ?string {
+                if (HostType::RegisteredName !== $this->type || null === $this->value) {
+                    return $this->value;
+                }
+
+                $formattedHost = rawurldecode($this->value);
+                if ($formattedHost === $this->value) {
+                    return $this->isDomainType() ? IdnConverter::toAscii($this->value)->domain() : strtolower($formattedHost);
+                }
+
+                return Encoder::normalizeHost($this->value);
+            };
+
+            $this->asciiIsLoaded = true;
+            $this->hostAsAscii = $generate();
         }
 
-        return Encoder::normalizeHost($this->value);
+        return $this->hostAsAscii;
     }
 
     public function toUnicode(): ?string
     {
-        return $this->isDomainName() && null !== $this->value ? IdnConverter::toUnicode($this->value)->domain() : $this->value;
+        if (!$this->unicodeIsLoaded) {
+            $this->unicodeIsLoaded = true;
+            $this->hostAsUnicode = $this->isDomainType() && null !== $this->value ? IdnConverter::toUnicode($this->value)->domain() : $this->value;
+        }
+
+        return $this->hostAsUnicode;
     }
 
-    public function isDomainName(): bool
+    public function isDomainType(): bool
     {
-        if (null !== $this->isDomainName) {
-            return $this->isDomainName;
-        }
-
-        if (HostType::RegisteredName !== $this->type) {
-            return $this->isDomainName = false;
-        }
-
-        if (null === $this->value) {
-            return $this->isDomainName = true;
-        }
-
-        if ('' === $this->value) {
-            return $this->isDomainName = false;
-        }
-
-        $result = IdnConverter::toAscii($this->value);
-
-        return $this->isDomainName = (!$result->hasErrors() && self::isValidDomain($result->domain()));
+        return $this->isDomainName ??= match (true) {
+            HostType::RegisteredName !== $this->type, '' === $this->value => false,
+            null === $this->value => true,
+            default => is_object($result = IdnConverter::toAscii($this->value))
+                && !$result->hasErrors()
+                && self::isValidDomain($result->domain()),
+        };
     }
 
     public function ipVersion(): ?string
     {
-        return match (true) {
-            HostType::Ipv4 === $this->type => '4',
-            HostType::Ipv6 === $this->type => '6',
-            1 === preg_match(self::REGEXP_IP_FUTURE, substr((string) $this->value, 1, -1), $matches) => $matches['version'],
-            default => null,
-        };
+        if (!$this->isIpVersionLoaded) {
+            $this->isIpVersionLoaded = true;
+            $this->ipVersion = match (true) {
+                HostType::Ipv4 === $this->type => '4',
+                HostType::Ipv6 === $this->type => '6',
+                1 === preg_match(self::REGEXP_IP_FUTURE, substr((string) $this->value, 1, -1), $matches) => $matches['version'],
+                default => null,
+            };
+        }
+
+        return $this->ipVersion;
     }
 
-    public static function validate(Stringable|string|null $host): bool
+    public static function isValid(Stringable|string|null $host): bool
     {
         try {
+            if (null !== $host) {
+                $host = (string) $host;
+            }
+
             return HostRecord::from($host)->value === $host;
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    public static function isIpv4(Stringable|string|null $host): bool
+    {
+        try {
+            return HostType::Ipv4 === HostRecord::from($host)->type;
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    public static function isIpv6(Stringable|string|null $host): bool
+    {
+        try {
+            return HostType::Ipv6 === HostRecord::from($host)->type;
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    public static function isIpvFuture(Stringable|string|null $host): bool
+    {
+        try {
+            return HostType::IpvFuture === HostRecord::from($host)->type;
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    public static function isIp(Stringable|string|null $host): bool
+    {
+        return !self::isRegisteredName($host);
+    }
+
+    public static function isRegisteredName(Stringable|string|null $host): bool
+    {
+        try {
+            return HostType::RegisteredName === HostRecord::from($host)->type;
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    public static function isDomain(Stringable|string|null $host): bool
+    {
+        try {
+            return HostRecord::from($host)->isDomainType();
         } catch (Throwable) {
             return false;
         }
@@ -298,5 +369,33 @@ final class HostRecord
             && 1 !== preg_match(self::REGEXP_GEN_DELIMS, $scope)
             && false !== filter_var($ipv6, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)
             && str_starts_with((string)inet_pton((string)$ipv6), self::ADDRESS_BLOCK);
+    }
+
+    public function jsonSerialize(): ?string
+    {
+        return $this->value;
+    }
+
+    /**
+     * @return HostRecordSerializedShape
+     */
+    public function __serialize(): array
+    {
+        return [['host' => $this->value], []];
+    }
+
+    /**
+     * @param HostRecordSerializedShape $data
+     *
+     * @throws Exception
+     */
+    public function __unserialize(array $data): void
+    {
+        [$properties] = $data;
+        $record = self::from($properties['host'] ?? throw new Exception('The `host` property is missing from the serialized object.'));
+
+        $this->value = $record->value;
+        $this->type = $record->type;
+        $this->format = $record->format;
     }
 }
