@@ -16,6 +16,7 @@ namespace Uri\Rfc3986;
 use Exception;
 use League\Uri\Encoder;
 use League\Uri\Exceptions\SyntaxError;
+use League\Uri\HostRecord;
 use League\Uri\UriString;
 use SensitiveParameter;
 use Uri\InvalidUriException;
@@ -322,7 +323,7 @@ if (PHP_VERSION_ID < 80500) {
             return match (true) {
                 null !== $host && str_contains($host, "\0") => throw new ValueError('Argument #1 ($host) must not contain any null bytes'),
                 $host === $this->getRawHost() => $this,
-                UriString::isValidHost($host) => $this->withComponent(['host' => $host]),
+                HostRecord::validate($host) => $this->withComponent(['host' => $host]),
                 default => throw new InvalidUriException('The host component value `'.$host.'` is not a valid host.'),
             };
         }
