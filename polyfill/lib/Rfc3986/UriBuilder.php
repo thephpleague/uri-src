@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Uri\Rfc3986;
 
-use HostRecord;
 use League\Uri\Encoder;
+use League\Uri\HostRecord;
 use League\Uri\UriString;
 use Uri\InvalidUriException;
 
@@ -222,7 +222,7 @@ if (PHP_VERSION_ID < 80600) {
             return $authority;
         }
 
-        private function buildPath(?string $authority): string
+        private function buildPath(?string $authority): ?string
         {
             if (null === $this->path || '' === $this->path) {
                 return $this->path;
