@@ -270,8 +270,9 @@ to apply the following changes to the submitted URI.
   <li><a href="#modifierappendquerypairs">appendQueryPairs</a></li>
   <li><a href="#modifierremovequerypairs">removeQueryPairs</a></li>
   <li><a href="#modifiermergequerypairs">mergeQueryPairs</a></li>
-  <li><a href="#modifiermreplacequerypair">replaceQueryPair</a></li>
-  <li><a href="#modifiermreplacequeryparameter">replaceQueryParameter</a></li>
+  <li><a href="#modifierreplacequerypair">replaceQueryPair</a></li>
+  <li><a href="#modifierreplacequeryparameter">replaceQueryParameter</a></li>
+  <li><a href="#modifierredactquerypairs">redactQueryPairs</a></li>
 </ul>
 </div>
 <div>
@@ -319,6 +320,9 @@ to apply the following changes to the submitted URI.
   <li><a href="#modifierreplacedatauriparameters">replaceDataUriParameters</a></li>
   <li><a href="#modifierdatapathtobinary">dataPathToBinary</a></li>
   <li><a href="#modifierdatapathtoascii">dataPathToAscii</a></li>
+  <li><a href="#modifierredactpathsegments">redactPathSegments</a></li>
+  <li><a href="#modifierredactpathnextsegments">redactPathNextSegments</a></li>
+  <li><a href="#modifierredactpathsegmentsbyoffset">redactPathSegmentsByOffset</a></li>
 </ul>
 </div>
 <div>
@@ -340,6 +344,7 @@ to apply the following changes to the submitted URI.
 <ul>
     <li><a href="#modifierwithscheme">withScheme</a></li>
     <li><a href="#modifierwithuserinfo">withUserInfo</a></li>
+    <li><a href="#modifierredactuserinfo">redactUserInfo</a></li>
     <li><a href="#modifierwithport">withPort</a></li>
 </ul>
 </div>
@@ -579,6 +584,21 @@ echo $newUri->unwrap()->getQuery(); //display "kingkong=toto&fo.o%5Bname%5D=john
 ~~~
 
 <p class="message-warning">If the name does not exist, a <code>ValueError</code> will be thrown</p>
+
+### Modifier::redactQueryPairs
+
+<p class="message-notice">since version <code>7.7.0</code></p>
+
+Redact query pair from the current URI by providing its offset.
+
+~~~php
+$uri = "http://example.com/test.php?kingkong=toto&fo.o=bar&fo_o=bar";
+$newUri = Modifier::wrap($uri)->redactQueryPairs('kingkong');
+
+echo $newUri->unwrap()->getQuery(); //display "kingkong=*****&name=john&fo_o=bar"
+~~~
+
+<p class="message-warning">If the offset does not exist, no modification is applied</p>
 
 ## Host modifiers
 
@@ -1134,6 +1154,53 @@ echo Modifier::wrap($uri)
 //display "text/plain;charset=US-ASCII,Hello%20World!"
 ~~~
 
+### Modifier::redactPathSegments
+
+<p class="message-notice">since version <code>7.7.0</code></p>
+
+Redact path segments from the current URI by providing its value.
+
+~~~php
+$uri = "http://example.com/api/users/john/orders/55/details?kingkong=toto&fo.o=bar&fo_o=bar";
+$newUri = Modifier::wrap($uri)->redactPathSegments('john', '55');
+
+echo $newUri->unwrap()->getPath(); //display "/api/users/*****/orders/*****/details"
+~~~
+
+<p class="message-warning">If the segment does not exist, no modification is applied</p>
+
+### Modifier::redactPathNextSegments
+
+<p class="message-notice">since version <code>7.7.0</code></p>
+
+Redact path segments from the current URI by providing the value of the segment
+that preceeds it immediately.
+
+~~~php
+$uri = "http://example.com/api/users/john/orders/55/details?kingkong=toto&fo.o=bar&fo_o=bar";
+$newUri = Modifier::wrap($uri)->redactPathNextSegments('users', 'orders');
+
+echo $newUri->unwrap()->getPath(); //display "/api/users/*****/orders/*****/details"
+~~~
+
+<p class="message-warning">If the segment or the next segment do not exist, no modification is applied</p>
+
+### Modifier::redactPathSegmentsByOffset
+
+<p class="message-notice">since version <code>7.7.0</code></p>
+
+Redact path segments from the current URI by providing the offset of the segment.
+
+~~~php
+$uri = "http://example.com/api/users/john/orders/55/details?kingkong=toto&fo.o=bar&fo_o=bar";
+$newUri = Modifier::wrap($uri)->redactPathSegmentsByOffset(2, -2);
+
+echo $newUri->unwrap()->getPath(); //display "/api/users/*****/orders/*****/details"
+~~~
+
+<p class="message-info">Negative offsets are supported</p>
+<p class="message-warning">If the segment or the next segment do not exist, no modification is applied</p>
+
 ## Fragment Modifiers
 
 ### Modifier::withFragment
@@ -1308,6 +1375,22 @@ echo Modifier::wrap($uri)
 // display ":pa%40ss"
 // for information the Uri::withUserInfo method only takes a single variable.
 ~~~
+
+### Modifier::redactUserInfo
+
+<p class="message-notice">since version <code>7.7.0</code></p>
+
+Redact the user info compoment from the current URI.
+
+~~~php
+$uri = "https://john:secretpass@example.com/api/v1/orders";
+$newUri = Modifier::wrap($uri)->redactUserInfo();
+
+echo $newUri->unwrap()->getPath(); //display "https://*****@example.com/api/v1/orders"
+~~~
+
+<p class="message-warning">If at least, the user or the password component are present, the full component is redacted.</p>
+<p class="message-warning">If no <code>UserInfo</code> component exists nothing will get masked, no modification is applied</p>
 
 ### Modifier::withScheme
 
