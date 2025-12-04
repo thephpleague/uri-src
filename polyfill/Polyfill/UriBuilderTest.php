@@ -72,11 +72,46 @@ final class UriBuilderTest extends TestCase
             ->build();
     }
 
+    public function test_it_fails_if_the_scheme_contains_invalid_characters(): void
+    {
+        $this->expectException(InvalidUriException::class);
+
+        (new UriBuilder())->setScheme('htt*s')->build();
+    }
+
+    public function test_it_fails_if_the_user_info_contains_invalid_characters(): void
+    {
+        $this->expectException(InvalidUriException::class);
+
+        (new UriBuilder())->setUserInfo('user:mot de passe')->build();
+    }
+
+    public function test_it_fails_if_the_host_contains_invalid_characters(): void
+    {
+        $this->expectException(InvalidUriException::class);
+
+        (new UriBuilder())->setHost('bébé.be')->build();
+    }
+
     public function test_it_fails_if_the_path_contains_invalid_characters(): void
     {
         $this->expectException(InvalidUriException::class);
 
         (new UriBuilder())->setPathSegments(['rfc', 'uri_fòllowup'])->build();
+    }
+
+    public function test_it_fails_if_the_query_contains_invalid_characters(): void
+    {
+        $this->expectException(InvalidUriException::class);
+
+        (new UriBuilder())->setQuery('foo=bàr')->build();
+    }
+
+    public function test_it_fails_if_the_fragment_contains_invalid_characters(): void
+    {
+        $this->expectException(InvalidUriException::class);
+
+        (new UriBuilder())->setFragment(':~:fràgment=now')->build();
     }
 
     public function test_it_prepend_the_path_when_there_is_too_many_slashes(): void

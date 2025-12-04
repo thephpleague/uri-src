@@ -79,7 +79,8 @@ if (PHP_VERSION_ID < 80600) {
         public function setHost(?string $host): self
         {
             if ($host !== $this->host) {
-                HostRecord::validate($host)
+                null === $host
+                || (UriString::containsRfc3986Chars($host) && HostRecord::validate($host))
                 || throw new InvalidUriException('The host `'.$host.'` is invalid.');
 
                 $this->host = $host;
@@ -128,12 +129,14 @@ if (PHP_VERSION_ID < 80600) {
          */
         public function setPathSegments(array $segments): self
         {
-            $segments = array_map(
-                fn (string $segment): string => str_replace('/', '%2F', $segment),
-                $segments
+            return $this->setPath(
+                [] === $segments
+                    ? null
+                    : implode('/', array_map(
+                        fn (string $segment): string => str_replace('/', '%2F', $segment),
+                        $segments
+                    ))
             );
-
-            return $this->setPath([] === $segments ? null : implode('/', $segments));
         }
 
         /**
