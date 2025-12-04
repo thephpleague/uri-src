@@ -18,14 +18,27 @@ future calls.
 
 ## Host Validation
 
+The class exposes several validation rules. The basic validation rules tells
+whether the input is considered a valid host:
+
 ```php
 use League\Uri\HostRecord;
 
-if (HostRecord::validate('[fe80:1234::]')) {
+if (HostRecord::isValid('[fe80:1234::]')) {
     //the host is valid you can proceed
     //with whatever you need to do with this host
 }
 ```
+
+The class exposes more specific validation rules that works using the same logic
+but allow to check if the host is:
+
+- an IPv4 address using `HostRecord::isIpv4`
+- an IPv6 address using `HostRecord::isIpv6`
+- an IPvFuture address using `HostRecord::isIpvFuture`
+- an IP address using `HostRecord::isIp`
+- a Registered Name address using `HostRecord::isRegisteredName`
+- a Domain Name address using `HostRecord::isDomain`
 
 ## Host Record
 
@@ -41,7 +54,7 @@ $hostRecord->type;           // HostType::Ipv6
 $hostRecord->format;         // HostFormat::Ascii
 $hostRecord->toAscii();      // returns '[fe80:1234::]'
 $hostRecord->toUnicode();    // returns '[fe80:1234::]'
-$hostRecord->isDomainName(); // returns false
+$hostRecord->isDomainType(); // returns false
 $hostRecord->ipVersion();    // returns '6'
 ```
 
