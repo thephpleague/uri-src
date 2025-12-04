@@ -80,7 +80,7 @@ if (PHP_VERSION_ID < 80600) {
         {
             if ($host !== $this->host) {
                 null === $host
-                || (UriString::containsRfc3986Chars($host) && HostRecord::validate($host))
+                || (UriString::containsRfc3986Chars($host) && HostRecord::isValid($host))
                 || throw new InvalidUriException('The host `'.$host.'` is invalid.');
 
                 $this->host = $host;
