@@ -75,6 +75,7 @@ final class URLSearchParamsTest extends TestCase
         self::assertTrue($params->has('id'), 'Search params object has name "id"');
         self::assertTrue($params->has('value'), 'Search params object has name "value"');
         self::assertSame('0', $params->get('id'));
+        self::assertSame('0', $params->first('id'));
         self::assertSame('%', $params->get('value'));
 
         $params = new URLSearchParams('b=%2sf%2a');
@@ -257,6 +258,10 @@ final class URLSearchParamsTest extends TestCase
         $params->append('first', 10);
         self::assertSame('1', $params->get('first'));
         self::assertSame(['1', '10', '10'], [...$params->getAll('first')]);
+        self::assertSame('1', $params->first('first'));
+        self::assertSame('10', $params->last('first'));
+        self::assertNull($params->last('fourth'));
+        self::assertNull($params->first('fourth'));
     }
 
     public function testDeleteBasics(): void
@@ -313,7 +318,7 @@ final class URLSearchParamsTest extends TestCase
         $params->append('a', 'b');
         $params->append('a', 'c');
         $params->append('a', 'd');
-        $params->delete('a', 'c');
+        $params->deleteValue('a', 'c');
         self::assertSame($params->toString(), 'a=b&a=d');
         self::assertCount(2, $params);
     }
@@ -691,17 +696,17 @@ JSON;
     public function testHasMethodSupportsTwoVariables(): void
     {
         $params = new URLSearchParams('a=b&a=d&c&e&');
-        self::assertTrue($params->has('a', 'b'));
-        self::assertFalse($params->has('a', 'c'));
-        self::assertTrue($params->has('a', 'd'));
-        self::assertTrue($params->has('e', ''));
+        self::assertTrue($params->hasValue('a', 'b'));
+        self::assertFalse($params->hasValue('a', 'c'));
+        self::assertTrue($params->hasValue('a', 'd'));
+        self::assertTrue($params->hasValue('e', ''));
 
         $params->append('first', null);
-        self::assertFalse($params->has('first', ''));
-        self::assertTrue($params->has('first', 'null'));
+        self::assertFalse($params->hasValue('first', ''));
+        self::assertTrue($params->hasValue('first', 'null'));
 
-        $params->delete('a', 'b');
-        self::assertTrue($params->has('a', 'd'));
+        $params->deleteValue('a', 'b');
+        self::assertTrue($params->hasValue('a', 'd'));
     }
 
     public function testInvalidHasUsageWithoutMoreThanTwoArguments(): void
