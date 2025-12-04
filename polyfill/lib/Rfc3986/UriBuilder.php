@@ -13,26 +13,15 @@ declare(strict_types=1);
 
 namespace Uri\Rfc3986;
 
+use HostRecord;
 use League\Uri\Encoder;
-use League\Uri\Idna\Converter as IdnaConverter;
 use League\Uri\UriString;
 use Uri\InvalidUriException;
 
 use function array_reduce;
-use function array_shift;
-use function count;
-use function dd;
-use function filter_var;
-use function in_array;
-use function inet_pton;
-use function preg_match;
-use function rawurldecode;
 use function str_replace;
 use function strpos;
-use function substr;
 
-use const FILTER_FLAG_IPV6;
-use const FILTER_VALIDATE_IP;
 use const PHP_VERSION_ID;
 
 if (PHP_VERSION_ID < 80600) {
@@ -43,66 +32,6 @@ if (PHP_VERSION_ID < 80600) {
      */
     final class UriBuilder
     {
-        /**
-         * General registered name regular expression.
-         *
-         * @link https://tools.ietf.org/html/rfc3986#section-3.2.2
-         * @var string
-         */
-        private const REGEXP_REGISTERED_NAME = '/(?(DEFINE)
-            (?<unreserved>[a-z0-9_~\-])   # . is missing as it is used to separate labels
-            (?<sub_delims>[!$&\'()*+,;=])
-            (?<encoded>%[A-F0-9]{2})
-            (?<reg_name>(?:(?&unreserved)|(?&sub_delims)|(?&encoded))*)
-        )
-        ^(?:(?&reg_name)\.)*(?&reg_name)\.?$/ix';
-
-        /**
-         * IPvFuture regular expression.
-         *
-         * @link https://tools.ietf.org/html/rfc3986#section-3.2.2
-         * @var string
-         */
-        private const REGEXP_IP_FUTURE = '/^
-            v(?<version>[A-F0-9])+\.
-            (?:
-                (?<unreserved>[a-z0-9_~\-\.])|
-                (?<sub_delims>[!$&\'()*+,;=:])  # also include the : character
-            )+
-        $/ix';
-
-        /**
-         * Invalid characters in host regular expression.
-         *
-         * @link https://tools.ietf.org/html/rfc3986#section-3.2.2
-         * @var string
-         */
-        private const REGEXP_INVALID_HOST_CHARS = '/
-            [:\/?#\[\]@ ]  # gen-delims characters as well as the space character
-        /ix';
-
-        /**
-         * Only the address block fe80::/10 can have a Zone ID attach to
-         * let's detect the link local significant 10 bits.
-         *
-         * @var string
-         */
-        private const ZONE_ID_ADDRESS_BLOCK = "\xfe\x80";
-
-        /**
-         * IDN Host detector regular expression.
-         *
-         * @var string
-         */
-        private const REGEXP_IDN_PATTERN = '/[^\x20-\x7f]/';
-
-        /**
-         * Maximum number of host cached.
-         *
-         * @var int
-         */
-        private const MAXIMUM_HOST_CACHED = 100;
-
         private ?string $scheme = null;
         private ?string $userInfo = null;
         private ?string $host = null;
@@ -154,81 +83,12 @@ if (PHP_VERSION_ID < 80600) {
                 return $this;
             }
 
-            self::isHost($host) || throw new InvalidUriException('The host `'.$host.'` is invalid.');
+            HostRecord::validate($host) || throw new InvalidUriException('The host `'.$host.'` is invalid.');
 
             $clone = clone $this;
             $clone->host = $host;
 
             return $clone;
-        }
-
-        /**
-         * @link https://tools.ietf.org/html/rfc3986#section-3.2.2
-         * @link https://tools.ietf.org/html/rfc6874#section-2
-         * @link https://tools.ietf.org/html/rfc6874#section-4
-         */
-        private static function isHost(?string $host): bool
-        {
-            if (null === $host || '' === $host) {
-                return true;
-            }
-
-            /** @var array<string, 1> $hostCache */
-            static $hostCache = [];
-            if (isset($hostCache[$host])) {
-                return true;
-            }
-
-            if (self::MAXIMUM_HOST_CACHED < count($hostCache)) {
-                array_shift($hostCache);
-            }
-
-             if (self::isValidHost($host)) {
-                 $hostCache[$host] = true;
-
-                 return true;
-             }
-
-             return false;
-        }
-
-        private static function isValidHost(string $host): bool
-        {
-            if ('[' !== $host[0] || !str_ends_with($host, ']')) {
-                $formattedHost = rawurldecode($host);
-                if ($formattedHost !== $host) {
-                    return !IdnaConverter::toAscii($formattedHost)->hasErrors();
-                }
-
-                if (1 === preg_match(self::REGEXP_REGISTERED_NAME, $formattedHost)) {
-                    return true;
-                }
-
-                //to test IDN host non-ascii characters must be present in the host
-                if (1 !== preg_match(self::REGEXP_IDN_PATTERN, $formattedHost)) {
-                    return false;
-                }
-
-                return !IdnaConverter::toAscii($host)->hasErrors();
-            }
-
-            if (false !== filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-                return true;
-            }
-
-            if (1 === preg_match(self::REGEXP_IP_FUTURE, $host, $matches)) {
-                return !in_array($matches['version'], ['4', '6'], true);
-            }
-
-            $pos = strpos($host, '%');
-            if (false === $pos || 1 === preg_match(self::REGEXP_INVALID_HOST_CHARS, rawurldecode(substr($host, $pos)))) {
-                return false;
-            }
-
-            $host = substr($host, 0, $pos);
-
-            return false !== filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)
-                && str_starts_with((string)inet_pton($host), self::ZONE_ID_ADDRESS_BLOCK);
         }
 
         /**
@@ -344,6 +204,8 @@ if (PHP_VERSION_ID < 80600) {
         private function buildAuthority(): ?string
         {
             if (null === $this->host) {
+                null === $this->userInfo || throw new InvalidUriException('The UserInfo component is set without a host component being present.');
+
                 return null;
             }
 
