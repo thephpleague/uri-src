@@ -25,8 +25,10 @@ use function array_key_first;
 use function count;
 use function explode;
 use function filter_var;
+use function get_object_vars;
 use function in_array;
 use function inet_pton;
+use function is_object;
 use function preg_match;
 use function rawurldecode;
 use function strtolower;
@@ -134,7 +136,8 @@ final class HostRecord implements JsonSerializable
     public function toAscii(): ?string
     {
         if (!$this->asciiIsLoaded) {
-            $generate = function (): ?string {
+            $this->asciiIsLoaded = true;
+            $this->hostAsAscii = (function (): ?string {
                 if (HostType::RegisteredName !== $this->type || null === $this->value) {
                     return $this->value;
                 }
@@ -145,10 +148,7 @@ final class HostRecord implements JsonSerializable
                 }
 
                 return Encoder::normalizeHost($this->value);
-            };
-
-            $this->asciiIsLoaded = true;
-            $this->hostAsAscii = $generate();
+            })();
         }
 
         return $this->hostAsAscii;
@@ -251,6 +251,9 @@ final class HostRecord implements JsonSerializable
         }
     }
 
+    /**
+     * @throws SyntaxError
+     */
     public static function from(Stringable|string|null $host): self
     {
         if ($host instanceof UriComponentInterface) {
@@ -390,15 +393,16 @@ final class HostRecord implements JsonSerializable
     /**
      * @param HostRecordSerializedShape $data
      *
-     * @throws Exception
+     * @throws Exception|SyntaxError
      */
     public function __unserialize(array $data): void
     {
         [$properties] = $data;
         $record = self::from($properties['host'] ?? throw new Exception('The `host` property is missing from the serialized object.'));
-
-        $this->value = $record->value;
-        $this->type = $record->type;
-        $this->format = $record->format;
+        //if the Host computed value are already cache this avoid recomputing them
+        foreach (get_object_vars($record) as $prop => $value) {
+            /** @phpstan-ignore-next-line */
+            $this->{$prop} = $value;
+        }
     }
 }
