@@ -15,6 +15,7 @@ namespace League\Uri;
 
 use Exception;
 use JsonSerializable;
+use League\Uri\Contracts\UriComponentInterface;
 use League\Uri\Exceptions\SyntaxError;
 use League\Uri\Idna\Converter as IdnConverter;
 use Stringable;
@@ -192,11 +193,9 @@ final class HostRecord implements JsonSerializable
     public static function isValid(Stringable|string|null $host): bool
     {
         try {
-            if (null !== $host) {
-                $host = (string) $host;
-            }
+            HostRecord::from($host);
 
-            return HostRecord::from($host)->value === $host;
+            return true;
         } catch (Throwable) {
             return false;
         }
@@ -254,6 +253,10 @@ final class HostRecord implements JsonSerializable
 
     public static function from(Stringable|string|null $host): self
     {
+        if ($host instanceof UriComponentInterface) {
+            $host = $host->value();
+        }
+
         if (null === $host) {
             return new self(
                 value: null,
