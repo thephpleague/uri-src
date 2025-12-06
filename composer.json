@@ -33,7 +33,7 @@
         "friendsofphp/php-cs-fixer": "^3.91.3",
         "guzzlehttp/psr7": "^2.8.0",
         "http-interop/http-factory-tests": "^2.3",
-        "laminas/laminas-diactoros": "^3.8.0",
+        "laminas/laminas-diactoros": "^3.5.0",
         "nyholm/psr7": "^1.8.2",
         "phpbench/phpbench": "^1.4.3",
         "phpstan/phpstan": "^1.12.32",
