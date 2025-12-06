@@ -263,6 +263,7 @@ to apply the following changes to the submitted URI.
   <li><a href="#modifiersortquery">sortQuery</a></li>
   <li><a href="#modifiermergequery">mergeQuery</a></li>
   <li><a href="#modifierappendquery">appendQuery</a></li>
+  <li><a href="#modifierprependquery">prependQuery</a></li>
   <li><a href="#modifierappendqueryparameters">appendQueryParameters</a></li>
   <li><a href="#modifierremovequeryparameters">removeQueryParameters</a></li>
   <li><a href="#modifierremovequeryparameterindices">removeQueryParameterIndices</a></li>
@@ -439,6 +440,19 @@ echo Modifier::wrap($uri)
     ->unwrap()
     ->getQuery();
 //display "kingkong=godzilla&foo=bar%20baz&toto"
+~~~
+
+### Modifier::prependQuery
+
+Prepends a submitted query string to the URI object to be modified. When prepending two query strings with the same key value the submitted query string value is added to the return query string without modifying the URI query string value.
+
+~~~php
+$uri = Http::new("http://example.com/test.php?kingkong=toto&foo=bar+baz#doc3")
+echo Modifier::wrap($uri)
+    ->prependQuery('kingkong=godzilla&toto')
+    ->unwrap()
+    ->getQuery();
+//display "kingkong=godzilla&kingkong=toto&foo=bar%20baz&toto"
 ~~~
 
 ### Modifier::appendQuery
