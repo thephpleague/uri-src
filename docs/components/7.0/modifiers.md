@@ -130,7 +130,7 @@ use League\Uri\Modifier;
 use Uri\WhatWg\Url;
 
 $uri = Modifier::wrap(new Url('https://www.mypoems.net/the-book-of-mwana-kupona/'))
-    ->prependSegment('epic')
+    ->prependPath('epic')
     ->removeLabels(-1)
     ->replaceLabel(1, "africanpoems")
     ->appendFragmentDirectives(new TextDirective(start: "Negema wangu binti", end: "neno lema kukwambia."))
@@ -313,8 +313,10 @@ to apply the following changes to the submitted URI.
   <li><a href="#modifierreplaceextension">replaceExtension</a></li>
   <li><a href="#modifieraddbasepath">addBasePath</a></li>
   <li><a href="#modifierremovebasepath">removeBasePath</a></li>
-  <li><a href="#modifierappendsegment">appendSegment</a></li>
-  <li><a href="#modifierprependsegment">prependSegment</a></li>
+  <li><a href="#modifierappendpath">appendPath</a></li>
+  <li><a href="#modifierprependpath">prependPath</a></li>
+  <li><a href="#modifierappendsegments">appendSegments</a></li>
+  <li><a href="#modifierprependsegments">prependSegments</a></li>
   <li><a href="#modifierreplacesegment">replaceSegment</a></li>
   <li><a href="#modifierremovesegments">removeSegments</a></li>
   <li><a href="#modifierslicesegments">sliceSegments</a></li>
@@ -1047,27 +1049,64 @@ echo Modifier::wrap($uri)
 //display "/sky"
 ~~~
 
-### Modifier::appendSegment
+### Modifier::appendPath
+
+<p class="message-notice">since version <code>7.7.0</code></p>
+<p class="message-info">replaces and deprecates <code>Modifier::appendSegment</code> since <code>7.7.0</code></p>
+
 
 Appends a path to the current URI path.
 
 ~~~php
 $uri = Http::new("http://www.example.com/path/to/the/sky/");
 echo Modifier::wrap($uri)
-    ->appendSegment("and/above")
+    ->appendPath("and/above")
     ->unwrap()
     ->getPath();
  //display "/path/to/the/sky/and/above"
 ~~~
 
-### Modifier::prependSegment
+### Modifier::prependPath
+
+<p class="message-notice">since version <code>7.7.0</code></p>
+<p class="message-info">replaces and deprecates <code>Modifier::prependSegment</code> since <code>7.7.0</code></p>
 
 Prepends a path to the current URI path.
 
 ~~~php
 $uri = Http::new("http://www.example.com/path/to/the/sky/");
 echo Modifier::wrap($uri)
-    ->prependSegment("and/above")
+    ->prependPath("and/above")
+    ->unwrap()
+    ->getPath();
+ //display "/and/above/path/to/the/sky/"
+~~~
+
+### Modifier::appendSegments
+
+<p class="message-notice">since version <code>7.7.0</code></p>
+
+Appends a list of path segments to the current URI path.
+
+~~~php
+$uri = Http::new("http://www.example.com/path/to/the/sky/");
+echo Modifier::wrap($uri)
+    ->appendSegments(["and","above"])
+    ->unwrap()
+    ->getPath();
+ //display "/path/to/the/sky/and/above"
+~~~
+
+### Modifier::prependSegments
+
+<p class="message-notice">since version <code>7.7.0</code></p>
+
+Prepends a path to the current URI path.
+
+~~~php
+$uri = Http::new("http://www.example.com/path/to/the/sky/");
+echo Modifier::wrap($uri)
+    ->prependSegments(["and","above"])
     ->unwrap()
     ->getPath();
  //display "/and/above/path/to/the/sky/"
