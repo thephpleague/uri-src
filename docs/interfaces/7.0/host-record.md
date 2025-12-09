@@ -55,6 +55,7 @@ $hostRecord->format;         // HostFormat::Ascii
 $hostRecord->toAscii();      // returns '[fe80:1234::]'
 $hostRecord->toUnicode();    // returns '[fe80:1234::]'
 $hostRecord->isDomainType(); // returns false
+$hostRecord->ipValue();      // returns 'fe80:1234::'
 $hostRecord->ipVersion();    // returns '6'
 ```
 

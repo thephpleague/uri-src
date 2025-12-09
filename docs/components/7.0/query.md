@@ -194,7 +194,7 @@ public Query::parameters(): array
 public Query::parameter(string $name): mixed
 public Query::hasParameter(string ...$name): bool
 public Query::withoutNumericIndices(): self
-public Query::withoutParameter(...string $offsets): self
+public Query::withoutParameters(...string $offsets): self
 ~~~
 
 <p class="message-info"><code>Query::fromVariable</code> replaced the deprecated 
@@ -289,13 +289,13 @@ echo $newQuery->value();  //return 'foo=1&z='
 
 <p class="message-warning">If the name does not exist, a <code>ValueError</code> will be thrown</p>
 
-### Query::withoutParameter
+### Query::withoutParameters
 
 If you want to remove PHP's variable from the query string you can use the `Query::withoutParams` method as shown below
 
 ~~~php
 $query = Query::fromRFC3986('foo[]=bar&foo[]=y+olo&z=');
-$new_query = $query->withoutParameter('foo');
+$new_query = $query->withoutParameters('foo');
 $new_query->params('foo'); //return null
 echo $new_query->value(); //return 'z='
 ~~~

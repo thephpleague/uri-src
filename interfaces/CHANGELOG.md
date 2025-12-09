@@ -2,21 +2,40 @@
 
 All Notable changes to `League\Uri\Interfaces` will be documented in this file
 
-## [Next](https://github.com/thephpleague/uri-interfaces/compare/7.6.0...master) - TBD
+## [Next](https://github.com/thephpleague/uri-interfaces/compare/7.7.0...master) - TBD
 
 ### Added
 
-- `HostRecord` class to normalize parsing and caching Host resolution through all packages
-- `HostType` Enum
-- `HostFormat` Enum
+- None
 
 ### Fixed
 
-- `UriString::buildAuthority` should fails if an optional component is present when the host is missing.
+- None
 
 ### Deprecated
 
-- `UriString::isValidHost` use `HostRecord::validate` method instead
+- None
+
+### Removed
+
+- None
+
+## [7.7.0](https://github.com/thephpleague/uri-interfaces/compare/7.6.0...7.7.0) - 2025-12-08
+
+### Added
+
+- `HostRecord` class to normalize parsing and caching Host resolution
+- `HostType` Host type enumeration list as defined by RFC3986
+- `HostFormat` Host format enumaration list as defined by RFC3986/RFC3987
+
+### Fixed
+
+- `UriString::buildAuthority` should fail if an optional component is present when the host is missing.
+- `UriString::build` should fail if an optional component is present when the host is missing.
+
+### Deprecated
+
+- `UriString::isValidHost` use `HostRecord::isValid` method instead
 
 ### Removed
 

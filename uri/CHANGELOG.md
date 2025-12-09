@@ -2,20 +2,40 @@
 
 All Notable changes to `League\Uri` will be documented in this file
 
-### [Next](https://github.com/thephpleague/uri/compare/7.6.0...master) - TBD
+## [Next](https://github.com/thephpleague/uri/compare/7.7.0...master) - TBD
+
+### Added
+
+- None
+
+### Fixed
+
+- None
+
+### Deprecated
+
+- None
+
+### Removed
+
+- None
+
+## [7.7.0](https://github.com/thephpleague/uri/compare/7.6.0...7.7.0) - 2025-12-08
 
 ### Added 
 
-- `Uri::isIpv4Host`
-- `Uri::isIpv6Host`
-- `Uri::isIpvFutureHost`
-- `Uri::isRegisteredNameHost`
-- `Uri::isDomainHost`
+- `Uri::isIpv4Host` tells whether the URI host is an IPv4 address
+- `Uri::isIpv6Host` tells whether the URI host is an IPv6 address
+- `Uri::isIpvFutureHost` tells whether the URI host is an IPvFuture address
+- `Uri::isRegisteredNameHost` tells whether the URI host is a registered name
+- `Uri::isDomainHost` tells whether the URI host is a domain name
 
 ### Fixed
 
 - Query order not respected in `BaseUri::isSameDocument` method [165](https://github.com/thephpleague/uri-src/issues/165)
 - Fix Host resolution using the new `HostRecord` class, some registered name were wrongly throwing exceptions.
+- Fix `Uri::withPath` improve handling of path leading slash presence
+- Fix `UriTemplate::exapndToUrl` and `UriTemplate::expandToUrlOrFail` adding the missing softErrors argument populated by reference.
 
 ### Deprecated
 
