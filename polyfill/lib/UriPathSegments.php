@@ -78,7 +78,7 @@ final class UriPathSegments implements Countable, IteratorAggregate
     /**
      * The returned value SHOULD be decoded
      */
-    public function getSegment(int $index): ?string
+    public function get(int $index): ?string
     {
         return $this->segments[$index] ?? null;
     }
