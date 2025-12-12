@@ -43,8 +43,6 @@ Installation
 $ composer require league/uri
 ```
 
-> ⚠️ If for whatever reason you decide to work on this package instead of recommended `uri-src` and will need to run unit tests, you will also need install **at least** `league/uri-components` for them to run.
-
 Documentation
 --------
 
