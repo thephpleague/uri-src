@@ -26,6 +26,9 @@ use function implode;
 use function ltrim;
 use function substr;
 
+/**
+ * @implements IteratorAggregate<int, string>
+ */
 final class UriPathSegments implements Countable, IteratorAggregate
 {
     private readonly UriPathType $type;
