@@ -41,7 +41,7 @@
         "league/uri-polyfill" : "Needed to backport the PHP URI extension for older versions of PHP",
         "php-64bit": "to improve IPV4 host parsing",
         "symfony/polyfill-intl-idn": "to handle IDN host via the Symfony polyfill if ext-intl is not present",
-        "rowbot/url": "to get an alternative way of handling URLs compliant with live WHATWG standard",
+        "rowbot/url": "to get an alternative way of handling URLs compliant with WHATWG URL Living Standard",
         "bakame/aide-uri": "A polyfill for PHP8.1 until PHP8.4 to add support to PHP Native URI parser"
     },
     "autoload": {
