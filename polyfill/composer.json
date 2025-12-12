@@ -40,11 +40,13 @@
     },
     "suggest": {
         "ext-intl": "to handle IDN host with the best performance",
-        "jeremykendall/php-domain-parser": "to be used after getting the host (getHost()) to further parse it and to resolve Public Suffix and Top Level Domain",
+        "jeremykendall/php-domain-parser": "to further parse the URI host and resolve its Public Suffix and Top Level Domain",
         "league/uri-components": "to provide additional tools to manipulate URI objects components",
         "php-64bit": "to improve IPV4 host parsing",
         "symfony/polyfill-intl-idn": "to handle IDN host via the Symfony polyfill if ext-intl is not present",
-        "symfony/polyfill-php82": "To use the SensitiveParameter polyfill in PHP8.1"
+        "symfony/polyfill-php82": "to use the SensitiveParameter polyfill in PHP8.1",
+        "league/uri-polyfill" : "to backport the PHP URI extension for older versions of PHP",
+        "rowbot/url": "to handle URLs using the WHATWG URL Living Standard specification"
     },
     "extra": {
         "branch-alias": {
