@@ -104,9 +104,12 @@ final class UriPathSegments implements Countable, IteratorAggregate
      */
     public function toRawString(): string
     {
-        return ($this->type === UriPathType::Absolute ? '' : '/') . implode('/', $this->segments);
+        return ($this->type === UriPathType::Absolute ? '/' : '') . implode('/', $this->segments);
     }
 
+    /**
+     * Encoding SHOULD be taken into account
+     */
     public function toString(): string
     {
         return UriString::removeDotSegments($this->toRawString());
@@ -125,7 +128,8 @@ final class UriPathSegments implements Countable, IteratorAggregate
     }
 
     /**
-     * Added segments are
+     * Returns a new instance with the new segments
+     *
      * @param list<string> $segments
      */
     public function withSegments(array $segments): self
