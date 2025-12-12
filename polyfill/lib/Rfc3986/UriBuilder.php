@@ -176,16 +176,10 @@ if (PHP_VERSION_ID < 80600) {
          */
         public function build(?Uri $baseUri = null): Uri
         {
-            $authority = $this->buildAuthority();
+            $path = $this->buildPath($authority = $this->buildAuthority());
 
             return new Uri(
-                UriString::buildUri(
-                    $this->scheme,
-                    $authority,
-                    $this->buildPath($authority),
-                    $this->query,
-                    $this->fragment
-                ),
+                UriString::buildUri($this->scheme, $authority, $path, $this->query, $this->fragment),
                 $baseUri
             );
         }
@@ -197,19 +191,18 @@ if (PHP_VERSION_ID < 80600) {
         {
             if (null === $this->host) {
                 (null === $this->userInfo && null === $this->port)
-                || throw new InvalidUriException('The UserInfo and/or the port component are set without a host component being present.');
+                || throw new InvalidUriException('The User Information and/or the Port component(s) are set without a Host component being present.');
 
                 return null;
             }
 
-            $authority = '';
+            $authority = $this->host;
             if (null !== $this->userInfo) {
-                $authority .= $this->userInfo.'@';
+                $authority = $this->userInfo.'@'.$authority;
             }
 
-            $authority .= $this->host;
             if (null !== $this->port) {
-                $authority .= ':'.$this->port;
+                return $authority.':'.$this->port;
             }
 
             return $authority;
