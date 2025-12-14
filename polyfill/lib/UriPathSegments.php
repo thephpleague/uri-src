@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace Uri;
 
 use Countable;
-
 use IteratorAggregate;
+use League\Uri\Encoder;
 use League\Uri\UriString;
 use Traversable;
-use Uri\Rfc3986\Uri;
-use Uri\WhatWg\Url;
 
+use function array_map;
+use function count;
 use function explode;
 use function implode;
 use function ltrim;
@@ -36,28 +36,18 @@ final class UriPathSegments implements Countable, IteratorAggregate
     private readonly array $segments;
 
     /**
-     * Decoding SHOULD be taken into account
-     * Unless I am wrong in both RFC3986 and WHATWG URL
-     * Path encoding is the same so one object
-     * should suffice
+     * The submitted string is the encoded path as returned by Url::getPath or Uri::getPath or Uri::getRawpath
+     *
+     * @param string $path
      */
     public function __construct(string $path)
     {
-        if ($path === '') {
-            $this->type = UriPathType::Relative;
-            $this->segments = [];
-        } else {
-            $this->type = ($path[0] === '/') ? UriPathType::Absolute : UriPathType::Relative;
-            $this->segments = explode('/', UriPathType::Absolute === $this->type ? substr($path, 1) : $path);
-        }
-    }
-
-    public static function fromUri(Uri|Url $uri): self
-    {
-        return new self(match (true) {
-            $uri instanceof Uri => $uri->getRawPath(),
-            $uri instanceof Url => $uri->getPath(),
-        });
+        [$this->type, $this->segments] = match (true) {
+            '' === $path => [UriPathType::Relative, []],
+            '/' === $path => [UriPathType::Absolute, ['']],
+            '/' === $path[0] => [UriPathType::Absolute, array_map(Encoder::decodeNecessary(...), explode('/', substr($path, 1)))],
+            default => [UriPathType::Relative, array_map(Encoder::decodeNecessary(...), explode('/', $path))],
+        };
     }
 
     public function getType(): UriPathType
@@ -66,7 +56,7 @@ final class UriPathSegments implements Countable, IteratorAggregate
     }
 
     /**
-     * The list returned SHOULD contained decoded segments
+     * The returned decoded segments
      *
      * @return list<string>
      */
@@ -76,7 +66,7 @@ final class UriPathSegments implements Countable, IteratorAggregate
     }
 
     /**
-     * The returned value SHOULD be decoded
+     * The returned value be decoded
      */
     public function get(int $index): ?string
     {
@@ -100,28 +90,27 @@ final class UriPathSegments implements Countable, IteratorAggregate
     }
 
     /**
-     * Encoding SHOULD be taken into account
+     * The raw path
      */
     public function toRawString(): string
     {
-        return ($this->type === UriPathType::Absolute ? '/' : '') . implode('/', $this->segments);
+        return ($this->type === UriPathType::Absolute ? '/' : '') . implode('/', array_map(Encoder::encodePath(...), $this->segments));
     }
 
     /**
-     * Encoding SHOULD be taken into account
+     * The raw path normalize using the remove dot segments algorithm.
      */
     public function toString(): string
     {
         return UriString::removeDotSegments($this->toRawString());
     }
 
+    /**
+     * Returns a new instance with a new type
+     */
     public function withType(UriPathType $type): self
     {
-        if ($type === $this->type) {
-            return $this;
-        }
-
-        return new self(match ($type) {
+        return $type === $this->type ? $this : new self(match ($type) {
             UriPathType::Relative => ltrim('/', $this->toRawString()),
             UriPathType::Absolute => '/'.ltrim('/', $this->toRawString()),
         });
@@ -134,24 +123,25 @@ final class UriPathSegments implements Countable, IteratorAggregate
      */
     public function withSegments(array $segments): self
     {
-        $path = implode('/', $segments);
-        if ($path === implode('/', $this->segments)) {
+        $segments = array_map(fn (string $segment) => str_replace('/', '%2F', $segment), $segments);
+        if ($segments === $this->segments) {
             return $this;
         }
 
+        $path = implode('/', $segments);
         if ($this->type === UriPathType::Absolute) {
             if ($path[0] !== '/') {
                 $path = '/'.$path;
             }
 
-            return new self('/'. $path);
+            return new self(Encoder::encodePath($path));
         }
 
         if ($path[0] === '/') {
             $path = substr($path, 1);
         }
 
-        return new self($path);
+        return new self(Encoder::encodePath($path));
     }
 
     public function __debugInfo(): array
