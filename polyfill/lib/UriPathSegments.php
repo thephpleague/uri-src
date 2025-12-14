@@ -40,11 +40,13 @@ final class UriPathSegments implements Countable, IteratorAggregate
      */
     public function __construct(string $path)
     {
+        $decoder = fn (string $segment): string => (string) Encoder::decodeNecessary($segment);
+
         [$this->type, $this->segments] = match (true) {
             '' === $path => [UriPathType::Relative, []],
             '/' === $path => [UriPathType::Absolute, ['']],
-            '/' === $path[0] => [UriPathType::Absolute, array_map(Encoder::decodeNecessary(...), explode('/', substr($path, 1)))],
-            default => [UriPathType::Relative, array_map(Encoder::decodeNecessary(...), explode('/', $path))],
+            '/' === $path[0] => [UriPathType::Absolute, array_map($decoder, explode('/', substr($path, 1)))],
+            default => [UriPathType::Relative, array_map($decoder, explode('/', $path))],
         };
     }
 
