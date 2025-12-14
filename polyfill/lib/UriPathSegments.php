@@ -37,8 +37,6 @@ final class UriPathSegments implements Countable, IteratorAggregate
 
     /**
      * The submitted string is the encoded path as returned by Url::getPath or Uri::getPath or Uri::getRawpath
-     *
-     * @param string $path
      */
     public function __construct(string $path)
     {
@@ -58,7 +56,7 @@ final class UriPathSegments implements Countable, IteratorAggregate
     /**
      * The returned decoded segments
      *
-     * @return list<string>
+     * @return list<string>|array{}
      */
     public function getAll(): array
     {
