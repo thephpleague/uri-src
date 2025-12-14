@@ -32,7 +32,7 @@ use function substr;
 final class UriPathSegments implements Countable, IteratorAggregate
 {
     private readonly UriPathType $type;
-    /** @var list<string> */
+    /** @var list<string>|array{} */
     private readonly array $segments;
 
     /**
