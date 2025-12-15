@@ -29,7 +29,7 @@ use function ltrim;
 use function substr;
 
 /**
- * @phpstan-type UriSerializedShape array{0: array{path: string}, 1: array{}}
+ * @phpstan-type SerializedShape array{0: array{path: string}, 1: array{}}
  * @implements IteratorAggregate<int, string>
  */
 final class PathSegments implements Countable, IteratorAggregate
@@ -194,7 +194,7 @@ final class PathSegments implements Countable, IteratorAggregate
     }
 
     /**
-     * @return UriSerializedShape
+     * @return SerializedShape
      */
     public function __serialize(): array
     {
@@ -202,7 +202,7 @@ final class PathSegments implements Countable, IteratorAggregate
     }
 
     /**
-     * @param UriSerializedShape $data
+     * @param SerializedShape $data
      *
      * @throws Exception|InvalidUriException
      */
