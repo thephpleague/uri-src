@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Uri;
 
-enum UriPathType
+enum PathType
 {
     case Absolute;
     case Relative;
