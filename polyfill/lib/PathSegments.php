@@ -26,6 +26,7 @@ use function count;
 use function explode;
 use function implode;
 use function ltrim;
+use function str_replace;
 use function substr;
 
 /**
@@ -54,6 +55,23 @@ final class PathSegments implements Countable, IteratorAggregate
             '/' === $path => [PathType::Absolute, ['']],
             '/' === $path[0] => [PathType::Absolute, array_map($decoder, explode('/', substr($path, 1)))],
             default => [PathType::Relative, array_map($decoder, explode('/', $path))],
+        };
+    }
+
+    /**
+     * @param list<string> $segments
+     *
+     * @throws InvalidUriException
+     */
+    public static function fromSegments(PathType $type, array $segments): self
+    {
+        $segments = array_map(fn (string $segment) => str_replace('/', '%2F', $segment), $segments);
+        $path = implode('/', array_map(Encoder::encodePath(...), $segments));
+
+        return match (true) {
+            PathType::Relative === $type => new self(ltrim($path, '/')),
+            $path[0] === '/' => new self($path),
+            default => new self('/'. $path),
         };
     }
 
@@ -150,11 +168,7 @@ final class PathSegments implements Countable, IteratorAggregate
      */
     public function withType(PathType $type): self
     {
-        return match (true) {
-            $this->type === $type => $this,
-            PathType::Absolute === $type => new self('/'.$this->toRawString()),
-            default => new self(ltrim($this->toRawString(), '/')),
-        };
+        return $type === $this->type ? $this : self::fromSegments($type, $this->segments);
     }
 
     /**
@@ -165,24 +179,8 @@ final class PathSegments implements Countable, IteratorAggregate
     public function withSegments(array $segments): self
     {
         $segments = array_map(fn (string $segment) => str_replace('/', '%2F', $segment), $segments);
-        if ($segments === $this->segments) {
-            return $this;
-        }
 
-        $path = implode('/', $segments);
-        if (PathType::Absolute === $this->type) {
-            if ('/' !== $path[0]) {
-                $path = '/'.$path;
-            }
-
-            return new self(Encoder::encodePath($path));
-        }
-
-        if ('/' === $path[0]) {
-            $path = ltrim($path, '/');
-        }
-
-        return new self(Encoder::encodePath($path));
+        return $segments === $this->segments ? $this : self::fromSegments($this->type, $segments);
     }
 
     public function __debugInfo(): array
