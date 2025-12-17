@@ -146,6 +146,61 @@ parse_str($query, $variables);
 // ];
 ```
 
+## Building fron PHP variables
+
+<p class="message-notice">Available since version <code>7.8</code></p>
+
+```php
+<?php
+
+public static function QueryString::compose(array|object $data, string $separator = '&', int $encType = PHP_QUERY_RFC3986): ?string;
+```
+
+To convert back an array or an object into a valid query string or the `null` value
+you can use the static public `QueryString::compose` method.
+
+```php
+echo QueryString::compose([
+    'module' => 'home',
+    'action' => 'show',
+    'page' => 'toto bar',
+], '|', PHP_QUERY_RFC3986);
+
+// display 'module=home|action=show|page=toto%20bar';
+```
+
+The static public `QueryString::compose` method parameters are:
+
+- `$data` an `array` or an `object` as describe in the `http_build_query` functions.
+- `$separator` is a string; by default, it is the `&` character;
+- `$encType` is one of PHP's constant `PHP_QUERY_RFC3968` or `PHP_QUERY_RFC1738` which represented the supported encoding algoritm
+    - If you specify `PHP_QUERY_RFC3968` encoding will be done using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) rules;
+    - If you specify `PHP_QUERY_RFC1738` encoding will be done using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
+
+The function returns the `null` value if the submitted `array` or if the result of using `get_object_vars()` on 
+the submitted object returns an empty array.
+
+<p class="message-warning">The <code>$separator</code> argument cannot be the empty string.</p>
+
+The `QueryString::compose` method is a userland implementation of the `http_build_query` functions with the following
+differences:
+
+- if a resource is used, a `TypeError` is thrown, `http_build_query` returns an empty string as query string.
+- if a recursion is detected a `ValueError` is thrown, `http_build_query` returns an empty string as query string.
+- the method preserves value with `null` value, `http_build_query` skips the name/value association.
+- the method does not handle prefix usage
+- By default, the method uses `PHP_QUERY_RFC3968`; `http_build_query` uses `PHP_QUERY_RFC1738`.
+
+```php
+echo QueryString::compose([
+    'module' => null,
+    'action' => '',
+    'page' => true,
+]);
+
+// display 'module&action=&page=1';
+```
+
 ## Advance usages
 
 Starting with version <code>7.1</code> you can have an improved control over the characters conversion
@@ -180,6 +235,7 @@ You can use the class on the following methods as the second argument:
 - `buildFromPairs` improved version of `build`
 - `extractFromValue` improved version of `extract`
 - `parseFromValue` improved version of `parse`
+- `composeFromValue` improved version of `compose` **since version 7.8**
 
 ## Exceptions
 
