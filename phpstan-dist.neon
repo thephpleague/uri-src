@@ -19,5 +19,7 @@ parameters:
 		- identifier: missingType.iterableValue
 		- '#deprecated class League\\Uri\\BaseUri#'
 		- '#deprecated interface League\\Uri\\Contracts\\UriAccess#'
+		- message: '#Call to deprecated method fromBaseUri\(\) of class#'
+		  path: uri/FactoryTest.php
 	reportUnmatchedIgnoredErrors: true
 	treatPhpDocTypesAsCertain: false
