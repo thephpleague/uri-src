@@ -609,4 +609,13 @@ final class UriTest extends TestCase
             'username' => 'user',
         ];
     }
+
+    #[Test]
+    public function test_user_credential_encoding(): void
+    {
+        $uri = new Uri('mysql://foo:bar%25bar@localhost/baz');
+
+        self::assertSame('foo:bar%25bar', $uri->getRawUserInfo());
+        self::assertSame('foo:bar%25bar', $uri->getUserInfo());
+    }
 }
