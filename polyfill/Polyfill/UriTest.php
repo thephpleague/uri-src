@@ -548,6 +548,14 @@ final class UriTest extends TestCase
         self::assertSame('//host//path', $uri2->toString());
     }
 
+    #[Test]
+    public function test_user_credential_encoding(): void
+    {
+        $uri = new Uri('mysql://foo:bar%25bar@localhost/baz');
+
+        self::assertSame('foo:bar%25bar', $uri->getUserInfo());
+    }
+
     public function test_it_fails_using_exception_with_null_bytes(): void
     {
         $uri = new Uri('https://example.com');
