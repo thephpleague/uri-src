@@ -148,7 +148,7 @@ final class QueryString
         $separator = $converter->separator();
         if (QueryBuildingMode::Native === $queryBuildingMode) {
             return $converter->toValue(
-                QueryString::parseFromValue(
+                self::parseFromValue(
                     http_build_query(data: $data, arg_separator: $separator),
                     $converter
                 )
@@ -165,7 +165,7 @@ final class QueryString
             throw new TypeError('Argument #1 ($data) must not be an enum, '.$enumType.' given') ;
         }
 
-        return QueryString::buildFromPairs(self::composeRecursive($queryBuildingMode, $data), $converter);
+        return self::buildFromPairs(self::composeRecursive($queryBuildingMode, $data), $converter);
     }
 
     /**
