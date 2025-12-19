@@ -13,28 +13,17 @@ declare(strict_types=1);
 
 namespace League\Uri;
 
-use BackedEnum;
 use League\Uri\Exceptions\SyntaxError;
 use League\Uri\KeyValuePair\Converter;
-use ReflectionEnum;
 use Stringable;
-use TypeError;
-use UnitEnum;
-use ValueError;
 
 use function array_key_exists;
 use function array_keys;
-use function get_object_vars;
 use function is_array;
-use function is_object;
-use function is_resource;
-use function is_scalar;
 use function rawurldecode;
-use function spl_object_id;
 use function strpos;
 use function substr;
 
-use const PHP_QUERY_RFC1738;
 use const PHP_QUERY_RFC3986;
 
 /**
@@ -46,7 +35,7 @@ final class QueryString
 {
     private const PAIR_VALUE_DECODED = 1;
     private const PAIR_VALUE_PRESERVED = 2;
-    private const RECURSION_MARKER = "\0__RECURSION_INTERNAL_MARKER__\0";
+
     /**
      * @codeCoverageIgnore
      */
@@ -105,102 +94,6 @@ final class QueryString
         }
 
         return ($converter ?? Converter::fromRFC3986())->toValue($keyValuePairs);
-    }
-
-    /**
-     * Build a query string from a object or an array like http_build_query without discarding values.
-     * The method differs from http_build_query for the following behavior:
-     *
-     *  - if a resource is used, a TypeError is thrown.
-     *  - if a recursion is detected a ValueError is thrown
-     *  - the method preserves value with `null` value (http_build_query) skip the key.
-     *  - the method does not handle prefix usage
-     *
-     * @param array<array-key, mixed> $data
-     * @param non-empty-string $separator
-     *
-     * @throws TypeError if a resource is found it the input array
-     * @throws ValueError if a recursion is detected
-     */
-    public static function compose(array|object $data, string $separator = '&', int $encType = PHP_QUERY_RFC1738): ?string
-    {
-        return self::composeFromValue($data, Converter::fromEncodingType($encType)->withSeparator($separator));
-    }
-
-    public static function composeFromValue(array|object $data, ?Converter $converter = null): ?string
-    {
-        if ($data instanceof UnitEnum) {
-            $enumType = (new ReflectionEnum($data::class))->isBacked() ? 'Backed' : 'Pure';
-
-            throw new TypeError('Argument #1 ($data) must not be an enum, '.$enumType.' given') ;
-        }
-
-        return self::buildFromPairs(self::composeRecursive($data), $converter ?? Converter::fromRFC3986());
-    }
-
-    /**
-     * @param array<array-key, mixed> $data
-     *
-     * @throws TypeError if a resource is found it the input array
-     *
-     * @return iterable<array{0: array-key, 1: string|int|float|bool|null}>
-     */
-    private static function composeRecursive(array|object $data, string|int $prefix = '', array $seenObjects = []): iterable
-    {
-        if (is_object($data)) {
-            $id = spl_object_id($data);
-            ! isset($seenObjects[$id]) || throw new ValueError('composition failed; object recursion detected.');
-            $seenObjects[$id] = true;
-            $data = get_object_vars($data);
-        }
-
-        ! self::isRecursive($data) || throw new ValueError('composition failed; array recursion detected.');
-
-        foreach ($data as $name => $value) {
-            if ('' !== $prefix) {
-                $name = $prefix.'['.$name.']';
-            }
-
-            ! is_resource($value) || throw new TypeError('composition failed; a resource has been detected and can not be converted.');
-            if (null === $value || is_scalar($value)) {
-                yield [$name, $value];
-
-                continue;
-            }
-
-            if ($value instanceof UnitEnum) {
-                $value instanceof BackedEnum || throw new TypeError('Unbacked enum '.$value::class.' cannot be converted to a string');
-                yield [$name, $value->value];
-
-                continue;
-            }
-
-            yield from self::composeRecursive($value, $name, $seenObjects);
-        }
-    }
-
-    /**
-     * Array recursion detection.
-     * @see https://stackoverflow.com/questions/9042142/detecting-infinite-array-recursion-in-php
-     */
-    private static function isRecursive(array &$arr): bool
-    {
-        if (isset($arr[self::RECURSION_MARKER])) {
-            return true;
-        }
-
-        try {
-            $arr[self::RECURSION_MARKER] = true;
-            foreach ($arr as $key => &$value) {
-                if (self::RECURSION_MARKER !== $key && is_array($value) && self::isRecursive($value)) {
-                    return true;
-                }
-            }
-
-            return false;
-        } finally {
-            unset($arr[self::RECURSION_MARKER]);
-        }
     }
 
     /**

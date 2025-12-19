@@ -22,6 +22,8 @@ use League\Uri\Contracts\UriInterface;
 use League\Uri\Encoder;
 use League\Uri\Exceptions\SyntaxError;
 use League\Uri\KeyValuePair\Converter;
+use League\Uri\QueryBuilder;
+use League\Uri\QueryBuildingMode;
 use League\Uri\QueryString;
 use League\Uri\UriString;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
@@ -96,7 +98,7 @@ final class Query extends Component implements QueryInterface
      *
      * @param non-empty-string $separator
      */
-    public static function fromVariable(object|array $parameters, string $separator = '&', string $prefix = ''): self
+    public static function fromVariable(object|array $parameters, string $separator = '&', string $prefix = '', QueryBuildingMode $mode = QueryBuildingMode::Default): self
     {
         $params = is_object($parameters) ? get_object_vars($parameters) : $parameters;
 
@@ -105,7 +107,10 @@ final class Query extends Component implements QueryInterface
             $data[$prefix.$name] = $value;
         }
 
-        return new self(http_build_query(data: $data, arg_separator: $separator), Converter::fromRFC1738($separator));
+        return new self(
+            QueryBuilder::build(data: $data, separator: $separator, queryBuildingMode: $mode),
+            Converter::fromRFC1738($separator)
+        );
     }
 
     /**
@@ -325,7 +330,7 @@ final class Query extends Component implements QueryInterface
         return [] !== $names;
     }
 
-    public function mergeParameters(object|array $parameter, string $prefix = ''): self
+    public function mergeParameters(object|array $parameter, string $prefix = '', QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Default): self
     {
         $params = is_object($parameter) ? get_object_vars($parameter) : $parameter;
         $data = [];
@@ -334,12 +339,12 @@ final class Query extends Component implements QueryInterface
         }
 
         return in_array($data, [$this->parameters, []], true) ? $this : new self(
-            http_build_query(data: array_merge($this->parameters, $data), arg_separator: $this->separator),
+            QueryBuilder::build(data: array_merge($this->parameters, $data), separator: $this->separator, queryBuildingMode: $queryBuildingMode),
             Converter::fromRFC1738($this->separator)
         );
     }
 
-    public function replaceParameter(string $name, mixed $parameter): self
+    public function replaceParameter(string $name, mixed $parameter, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Default): self
     {
         $this->hasParameter($name) || throw new ValueError('The specified name does not exist');
         if ($parameter === $this->parameters[$name]) {
@@ -349,7 +354,10 @@ final class Query extends Component implements QueryInterface
         $parameters = $this->parameters;
         $parameters[$name] = $parameter;
 
-        return new self(http_build_query(data: $parameters, arg_separator: $this->separator), Converter::fromRFC1738($this->separator));
+        return new self(
+            QueryBuilder::build(data: $parameters, separator: $this->separator, queryBuildingMode: $queryBuildingMode),
+            Converter::fromRFC1738($this->separator)
+        );
     }
 
     public function withSeparator(string $separator): self
