@@ -249,7 +249,7 @@ final class QueryBuilderTest extends TestCase
             'separator' => '&',
             'encoding' => PHP_QUERY_RFC3986,
             'expected' => 'backed%5Bname%5D=Two&backed%5Bvalue%5D=Kabiri',
-            'mode' => QueryBuildingMode::Default,
+            'mode' => QueryBuildingMode::Legacy,
         ];
 
         yield 'basic encoding from php-src tests backed enum in modern handled form' => [
