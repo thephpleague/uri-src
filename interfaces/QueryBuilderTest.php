@@ -33,8 +33,8 @@ final class QueryBuilderTest extends TestCase
         object|array $variable,
         string $separator,
         int $encoding,
+        ?string $expected,
         QueryBuildingMode $mode,
-        ?string $expected
     ): void {
         self::assertSame($expected, QueryBuilder::build($variable, $separator, $encoding, $mode));
     }
