@@ -16,27 +16,33 @@ namespace League\Uri;
 enum QueryBuildingMode
 {
     /**
-     * Use http_build_query algorithm.
+     * Use current http_build_query algorithm.
      */
-    case Default;
+    case Native;
 
     /**
-     * strictly uses get_object_vars on objects and Enum
+     * Strictly uses get_object_vars on objects (Enum included)
      * if the value can not be serialized the entry is skipped.
      *
-     * ie http_build_query behavior for PHP8.4-
+     * ie http_build_query behavior before PHP8.4
      */
-    case Legacy;
+    case Compatible;
 
     /**
      * Mimic PHP8.4+ http_build_query behavior
+     * with support for Enum
      */
-    case HandleEnums;
+    case EnumNative;
 
     /**
-     * Disallow building with objects, Enum or resource throw TypeError
-     * Recursions throws a ValueError
-     * null values are kept but composed without the `=` separator.
+     * Validation-first mode.
+     *
+     * Guarantees that only scalar values and null are accepted.
+     * Any object, enum, resource, or recursive structure
+     * results in an exception.
+     *
+     * This contract is stable and independent of PHP's
+     * http_build_query implementation.
      */
     case Strict;
 }
