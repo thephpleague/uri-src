@@ -12,6 +12,7 @@
 namespace League\Uri;
 
 use ArrayIterator;
+use Backed;
 use League\Uri\Components\Fragment;
 use League\Uri\Exceptions\SyntaxError;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -27,6 +28,7 @@ use function tmpfile;
 
 use const PHP_QUERY_RFC1738;
 use const PHP_QUERY_RFC3986;
+use const PHP_VERSION;
 
 final class QueryStringTest extends TestCase
 {
@@ -804,6 +806,19 @@ final class QueryStringTest extends TestCase
         $this->expectException(TypeError::class);
 
         QueryString::compose(['pure' => PureEnum::One], queryBuildingMode: QueryBuildingMode::EnumNative);
+    }
+
+    public function test_it_handles_backed_enums(): void
+    {
+        $params = ['bar' => BackedEnum::One, 'baz' => 1];
+        $compatible = 'bar%5Bname%5D=One&bar%5Bvalue%5D=Rimwe';
+        $enumNative = 'bar=Rimwe';
+
+        self::assertSame((PHP_VERSION < 80400 ? $compatible : $enumNative).'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::Native));
+        self::assertSame($compatible.'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::Compatible));
+        self::assertSame($enumNative.'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::EnumNative));
+        self::assertSame($enumNative.'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::Strict));
+
     }
 }
 

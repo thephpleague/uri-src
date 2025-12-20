@@ -159,12 +159,6 @@ final class QueryString
             throw new ValueError('In conservative mode only arrays are supported.');
         }
 
-        if (QueryBuildingMode::EnumNative === $queryBuildingMode && $data instanceof UnitEnum) {
-            $enumType = (new ReflectionEnum($data::class))->isBacked() ? 'Backed' : 'Pure';
-
-            throw new TypeError('Argument #1 ($data) must not be an enum, '.$enumType.' given') ;
-        }
-
         return self::buildFromPairs(self::composeRecursive($queryBuildingMode, $data), $converter);
     }
 
@@ -185,13 +179,14 @@ final class QueryString
             throw new ValueError('In conservative mode only arrays are supported.');
         }
 
+        if (QueryBuildingMode::EnumNative === $queryBuildingMode && $data instanceof UnitEnum) {
+            throw new TypeError('Argument #1 ($data) must not be an enum, '.((new ReflectionEnum($data::class))->isBacked() ? 'Backed' : 'Pure').' given') ;
+        }
+
         if (is_object($data)) {
             $id = spl_object_id($data);
             if (isset($seenObjects[$id])) {
-                if (QueryBuildingMode::Strict === $queryBuildingMode) {
-                    throw new ValueError('composition failed; object recursion detected.');
-                }
-
+                QueryBuildingMode::Strict !== $queryBuildingMode || throw new ValueError('composition failed; object recursion detected.');
                 return;
             }
 
@@ -200,9 +195,7 @@ final class QueryString
         }
 
         if (self::isRecursive($data)) {
-            if (QueryBuildingMode::Strict === $queryBuildingMode) {
-                throw new ValueError('composition failed; array recursion detected.');
-            }
+            QueryBuildingMode::Strict !== $queryBuildingMode || throw new ValueError('composition failed; array recursion detected.');
 
             return;
         }
@@ -212,14 +205,8 @@ final class QueryString
                 $name = $prefix.'['.$name.']';
             }
 
-            if (QueryBuildingMode::Strict === $queryBuildingMode && (is_object($data) || is_resource($data))) {
-                throw new ValueError('In conservative mode only arrays, scalar value or null are supported.');
-            }
-
             if (is_resource($value)) {
-                if (QueryBuildingMode::Strict === $queryBuildingMode) {
-                    throw new TypeError('composition failed; a resource has been detected and can not be converted.');
-                }
+                QueryBuildingMode::Strict !== $queryBuildingMode || throw new TypeError('composition failed; a resource has been detected and can not be converted.');
                 continue;
             }
 
@@ -229,13 +216,24 @@ final class QueryString
                 continue;
             }
 
-            if (QueryBuildingMode::EnumNative === $queryBuildingMode) {
-                if ($value instanceof UnitEnum) {
-                    $value instanceof BackedEnum || throw new TypeError('Unbacked enum '.$value::class.' cannot be converted to a string');
+            if ($value instanceof BackedEnum) {
+                if (QueryBuildingMode::Compatible !== $queryBuildingMode) {
                     yield [$name, $value->value];
 
                     continue;
                 }
+
+                $value = get_object_vars($value);
+            }
+
+            if ($value instanceof UnitEnum) {
+                QueryBuildingMode::Compatible === $queryBuildingMode || throw new TypeError('Unbacked enum '.$value::class.' cannot be converted to a string');
+
+                $value = get_object_vars($value);
+            }
+
+            if (QueryBuildingMode::Strict === $queryBuildingMode && is_object($value)) {
+                throw new ValueError('In conservative mode only arrays, scalar value or null are supported.');
             }
 
             yield from self::composeRecursive($queryBuildingMode, $value, $name, $seenObjects);
