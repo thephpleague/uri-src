@@ -143,9 +143,9 @@ final class Builder
 
     public function build(Rfc3986Uri|WhatWgUrl|Stringable|string|null $baseUri = null): Uri
     {
-        $path = $this->buildPath($authority = $this->buildAuthority());
-
-        $uri = UriString::buildUri(
+        $authority = $this->buildAuthority();
+        $path = $this->buildPath($authority);
+        $uriString = UriString::buildUri(
             $this->scheme,
             $authority,
             $path,
@@ -153,13 +153,11 @@ final class Builder
             Encoder::encodeQueryOrFragment($this->fragment)
         );
 
-        return null !== $baseUri
-            ? Uri::new(UriString::resolve($uri, match (true) {
-                $baseUri instanceof Rfc3986Uri => $baseUri->toString(),
-                $baseUri instanceof WhatWgUrl => $baseUri->toAsciiString(),
-                default => (string) $baseUri,
-            }))
-            : Uri::new($uri)->normalize();
+        return Uri::new(null === $baseUri ? $uriString : UriString::resolve($uriString, match (true) {
+            $baseUri instanceof Rfc3986Uri => $baseUri->toString(),
+            $baseUri instanceof WhatWgUrl => $baseUri->toAsciiString(),
+            default => (string) $baseUri,
+        }));
     }
 
     /**
