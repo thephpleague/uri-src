@@ -30,6 +30,7 @@ use function tmpfile;
 use const PHP_QUERY_RFC1738;
 use const PHP_QUERY_RFC3986;
 use const PHP_VERSION;
+use const PHP_VERSION_ID;
 
 final class QueryStringTest extends TestCase
 {
@@ -802,11 +803,23 @@ final class QueryStringTest extends TestCase
         QueryString::compose($tmpfile, queryBuildingMode: QueryBuildingMode::Strict);
     }
 
-    public function test_it_throws_if_a_non_backed_enum_is_given(): void
+    public function test_it_throws_if_a_non_backed_enum_is_given_in_enum_native_mode(): void
     {
         $this->expectException(TypeError::class);
 
         QueryString::compose(['pure' => PureEnum::One], queryBuildingMode: QueryBuildingMode::EnumNative);
+    }
+
+    public function test_it_throws_if_a_non_backed_enum_is_given_in_strict_mode(): void
+    {
+        $this->expectException(TypeError::class);
+
+        QueryString::compose(['pure' => PureEnum::One], queryBuildingMode: QueryBuildingMode::Strict);
+    }
+
+    public function test_it_does_not_fail_if_a_non_backed_enum_is_given_in_compatible_mode(): void
+    {
+        self::assertSame('pure%5Bname%5D=One', QueryString::compose(['pure' => PureEnum::One], queryBuildingMode: QueryBuildingMode::Compatible));
     }
 
     public function test_it_handles_backed_enums(): void
@@ -820,6 +833,14 @@ final class QueryStringTest extends TestCase
         self::assertSame($enumNative.'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::EnumNative));
         self::assertSame($enumNative.'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::Strict));
 
+    }
+
+    public function test_it_can_handles_empty_array(): void
+    {
+        self::assertSame('', QueryString::compose([], queryBuildingMode: QueryBuildingMode::Native));
+        self::assertSame('', QueryString::compose([], queryBuildingMode: QueryBuildingMode::Compatible));
+        self::assertSame('', QueryString::compose([], queryBuildingMode: QueryBuildingMode::EnumNative));
+        self::assertNull(QueryString::compose([], queryBuildingMode: QueryBuildingMode::Strict));
     }
 }
 
