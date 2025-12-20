@@ -24,6 +24,7 @@ use TypeError;
 use ValueError;
 
 use function date_create;
+use function dd;
 use function tmpfile;
 
 use const PHP_QUERY_RFC1738;
@@ -814,7 +815,7 @@ final class QueryStringTest extends TestCase
         $compatible = 'bar%5Bname%5D=One&bar%5Bvalue%5D=Rimwe';
         $enumNative = 'bar=Rimwe';
 
-        self::assertSame((PHP_VERSION < 80400 ? $compatible : $enumNative).'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::Native));
+        self::assertSame((PHP_VERSION_ID < 80400 ? $compatible : $enumNative).'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::Native));
         self::assertSame($compatible.'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::Compatible));
         self::assertSame($enumNative.'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::EnumNative));
         self::assertSame($enumNative.'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::Strict));
