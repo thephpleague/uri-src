@@ -758,7 +758,7 @@ final class QueryStringTest extends TestCase
             'separator' => '&',
             'encoding' => PHP_QUERY_RFC3986,
             'expected' => 'backed=Kabiri',
-            'mode' => QueryBuildingMode::EnumNative,
+            'mode' => QueryBuildingMode::EnumCompatible,
         ];
     }
 
@@ -772,7 +772,7 @@ final class QueryStringTest extends TestCase
 
         self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::Native));
         self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::Compatible));
-        self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::EnumNative));
+        self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::EnumCompatible));
 
         $this->expectException(ValueError::class);
         self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::Strict));
@@ -785,7 +785,7 @@ final class QueryStringTest extends TestCase
 
         self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::Native));
         self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::Compatible));
-        self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::EnumNative));
+        self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::EnumCompatible));
 
         $this->expectException(ValueError::class);
         self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::Strict));
@@ -796,7 +796,7 @@ final class QueryStringTest extends TestCase
         $tmpfile = [tmpfile()];
         self::assertSame('', QueryString::compose($tmpfile, queryBuildingMode: QueryBuildingMode::Native));
         self::assertSame('', QueryString::compose($tmpfile, queryBuildingMode: QueryBuildingMode::Compatible));
-        self::assertSame('', QueryString::compose($tmpfile, queryBuildingMode: QueryBuildingMode::EnumNative));
+        self::assertSame('', QueryString::compose($tmpfile, queryBuildingMode: QueryBuildingMode::EnumCompatible));
 
         $this->expectException(TypeError::class);
 
@@ -807,7 +807,7 @@ final class QueryStringTest extends TestCase
     {
         $this->expectException(TypeError::class);
 
-        QueryString::compose(['pure' => PureEnum::One], queryBuildingMode: QueryBuildingMode::EnumNative);
+        QueryString::compose(['pure' => PureEnum::One], queryBuildingMode: QueryBuildingMode::EnumCompatible);
     }
 
     public function test_it_throws_if_a_non_backed_enum_is_given_in_strict_mode(): void
@@ -830,7 +830,7 @@ final class QueryStringTest extends TestCase
 
         self::assertSame((PHP_VERSION_ID < 80400 ? $compatible : $enumNative).'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::Native));
         self::assertSame($compatible.'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::Compatible));
-        self::assertSame($enumNative.'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::EnumNative));
+        self::assertSame($enumNative.'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::EnumCompatible));
         self::assertSame($enumNative.'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::Strict));
 
     }
@@ -839,7 +839,7 @@ final class QueryStringTest extends TestCase
     {
         self::assertSame('', QueryString::compose([], queryBuildingMode: QueryBuildingMode::Native));
         self::assertSame('', QueryString::compose([], queryBuildingMode: QueryBuildingMode::Compatible));
-        self::assertSame('', QueryString::compose([], queryBuildingMode: QueryBuildingMode::EnumNative));
+        self::assertSame('', QueryString::compose([], queryBuildingMode: QueryBuildingMode::EnumCompatible));
         self::assertNull(QueryString::compose([], queryBuildingMode: QueryBuildingMode::Strict));
     }
 }

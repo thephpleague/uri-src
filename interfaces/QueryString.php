@@ -179,7 +179,7 @@ final class QueryString
             throw new ValueError('In conservative mode only arrays are supported.');
         }
 
-        if (QueryBuildingMode::EnumNative === $queryBuildingMode && $data instanceof UnitEnum) {
+        if (QueryBuildingMode::EnumCompatible === $queryBuildingMode && $data instanceof UnitEnum) {
             throw new TypeError('Argument #1 ($data) must not be an enum, '.((new ReflectionEnum($data::class))->isBacked() ? 'Backed' : 'Pure').' given') ;
         }
 

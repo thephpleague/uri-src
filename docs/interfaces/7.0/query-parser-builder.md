@@ -146,14 +146,20 @@ parse_str($query, $variables);
 // ];
 ```
 
-## Building fron PHP variables
+## Building from PHP variables
 
-<p class="message-notice">Available since version <code>7.8</code></p>
+<p class="message-notice">Available since version <code>7.8.0</code></p>
 
 ```php
 <?php
+use League\Uri\QueryBuildingMode;
 
-public static function QueryString::compose(array|object $data, string $separator = '&', int $encType = PHP_QUERY_RFC3986): ?string;
+public static function QueryString::compose(
+    array|object $data,
+    string $separator = '&',
+    int $encType = PHP_QUERY_RFC3986,
+    QueryBuildingMode $queruBuildingMode = QueryBuildingMode::Native
+): ?string;
 ```
 
 To convert back an array or an object into a valid query string or the `null` value
@@ -176,9 +182,10 @@ The static public `QueryString::compose` method parameters are:
 - `$encType` is one of PHP's constant `PHP_QUERY_RFC3968` or `PHP_QUERY_RFC1738` which represented the supported encoding algoritm
     - If you specify `PHP_QUERY_RFC3968` encoding will be done using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) rules;
     - If you specify `PHP_QUERY_RFC1738` encoding will be done using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
+- `$queryBuildingMode` a Enum to describe how query serialization will be performed.
 
-The function returns the `null` value if the submitted `array` or if the result of using `get_object_vars()` on 
-the submitted object returns an empty array.
+if `$queryBuildingMode` is equal to `QueryBuildingMode::Native` the function returns the `null` value if the submitted `array`
+is the empty array. Otherwise in any other building mode, the empty string will be used.
 
 <p class="message-warning">The <code>$separator</code> argument cannot be the empty string.</p>
 
