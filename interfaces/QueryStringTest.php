@@ -552,7 +552,7 @@ final class QueryStringTest extends TestCase
             'separator' => '&',
             'encoding' => PHP_QUERY_RFC1738,
             'expected' => null,
-            'mode' => QueryBuildingMode::Strict,
+            'mode' => QueryBuildingMode::ValueOnly,
         ];
 
         yield 'null if the object properties are not accessible' => [
@@ -720,7 +720,7 @@ final class QueryStringTest extends TestCase
             'separator' => '&',
             'encoding' => PHP_QUERY_RFC3986,
             'expected' => '0',
-            'mode' => QueryBuildingMode::Strict,
+            'mode' => QueryBuildingMode::ValueOnly,
         ];
 
         $v = 'value';
@@ -772,7 +772,7 @@ final class QueryStringTest extends TestCase
         self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::EnumCompatible));
 
         $this->expectException(ValueError::class);
-        self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::Strict));
+        self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::ValueOnly));
     }
 
     public function test_it_throws_if_a_array_recursion_is_detected(): void
@@ -785,7 +785,7 @@ final class QueryStringTest extends TestCase
         self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::EnumCompatible));
 
         $this->expectException(ValueError::class);
-        self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::Strict));
+        self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::ValueOnly));
     }
 
     public function test_it_throws_if_a_resource_is_present(): void
@@ -797,7 +797,7 @@ final class QueryStringTest extends TestCase
 
         $this->expectException(TypeError::class);
 
-        QueryString::compose($tmpfile, queryBuildingMode: QueryBuildingMode::Strict);
+        QueryString::compose($tmpfile, queryBuildingMode: QueryBuildingMode::ValueOnly);
     }
 
     public function test_it_throws_if_a_non_backed_enum_is_given_in_enum_native_mode(): void
@@ -811,7 +811,7 @@ final class QueryStringTest extends TestCase
     {
         $this->expectException(TypeError::class);
 
-        QueryString::compose(['pure' => PureEnum::One], queryBuildingMode: QueryBuildingMode::Strict);
+        QueryString::compose(['pure' => PureEnum::One], queryBuildingMode: QueryBuildingMode::ValueOnly);
     }
 
     public function test_it_does_not_fail_if_a_non_backed_enum_is_given_in_compatible_mode(): void
@@ -828,7 +828,7 @@ final class QueryStringTest extends TestCase
         self::assertSame((PHP_VERSION_ID < 80400 ? $compatible : $enumNative).'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::Native));
         self::assertSame($compatible.'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::Compatible));
         self::assertSame($enumNative.'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::EnumCompatible));
-        self::assertSame($enumNative.'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::Strict));
+        self::assertSame($enumNative.'&baz=1', QueryString::compose($params, queryBuildingMode: QueryBuildingMode::ValueOnly));
 
     }
 
@@ -837,7 +837,7 @@ final class QueryStringTest extends TestCase
         self::assertSame('', QueryString::compose([], queryBuildingMode: QueryBuildingMode::Native));
         self::assertSame('', QueryString::compose([], queryBuildingMode: QueryBuildingMode::Compatible));
         self::assertSame('', QueryString::compose([], queryBuildingMode: QueryBuildingMode::EnumCompatible));
-        self::assertNull(QueryString::compose([], queryBuildingMode: QueryBuildingMode::Strict));
+        self::assertNull(QueryString::compose([], queryBuildingMode: QueryBuildingMode::ValueOnly));
     }
 }
 

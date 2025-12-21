@@ -54,5 +54,5 @@ enum QueryBuildingMode
      * This contract is stable and independent of PHP's
      * http_build_query implementation.
      */
-    case Strict;
+    case ValueOnly;
 }

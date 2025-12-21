@@ -158,7 +158,7 @@ public static function QueryString::compose(
     array|object $data,
     string $separator = '&',
     int $encType = PHP_QUERY_RFC3986,
-    QueryBuildingMode $queruBuildingMode = QueryBuildingMode::Native
+    QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native
 ): ?string;
 ```
 
@@ -180,12 +180,17 @@ The static public `QueryString::compose` method parameters are:
 - `$data` an `array` or an `object` as describe in the `http_build_query` functions.
 - `$separator` is a string; by default, it is the `&` character;
 - `$encType` is one of PHP's constant `PHP_QUERY_RFC3968` or `PHP_QUERY_RFC1738` which represented the supported encoding algoritm
-    - If you specify `PHP_QUERY_RFC3968` encoding will be done using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) rules;
+    - If you specify `PHP_QUERY_RFC3986` encoding will be done using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) rules;
     - If you specify `PHP_QUERY_RFC1738` encoding will be done using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
 - `$queryBuildingMode` a Enum to describe how query serialization will be performed.
 
-if `$queryBuildingMode` is equal to `QueryBuildingMode::Native` the function returns the `null` value if the submitted `array`
-is the empty array. Otherwise in any other building mode, the empty string will be used.
+if `$queryBuildingMode` is equal to `QueryBuildingMode::ValueOnly`:
+
+- the function returns the `null` value if the submitted `array is the empty array. Otherwise in any other building mode, the empty string will be used.
+- the function disallows the use of resources or objects (with the notable exception of `BackedEnum`).
+
+Two other modes, `QueryBuildingMode::Compatible` and `QueryBuildingMode::EnumCompatible`, exists to allow
+migrating your codebase from the historical encoding algorithm to the current algorithm.
 
 <p class="message-warning">The <code>$separator</code> argument cannot be the empty string.</p>
 
