@@ -16,7 +16,7 @@ namespace League\Uri;
 enum QueryBuildingMode
 {
     /**
-     * Pre-PHP 8.4 Mode
+     * Pre-PHP 8.4 Mode.
      *
      * Strictly uses get_object_vars on objects (Enum included)
      * If the value can not be serialized the entry is skipped.

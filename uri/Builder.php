@@ -176,7 +176,7 @@ final class Builder
         if (null !== $this->username || null !== $this->password) {
             $userInfo = Encoder::encodeUser($this->username);
             if (null !== $this->password) {
-                $userInfo .= ':' . Encoder::encodePassword($this->password);
+                $userInfo .= ':'.Encoder::encodePassword($this->password);
             }
 
             $authority = $userInfo.'@'.$authority;

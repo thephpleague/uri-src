@@ -12,7 +12,6 @@
 namespace League\Uri;
 
 use ArrayIterator;
-use Backed;
 use League\Uri\Components\Fragment;
 use League\Uri\Exceptions\SyntaxError;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -24,12 +23,10 @@ use TypeError;
 use ValueError;
 
 use function date_create;
-use function dd;
 use function tmpfile;
 
 use const PHP_QUERY_RFC1738;
 use const PHP_QUERY_RFC3986;
-use const PHP_VERSION;
 use const PHP_VERSION_ID;
 
 final class QueryStringTest extends TestCase
