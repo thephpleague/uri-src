@@ -441,30 +441,30 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
         return $this->withQuery(Query::fromPairs(Query::fromUri($this->uri), prefix: $prefix));
     }
 
-    public function prefixQueryParameters(string $prefix): self
+    public function prefixQueryParameters(string $prefix, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): self
     {
-        return $this->withQuery(Query::fromVariable(Query::fromUri($this->uri)->parameters(), prefix: $prefix));
+        return $this->withQuery(Query::fromVariable(Query::fromUri($this->uri)->parameters(), prefix: $prefix, mode: $queryBuildingMode));
     }
 
     /**
      * Append PHP query parameters to the existing URI query.
      */
-    public function appendQueryParameters(object|array $parameters, string $prefix = ''): self
+    public function appendQueryParameters(object|array $parameters, string $prefix = '', QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): self
     {
-        return $this->appendQuery(Query::fromVariable($parameters, prefix: $prefix)->value());
+        return $this->appendQuery(Query::fromVariable($parameters, prefix: $prefix, mode: $queryBuildingMode)->value());
     }
 
     /**
      * Prepend PHP query parameters to the existing URI query.
      */
-    public function prependQueryParameters(object|array $parameters, string $prefix = ''): self
+    public function prependQueryParameters(object|array $parameters, string $prefix = '', QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): self
     {
-        return $this->withQuery(Query::fromVariable($parameters, prefix: $prefix)->append(Query::fromUri($this->uri)->value())->value());
+        return $this->withQuery(Query::fromVariable($parameters, prefix: $prefix, mode: $queryBuildingMode)->append(Query::fromUri($this->uri)->value())->value());
     }
 
-    public function replaceQueryParameter(string $name, mixed $value): self
+    public function replaceQueryParameter(string $name, mixed $value, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): self
     {
-        return $this->withQuery(Query::fromUri($this->uri)->replaceParameter($name, $value)->value());
+        return $this->withQuery(Query::fromUri($this->uri)->replaceParameter($name, $value, $queryBuildingMode)->value());
     }
 
     /**
@@ -523,9 +523,9 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
     /**
      * Merge PHP query parameters with the existing URI query.
      */
-    public function mergeQueryParameters(object|array $parameters, string $prefix = ''): self
+    public function mergeQueryParameters(object|array $parameters, string $prefix = '', QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): self
     {
-        return $this->withQuery(Query::fromUri($this->uri)->mergeParameters($parameters, prefix: $prefix)->value());
+        return $this->withQuery(Query::fromUri($this->uri)->mergeParameters($parameters, prefix: $prefix, queryBuildingMode: $queryBuildingMode)->value());
     }
 
     /**

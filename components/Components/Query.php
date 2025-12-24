@@ -22,6 +22,7 @@ use League\Uri\Contracts\UriInterface;
 use League\Uri\Encoder;
 use League\Uri\Exceptions\SyntaxError;
 use League\Uri\KeyValuePair\Converter;
+use League\Uri\QueryBuildingMode;
 use League\Uri\QueryString;
 use League\Uri\UriString;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
@@ -39,14 +40,18 @@ use function array_intersect;
 use function array_is_list;
 use function array_map;
 use function array_merge;
+use function array_reduce;
 use function count;
 use function get_object_vars;
 use function http_build_query;
 use function implode;
 use function in_array;
+use function is_array;
 use function is_int;
+use function is_iterable;
 use function is_object;
 use function is_string;
+use function iterator_to_array;
 use function preg_match;
 use function preg_quote;
 use function preg_replace;
@@ -96,7 +101,7 @@ final class Query extends Component implements QueryInterface
      *
      * @param non-empty-string $separator
      */
-    public static function fromVariable(object|array $parameters, string $separator = '&', string $prefix = ''): self
+    public static function fromVariable(object|array $parameters, string $separator = '&', string $prefix = '', QueryBuildingMode $mode = QueryBuildingMode::Native): self
     {
         $params = is_object($parameters) ? get_object_vars($parameters) : $parameters;
 
@@ -105,7 +110,10 @@ final class Query extends Component implements QueryInterface
             $data[$prefix.$name] = $value;
         }
 
-        return new self(http_build_query(data: $data, arg_separator: $separator), Converter::fromRFC1738($separator));
+        return new self(
+            QueryString::compose(data: $data, separator: $separator, queryBuildingMode: $mode),
+            Converter::fromRFC1738($separator)
+        );
     }
 
     /**
@@ -325,7 +333,7 @@ final class Query extends Component implements QueryInterface
         return [] !== $names;
     }
 
-    public function mergeParameters(object|array $parameter, string $prefix = ''): self
+    public function mergeParameters(object|array $parameter, string $prefix = '', QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): self
     {
         $params = is_object($parameter) ? get_object_vars($parameter) : $parameter;
         $data = [];
@@ -334,12 +342,12 @@ final class Query extends Component implements QueryInterface
         }
 
         return in_array($data, [$this->parameters, []], true) ? $this : new self(
-            http_build_query(data: array_merge($this->parameters, $data), arg_separator: $this->separator),
+            QueryString::compose(data: array_merge($this->parameters, $data), separator: $this->separator, queryBuildingMode: $queryBuildingMode),
             Converter::fromRFC1738($this->separator)
         );
     }
 
-    public function replaceParameter(string $name, mixed $parameter): self
+    public function replaceParameter(string $name, mixed $parameter, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): self
     {
         $this->hasParameter($name) || throw new ValueError('The specified name does not exist');
         if ($parameter === $this->parameters[$name]) {
@@ -349,7 +357,10 @@ final class Query extends Component implements QueryInterface
         $parameters = $this->parameters;
         $parameters[$name] = $parameter;
 
-        return new self(http_build_query(data: $parameters, arg_separator: $this->separator), Converter::fromRFC1738($this->separator));
+        return new self(
+            QueryString::compose(data: $parameters, separator: $this->separator, queryBuildingMode: $queryBuildingMode),
+            Converter::fromRFC1738($this->separator)
+        );
     }
 
     public function withSeparator(string $separator): self
@@ -479,9 +490,36 @@ final class Query extends Component implements QueryInterface
         return $pair;
     }
 
-    public function withPair(string $key, Stringable|string|int|float|bool|null $value): QueryInterface
+    public function withPair(string $key, Stringable|string|int|float|bool|null ...$value): QueryInterface
     {
-        $pairs = $this->addPair($this->pairs, [$key, $this->filterPair($value)]);
+        [] !== $value || throw new ValueError('The value list can not be empty.');
+
+        $found = false;
+        $reducer = static function (array $pairs, array $srcPair) use ($key, $value, &$found): array {
+            if ($key !== $srcPair[0]) {
+                $pairs[] = $srcPair;
+
+                return $pairs;
+            }
+
+            if ($found) {
+                return $pairs;
+            }
+
+            foreach ($value as $val) {
+                $pairs[] = [$key, self::filterPair($val)];
+            }
+            $found = true;
+
+            return $pairs;
+        };
+
+        $pairs = array_reduce($this->pairs, $reducer, []);
+        if (!$found) {
+            foreach ($value as $val) {
+                $pairs[] = [$key, self::filterPair($val)];
+            }
+        }
 
         return match ($this->pairs) {
             $pairs => $this,
@@ -542,7 +580,7 @@ final class Query extends Component implements QueryInterface
      *
      * To be valid, the pair must be the null value, a scalar or a collection of scalar and null values.
      */
-    private function filterPair(Stringable|string|int|float|bool|null $value): ?string
+    private static function filterPair(Stringable|string|int|float|bool|null $value): ?string
     {
         return match (true) {
             $value instanceof UriComponentInterface => $value->value(),
@@ -577,7 +615,7 @@ final class Query extends Component implements QueryInterface
             return $this;
         }
 
-        $values = array_map($this->filterPair(...), $values);
+        $values = array_map(self::filterPair(...), $values);
         $newPairs = array_filter($this->pairs, fn (array $pair) => !in_array($pair[1], $values, true));
 
         return match ($this->pairs) {
@@ -588,7 +626,7 @@ final class Query extends Component implements QueryInterface
 
     public function withoutPairByKeyValue(string $key, Stringable|string|int|float|bool|null $value): self
     {
-        $pair = [$key, $this->filterPair($value)];
+        $pair = [$key, self::filterPair($value)];
         $newPairs = array_filter($this->pairs, fn (array $currentPair) => $currentPair !== $pair);
 
         return match ($this->pairs) {
@@ -597,9 +635,17 @@ final class Query extends Component implements QueryInterface
         };
     }
 
-    public function appendTo(string $key, Stringable|string|int|float|bool|null $value): QueryInterface
+    public function appendTo(string $key, Stringable|string|int|float|bool|null ...$value): QueryInterface
     {
-        return self::fromPairs([...$this->pairs, [$key, $this->filterPair($value)]], $this->separator);
+        [] !== $value || throw new ValueError('Missing values to append');
+
+        $converter = function (iterable $values) use ($key) {
+            foreach ($values as $value) {
+                yield [$key, self::filterPair($value)];
+            }
+        };
+
+        return self::fromPairs([...$this->pairs, ...$converter($value)], $this->separator);
     }
 
     public function append(Stringable|string|null $query): QueryInterface
@@ -630,7 +676,7 @@ final class Query extends Component implements QueryInterface
         $pair = $this->pairs[$index] ?? [];
         [] !== $pair || throw new ValueError('The given offset "'.$offset.'" does not exist');
 
-        $newPair = [$key, $this->filterPair($value)];
+        $newPair = [$key, self::filterPair($value)];
         if ($pair === $newPair) {
             return $this;
         }

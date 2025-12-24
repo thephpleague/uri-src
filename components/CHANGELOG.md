@@ -10,7 +10,7 @@ All Notable changes to `League\Uri\Components` will be documented in this file
 
 ### Fixed
 
-- None
+- `Query` related parameters method can opt to switch to different query string representations using the new `$mode` parameeter.
 
 ### Deprecated
 
