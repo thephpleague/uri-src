@@ -33,7 +33,7 @@ enum QueryBuildingMode
      * Uses get_object_vars() for non-enum objects.
      * Unserializable values are skipped.
      *
-     * Approximates http_build_query behavior in PHP 8.4+.
+     * http_build_query behavior in PHP 8.4+.
      *
      * Non-enum behavior may evolve in future versions.
      */
@@ -41,6 +41,9 @@ enum QueryBuildingMode
 
     /**
      * Use PHP version http_build_query algorithm.
+     *
+     * In pre-PHP8.4 you get the same results as `Compatible`
+     * In PHP PHP8.4+ you get the same results as `EnumCompatible`
      */
     case Native;
 
@@ -54,5 +57,5 @@ enum QueryBuildingMode
      * This contract is stable and independent of PHP's
      * http_build_query implementation.
      */
-    case ValueOnly;
+    case Safe;
 }

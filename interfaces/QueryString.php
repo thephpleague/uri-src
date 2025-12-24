@@ -136,7 +136,7 @@ final class QueryString
 
         $query = self::composeFromValue($data, Converter::fromEncodingType($encType)->withSeparator($separator), $queryBuildingMode);
 
-        return QueryBuildingMode::ValueOnly !== $queryBuildingMode ? (string) $query : $query;
+        return QueryBuildingMode::Safe !== $queryBuildingMode ? (string) $query : $query;
     }
 
     public static function composeFromValue(
@@ -155,7 +155,7 @@ final class QueryString
             );
         }
 
-        if (QueryBuildingMode::ValueOnly === $queryBuildingMode && !is_array($data)) {
+        if (QueryBuildingMode::Safe === $queryBuildingMode && !is_array($data)) {
             throw new ValueError('In conservative mode only arrays are supported.');
         }
 
@@ -175,7 +175,7 @@ final class QueryString
         string|int $prefix = '',
         array $seenObjects = [],
     ): iterable {
-        if (QueryBuildingMode::ValueOnly === $queryBuildingMode && !is_array($data)) {
+        if (QueryBuildingMode::Safe === $queryBuildingMode && !is_array($data)) {
             throw new ValueError('In conservative mode only arrays are supported.');
         }
 
@@ -186,7 +186,7 @@ final class QueryString
         if (is_object($data)) {
             $id = spl_object_id($data);
             if (isset($seenObjects[$id])) {
-                QueryBuildingMode::ValueOnly !== $queryBuildingMode || throw new ValueError('composition failed; object recursion detected.');
+                QueryBuildingMode::Safe !== $queryBuildingMode || throw new ValueError('composition failed; object recursion detected.');
                 return;
             }
 
@@ -195,7 +195,7 @@ final class QueryString
         }
 
         if (self::isRecursive($data)) {
-            QueryBuildingMode::ValueOnly !== $queryBuildingMode || throw new ValueError('composition failed; array recursion detected.');
+            QueryBuildingMode::Safe !== $queryBuildingMode || throw new ValueError('composition failed; array recursion detected.');
 
             return;
         }
@@ -206,7 +206,7 @@ final class QueryString
             }
 
             if (is_resource($value)) {
-                QueryBuildingMode::ValueOnly !== $queryBuildingMode || throw new TypeError('composition failed; a resource has been detected and can not be converted.');
+                QueryBuildingMode::Safe !== $queryBuildingMode || throw new TypeError('composition failed; a resource has been detected and can not be converted.');
                 continue;
             }
 
@@ -232,7 +232,7 @@ final class QueryString
                 $value = get_object_vars($value);
             }
 
-            if (QueryBuildingMode::ValueOnly === $queryBuildingMode && is_object($value)) {
+            if (QueryBuildingMode::Safe === $queryBuildingMode && is_object($value)) {
                 throw new ValueError('In conservative mode only arrays, scalar value or null are supported.');
             }
 
