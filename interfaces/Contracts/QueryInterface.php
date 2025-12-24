@@ -29,7 +29,6 @@ use Stringable;
  * @method ?string toFormData() Returns the string representation using the applicat/www-form-urlencoded rules
  * @method ?string toRFC3986() Returns the string representation using RFC3986 rules
  * @method self normalize() returns the normalized string representation of the component
- * @method self appendMany(string $key, iterable $values): append multiple value to a single key
  */
 interface QueryInterface extends Countable, IteratorAggregate, UriComponentInterface
 {
