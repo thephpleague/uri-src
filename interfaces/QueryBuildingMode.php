@@ -26,7 +26,7 @@ enum QueryBuildingMode
     case Compatible;
 
     /**
-     * Transitional compatibility mode.
+     * PHP 8.4+ mode.
      *
      * Provides stable support for BackedEnum values.
      * Throws for UnitEnum.
