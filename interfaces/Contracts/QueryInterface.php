@@ -26,9 +26,11 @@ use Stringable;
  * @method self withoutPairByValue(Stringable|string|int|bool|null ...$values) Returns an instance without pairs with the specified values.
  * @method self withoutPairByKeyValue(string $key, Stringable|string|int|bool|null $value) Returns an instance without pairs with the specified key/value pair
  * @method bool hasPair(string $key, ?string $value) Tells whether the pair exists in the query.
- * @method ?string toFormData() Returns the string representation using the applicat/www-form-urlencoded rules
- * @method ?string toRFC3986() Returns the string representation using RFC3986 rules
+ * @method string|null toFormData() Returns the string representation using the application/www-form-urlencoded rules
+ * @method string|null toRFC3986() Returns the string representation using RFC3986 rules
  * @method self normalize() returns the normalized string representation of the component
+ * @method string|null first(string $name) returns the first value associated with the given name
+ * @method string|null last(string $name) returns the first value associated with the given name
  */
 interface QueryInterface extends Countable, IteratorAggregate, UriComponentInterface
 {

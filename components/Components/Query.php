@@ -151,9 +151,11 @@ final class Query extends Component implements QueryInterface
         $uri = self::filterUri($uri);
 
         return match (true) {
-            $uri instanceof Rfc3986Uri => new self($uri->getRawQuery()),
-            $uri instanceof Psr7UriInterface => new self(UriString::parse($uri)['query']),
-            default => new self($uri->getQuery()),
+            $uri instanceof Rfc3986Uri => new self($uri->getRawQuery(), Converter::fromRFC3986()),
+            $uri instanceof WhatWgUrl => new self($uri->getQuery(), Converter::fromFormData()),
+            $uri instanceof UriInterface,
+            $uri instanceof Psr7UriInterface => new self($uri->getQuery(), Converter::fromRFC3986()),
+            default => new self(UriString::parse($uri)['query'], Converter::fromRFC3986()),
         };
     }
 
