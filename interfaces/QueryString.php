@@ -144,22 +144,17 @@ final class QueryString
         ?Converter $converter = null,
         QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native,
     ): ?string {
-        $converter ??= Converter::fromRFC3986();
-        $separator = $converter->separator();
-        if (QueryBuildingMode::Native === $queryBuildingMode) {
-            return $converter->toValue(
-                self::parseFromValue(
-                    http_build_query(data: $data, arg_separator: $separator),
-                    $converter
-                )
-            );
-        }
-
         if (QueryBuildingMode::Safe === $queryBuildingMode && !is_array($data)) {
-            throw new ValueError('In conservative mode only arrays are supported.');
+            throw new ValueError('In safe mode only arrays are supported.');
         }
 
-        return self::buildFromPairs(self::composeRecursive($queryBuildingMode, $data), $converter);
+        $converter ??= Converter::fromRFC3986();
+
+        $pairs = QueryBuildingMode::Native !== $queryBuildingMode
+            ? self::composeRecursive($queryBuildingMode, $data)
+            : self::parseFromValue(http_build_query(data: $data, arg_separator: '&'), Converter::fromRFC1738());
+
+        return self::buildFromPairs($pairs, $converter);
     }
 
     /**
