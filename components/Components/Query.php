@@ -50,7 +50,6 @@ use function implode;
 use function in_array;
 use function is_array;
 use function is_int;
-use function is_iterable;
 use function is_object;
 use function is_string;
 use function iterator_to_array;
@@ -105,7 +104,7 @@ final class Query extends Component implements QueryInterface
      */
     public static function fromVariable(object|array $parameters, string $separator = '&', string $prefix = '', QueryBuildingMode $mode = QueryBuildingMode::Native): self
     {
-        if ($parameters instanceof UnitEnum && $mode !== QueryBuildingMode::Compatible) {
+        if ($parameters instanceof UnitEnum && QueryBuildingMode::Compatible !== $mode) {
             throw new TypeError('Enum can not be used as arguments.');
         }
 
