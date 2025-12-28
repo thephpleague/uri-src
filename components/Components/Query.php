@@ -28,6 +28,8 @@ use League\Uri\UriString;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use Stringable;
 use Traversable;
+use TypeError;
+use UnitEnum;
 use Uri\Rfc3986\Uri as Rfc3986Uri;
 use Uri\WhatWg\Url as WhatWgUrl;
 use ValueError;
@@ -103,6 +105,10 @@ final class Query extends Component implements QueryInterface
      */
     public static function fromVariable(object|array $parameters, string $separator = '&', string $prefix = '', QueryBuildingMode $mode = QueryBuildingMode::Native): self
     {
+        if ($parameters instanceof UnitEnum && $mode !== QueryBuildingMode::Compatible) {
+            throw new TypeError('Enum can not be used as arguments.');
+        }
+
         $params = is_object($parameters) ? get_object_vars($parameters) : $parameters;
 
         $data = [];
