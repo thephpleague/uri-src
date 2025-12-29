@@ -17,6 +17,7 @@ use BackedEnum;
 use League\Uri\Exceptions\SyntaxError;
 use League\Uri\KeyValuePair\Converter;
 use ReflectionEnum;
+use SplObjectStorage;
 use Stringable;
 use TypeError;
 use UnitEnum;
@@ -145,9 +146,7 @@ final class QueryString
         ?Converter $converter = null,
         QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native,
     ): ?string {
-        if (QueryBuildingMode::Safe === $queryBuildingMode && !is_array($data)) {
-            throw new ValueError('In safe mode only arrays are supported.');
-        }
+        QueryBuildingMode::Safe !== $queryBuildingMode || is_array($data) || throw new TypeError('In safe mode only arrays are supported.');
 
         $converter ??= Converter::fromRFC3986();
 
@@ -159,7 +158,8 @@ final class QueryString
     }
 
     /**
-     * @param array<array-key, mixed> $data
+     * @param array<array-key, mixed>|object $data
+     * @param SplObjectStorage<object, null> $seenObjects
      *
      * @throws TypeError if a resource is found it the input array
      *
@@ -169,24 +169,19 @@ final class QueryString
         QueryBuildingMode $queryBuildingMode,
         array|object $data,
         string|int $prefix = '',
-        array $seenObjects = [],
+        SplObjectStorage $seenObjects = new SplObjectStorage(),
     ): iterable {
-        if (QueryBuildingMode::Safe === $queryBuildingMode && !is_array($data)) {
-            throw new ValueError('In conservative mode only arrays are supported.');
-        }
-
-        if (QueryBuildingMode::EnumCompatible === $queryBuildingMode && $data instanceof UnitEnum) {
-            throw new TypeError('Argument #1 ($data) must not be an enum, '.((new ReflectionEnum($data::class))->isBacked() ? 'Backed' : 'Pure').' given') ;
-        }
+        QueryBuildingMode::Safe !== $queryBuildingMode || is_array($data) || throw new TypeError('In safe mode only arrays are supported.');
+        QueryBuildingMode::EnumCompatible !== $queryBuildingMode || !$data instanceof UnitEnum || throw new TypeError('Argument #1 ($data) must not be an enum, '.((new ReflectionEnum($data::class))->isBacked() ? 'Backed' : 'Pure').' given') ;
 
         if (is_object($data)) {
-            $id = spl_object_id($data);
-            if (isset($seenObjects[$id])) {
+            if ($seenObjects->contains($data)) {
                 QueryBuildingMode::Safe !== $queryBuildingMode || throw new ValueError('composition failed; object recursion detected.');
+
                 return;
             }
 
-            $seenObjects[$id] = true;
+            $seenObjects->attach($data);
             $data = get_object_vars($data);
         }
 

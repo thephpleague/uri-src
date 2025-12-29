@@ -771,8 +771,8 @@ final class QueryStringTest extends TestCase
         self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::Compatible));
         self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::EnumCompatible));
 
-        $this->expectException(ValueError::class);
-        self::assertSame('', QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::Safe));
+        $this->expectException(TypeError::class);
+        QueryString::compose($recursive, queryBuildingMode: QueryBuildingMode::Safe);
     }
 
     public function test_it_throws_if_a_array_recursion_is_detected(): void
