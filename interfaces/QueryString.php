@@ -22,6 +22,7 @@ use TypeError;
 use UnitEnum;
 use ValueError;
 
+use function array_is_list;
 use function array_key_exists;
 use function array_keys;
 use function get_object_vars;
@@ -195,7 +196,10 @@ final class QueryString
             return;
         }
 
+        $stripIndices = QueryBuildingMode::Safe === $queryBuildingMode && array_is_list($data);
+
         foreach ($data as $name => $value) {
+            $name = $stripIndices ? '' : $name;
             if ('' !== $prefix) {
                 $name = $prefix.'['.$name.']';
             }

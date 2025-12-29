@@ -54,8 +54,17 @@ enum QueryBuildingMode
      * Any object, UnitEnum, resource, or recursive structure
      * results in an exception.
      *
-     * This contract is stable and independent of PHP's
-     * http_build_query implementation.
+     * - null: the key name is used but the separator and its content are omitted
+     * - string: used as-is
+     * - bool: converted to string “0” (false) or “1” (true)
+     * - int: converted to numeric string (123 -> “123”)
+     * - float: converted to decimal string (3.14 -> “3.14”)
+     * - Backed Enum: converted to their backing value and then stringify see int and string
+     * - array: empty array: An empty array has zero items, therefore empty arrays are omitted from the query parameter list.
+     *     - lists: Becomes a repeated name suffixed with empty brackets (ie "a" with ["foo", false, 1.23] will result in a[]=foo&a[]=0&a[]=1.23)
+     *     - maps: Becomes a repeated name suffixed with brackets containing the key (ie "a" with ["b" => "foo", "c" => false, "d" => 1.23] will result in a[b]=foo&a[c]=0&a[d]=1.23)
+     *
+     * This contract is stable and independent of PHP's http_build_query implementation.
      */
     case Safe;
 }

@@ -15,6 +15,7 @@ use ArrayIterator;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\Exceptions\SyntaxError;
 use League\Uri\Http;
+use League\Uri\QueryBuildingMode;
 use League\Uri\Uri;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -350,7 +351,13 @@ final class QueryTest extends TestCase
     #[DataProvider('withoutParamProvider')]
     public function testwithoutParam(array $origin, array $without, string $expected): void
     {
-        self::assertSame($expected, Query::fromVariable($origin)->withoutParameters(...$without)->toString());
+        self::assertSame(
+            $expected,
+            Query::fromVariable($origin)
+                ->withoutParameterList(...$without)
+                ->withoutPairByKey(...$without)
+                ->toString()
+        );
     }
 
     public static function withoutParamProvider(): array
@@ -416,7 +423,7 @@ final class QueryTest extends TestCase
         self::assertFalse($query->hasParameter('bar'));
         self::assertFalse($query->hasParameter('foo', 'bar'));
 
-        $newQuery = $query->withoutParameters('foo[0]');
+        $newQuery = $query->withoutPairByKey('foo[0]');
 
         self::assertSame('foo%5B1%5D=baz', $newQuery->value());
         self::assertSame(['foo' => [1 => 'baz']], $newQuery->parameters());
@@ -426,7 +433,7 @@ final class QueryTest extends TestCase
     {
         $query = Query::new('foo&bar=baz');
 
-        self::assertSame($query, $query->withoutParameters());
+        self::assertSame($query, $query->withoutPairByKey());
     }
 
     public function testCreateFromParamsWithTraversable(): void
@@ -949,5 +956,41 @@ final class QueryTest extends TestCase
         $query->replace(1, 'b', 5);
 
         self::assertSame('a=1&b=2', $query->toString(), 'Original instance must remain unchanged');
+    }
+
+    public function test_it_can_add_parameters(): void
+    {
+        $query = Query::new('a=1&b=2')->withParameterList('c', [1, 2, 3]);
+
+        self::assertSame('a=1&b=2&c%5B0%5D=1&c%5B1%5D=2&c%5B2%5D=3', $query->toString());
+
+        $query = Query::new('a=1&b=2')->withParameterList('c', [1, 2, 3], QueryBuildingMode::Safe);
+
+        self::assertSame('a=1&b=2&c%5B%5D=1&c%5B%5D=2&c%5B%5D=3', $query->toString());
+    }
+
+    public function test_it_can_add_parameters_without_deleting_non_array_like_parameters(): void
+    {
+        $query = Query::new('a=1&b=2')->withParameterList('a', [1, 2, 3]);
+
+        self::assertSame('a=1&b=2&a%5B0%5D=1&a%5B1%5D=2&a%5B2%5D=3', $query->toString());
+    }
+
+    public function test_it_can_remove_parameters_list_like_parameters(): void
+    {
+        $query = Query::new('a=1&b=2&a%5B0%5D=1&a%5B1%5D=2&a%5B2%5D=3');
+
+        self::assertTrue($query->hasParameter('a'));
+        self::assertTrue($query->hasParameter('b'));
+        self::assertTrue($query->hasParameterList('a'));
+        self::assertFalse($query->hasParameterList('b'));
+
+        $altQuery = $query->withoutParameterList('a');
+
+        self::assertSame('a=1&b=2',$altQuery->toString());
+        self::assertTrue($altQuery->hasParameter('a'));
+        self::assertTrue($altQuery->hasParameter('b'));
+        self::assertFalse($altQuery->hasParameterList('a'));
+        self::assertFalse($altQuery->hasParameterList('b'));
     }
 }

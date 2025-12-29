@@ -719,7 +719,7 @@ final class QueryStringTest extends TestCase
             'variable' =>  [null],
             'separator' => '&',
             'encoding' => PHP_QUERY_RFC3986,
-            'expected' => '0',
+            'expected' => '',
             'mode' => QueryBuildingMode::Safe,
         ];
 
@@ -838,6 +838,14 @@ final class QueryStringTest extends TestCase
         self::assertSame('', QueryString::compose([], queryBuildingMode: QueryBuildingMode::Compatible));
         self::assertSame('', QueryString::compose([], queryBuildingMode: QueryBuildingMode::EnumCompatible));
         self::assertNull(QueryString::compose([], queryBuildingMode: QueryBuildingMode::Safe));
+    }
+
+    public function test_it_can_convert_list_without_indices_in_safe_mode(): void
+    {
+        $data = ['a' => ["foo", false, 1.23]];
+
+        self::assertSame('a%5B%5D=foo&a%5B%5D=0&a%5B%5D=1.23', QueryString::compose($data, queryBuildingMode: QueryBuildingMode::Safe));
+        self::assertSame('a%5B0%5D=foo&a%5B1%5D=0&a%5B2%5D=1.23', QueryString::compose($data, queryBuildingMode: QueryBuildingMode::Native));
     }
 }
 

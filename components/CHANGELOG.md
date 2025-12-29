@@ -6,15 +6,21 @@ All Notable changes to `League\Uri\Components` will be documented in this file
 
 ### Added
 
-- None
+- `Query::addParameterList`
+- `Query::appendParameterList`
+- `Query::withoutParameterList`
+- `Query::hasParameterList`
+- `Query::parameterList`
+- `Modifier::addQueryParameter`
+- `Modifier::appendQueryParameter`
 
 ### Fixed
 
-- `Query` related parameters method can opt to switch to different query string representations using the new `$mode` parameeter.
+- `Query` related parameters method can opt to switch to different query string representations using the new `$queryBuildigMode` parameter.
 
 ### Deprecated
 
-- None
+- `Query::withoutParameters` use `Query::withoutParameterList` or `Query::withoutPairsBykey` or both.
 
 ### Removed
 

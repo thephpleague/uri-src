@@ -443,7 +443,7 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
 
     public function prefixQueryParameters(string $prefix, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): self
     {
-        return $this->withQuery(Query::fromVariable(Query::fromUri($this->uri)->parameters(), prefix: $prefix, mode: $queryBuildingMode));
+        return $this->withQuery(Query::fromVariable(Query::fromUri($this->uri)->parameters(), prefix: $prefix, queryBuildingMode: $queryBuildingMode));
     }
 
     /**
@@ -451,7 +451,7 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
      */
     public function appendQueryParameters(object|array $parameters, string $prefix = '', QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): self
     {
-        return $this->appendQuery(Query::fromVariable($parameters, prefix: $prefix, mode: $queryBuildingMode)->value());
+        return $this->appendQuery(Query::fromVariable($parameters, prefix: $prefix, queryBuildingMode: $queryBuildingMode)->value());
     }
 
     /**
@@ -459,7 +459,7 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
      */
     public function prependQueryParameters(object|array $parameters, string $prefix = '', QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): self
     {
-        return $this->withQuery(Query::fromVariable($parameters, prefix: $prefix, mode: $queryBuildingMode)->append(Query::fromUri($this->uri)->value())->value());
+        return $this->withQuery(Query::fromVariable($parameters, prefix: $prefix, queryBuildingMode: $queryBuildingMode)->append(Query::fromUri($this->uri)->value())->value());
     }
 
     public function replaceQueryParameter(string $name, mixed $value, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): self
@@ -576,13 +576,39 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
     public function removeQueryParameters(string ...$keys): static
     {
         $query = Query::fromUri($this->uri);
-        $newQuery = $query->withoutParameters(...$keys)->value();
+        $newQuery = $query
+            ->withoutPairByKey(...$keys)
+            ->withoutParameterList(...$keys)
+            ->value();
 
         return match ($newQuery) {
             $query->value() => $this,
             default => $this->withQuery($newQuery),
         };
     }
+
+    public function addQueryParameter(string $key, array $value, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): static
+    {
+        $query = Query::fromUri($this->uri);
+        $newQuery = $query->withParameterList($key, $value, $queryBuildingMode)->value();
+
+        return match ($newQuery) {
+            $query->value() => $this,
+            default => $this->withQuery($newQuery),
+        };
+    }
+
+    public function appendQueryParameter(string $key, array $value, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): static
+    {
+        $query = Query::fromUri($this->uri);
+        $newQuery = $query->appendParameterList($key, $value, $queryBuildingMode)->value();
+
+        return match ($newQuery) {
+            $query->value() => $this,
+            default => $this->withQuery($newQuery),
+        };
+    }
+
 
     /**
      * Remove empty pairs from the URL query component.
