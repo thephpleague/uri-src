@@ -840,8 +840,6 @@ final class Query extends Component implements QueryInterface
      *
      * @codeCoverageIgnore
      *
-     * @param string ...$separator
-     *
      * Returns a new instance without the parameter name being used.
      *
      * @deprecated Since version 7.8.0
