@@ -690,12 +690,13 @@ final class Query extends Component implements QueryInterface
             $query = $query->value();
         }
 
-        $pairs = array_merge($this->pairs, QueryString::parse($query, $this->separator));
-
-        return match ($this->pairs) {
-            $pairs  => $this,
-            default => self::fromPairs(array_filter($pairs, $this->filterEmptyValue(...)), $this->separator),
-        };
+        return null === $query ? $this : self::fromPairs(
+            array_filter(
+                array_merge($this->pairs, QueryString::parse($query, $this->separator)),
+                static fn (array $pair): bool => '' !== $pair[0] || null !== $pair[1]
+            ),
+            $this->separator
+        );
     }
 
     public function prepend(Stringable|string|null $query): QueryInterface
@@ -758,14 +759,6 @@ final class Query extends Component implements QueryInterface
         }
 
         return null;
-    }
-
-    /**
-     * Empty Pair filtering.
-     */
-    private function filterEmptyValue(array $pair): bool
-    {
-        return '' !== $pair[0] || null !== $pair[1];
     }
 
     public function withParameterList(
