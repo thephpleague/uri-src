@@ -28,7 +28,7 @@ final class Builder
     public function __construct(
         private ?string $scheme = null,
         private ?string $username = null,
-        private ?string $password = null,
+        #[SensitiveParameter] private ?string $password = null,
         private ?string $host = null,
         private ?int $port = null,
         private ?string $path = null,
@@ -46,10 +46,28 @@ final class Builder
     }
 
     /**
+     * Puts back the Builder in a freshly created state.
+     */
+    public function reset(): self
+    {
+        $this->scheme = null;
+        $this->username = null;
+        $this->password = null;
+        $this->host = null;
+        $this->port = null;
+        $this->path = null;
+        $this->query = null;
+        $this->fragment = null;
+
+        return $this;
+    }
+
+    /**
      * @throws SyntaxError
      */
-    public function scheme(?string $scheme): self
+    public function scheme(Stringable|string|null $scheme): self
     {
+        $scheme = $this->filterString($scheme);
         if ($scheme !== $this->scheme) {
             UriString::isValidScheme($scheme) || throw new SyntaxError('The scheme `'.$scheme.'` is invalid.');
 
@@ -76,8 +94,9 @@ final class Builder
     /**
      * @throws SyntaxError
      */
-    public function host(?string $host): self
+    public function host(Stringable|string|null $host): self
     {
+        $host = $this->filterString($host);
         if ($host !== $this->host) {
             null === $host
             || HostRecord::isValid($host)
