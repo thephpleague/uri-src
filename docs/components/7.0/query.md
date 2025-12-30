@@ -122,7 +122,7 @@ public Query::merge($query): Query
 This method expects a single argument which is a string
 
 ~~~php
-$query    = Query::fromRFC3986('foo=bar&baz=toto');
+$query = Query::fromRFC3986('foo=bar&baz=toto');
 $newQuery = $query->merge('foo=jane&r=stone');
 $newQuery->__toString(); //return foo=jane&baz=toto&r=stone
 // the 'foo' parameter was updated
@@ -132,7 +132,7 @@ $newQuery->__toString(); //return foo=jane&baz=toto&r=stone
 <p class="message-info">Values equal to <code>null</code> or the empty string are merge differently.</p>
 
 ~~~php
-$query    = Query::fromRFC3986('foo=bar&baz=toto');
+$query = Query::fromRFC3986('foo=bar&baz=toto');
 $newQuery = $query->merge('baz=&r');
 $newQuery->__toString(); //return foo=bar&baz=&r
 // the 'r' parameter was added without any value
@@ -338,6 +338,15 @@ public Query::withoutPairByKey(string ...$keys): self
 public Query::withoutPairByValue(?string ...$values): self
 public Query::withoutPairByKeyValue(string $key, ?string $value): self
 public Query::appendTo(string $key, $value): self
+public Query::indexOf(string $key, $nth = 0): ?int
+public Query::pair(int $offset): ?string
+public Query::keyAt(int $offset): string
+public Query::valueAt(int $offset): ?string
+public Query::getList(string $name): array
+public Query::hasList(string ...$names): bool
+public Query::appendList(string $name, array $value): bool
+public Query::withList(string $name, array $value): bool
+public Query::withoutList(string ...$names): bool
 ~~~
 
 ### Query::fromPairs
@@ -406,6 +415,20 @@ foreach ($query->pairs() as $name => $value) {
 
 <p class="message-info">The returned iterable contains decoded data.</p>
 
+### Query::pair
+
+<p class="message-notice">Available since version <code>7.8.0</code></p>
+
+The `Query::pair` method returns the key/pair value at a given position in the query string.
+The method supports negative offset. But if no value is found, an `OutOfBoundException` is triggered.
+
+~~~php
+$query = Query::fromRFC3986('foo=bar&foo=BAZ&p=y+olo&z=');
+$query->pair(2);  // returns ['p', 'y+olo'];
+$query->pair(-1); // returns ['z', ''];
+$query->pair(42); // throws OutOfBoundException
+~~~
+
 ### Query::has and Query::hasPair
 
 Because a query pair value can be `null` the `Query::has` method is used to remove the possible `Query::get` result ambiguity.
@@ -439,6 +462,18 @@ $query->hasPair('foo', 'p');    //return false
 $query->has('foo', 'p');        //return true
 ~~~
 
+### Query::getAll
+
+This method will return all the value associated with its submitted `$name`.
+
+~~~php
+$query = Query::fromRFC3986('foo=bar&foo=BAZ&p=y+olo&z=');
+$query->getAll('foo');   //return ['bar', 'BAZ']
+$query->getAll('gweta');  //return null
+~~~
+
+<p class="message-info">The returned data are fully decoded.</p>
+
 ### Query::get
 
 If you are only interested in a given pair you can access it directly using the `Query::get` method as show below:
@@ -453,15 +488,59 @@ The method returns the first value of a specific pair key as explained in the WH
 
 <p class="message-info">The returned data are fully decoded.</p>
 
-### Query::getAll
+### Query::first and Query::last
 
-This method will return all the value associated with its submitted `$name`.
+<p class="message-notice">Available since version <code>7.7.0</code></p>
+
+`Query::get()` is an alias of `Query::first()`, `Query::last` is the complementary method which returns the
+last value of a specific pair key as explained. If the key does not exist `null` will be returned. This value
+is more in line with what PHP developer expects when using `_GET` or `parse_str` on non-array like value.
 
 ~~~php
 $query = Query::fromRFC3986('foo=bar&foo=BAZ&p=y+olo&z=');
-$query->getAll('foo');   //return ['bar', 'BAZ']
-$query->getAll('gweta');  //return null
+$query->first('foo');    // return 'bar'
+$query->first('gweta');  // return null
+$query->last('foo');     // return 'BAZ'
+
+parse_str('foo=bar&foo=BAZ&p=y+olo&z=', $arr);
+$arr['foo']; // return 'BAZ'
 ~~~
+
+### Query::indexOf
+
+<p class="message-notice">since version <code>7.6.0</code></p>
+
+`Query::indexOf` returns the key/value pair offset within the query.
+By default, if the key appears multiple times, the method returns the offset of its first occurrence.
+You can retrieve subsequent occurrences by specifying the desired index using the optional `nth` parameter.
+
+The method accepts negative offset.
+
+~~~php
+$query = Query::fromRFC3986('foo=bar&p=y+olo&z=&foo=jazz');
+$query->indexOf('foo');         //returns 0;
+$query->indexOf('foo', 1);      //returns 3;
+$query->indexOf('foo', -1);     //returns 3
+$query->indexOf('unknown', -1); //returns null
+~~~
+
+<p class="message-info">The occurrence is design with a <code>zero-based indexing</code> so the first
+occurrence is <code>0</code> instead of <code>1</code></p>
+
+### Query::keyAt and Query::valueAt
+
+<p class="message-notice">Available since version <code>7.8.0</code></p>
+
+The `Query::keyAt()` and `Query::valueAt()` methods return the key or the value of the pair
+at the specified offset. The methods support negative offset but if the offset does not exist
+an `OutOfBoundException` is thrown.
+
+```php
+$query = Query::fromRFC3986('foo=bar&foo=BAZ&p=y+olo&z=');
+$query->valueAt(0);  // return 'bar'
+$query->keyAt(2);    // return 'p'
+$query->valueOf(42); // throws OutOfBoundException
+```
 
 ### Query::withPair
 
@@ -516,28 +595,6 @@ echo $query; //displays '&&=toto&&&&=&'
 echo $newQuery; //displays '=toto&='
 ~~~
 
-### Query::indexOf
-
-<p class="message-notice">since version <code>7.6.0</code></p>
-
-
-`Query::indexOf` returns the key/value pair offset within the query.
-By default, if the key appears multiple times, the method returns the offset of its first occurrence.
-You can retrieve subsequent occurrences by specifying the desired index using the optional `nth` parameter.
-
-The method accepts negative offset.
-
-~~~php
-$query = Query::fromRFC3986('foo=bar&p=y+olo&z=&foo=jazz');
-$query->indexOf('foo');         //returns 0;
-$query->indexOf('foo', 1);      //returns 3;
-$query->indexOf('foo', -1);     //returns 3
-$query->indexOf('unknown', -1); //returns null
-~~~
-
-<p class="message-info">The occurrence is design with a <code>zero-based indexing</code> so the first
-occurrence is <code>0</code> instead of <code>1</code></p>
-
 ### Query::replace
 
 <p class="message-notice">since version <code>7.6.0</code></p>
@@ -553,3 +610,54 @@ $query = Query::fromRFC3986('foo=bar&p=y+olo&z=&foo=jazz');
 $query->replace(1, 'toto', 'foobar')->toString(); 
 //returns 'foo=bar&toto=foobar&z=&foo=jazz'
 ~~~
+
+### Query::hasList
+
+<p class="message-notice">Available since version <code>7.8.0</code></p>
+
+The `hasList()` method tells whether a parameter exists as a structured list in the parsed
+representation of the query string. (ie the key string should contains open and closes bracket as
+per `parse_str` algorithm).
+
+```php
+$query = Query::fromUri('http://example.com/?b=2&a[]=1&a[]=2&a[]=3');
+
+$query->hasList('a'); // true
+$query->hasList('b'); // false
+```
+The parameter `a` is written using bracket notation (`a[]`), after parsing using
+PHP algorithm, an array is generated. On the otherhand the `b` parameter does not
+exist as an array, it is a scalar value so `hasList` returns false.
+
+<p class="message-info"><code>hasList()</code> operates on the parsed parameter view of the query, not on raw query pairs.</p>
+
+### Query::getList
+
+<p class="message-notice">Available since version <code>7.8.0</code></p>
+
+The `getList()` method returns the values of a parameter **only if that parameter is represented as a list**
+in the parsed form of the query string.
+
+```php
+$query = Query::fromUri('http://example.com/?b=2&a[]=1&a[]=2&a[]=3&a=not-present');
+
+$query->getList('a'); // ['1', '2', '3']
+$query->getAll('a');  // ['not-present']
+$query->getAll('b');  // []
+$query->getAll('a[]');  // ['1', '2', '3']
+```
+
+In the example above shows how `getList` works and its relation to the other getter methods:
+
+
+### Query::withList
+
+<p class="message-notice">Available since version <code>7.8.0</code></p>
+
+### Query::withoutList
+
+<p class="message-notice">Available since version <code>7.8.0</code></p>
+
+### Query::appendList
+
+<p class="message-notice">Available since version <code>7.8.0</code></p>

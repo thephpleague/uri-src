@@ -46,6 +46,7 @@ use function array_is_list;
 use function array_map;
 use function array_merge;
 use function array_reduce;
+use function array_values;
 use function count;
 use function get_object_vars;
 use function http_build_query;
@@ -66,11 +67,16 @@ use const PREG_SPLIT_NO_EMPTY;
 final class Query extends Component implements QueryInterface
 {
     private const REGEXP_NON_ASCII_PATTERN = '/[^\x20-\x7f]/';
+    private const REGXP_FILTER_LIST = '/^
+        [^\[\]]+        # base key (no [ or ])
+        (?:\[[^\]]*\])+ # one or more bracket groups
+    $/x';
     /** @var array<int, array{0:string, 1:string|null}> */
     private readonly array $pairs;
     /** @var non-empty-string */
     private readonly string $separator;
     private readonly array $parameters;
+    private readonly array $list;
 
     /**
      * Returns a new instance.
@@ -81,8 +87,9 @@ final class Query extends Component implements QueryInterface
     {
         $converter ??= Converter::fromRFC3986();
         $this->pairs = QueryString::parseFromValue($query, $converter);
-        $this->parameters = QueryString::extractFromValue($query, $converter);
         $this->separator = $converter->separator();
+        $this->parameters = QueryString::extractFromValue($query, $converter);
+        $this->list = QueryString::convert(array_values(array_filter($this->pairs, static fn (array $pair): bool => 1 === preg_match(self::REGXP_FILTER_LIST, $pair[0]))));
     }
 
     /**
@@ -376,9 +383,7 @@ final class Query extends Component implements QueryInterface
 
     public function getList(string $name): array
     {
-        $data = $this->parameters[$name] ?? null;
-
-        return is_array($data) ? $data : [];
+        return $this->list[$name] ?? [];
     }
 
     public function hasList(string ...$names): bool
