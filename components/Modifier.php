@@ -578,7 +578,7 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
         $query = Query::fromUri($this->uri);
         $newQuery = $query
             ->withoutPairByKey(...$keys)
-            ->withoutParameterList(...$keys)
+            ->withoutList(...$keys)
             ->value();
 
         return match ($newQuery) {
@@ -590,7 +590,7 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
     public function addQueryParameter(string $key, array $value, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): static
     {
         $query = Query::fromUri($this->uri);
-        $newQuery = $query->withParameterList($key, $value, $queryBuildingMode)->value();
+        $newQuery = $query->withList($key, $value, $queryBuildingMode)->value();
 
         return match ($newQuery) {
             $query->value() => $this,
@@ -601,7 +601,7 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
     public function appendQueryParameter(string $key, array $value, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): static
     {
         $query = Query::fromUri($this->uri);
-        $newQuery = $query->appendParameterList($key, $value, $queryBuildingMode)->value();
+        $newQuery = $query->appendList($key, $value, $queryBuildingMode)->value();
 
         return match ($newQuery) {
             $query->value() => $this,

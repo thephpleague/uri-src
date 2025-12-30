@@ -25,18 +25,22 @@ use Stringable;
  *
  * @method string|null toFormData() Returns the string representation using the application/www-form-urlencoded rules
  * @method string|null toRFC3986() Returns the string representation using RFC3986 rules
- * @method string|null first(string $key) returns the first value associated with the given name
- * @method string|null last(string $key) returns the first value associated with the given name
+ * @method string|null first(string $key) Returns the first value associated with the given name
+ * @method string|null last(string $key) Returns the first value associated with the given name
+ * @method int|null indexOf(string $key, int $nth = 0) Returns the offset of the pair based on its key and its nth occurrence; negative occurrences are supported
+ * @method array pair(int $offset) Returns the key/value pair at the given numeric offset; negative occurrences are supported
+ * @method string|null valueAt(int $offset): Returns the value at the given numeric offset; negative occurrences are supported
+ * @method string keyAt(int $offset): Returns the key at the given numeric offset; negative occurrences are supported
  * @method self normalize() returns the normalized string representation of the component
  * @method self withoutPairByKey(string ...$keys) Returns an instance without pairs with the specified keys.
  * @method self withoutPairByValue(Stringable|string|int|bool|null ...$values) Returns an instance without pairs with the specified values.
  * @method self withoutPairByKeyValue(string $key, Stringable|string|int|bool|null $value) Returns an instance without pairs with the specified key/value pair
  * @method bool hasPair(string $key, ?string $value) Tells whether the pair exists in the query.
- * @method self appendParameterList(string $name, array $values, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native) Appends a parameter to the query string
- * @method self withParameterList(string $name, array $values, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native) Adds a new parameter to the query string and remove any previously set values
- * @method self withoutParameterList(string ...$names) Removes any given list associated with the given names
- * @method array parameterList(string $name) Returns the list associated with the given name or an empty array if it does not exist.
- * @method bool hasParameterList(string $name) Tells whether the parameter list exists in the query.
+ * @method self appendList(string $name, array $values, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native) Appends a parameter to the query string
+ * @method self withList(string $name, array $values, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native) Adds a new parameter to the query string and remove any previously set values
+ * @method self withoutList(string ...$names) Removes any given list associated with the given names
+ * @method array getList(string $name) Returns the list associated with the given name or an empty array if it does not exist.
+ * @method bool hasList(string ...$names) Tells whether the parameter list exists in the query.
  */
 interface QueryInterface extends Countable, IteratorAggregate, UriComponentInterface
 {
@@ -133,6 +137,7 @@ interface QueryInterface extends Countable, IteratorAggregate, UriComponentInter
      * @return mixed the collection of stored PHP variables or the empty array if no input is given,
      *               the single value of a stored PHP variable or null if the variable is not present in the collection
      */
+    #[Deprecated(message:'use League\Uri\Contracts\QueryInterface::get() or League\Uri\Contracts\QueryInterface::last() or League\Uri\Contracts\QueryInterface::getAll() or League\Uri\Contracts\QueryInterface::getList() instead', since:'league/uri-interfaces:7.8.0')]
     public function parameter(string $name): mixed;
 
     /**
@@ -258,5 +263,6 @@ interface QueryInterface extends Countable, IteratorAggregate, UriComponentInter
      * an instance that contains the modified component without PHP's value.
      * PHP's mangled is not taken into account.
      */
+    #[Deprecated(message:'use League\Uri\Contracts\QueryInterface::withoutPairByKey() and\or League\Uri\Contracts\QueryInterface::withoutList() instead', since:'league/uri-interfaces:7.8.0')]
     public function withoutParameters(string ...$names): self;
 }

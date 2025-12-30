@@ -21,11 +21,13 @@ use League\Uri\Contracts\UriComponentInterface;
 use League\Uri\Contracts\UriException;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\Encoder;
+use League\Uri\Exceptions\OffsetOutOfBounds;
 use League\Uri\Exceptions\SyntaxError;
 use League\Uri\KeyValuePair\Converter;
 use League\Uri\QueryBuildingMode;
 use League\Uri\QueryString;
 use League\Uri\UriString;
+use OutOfBoundsException;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use Stringable;
 use Traversable;
@@ -72,6 +74,8 @@ final class Query extends Component implements QueryInterface
 
     /**
      * Returns a new instance.
+     *
+     * @throws SyntaxError
      */
     private function __construct(Stringable|string|null $query, ?Converter $converter = null)
     {
@@ -81,6 +85,9 @@ final class Query extends Component implements QueryInterface
         $this->separator = $converter->separator();
     }
 
+    /**
+     * @throws SyntaxError
+     */
     public static function new(Stringable|string|null $value = null): self
     {
         return self::fromRFC3986($value);
@@ -277,32 +284,112 @@ final class Query extends Component implements QueryInterface
         return in_array([$key, $value], $this->pairs, true);
     }
 
+    public function first(string $key): ?string
+    {
+        $offset = $this->indexOf($key);
+
+        return null === $offset ? null : $this->valueAt($offset);
+    }
+
+    public function last(string $key): ?string
+    {
+        $offset = $this->indexOf($key, -1);
+
+        return null === $offset ? null : $this->valueAt($offset);
+    }
+
     public function get(string $key): ?string
     {
-        foreach ($this->pairs as $pair) {
-            if ($key === $pair[0]) {
-                return $pair[1];
+        return $this->first($key);
+    }
+
+    public function getAll(string $key): array
+    {
+        return array_column(array_filter($this->pairs, fn (array $pair): bool => $key === $pair[0]), 1);
+    }
+
+    public function indexOf(string $key, int $nth = 0): ?int
+    {
+        if ([] === $this->pairs) {
+            return null;
+        }
+
+        if ($nth < 0) {
+            $matchCount = 0;
+            for ($offset = count($this->pairs) - 1; $offset >= 0; --$offset) {
+                if ($this->pairs[$offset][0] === $key) {
+                    if (++$matchCount === -$nth) {
+                        return $offset;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        $matchCount = 0;
+        foreach ($this->pairs as $offset => $pair) {
+            if ($pair[0] === $key) {
+                if ($nth === $matchCount) {
+                    return $offset;
+                }
+                ++$matchCount;
             }
         }
 
         return null;
     }
 
-    public function first(string $key): ?string
+    /**
+     * Returns the key/value pair at the given numeric offset.
+     *
+     * Negative offsets are supported (counting from the end).
+     *
+     * @throws OutOfBoundsException If the offset is invalid
+     *
+     * @return array{0:string, 1:?string}
+     */
+    public function pair(int $offset): array
     {
-        return $this->get($key);
+        if ($offset < 0) {
+            $offset += count($this->pairs);
+        }
+
+        return $this->pairs[$offset] ?? throw new OffsetOutOfBounds("Offset $offset does not exist");
     }
 
-    public function last(string $key): ?string
+    /**
+     * @throws OutOfBoundsException If the offset is invalid
+     */
+    public function valueAt(int $offset): ?string
     {
-        $res = $this->getAll($key);
-
-        return $res[count($res) - 1] ?? null;
+        return $this->pair($offset)[1];
     }
 
-    public function getAll(string $key): array
+    /**
+     * @throws OutOfBoundsException If the offset is invalid
+     */
+    public function keyAt(int $offset): string
     {
-        return array_column(array_filter($this->pairs, fn (array $pair): bool => $key === $pair[0]), 1);
+        return $this->pair($offset)[0];
+    }
+
+    public function getList(string $name): array
+    {
+        $data = $this->parameters[$name] ?? null;
+
+        return is_array($data) ? $data : [];
+    }
+
+    public function hasList(string ...$names): bool
+    {
+        foreach ($names as $name) {
+            if ([] === $this->getList($name)) {
+                return false;
+            }
+        }
+
+        return [] !== $names;
     }
 
     public function equals(mixed $value): bool
@@ -319,69 +406,6 @@ final class Query extends Component implements QueryInterface
         }
 
         return $value->getUriComponent() === $this->getUriComponent();
-    }
-
-    public function parameters(): array
-    {
-        return $this->parameters;
-    }
-
-    public function parameter(string $name): mixed
-    {
-        return $this->parameters[$name] ?? null;
-    }
-
-    public function parameterList(string $name): array
-    {
-        $data = $this->parameter($name);
-
-        return is_array($data) ? $data : [];
-    }
-
-    public function hasParameterList(string $name): bool
-    {
-        return [] !== $this->parameterList($name);
-    }
-
-    public function hasParameter(string ...$names): bool
-    {
-        foreach ($names as $name) {
-            if (!isset($this->parameters[$name])) {
-                return false;
-            }
-        }
-
-        return [] !== $names;
-    }
-
-    public function mergeParameters(object|array $parameter, string $prefix = '', QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): self
-    {
-        $params = is_object($parameter) ? get_object_vars($parameter) : $parameter;
-        $data = [];
-        foreach ($params as $name => $value) {
-            $data[$prefix.$name] = $value;
-        }
-
-        return in_array($data, [$this->parameters, []], true) ? $this : new self(
-            QueryString::compose(data: array_merge($this->parameters, $data), separator: $this->separator, queryBuildingMode: $queryBuildingMode),
-            Converter::fromRFC1738($this->separator)
-        );
-    }
-
-    public function replaceParameter(string $name, mixed $parameter, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): self
-    {
-        $this->hasParameter($name) || throw new ValueError('The specified name does not exist');
-        if ($parameter === $this->parameters[$name]) {
-            return $this;
-        }
-
-        $parameters = $this->parameters;
-        $parameters[$name] = $parameter;
-
-        return new self(
-            QueryString::compose(data: $parameters, separator: $this->separator, queryBuildingMode: $queryBuildingMode),
-            Converter::fromRFC1738($this->separator)
-        );
     }
 
     public function withSeparator(string $separator): self
@@ -670,7 +694,7 @@ final class Query extends Component implements QueryInterface
         return self::fromPairs([...$this->pairs, ...$converter($value)], $this->separator);
     }
 
-    public function appendParameterList(
+    public function appendList(
         string $name,
         array $values,
         QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native
@@ -724,44 +748,7 @@ final class Query extends Component implements QueryInterface
         return self::fromPairs($newPairs, $this->separator);
     }
 
-    /**
-     * Returns the offset of the pair based on its key and its nth occurrence.
-     *
-     * negative occurrences are supported
-     */
-    public function indexOf(string $key, int $nth = 0): ?int
-    {
-        if ([] === $this->pairs) {
-            return null;
-        }
-
-        if ($nth < 0) {
-            $matchCount = 0;
-            for ($offset = count($this->pairs) - 1; $offset >= 0; --$offset) {
-                if ($this->pairs[$offset][0] === $key) {
-                    if (++$matchCount === -$nth) {
-                        return $offset;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        $matchCount = 0;
-        foreach ($this->pairs as $offset => $pair) {
-            if ($pair[0] === $key) {
-                if ($nth === $matchCount) {
-                    return $offset;
-                }
-                ++$matchCount;
-            }
-        }
-
-        return null;
-    }
-
-    public function withParameterList(
+    public function withList(
         string $name,
         array $values,
         QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native
@@ -807,7 +794,7 @@ final class Query extends Component implements QueryInterface
         return $this->pairs === $pairs ? $this : self::fromPairs($pairs, $this->separator);
     }
 
-    public function withoutParameterList(string ...$names): QueryInterface
+    public function withoutList(string ...$names): QueryInterface
     {
         if ([] === $names) {
             return $this;
@@ -824,12 +811,87 @@ final class Query extends Component implements QueryInterface
         };
     }
 
+    public function parameters(): array
+    {
+        return $this->parameters;
+    }
+
+    public function mergeParameters(object|array $parameter, string $prefix = '', QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): self
+    {
+        $params = is_object($parameter) ? get_object_vars($parameter) : $parameter;
+        $data = [];
+        foreach ($params as $name => $value) {
+            $data[$prefix.$name] = $value;
+        }
+
+        return in_array($data, [$this->parameters, []], true) ? $this : new self(
+            QueryString::compose(data: array_merge($this->parameters, $data), separator: $this->separator, queryBuildingMode: $queryBuildingMode),
+            Converter::fromRFC1738($this->separator)
+        );
+    }
+
+    public function replaceParameter(string $name, mixed $parameter, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): self
+    {
+        $this->has($name) || $this->hasList($name) || throw new ValueError('The specified name does not exist');
+        if ($parameter === $this->parameters[$name]) {
+            return $this;
+        }
+
+        $parameters = $this->parameters;
+        $parameters[$name] = $parameter;
+
+        return new self(
+            QueryString::compose(data: $parameters, separator: $this->separator, queryBuildingMode: $queryBuildingMode),
+            Converter::fromRFC1738($this->separator)
+        );
+    }
+
+    /**
+     * DEPRECATION WARNING! This method will be removed in the next major point release.
+     *
+     * @deprecated Since version 7.8.0
+     * @see Query::getAll()
+     * @see Query::getList()
+     *
+     * @codeCoverageIgnore
+     *
+     * Returns a new instance.
+     */
+    #[Deprecated(message:'use League\Uri\Components\Query::get() or League\Uri\Components\Query::getAll() or League\Uri\Components\Query::list() instead', since:'league/uri-components:7.8.0')]
+    public function parameter(string $name): mixed
+    {
+        return $this->parameters[$name] ?? null;
+    }
+
+    /**
+     * DEPRECATION WARNING! This method will be removed in the next major point release.
+     *
+     * @deprecated Since version 7.8.0
+     * @see Query::has()
+     * @see Query::hasList()
+     *
+     * @codeCoverageIgnore
+     *
+     * Returns a new instance.
+     */
+    #[Deprecated(message:'use League\Uri\Components\Query::has() and/or League\Uri\Components\Query::hasList() instead', since:'league/uri-components:7.8.0')]
+    public function hasParameter(string ...$names): bool
+    {
+        foreach ($names as $name) {
+            if (!isset($this->parameters[$name])) {
+                return false;
+            }
+        }
+
+        return [] !== $names;
+    }
+
     /**
      * DEPRECATION WARNING! This method will be removed in the next major point release.
      *
      * @deprecated Since version 7.8.0
      * @see Query::withoutPairByKey()
-     * @see Query::withoutParameterList()
+     * @see Query::withoutList()
      *
      * @codeCoverageIgnore
      *
@@ -837,22 +899,10 @@ final class Query extends Component implements QueryInterface
      *
      * @deprecated Since version 7.8.0
      */
-    #[Deprecated(message:'use League\Uri\Components\Query::withoutPairByKey() and/or League\Uri\Components\Query::withoutParameterList() instead', since:'league/uri-components:7.8.0')]
+    #[Deprecated(message:'use League\Uri\Components\Query::withoutPairByKey() and/or League\Uri\Components\Query::withoutList() instead', since:'league/uri-components:7.8.0')]
     public function withoutParameters(string ...$names): QueryInterface
     {
-        if ([] === $names) {
-            return $this;
-        }
-
-        $mapper = static fn (string $offset): string => preg_quote($offset, ',').'(\[.*\].*)?';
-        $regexp = ',^('.implode('|', array_map($mapper, $names)).')?$,';
-        $filter = fn (array $pair): bool => 1 !== preg_match($regexp, $pair[0]);
-        $pairs = array_filter($this->pairs, $filter);
-
-        return match ($this->pairs) {
-            $pairs => $this,
-            default => self::fromPairs($pairs, $this->separator),
-        };
+        return $this->withoutPairByKey(...$names)->withoutList(...$names);
     }
 
     /**
@@ -969,10 +1019,7 @@ final class Query extends Component implements QueryInterface
     #[Deprecated(message:'use League\Uri\Components\Query::parameter() or League\Uri\Components\Query::parameters() instead', since:'league/uri-components:7.0.0')]
     public function params(?string $key = null): mixed
     {
-        return match (null) {
-            $key => $this->parameters(),
-            default => $this->parameter($key),
-        };
+        return null === $key ? $this->parameters : $this->parameters[$key] ?? null;
     }
 
     /**
@@ -986,7 +1033,7 @@ final class Query extends Component implements QueryInterface
     #[Deprecated(message:'use League\Uri\Components\Query::withoutParameters() instead', since:'league/uri-components:7.0.0')]
     public function withoutParams(string ...$names): QueryInterface
     {
-        return $this->withoutPairByKey(...$names)->withoutParameterList(...$names);
+        return $this->withoutPairByKey(...$names)->withoutList(...$names);
     }
 
     /**

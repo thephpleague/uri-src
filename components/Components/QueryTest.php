@@ -201,8 +201,8 @@ final class QueryTest extends TestCase
         $query = Query::new('foo[]=bar&foo[]=baz');
 
         self::assertCount(1, $query->parameters());
-        self::assertSame(['bar', 'baz'], $query->parameter('foo'));
-        self::assertNull($query->parameter('foo[]'));
+        self::assertSame(['bar', 'baz'], $query->getList('foo'));
+        self::assertSame([], $query->getList('foo[]'));
     }
 
     #[DataProvider('withoutKeyPairProvider')]
@@ -354,7 +354,7 @@ final class QueryTest extends TestCase
         self::assertSame(
             $expected,
             Query::fromVariable($origin)
-                ->withoutParameterList(...$without)
+                ->withoutList(...$without)
                 ->withoutPairByKey(...$without)
                 ->toString()
         );
@@ -419,9 +419,9 @@ final class QueryTest extends TestCase
         $query = Query::fromVariable($data);
         self::assertSame('foo%5B0%5D=bar&foo%5B1%5D=baz', $query->value());
 
-        self::assertTrue($query->hasParameter('foo'));
-        self::assertFalse($query->hasParameter('bar'));
-        self::assertFalse($query->hasParameter('foo', 'bar'));
+        self::assertTrue($query->hasList('foo'));
+        self::assertFalse($query->hasList('bar'));
+        self::assertFalse($query->hasList('foo', 'bar'));
 
         $newQuery = $query->withoutPairByKey('foo[0]');
 
@@ -960,18 +960,18 @@ final class QueryTest extends TestCase
 
     public function test_it_can_add_parameters(): void
     {
-        $query = Query::new('a=1&b=2')->withParameterList('c', [1, 2, 3]);
+        $query = Query::new('a=1&b=2')->withList('c', [1, 2, 3]);
 
         self::assertSame('a=1&b=2&c%5B0%5D=1&c%5B1%5D=2&c%5B2%5D=3', $query->toString());
 
-        $query = Query::new('a=1&b=2')->withParameterList('c', [1, 2, 3], QueryBuildingMode::Safe);
+        $query = Query::new('a=1&b=2')->withList('c', [1, 2, 3], QueryBuildingMode::Safe);
 
         self::assertSame('a=1&b=2&c%5B%5D=1&c%5B%5D=2&c%5B%5D=3', $query->toString());
     }
 
     public function test_it_can_add_parameters_without_deleting_non_array_like_parameters(): void
     {
-        $query = Query::new('a=1&b=2')->withParameterList('a', [1, 2, 3]);
+        $query = Query::new('a=1&b=2')->withList('a', [1, 2, 3]);
 
         self::assertSame('a=1&b=2&a%5B0%5D=1&a%5B1%5D=2&a%5B2%5D=3', $query->toString());
     }
@@ -980,17 +980,17 @@ final class QueryTest extends TestCase
     {
         $query = Query::new('a=1&b=2&a%5B0%5D=1&a%5B1%5D=2&a%5B2%5D=3');
 
-        self::assertTrue($query->hasParameter('a'));
-        self::assertTrue($query->hasParameter('b'));
-        self::assertTrue($query->hasParameterList('a'));
-        self::assertFalse($query->hasParameterList('b'));
+        self::assertTrue($query->has('a'));
+        self::assertTrue($query->has('b'));
+        self::assertTrue($query->hasList('a'));
+        self::assertFalse($query->hasList('b'));
 
-        $altQuery = $query->withoutParameterList('a');
+        $altQuery = $query->withoutList('a');
 
-        self::assertSame('a=1&b=2',$altQuery->toString());
-        self::assertTrue($altQuery->hasParameter('a'));
-        self::assertTrue($altQuery->hasParameter('b'));
-        self::assertFalse($altQuery->hasParameterList('a'));
-        self::assertFalse($altQuery->hasParameterList('b'));
+        self::assertSame('a=1&b=2', $altQuery->toString());
+        self::assertTrue($altQuery->has('a'));
+        self::assertTrue($altQuery->has('b'));
+        self::assertFalse($altQuery->hasList('a'));
+        self::assertFalse($altQuery->hasList('b'));
     }
 }

@@ -33,7 +33,6 @@ use function is_object;
 use function is_resource;
 use function is_scalar;
 use function rawurldecode;
-use function spl_object_id;
 use function strpos;
 use function substr;
 
