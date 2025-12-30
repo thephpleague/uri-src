@@ -639,16 +639,15 @@ The `getList()` method returns the values of a parameter **only if that paramete
 in the parsed form of the query string.
 
 ```php
-$query = Query::fromUri('http://example.com/?b=2&a[]=1&a[]=2&a[]=3&a=not-present');
+$query = Query::fromUri('http://example.com/?b=2&a[foo]=1&a[]=2&a=not-present');
 
-$query->getList('a'); // ['1', '2', '3']
-$query->getAll('a');  // ['not-present']
-$query->getAll('b');  // []
-$query->getAll('a[]');  // ['1', '2', '3']
+$query->getList('a');   // ['foo' => '1', '0' => '2']
+$query->getAll('a');    // ['not-present']
+$query->getAll('b');    // [0 => '2']
+$query->getAll('a[]');  // [0 => '2']
 ```
 
-In the example above shows how `getList` works and its relation to the other getter methods:
-
+In the example above shows how `getList` works and its relation to the `getAll`.
 
 ### Query::withList
 
