@@ -6,13 +6,13 @@ All Notable changes to `League\Uri\Components` will be documented in this file
 
 ### Added
 
-- `Query::addParameterList`
-- `Query::appendParameterList`
-- `Query::withoutParameterList`
-- `Query::hasParameterList`
-- `Query::parameterList`
-- `Modifier::addQueryParameter`
-- `Modifier::appendQueryParameter`
+- `Query::hasList`
+- `Query::getList`
+- `Query::withList`
+- `Query::appendList`
+- `Query::withoutList`
+- `Query::withoutLists`
+- `Query::onlyLists`
 
 ### Fixed
 

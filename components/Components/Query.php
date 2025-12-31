@@ -848,6 +848,34 @@ final class Query extends Component implements QueryInterface
         };
     }
 
+    public function onlyLists(): QueryInterface
+    {
+        $pairs = array_values(
+            array_filter(
+                $this->pairs,
+                static fn (array $pair): bool => 1 === preg_match(self::REGXP_FILTER_LIST, $pair[0])
+            )
+        );
+
+        return $pairs === $this->pairs ? $this : self::fromPairs($pairs, $this->separator);
+    }
+
+    public function withoutLists(): QueryInterface
+    {
+        if ([] === $this->list) {
+            return $this;
+        }
+
+        $pairs = array_values(
+            array_filter(
+                $this->pairs,
+                static fn (array $pair): bool => 1 !== preg_match(self::REGXP_FILTER_LIST, $pair[0])
+            )
+        );
+
+        return self::fromPairs($pairs, $this->separator);
+    }
+
     public function parameters(): array
     {
         return $this->parameters;

@@ -689,7 +689,7 @@ Query::new('foo[]=bar&p=y+olo&z=&foo[]=BAZ')
 
 #### Removing Lists
 
-The `Query::withoutList()` method removes all list parameters with the given name from the query string.
+The `Query::withoutList()` method removes all list parameters with the given names from the query string.
 
 Only parameters represented using bracket notation are affected.
 Scalar parameters with the same name **are preserved**.
@@ -699,4 +699,22 @@ Query::new('foo[]=bar&p=y+olo&z=&foo[qux]=quux&foo=scalar')
     ->withoutList('foo')
     ->toString();
 // returns 'p=y%2Bolo&z=&foo=scalar'
+~~~
+
+The `Query::withoutLists` removes **all list-based parameters** from the query string.
+
+~~~php
+Query::new('a=1&a[]=2&b=3&b[]=4')
+    ->withoutLists()
+    ->toString();
+// returns a=1&b=3
+~~~
+
+The `Query::onlyLists` removes **all scalar parameters** and keeps only lists.
+
+~~~php
+Query::new('a=1&a[]=2&b=3&b[]=4')
+    ->onlyLists()
+    ->toString();
+// returns a%5B%5D=2&b%5B%5D=4
 ~~~

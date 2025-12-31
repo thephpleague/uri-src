@@ -37,11 +37,13 @@ use Stringable;
  * @method self withoutPairByValue(Stringable|string|int|bool|null ...$values) Returns an instance without pairs with the specified values.
  * @method self withoutPairByKeyValue(string $key, Stringable|string|int|bool|null $value) Returns an instance without pairs with the specified key/value pair
  * @method bool hasPair(string $key, ?string $value) Tells whether the pair exists in the query.
+ * @method array getList(string $name) Returns the list associated with the given name or an empty array if it does not exist.
+ *                                     * @method bool hasList(string ...$names) Tells whether the parameter list exists in the query.
  * @method self appendList(string $name, array $values, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native) Appends a parameter to the query string
  * @method self withList(string $name, array $values, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native) Adds a new parameter to the query string and remove any previously set values
  * @method self withoutList(string ...$names) Removes any given list associated with the given names
- * @method array getList(string $name) Returns the list associated with the given name or an empty array if it does not exist.
- * @method bool hasList(string ...$names) Tells whether the parameter list exists in the query.
+ * @method self withoutLists() Removes all lists from the query string
+ * @method self onlyLists() Removes all pairs without a valid PHP's bracket notation
  */
 interface QueryInterface extends Countable, IteratorAggregate, UriComponentInterface
 {
