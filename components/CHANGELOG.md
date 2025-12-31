@@ -20,7 +20,7 @@ All Notable changes to `League\Uri\Components` will be documented in this file
 
 ### Deprecated
 
-- `Query::withoutParameters` use `Query::withoutParameterList` or `Query::withoutPairsBykey` or both.
+- None
 
 ### Removed
 
