@@ -38,7 +38,7 @@ use Stringable;
  * @method self withoutPairByKeyValue(string $key, Stringable|string|int|bool|null $value) Returns an instance without pairs with the specified key/value pair
  * @method bool hasPair(string $key, ?string $value) Tells whether the pair exists in the query.
  * @method array getList(string $name) Returns the list associated with the given name or an empty array if it does not exist.
- *                                     * @method bool hasList(string ...$names) Tells whether the parameter list exists in the query.
+ * @method bool hasList(string ...$names) Tells whether the parameter list exists in the query.
  * @method self appendList(string $name, array $values, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native) Appends a parameter to the query string
  * @method self withList(string $name, array $values, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native) Adds a new parameter to the query string and remove any previously set values
  * @method self withoutList(string ...$names) Removes any given list associated with the given names
