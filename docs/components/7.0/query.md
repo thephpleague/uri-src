@@ -645,9 +645,12 @@ $query = Query::fromUri('http://example.com/?b=2&a[foo]=1&a[]=2&a=not-present');
 
 $query->getList('a');   // ['foo' => '1', '0' => '2']
 $query->getAll('a');    // ['not-present']
-$query->getAll('b');    // [0 => '2']
 $query->getAll('a[]');  // [0 => '2']
-$query->parameter('a'); // 'not-present' (the array got overwritten by the last pair)
+$query->getAll('b');    // [0 => '2']
+$query->parameter('a'); // 'not-present' (the array got overwritten as per PHP's parse_str logic)
+
+parse_str($query->toRfc1738(), $arr);
+$arr['a']; // 'not-present' (the array got overwritten as per the function logic)
 ```
 
 The example above shows how `getList` works and differs from `getAll` and `parameter`.
