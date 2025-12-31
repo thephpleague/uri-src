@@ -195,6 +195,8 @@ public Query::parameter(string $name): mixed
 public Query::hasParameter(string ...$name): bool
 public Query::withoutNumericIndices(): self
 public Query::withoutParameters(...string $offsets): self
+public Query::mergeParameters(array $data): self
+public Query::replaceParameter(string $name, mixed $value): self;
 ~~~
 
 <p class="message-info"><code>Query::fromVariable</code> replaced the deprecated 
@@ -318,9 +320,11 @@ $query->parameters(); //return ['foo' => ['bar', 'baz']]
 $new_query->parameters(); //return ['foo' => ['bar', 'baz']]
 ~~~
 
-## Key/Value Pairs Collection
+## Query Collection
 
-To better support interoperability, This class mainly represents the query string as a collection of key/value pairs.
+To better support interoperability, this class represents a query string primarily as an ordered
+collection of key/value pairs, while also providing additional APIs to work with parameters
+that are parsed as lists using PHP’s bracket notation.
 
 ~~~php
 public static Query::fromPairs(iterable $pairs, string $separator = '&'): self
@@ -435,9 +439,9 @@ Because a query pair value can be `null` the `Query::has` method is used to remo
 
 ~~~php
 $query = Query::fromRFC3986('foo=bar&p&z=');
-$query->getPair('foo');   //return 'bar'
-$query->getPair('p');     //return null
-$query->getPair('gweta'); //return null
+$query->get('foo');   //return 'bar'
+$query->get('p');     //return null
+$query->get('gweta'); //return null
 
 $query->has('gweta'); //return false
 $query->has('p');     //return true
@@ -564,7 +568,7 @@ Query::new('foo=bar&p=y+olo&z=')->appendTo('foo', 'new')->toString();
 //return 'foo=bar&p=y+olo&z=&foo=new'
 ~~~
 
-### Query::withoutPairByKey, Query::withoutPairByValue, Query::withoutPairByKeyAndValue
+### Removing specific pairs
 
 <p class="message-notice">since version <code>7.3.0</code></p>
 
