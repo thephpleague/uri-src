@@ -534,12 +534,9 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
     public function removeQueryPairsByKey(string ...$keys): static
     {
         $query = Query::fromUri($this->uri);
-        $newQuery = $query->withoutPairByKey(...$keys)->value();
+        $newQuery = $query->withoutPairByKey(...$keys);
 
-        return match ($query->value()) {
-            $newQuery => $this,
-            default => $this->withQuery($newQuery),
-        };
+        return $newQuery->value() === $query->value() ? $this : $this->withQuery($newQuery);
     }
 
     /**
@@ -548,12 +545,9 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
     public function removeQueryPairsByValue(Stringable|string|int|float|bool|null ...$values): static
     {
         $query = Query::fromUri($this->uri);
-        $newQuery = $query->withoutPairByValue(...$values)->value();
+        $newQuery = $query->withoutPairByValue(...$values);
 
-        return match ($query->value()) {
-            $newQuery => $this,
-            default => $this->withQuery($newQuery),
-        };
+        return $newQuery->value() === $query->value() ? $this : $this->withQuery($newQuery);
     }
 
     /**
@@ -562,12 +556,9 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
     public function removeQueryPairsByKeyValue(string $key, Stringable|string|int|bool|null $value): static
     {
         $query = Query::fromUri($this->uri);
-        $newQuery = $query->withoutPairByKeyValue($key, $value)->value();
+        $newQuery = $query->withoutPairByKeyValue($key, $value);
 
-        return match ($newQuery) {
-            $query->value() => $this,
-            default => $this->withQuery($newQuery),
-        };
+        return $newQuery->value() === $query->value() ? $this : $this->withQuery($newQuery);
     }
 
     /**
@@ -576,39 +567,10 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
     public function removeQueryParameters(string ...$keys): static
     {
         $query = Query::fromUri($this->uri);
-        $newQuery = $query
-            ->withoutPairByKey(...$keys)
-            ->withoutList(...$keys)
-            ->value();
+        $newQuery = $query->withoutParameters(...$keys);
 
-        return match ($newQuery) {
-            $query->value() => $this,
-            default => $this->withQuery($newQuery),
-        };
+        return $newQuery->value() === $query->value() ? $this : $this->withQuery($newQuery);
     }
-
-    public function addQueryParameter(string $key, array $value, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): static
-    {
-        $query = Query::fromUri($this->uri);
-        $newQuery = $query->withList($key, $value, $queryBuildingMode)->value();
-
-        return match ($newQuery) {
-            $query->value() => $this,
-            default => $this->withQuery($newQuery),
-        };
-    }
-
-    public function appendQueryParameter(string $key, array $value, QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): static
-    {
-        $query = Query::fromUri($this->uri);
-        $newQuery = $query->appendList($key, $value, $queryBuildingMode)->value();
-
-        return match ($newQuery) {
-            $query->value() => $this,
-            default => $this->withQuery($newQuery),
-        };
-    }
-
 
     /**
      * Remove empty pairs from the URL query component.

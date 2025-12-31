@@ -347,6 +347,38 @@ final class Query extends Component implements QueryInterface
         return null;
     }
 
+    public function indexOfValue(?string $value, int $nth = 0): ?int
+    {
+        if ([] === $this->pairs) {
+            return null;
+        }
+
+        if ($nth < 0) {
+            $matchCount = 0;
+            for ($offset = count($this->pairs) - 1; $offset >= 0; --$offset) {
+                if ($this->pairs[$offset][1] === $value) {
+                    if (++$matchCount === -$nth) {
+                        return $offset;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        $matchCount = 0;
+        foreach ($this->pairs as $offset => $pair) {
+            if ($pair[1] === $value) {
+                if ($nth === $matchCount) {
+                    return $offset;
+                }
+                ++$matchCount;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Returns the key/value pair at the given numeric offset.
      *
@@ -851,35 +883,11 @@ final class Query extends Component implements QueryInterface
         );
     }
 
-    /**
-     * DEPRECATION WARNING! This method will be removed in the next major point release.
-     *
-     * @deprecated Since version 7.8.0
-     * @see Query::getAll()
-     * @see Query::getList()
-     *
-     * @codeCoverageIgnore
-     *
-     * Returns a new instance.
-     */
-    #[Deprecated(message:'use League\Uri\Components\Query::get() or League\Uri\Components\Query::getAll() or League\Uri\Components\Query::list() instead', since:'league/uri-components:7.8.0')]
     public function parameter(string $name): mixed
     {
         return $this->parameters[$name] ?? null;
     }
 
-    /**
-     * DEPRECATION WARNING! This method will be removed in the next major point release.
-     *
-     * @deprecated Since version 7.8.0
-     * @see Query::has()
-     * @see Query::hasList()
-     *
-     * @codeCoverageIgnore
-     *
-     * Returns a new instance.
-     */
-    #[Deprecated(message:'use League\Uri\Components\Query::has() and/or League\Uri\Components\Query::hasList() instead', since:'league/uri-components:7.8.0')]
     public function hasParameter(string ...$names): bool
     {
         foreach ($names as $name) {
@@ -891,23 +899,21 @@ final class Query extends Component implements QueryInterface
         return [] !== $names;
     }
 
-    /**
-     * DEPRECATION WARNING! This method will be removed in the next major point release.
-     *
-     * @deprecated Since version 7.8.0
-     * @see Query::withoutPairByKey()
-     * @see Query::withoutList()
-     *
-     * @codeCoverageIgnore
-     *
-     * Returns a new instance without the parameter name being used.
-     *
-     * @deprecated Since version 7.8.0
-     */
-    #[Deprecated(message:'use League\Uri\Components\Query::withoutPairByKey() and/or League\Uri\Components\Query::withoutList() instead', since:'league/uri-components:7.8.0')]
     public function withoutParameters(string ...$names): QueryInterface
     {
-        return $this->withoutPairByKey(...$names)->withoutList(...$names);
+        if ([] === $names) {
+            return $this;
+        }
+
+        $mapper = static fn (string $offset): string => preg_quote($offset, ',').'(\[.*\].*)?';
+        $regexp = ',^('.implode('|', array_map($mapper, $names)).')?$,';
+        $filter = fn (array $pair): bool => 1 !== preg_match($regexp, $pair[0]);
+        $pairs = array_filter($this->pairs, $filter);
+
+        return match ($this->pairs) {
+            $pairs => $this,
+            default => self::fromPairs($pairs, $this->separator),
+        };
     }
 
     /**

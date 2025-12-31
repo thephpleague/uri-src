@@ -28,6 +28,7 @@ use Stringable;
  * @method string|null first(string $key) Returns the first value associated with the given name
  * @method string|null last(string $key) Returns the first value associated with the given name
  * @method int|null indexOf(string $key, int $nth = 0) Returns the offset of the pair based on its key and its nth occurrence; negative occurrences are supported
+ * @method int|null indexOfValue(?string $value, int $nth = 0) Returns the offset of the pair based on its value and its nth occurrence; negative occurrences are supported
  * @method array pair(int $offset) Returns the key/value pair at the given numeric offset; negative occurrences are supported
  * @method string|null valueAt(int $offset): Returns the value at the given numeric offset; negative occurrences are supported
  * @method string keyAt(int $offset): Returns the key at the given numeric offset; negative occurrences are supported
@@ -137,7 +138,6 @@ interface QueryInterface extends Countable, IteratorAggregate, UriComponentInter
      * @return mixed the collection of stored PHP variables or the empty array if no input is given,
      *               the single value of a stored PHP variable or null if the variable is not present in the collection
      */
-    #[Deprecated(message:'use League\Uri\Contracts\QueryInterface::get() or League\Uri\Contracts\QueryInterface::last() or League\Uri\Contracts\QueryInterface::getAll() or League\Uri\Contracts\QueryInterface::getList() instead', since:'league/uri-interfaces:7.8.0')]
     public function parameter(string $name): mixed;
 
     /**
@@ -263,6 +263,5 @@ interface QueryInterface extends Countable, IteratorAggregate, UriComponentInter
      * an instance that contains the modified component without PHP's value.
      * PHP's mangled is not taken into account.
      */
-    #[Deprecated(message:'use League\Uri\Contracts\QueryInterface::withoutPairByKey() and\or League\Uri\Contracts\QueryInterface::withoutList() instead', since:'league/uri-interfaces:7.8.0')]
     public function withoutParameters(string ...$names): self;
 }

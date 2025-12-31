@@ -892,6 +892,91 @@ final class QueryTest extends TestCase
         ];
     }
 
+    #[DataProvider('provideIndexOfValues')]
+    public function test_index_of_value(array $pairs, ?string $value, int $nth, ?int $expected): void
+    {
+        self::assertSame($expected, Query::fromPairs($pairs)->indexOfValue($value, $nth));
+    }
+
+    public static function provideIndexOfValues(): array
+    {
+        return [
+            // --- Empty dataset ---
+            'empty array' => [
+                'pairs' => [],
+                'value' => '1',
+                'nth' => 0,
+                'expected' => null,
+            ],
+
+            // --- Single occurrence ---
+            'single match' => [
+                'pairs' => [['a', 1], ['b', 2], ['c', 3]],
+                'value' => '1',
+                'nth' => 0,
+                'expected' => 0,
+            ],
+            'single no match' => [
+                'pairs' => [['a', 1], ['b', 2], ['c', 3]],
+                'value' => '42',
+                'nth' => 0,
+                'expected' => null,
+            ],
+
+            // --- Multiple matches ---
+            'first occurrence' => [
+                'pairs' => [['a', 1], ['b', 2], ['c', 1], ['d', 3], ['e', 1]],
+                'value' => '1',
+                'nth' => 0,
+                'expected' => 0,
+            ],
+            'second occurrence' => [
+                'pairs' => [['a', 1], ['b', 2], ['c', 1], ['d', 3], ['e', 1]],
+                'value' => '1',
+                'nth' => 1,
+                'expected' => 2,
+            ],
+            'third occurrence' => [
+                'pairs' => [['a', 1], ['b', 2], ['c', 1], ['d', 3], ['e', 1]],
+                'value' => '1',
+                'nth' => 2,
+                'expected' => 4,
+            ],
+            'out of bounds positive' => [
+                'pairs' => [['a', 1], ['b', 1]],
+                'value' => '1',
+                'nth' => 2,
+                'expected' => null,
+            ],
+
+            // --- Negative nth (count from end) ---
+            'last occurrence (-1)' => [
+                'pairs' => [['a', 1], ['b', 2], ['c', 1], ['d', 1]],
+                'value' => '1',
+                'nth' => -1,
+                'expected' => 3,
+            ],
+            'second-to-last (-2)' => [
+                'pairs' => [['a', 1], ['b', 2], ['c', 1], ['d', 1]],
+                'value' => '1',
+                'nth' => -2,
+                'expected' => 2,
+            ],
+            'negative out of bounds' => [
+                'pairs' => [['a', 1], ['b', 2]],
+                'value' => '1',
+                'nth' => -3,
+                'expected' => null,
+            ],
+            'negative no matches' => [
+                'pairs' => [['x', 1], ['y', 2]],
+                'value' => '42',
+                'nth' => -1,
+                'expected' => null,
+            ],
+        ];
+    }
+
     public function testReplaceExistingPair(): void
     {
         $query = Query::new('a=1&b=2&c=3');
