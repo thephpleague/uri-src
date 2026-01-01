@@ -102,25 +102,45 @@ The static public `QueryString::build` method parameters are:
 
 ## Extracting PHP variables
 
-```php
-<?php
-
-public static function QueryString::extract($query, string $separator = '&', int $enc_type = PHP_QUERY_RFC3986): array;
-public static function QueryString::convert(iterable $pairs): array;
-```
-
 `QueryString::parse` and `QueryString::build` preserve the query string pairs content and order. If you want to extract PHP variables from the query string *à la* `parse_str` you can use:
 
-- The `QueryString::extract` method which takes the same parameters as `QueryString::parse`
-- The `QueryString::convert` method which takes the result of `QueryString::parse`
+```php
+<?php
+use League\Uri\QueryParsingMode;
 
-both methods, however, do not allow parameters key mangling in the returned array like  `parse_str`;
+public static function QueryString::extract($query, string $separator = '&', int $enc_type = PHP_QUERY_RFC3986, QueryParsingMode $queryParsingMode = QueryParsingMode::Unmangled): array;
+public static function QueryString::convert(iterable $pairs, QueryParsingMode $queryParsingMode = QueryParsingMode::Unmangled): array;
+```
+
+- The `QueryString::extract` method takes the same parameters as `QueryString::parse`
+- The `QueryString::convert` method takes the result of `QueryString::parse`
+
+Both methods take an optional parsing mode that dictates how the parameters are constructired:
+
+- `QueryParsingMode::Native` generates an array like `parse_str` the only difference is that you can specify the separator character;
+- `QueryParsingMode::Unmangled` generates an array like `parse_str` but does not allow parameters key mangling in the returned array;
+- `QueryParsingMode::PreserveNull` Use the same rules used for `QueryParsingMode::Unmangled` and adds the facts that `null` values as not converted to the empty string;
+
+By default, both methods use the `QueryParsingMode::Unmangled` mode.
 
 ```php
-$query = 'module=show&arr.test[1]=sid&arr test[4][two]=fred&+module+=hide';
+$query = 'module=show&arr.test[1]=sid&arr test[4][two]=fred&+module+=hide&null';
 
-$params = QueryString::extract($query, '&', PHP_QUERY_RFC1738);
-// $params contains [
+$native = QueryString::extract($query, '&', PHP_QUERY_RFC1738, QueryParsingMode::Native);
+// $native contains [
+//     'module' = 'show',
+//     'arr_test' => [
+//         1 => 'sid',
+//         4 => [
+//             'two' => 'fred',
+//         ],
+//     ],
+//     'module_' = 'hide',
+//     'null' => '',
+// ];
+
+$unmangled = QueryString::extract($query, '&', PHP_QUERY_RFC1738, QueryParsingMode::Unmangled);
+// $unmangled contains [
 //     'module' = 'show',
 //     'arr.test' => [
 //         1 => 'sid',
@@ -131,18 +151,22 @@ $params = QueryString::extract($query, '&', PHP_QUERY_RFC1738);
 //         ]
 //     ],
 //     ' module ' => 'hide',
+//     'null' => '',
 // ];
 
-parse_str($query, $variables);
-// $variables contains [
+$preserved = QueryString::extract($query, '&', PHP_QUERY_RFC1738, QueryParsingMode::PreserveNull);
+// $preserved contains [
 //     'module' = 'show',
-//     'arr_test' => [
+//     'arr.test' => [
 //         1 => 'sid',
+//     ],
+//     'arr test' => [
 //         4 => [
 //             'two' => 'fred',
-//         ],
+//         ]
 //     ],
-//     'module_' = 'hide',
+//     ' module ' => 'hide',
+//     'null' => null,
 // ];
 ```
 
