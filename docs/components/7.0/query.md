@@ -181,7 +181,7 @@ The `Query` class can be seen as a PHP Data Transporter layer and a public API w
 around this concept.
 
 ~~~php
-public static Query::fromVariable($params, string $separator = '&', QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native): self
+public static Query::fromVariable($params, string $separator = '&', QueryComposeMode $queryComposeMode = QueryComposeMode::Native): self
 public Query::parameters(): array
 public Query::parameter(string $name): mixed
 public Query::hasParameter(string ...$name): bool
@@ -319,40 +319,13 @@ $new_query->parameters(); //return ['foo' => ['bar', 'baz']]
 
 <p class="message-warning">While PHP exclusively uses this algorithm. It is not recommended for
 interoperability as it destroys or skips key and/or values. Consider using the
-<code>Query Collection</code> approach instead.</p>
+<code>Collection</code> approach instead.</p>
 
-## Query Collection
+## Query as a Collection
 
 To better support interoperability, the class also represents a query string as an ordered
 collection of key/value pairs, while also providing additional APIs to work with parameters
 that are parsed as lists using PHP’s bracket notation.
-
-~~~php
-public static Query::fromPairs(iterable $pairs, string $separator = '&'): self
-public Query::count(): int
-public Query::getIterator(): iterable
-public Query::pairs(): iterable
-public Query::has(string $key): bool
-public Query::hasPair(string $key, ?string $value): bool
-public Query::get(string $key): ?string
-public Query::getAll(string $key): array
-public Query::indexOf(string $key, $nth = 0): ?int
-public Query::pair(int $offset): ?string
-public Query::keyAt(int $offset): string
-public Query::valueAt(int $offset): ?string
-public Query::withPair(string $key, $value): self
-public Query::withoutDuplicates(): self
-public Query::withoutEmptyPairs(): self
-public Query::withoutPairByKey(string ...$keys): self
-public Query::withoutPairByValue(?string ...$values): self
-public Query::withoutPairByKeyValue(string $key, ?string $value): self
-public Query::appendTo(string $key, $value): self
-public Query::getList(string $name): array
-public Query::hasList(string ...$names): bool
-public Query::appendList(string $name, array $value): bool
-public Query::withList(string $name, array $value): bool
-public Query::withoutList(string ...$names): bool
-~~~
 
 ### Instantiation
 
@@ -515,7 +488,7 @@ $query->hasPair('foo', 'p');    //return false
 $query->has('foo', 'p');        //return true
 ~~~
 
-#### Iterations and count
+### Collection methods
 
 The class implements PHP's `Countable` and `IteratorAggregate` interfaces. This means that you can count the number of pairs and use the `foreach` construct to iterate over them.
 
@@ -546,6 +519,11 @@ foreach ($query->pairs() as $name => $value) {
 ~~~
 
 <p class="message-info">The returned iterable contains decoded data.</p>
+
+The class also exposes the `filter()`, `reduce()` and `map()` methods with callbacks
+expecting the pair structure. For filtering and mapping, the pair offset can optionally
+be provided. You can also tell whether the collection is empty or not using the `isEmpty()`
+method.
 
 ### Modifying Pairs
 

@@ -106,10 +106,10 @@ The static public `QueryString::build` method parameters are:
 
 ```php
 <?php
-use League\Uri\QueryParsingMode;
+use League\Uri\QueryExtractMode;
 
-public static function QueryString::extract($query, string $separator = '&', int $enc_type = PHP_QUERY_RFC3986, QueryParsingMode $queryParsingMode = QueryParsingMode::Unmangled): array;
-public static function QueryString::convert(iterable $pairs, QueryParsingMode $queryParsingMode = QueryParsingMode::Unmangled): array;
+public static function QueryString::extract(?string $query, string $separator = '&', int $enc_type = PHP_QUERY_RFC3986, QueryExtractMode $extractMode = QueryExtractMode::Unmangled): array;
+public static function QueryString::convert(iterable $pairs, QueryExtractMode $extractMode = QueryExtractMode::Unmangled): array;
 ```
 
 - The `QueryString::extract` method takes the same parameters as `QueryString::parse`
@@ -117,16 +117,16 @@ public static function QueryString::convert(iterable $pairs, QueryParsingMode $q
 
 Both methods take an optional parsing mode that dictates how the parameters are constructired:
 
-- `QueryParsingMode::Native` generates an array like `parse_str` the only difference is that you can specify the separator character;
-- `QueryParsingMode::Unmangled` generates an array like `parse_str` but does not allow parameters key mangling in the returned array;
-- `QueryParsingMode::PreserveNull` Use the same rules used for `QueryParsingMode::Unmangled` and adds the facts that `null` values as not converted to the empty string;
+- `QueryExtractMode::Native` generates an array like `parse_str` the only difference is that you can specify the separator character;
+- `QueryExtractMode::Unmangled` generates an array like `parse_str` but does not allow parameters key mangling in the returned array;
+- `QueryExtractMode::LossLess` Use the same rules used for `QueryExtractMode::Unmangled` and adds the facts that `null` values are not converted to the empty string;
 
-By default, both methods use the `QueryParsingMode::Unmangled` mode.
+By default, both methods use the `QueryExtractMode::Unmangled` mode.
 
 ```php
 $query = 'module=show&arr.test[1]=sid&arr test[4][two]=fred&+module+=hide&null';
 
-$native = QueryString::extract($query, '&', PHP_QUERY_RFC1738, QueryParsingMode::Native);
+$native = QueryString::extract($query, '&', PHP_QUERY_RFC1738, QueryExtractMode::Native);
 // $native contains [
 //     'module' = 'show',
 //     'arr_test' => [
@@ -139,7 +139,7 @@ $native = QueryString::extract($query, '&', PHP_QUERY_RFC1738, QueryParsingMode:
 //     'null' => '',
 // ];
 
-$unmangled = QueryString::extract($query, '&', PHP_QUERY_RFC1738, QueryParsingMode::Unmangled);
+$unmangled = QueryString::extract($query, '&', PHP_QUERY_RFC1738, QueryExtractMode::Unmangled);
 // $unmangled contains [
 //     'module' = 'show',
 //     'arr.test' => [
@@ -154,7 +154,7 @@ $unmangled = QueryString::extract($query, '&', PHP_QUERY_RFC1738, QueryParsingMo
 //     'null' => '',
 // ];
 
-$preserved = QueryString::extract($query, '&', PHP_QUERY_RFC1738, QueryParsingMode::PreserveNull);
+$preserved = QueryString::extract($query, '&', PHP_QUERY_RFC1738, QueryExtractMode::LossLess);
 // $preserved contains [
 //     'module' = 'show',
 //     'arr.test' => [
@@ -170,19 +170,19 @@ $preserved = QueryString::extract($query, '&', PHP_QUERY_RFC1738, QueryParsingMo
 // ];
 ```
 
-## Building from PHP variables
+## Composing of PHP variables
 
 <p class="message-notice">Available since version <code>7.8.0</code></p>
 
 ```php
 <?php
-use League\Uri\QueryBuildingMode;
+use League\Uri\QueryComposeMode;
 
 public static function QueryString::compose(
     array|object $data,
     string $separator = '&',
     int $encType = PHP_QUERY_RFC3986,
-    QueryBuildingMode $queryBuildingMode = QueryBuildingMode::Native
+    QueryComposeMode $composeMode = QueryComposeMode::Native
 ): ?string;
 ```
 
@@ -206,14 +206,14 @@ The static public `QueryString::compose` method parameters are:
 - `$encType` is one of PHP's constant `PHP_QUERY_RFC3968` or `PHP_QUERY_RFC1738` which represented the supported encoding algoritm
     - If you specify `PHP_QUERY_RFC3986` encoding will be done using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) rules;
     - If you specify `PHP_QUERY_RFC1738` encoding will be done using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
-- `$queryBuildingMode` a Enum to describe how query serialization will be performed.
+- `$queryComposeMode` a Enum to describe how query serialization will be performed.
 
-if `$queryBuildingMode` is equal to `QueryBuildingMode::ValueOnly`:
+if `$queryComposeMode` is equal to `QueryComposeMode::ValueOnly`:
 
 - the function returns the `null` value if the submitted `array is the empty array. Otherwise in any other building mode, the empty string will be used.
 - the function disallows the use of resources or objects (with the notable exception of `BackedEnum`).
 
-Two other modes, `QueryBuildingMode::Compatible` and `QueryBuildingMode::EnumCompatible`, exists to allow
+Two other modes, `QueryComposeMode::Compatible` and `QueryComposeMode::EnumCompatible`, exists to allow
 migrating your codebase from the historical encoding algorithm to the current algorithm.
 
 <p class="message-warning">The <code>$separator</code> argument cannot be the empty string.</p>
@@ -245,10 +245,10 @@ pair and for converting key/value pairs into string adding an extra string repla
 after building the string.
 
 ```php
-use League\Uri\KeyValuePair\Converter as KeyValuePairConverter;
+use League\Uri\KeyValuePair\Converter;
 use League\Uri\QueryString;
 
-$converter = KeyValuePairConverter::new(';')
+$converter = Converter::new(';')
     ->withEncodingMap([
         '%3F' => '?',
         '%2F' => '/',
