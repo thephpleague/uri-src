@@ -488,12 +488,17 @@ $query->hasPair('foo', 'p');    //return false
 $query->has('foo', 'p');        //return true
 ~~~
 
-### Collection methods
+#### Collection methods
 
-The class implements PHP's `Countable` and `IteratorAggregate` interfaces. This means that you can count the number of pairs and use the `foreach` construct to iterate over them.
+You can tell whether the collection is empty or not using the `isEmpty()` or `isNotEmpty()` methods.
+
+The class implements PHP's `Countable` and `IteratorAggregate` interfaces. This means that you can
+count the number of pairs and use the `foreach` construct to iterate over them.
 
 ~~~php
 $query = new Query::fromRFC1738('foo=bar&p=y+olo&z=');
+$query->isEmpty(); //return false
+$query->isNotEmpty(); //return true
 count($query); //return 3
 foreach ($query as $pair) {
     //first round 
@@ -520,10 +525,8 @@ foreach ($query->pairs() as $name => $value) {
 
 <p class="message-info">The returned iterable contains decoded data.</p>
 
-The class also exposes the `filter()`, `reduce()` and `map()` methods with callbacks
-expecting the pair structure. For filtering and mapping, the pair offset can optionally
-be provided. You can also tell whether the collection is empty or not using the `isEmpty()`
-method.
+Las but not least because `keys` can be repeated the class exposes the `countDistinctKeys()`
+method which returns the number of distinct keys present in the query.
 
 ### Modifying Pairs
 
@@ -586,6 +589,12 @@ $query = Query::fromRFC3986('foo=bar&p=y+olo&z=&foo=jazz');
 $query->replace(1, 'toto', 'foobar')->toString(); 
 //returns 'foo=bar&toto=foobar&z=&foo=jazz'
 ~~~
+
+#### Collection Methods
+
+The class exposes the `filter()`, `reduce()` and `map()` methods with callbacks
+expecting the pair structure. For filtering and mapping, the pair offset can optionally
+be provided.
 
 ### Handling List
 
