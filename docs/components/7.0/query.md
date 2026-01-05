@@ -600,11 +600,14 @@ be provided.
 
 <p class="message-notice">Available since version <code>7.8.0</code></p>
 
-PHP relies on the presence of brackets in parameter names to parse query string values into lists.
+PHP relies on the presence of brackets in parameter names to parse query string values into array.
 Since this notation is well established in the PHP community, this library provides a dedicated API
-to work with list parameters while still preserving the original key/value pairs.
+to work with array parameters while still preserving the original key/value pairs.
 
-<p class="message-info">The API operates on the parsed parameter view of the query, not on raw query pairs.</p>
+<p class="message-info">The API operates on the parsed parameter view of the query, not on raw query pairs.
+Since the goal is to still preserve the original query string we will talk about lists
+instead of <code>array</code>, their internal representation, because the order and
+the duplication are preserved.</p>
 
 #### Accessing List
 
