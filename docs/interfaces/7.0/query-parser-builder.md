@@ -198,43 +198,48 @@ echo QueryString::compose([
 
 // display 'module=home|action=show|page=toto%20bar';
 ```
+The `QueryString::compose` method is a userland implementation of the `http_build_query`
+functions with some differences. The function does not handle any prefixing or the variable
+and allow for a range of algorithm compositions:
 
-The static public `QueryString::compose` method parameters are:
+The method parameters are:
 
 - `$data` an `array` or an `object` as describe in the `http_build_query` functions.
 - `$separator` is a string; by default, it is the `&` character;
 - `$encType` is one of PHP's constant `PHP_QUERY_RFC3968` or `PHP_QUERY_RFC1738` which represented the supported encoding algoritm
     - If you specify `PHP_QUERY_RFC3986` encoding will be done using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) rules;
     - If you specify `PHP_QUERY_RFC1738` encoding will be done using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
-- `$queryComposeMode` a Enum to describe how query serialization will be performed.
+- `$composeMode` a Enum to describe how query serialization will be performed.
 
-if `$queryComposeMode` is equal to `QueryComposeMode::ValueOnly`:
+The `$composeMode` parameter dictates how the `$data` argument will be converted into a URI query string.
+If its value is equal to `QueryComposeMode::Safe`:
 
-- the function returns the `null` value if the submitted `array is the empty array. Otherwise in any other building mode, the empty string will be used.
+- the function returns the `null` value if the submitted `array is the empty array. Otherwise in with other compose modes, the empty string is returned instead.
 - the function disallows the use of resources or objects (with the notable exception of `BackedEnum`).
 
-Two other modes, `QueryComposeMode::Compatible` and `QueryComposeMode::EnumCompatible`, exists to allow
-migrating your codebase from the historical encoding algorithm to the current algorithm.
+Three other modes, `QueryComposeMode::Compatible`, `QueryComposeMode::EnumLenient` and `QueryComposeMode::EnumCompatible`, exists to allow
+migrating your codebase from the historical encoding algorithm prior to PHP8.4, if you use the `QueryComposeMode::Compatible` mode
+to the current PHP8.4+ behaviour represented by the `QueryComposeMode::EnumCompatible` algorithm or the `QueryComposeMode::Native` mode.
+A `QueryComposeMode::EnumLient` mode exist to allow a working with invalid type without triggering
+any PHP exception.
 
 <p class="message-warning">The <code>$separator</code> argument cannot be the empty string.</p>
 
 The `QueryString::compose` method is a userland implementation of the `http_build_query` functions with the following
 differences:
 
-- if a resource is used, a `TypeError` is thrown, `http_build_query` returns an empty string as query string.
-- if a recursion is detected a `ValueError` is thrown, `http_build_query` returns an empty string as query string.
-- the method preserves value with `null` value, `http_build_query` skips the name/value association.
-- the method does not handle prefix usage
-- By default, the method uses `PHP_QUERY_RFC3968`; `http_build_query` uses `PHP_QUERY_RFC1738`.
-
 ```php
-echo QueryString::compose([
-    'module' => null,
-    'action' => '',
-    'page' => true,
-]);
+use League\Uri\QueryComposeMode;
+use League\Uri\QueryString;
 
+$data = ['module' => null, 'action' => '', 'page' => true];
+
+echo QueryString::compose($data, QueryComposeMode::Safe);
 // display 'module&action=&page=1';
+
+echo QueryString::compose($data, QueryComposeMode::Native);
+echo http_build_query($data);
+// both call will display 'action=&page=1';
 ```
 
 ## Advance usages
