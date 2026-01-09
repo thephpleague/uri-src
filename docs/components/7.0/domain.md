@@ -8,7 +8,7 @@ The Domain Host
 =======
 
 The `Domain` class represents a domain name host component. Apart from the [package common API](/components/7.0/)
-and the [host common API](/components/7.0/path), the class exposes specific properties and methods to
+and the [host common API](/components/7.0/host), the class exposes specific properties and methods to
 work with Domain name labels and logic.
 
 <p class="message-notice">If the modifications do not change the current object, it is returned as is, otherwise, a new modified object is returned.</p>
@@ -97,13 +97,68 @@ echo Domain::new('example.com')->prepend('toto'); //return toto.example.com
 
 ### Replace and Remove Labels
 
-Replacing or removing labels is done on the basis of the label offsets by using the `Domain::replaceLabel` and/or
-the `Domain::withoutLabels` methods.
+Replacing or removing labels is done on the basis of the label offsets by using 
+
+- the `Domain::replaceLabel`
+- the `Domain::withoutLabels`
+- the `Domain::slice`
+
+methods
 
 ~~~php
-echo Domain::new('foo.example.com')->replaceLabel(2, 'bar.baz'); //return bar.baz.example.com
-echo Domain::new('toto.example.com')->withoutLabels(0, 2); //return example
+use League\Uri\Components\Domain;
+
+echo Domain::new('foo.example.com')->replaceLabel(2, 'bar.baz'); //return 'bar.baz.example.com'
+echo Domain::new('toto.example.com')->withoutLabels(0, 2); //return 'example'
+echo Domain::new('foo.example.com')->slice(0, -1); //returns 'example.com'
 ~~~
 
-<p class="message-info"><code>replaceLabel</code> and <code>withoutLabels</code> support negative offsets</p>
+<p class="message-info"><code>replaceLabel</code>, <code>withoutLabels</code> and <code>slice</code> support negative offsets</p>
 <p class="message-warning">if the specified offsets do not exist, no modification is performed and the current object is returned.</p>
+
+### Domain relationships
+
+<p class="message-notice">Available since version <code>7.8.0</code></p>
+
+While the `Domain` class does not rely on the Public Suffix List to infer DNS semantics,
+it can still provide meaningful insight into **label-based relationships** between domain names.
+
+The following methods expose the **structural relationships** between domain names.
+
+- `Domain::isSubdomainOf`
+- `Domain::hasSubdomain`
+- `Domain::isSiblingOf`
+
+```php
+use League\Uri\Components\Domain;
+
+Domain::new('foo.example.com')->isSubdomainOf('example.com'); //returns true
+Domain::new('example.com')->hasSubdomain('foo.example.org'); //returns false
+Domain::new('bébê.com')->isSiblingOf('fôo.com'); //returns true
+```
+
+<p class="message-info">A sibling domain is defined as a domain sharing the <strong>same direct parent</strong> and having the <strong>same number of labels.</strong></p>
+
+The following methods compute **hierarchical relationships** between two domains:
+
+- `Domain::commonAncestorWith`
+- `Domain::parentHost`
+
+Each one of these methods returns a **new non-absolute `Domain` instance**.
+If not parent or common ancestor exists, an **empty `Domain` instance** is returned.
+
+```php
+use League\Uri\Components\Domain;
+
+$a = Domain::new('foo.bébê.com');
+$b = Domain::new('bar.xn--bb-bjaf.com.');
+$c = $a->commonAncestorWith($b);
+$c->toAscii(); //returns 'xn--bb-bjaf.com'
+
+$a->parentHost()->toUnicode(); // returns 'bébê.com'
+```
+
+<p class="message-info">
+All methods fully support Internationalized Domain Names (IDN) and
+handle Unicode, Punycode, and root-dot normalization transparently.
+</p>
