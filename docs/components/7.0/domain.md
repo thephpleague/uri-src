@@ -116,12 +116,14 @@ echo Domain::new('foo.example.com')->slice(0, -1); //returns 'example.com'
 <p class="message-info"><code>replaceLabel</code>, <code>withoutLabels</code> and <code>slice</code> support negative offsets</p>
 <p class="message-warning">if the specified offsets do not exist, no modification is performed and the current object is returned.</p>
 
-### Domain relationships
+## Label-based Relationships
 
 <p class="message-notice">Available since version <code>7.8.0</code></p>
 
 While the `Domain` class does not rely on the Public Suffix List to infer DNS semantics,
 it can still provide meaningful insight into **label-based relationships** between domain names.
+
+### Structural Relationships
 
 The following methods expose the **structural relationships** between domain names.
 
@@ -138,6 +140,8 @@ Domain::new('bébê.com')->isSiblingOf('fôo.com'); //returns true
 ```
 
 <p class="message-info">A sibling domain is defined as a domain sharing the <strong>same direct parent</strong> and having the <strong>same number of labels.</strong></p>
+
+### Hierarchical Relationships
 
 The following methods compute **hierarchical relationships** between two domains:
 
