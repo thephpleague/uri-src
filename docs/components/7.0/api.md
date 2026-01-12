@@ -79,9 +79,10 @@ $host->equals('bébé.be');        // returns true
 $host->equals('xn--bb-bjab.be'); // returns true
 ~~~
 
-## Conditional Builder
+## Helper Methods
 
 <p class="message-notice">The <code>when</code> method is available since version <code>7.6.0</code></p>
+
 To ease building components, the `when` method is added to all components to conditionally create your component.
 
 ```php
@@ -97,6 +98,13 @@ echo Query::fromUri('https://uri.thephpleague.com/components/7.0/modifiers/')
     ->getUriComponent();
 // returns '?bar=baz';
 ```
+
+<p class="message-notice">The <code>transform</code> method is available since version <code>7.8.0</code></p>
+
+To ease apply complex modification, the `transform` method is added to all **immutable classes** components whereas
+The `tap` method is added to **mutable class** like `URLSearchParams`.
+
+It is, of course, possible to combine the helper methods to produce a more readable modification workflow.
 
 ## Available components
 
