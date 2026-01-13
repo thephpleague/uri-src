@@ -95,8 +95,25 @@ The static public `QueryString::build` method parameters are:
 - `$enc_type` is one of PHP's constant `PHP_QUERY_RFC3968` or `PHP_QUERY_RFC1738` which represented the supported encoding algoritm
     - If you specify `PHP_QUERY_RFC3968` encoding will be done using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) rules;
     - If you specify `PHP_QUERY_RFC1738` encoding will be done using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
+- `$coercionMode` takes one of the value of the `StringCoercionMode` Enum introduced in version **7.8.0**
+Depending on the coercionMode selected `Native` (for PHP coercion to string) or `EcmaScript` (for JavaScript coercion), the type of parameter accepted and the coercion rules used to convert the value to a string are different.
 
-- the function returns the `null` value if the submitted collection is empty.
+```php
+$pairs = [
+    ['module', 'home'],
+    ['action', false],
+];
+
+echo QueryString::build($pairs, coercionMode: StringCoercionMode::Native);
+// returns 'module=home&action=0'
+echo QueryString::build($pairs, coercionMode: StringCoercionMode::EcmaScript);
+// returns 'module=home&action==false'
+```
+
+**For the same input the generated query string is different.**
+
+
+The function returns the `null` value if the submitted collection is empty.
 
 <p class="message-warning">The <code>$separator</code> argument cannot be the empty string.</p>
 
