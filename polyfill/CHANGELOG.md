@@ -2,7 +2,7 @@
 
 All Notable changes to `League\Uri` will be documented in this file
 
-## [Next](https://github.com/thephpleague/uri-polyfill/compare/7.7.0...master) - TBD
+## [Next](https://github.com/thephpleague/uri-polyfill/compare/7.8.0...master) - TBD
 
 ### Added
 
@@ -11,6 +11,24 @@ All Notable changes to `League\Uri` will be documented in this file
 ### Fixed
 
 - None
+
+### Deprecated
+
+- None
+
+### Removed
+
+- None
+
+## [7.8.0](https://github.com/thephpleague/uri-polyfill/compare/7.7.0...7.8.0) - TBD
+
+### Added
+
+- None
+
+### Fixed
+
+- Test to validate user info encoding for the `Uri\Rfc3986\Uri` class
 
 ### Deprecated
 
