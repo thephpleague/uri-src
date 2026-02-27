@@ -144,7 +144,7 @@ final class UriString
      */
     public static function toIriString(BackedEnum|Stringable|string $uri): string
     {
-        $components = UriString::parse($uri);
+        $components = self::parse($uri);
         $port = null;
         if (isset($components['port'])) {
             $port = (int) $components['port'];
@@ -325,7 +325,7 @@ final class UriString
             return null;
         }
 
-        $components = UriString::parseAuthority($authority);
+        $components = self::parseAuthority($authority);
         $components['host'] = self::normalizeHost($components['host'] ?? null);
         $components['user'] = Encoder::normalizeUser($components['user']);
         $components['pass'] = Encoder::normalizePassword($components['pass']);
@@ -378,7 +378,7 @@ final class UriString
         }
 
         if (null !== $uriComponents['scheme'] && '' !== $uriComponents['scheme']) {
-            return UriString::buildUri(
+            return self::buildUri(
                 scheme: $uriComponents['scheme'],
                 authority: $authority,
                 path: $path,
@@ -388,7 +388,7 @@ final class UriString
         }
 
         if (null !== $authority) {
-            return UriString::buildUri(
+            return self::buildUri(
                 scheme: $baseUriComponents['scheme'],
                 authority: $authority,
                 path: $path,
@@ -398,13 +398,13 @@ final class UriString
         }
 
         [$path, $query] = self::resolvePathAndQuery($uriComponents, $baseUriComponents);
-        $path = UriString::removeDotSegments($path);
+        $path = self::removeDotSegments($path);
         $baseAuthority = self::buildAuthority($baseUriComponents);
-        if ('' !== $path && '/' !== $path[0] && null !== $baseAuthority) {
+        if (null !== $baseAuthority && '' !== $path && '/' !== $path[0]) {
             $path = '/'.$path;
         }
 
-        return UriString::buildUri(
+        return self::buildUri(
             scheme: $baseUriComponents['scheme'],
             authority: $baseAuthority,
             path: $path,
