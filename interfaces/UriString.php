@@ -372,32 +372,26 @@ final class UriString
         }
 
         $authority = self::buildAuthority($uriComponents);
-        if (null !== $uriComponents['scheme'] && '' !== $uriComponents['scheme']) {
-            $uriComponents['path'] = self::removeDotSegments($uriComponents['path']);
-            if (null !== $authority && '' !== $uriComponents['path'] && '/' !== $uriComponents['path'][0]) {
-                $uriComponents['path'] = '/'.$uriComponents['path'];
-            }
+        $path = self::removeDotSegments($uriComponents['path']);
+        if (null !== $authority && '' !== $path && '/' !== $path[0]) {
+            $path = '/'.$path;
+        }
 
+        if (null !== $uriComponents['scheme'] && '' !== $uriComponents['scheme']) {
             return UriString::buildUri(
                 scheme: $uriComponents['scheme'],
                 authority: $authority,
-                path: $uriComponents['path'],
+                path: $path,
                 query: $uriComponents['query'],
                 fragment: $uriComponents['fragment']
             );
         }
 
         if (null !== $authority) {
-            $uriComponents['scheme'] = $baseUriComponents['scheme'];
-            $uriComponents['path'] = self::removeDotSegments($uriComponents['path']);
-            if ('' !== $uriComponents['path'] && '/' !== $uriComponents['path'][0]) {
-                $uriComponents['path'] = '/'.$uriComponents['path'];
-            }
-
             return UriString::buildUri(
-                scheme: $uriComponents['scheme'],
+                scheme: $baseUriComponents['scheme'],
                 authority: $authority,
-                path: $uriComponents['path'],
+                path: $path,
                 query: $uriComponents['query'],
                 fragment: $uriComponents['fragment']
             );
