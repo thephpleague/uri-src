@@ -358,12 +358,12 @@ final class UriString
 
         $uri = (string) $uri;
         if ('' === $uri) {
-            $uri = $baseUri ?? throw new SyntaxError('The uri can not be the empty string when there\'s no base URI.');
+            $uri = $baseUri ?? throw new SyntaxError("The uri can not be the empty string when there's no base URI.");
         }
 
         $uriComponents = self::parse($uri);
         $baseUriComponents = $uriComponents;
-        if (null !== $baseUri && (string) $uri !== (string) $baseUri) {
+        if (null !== $baseUri && $uri !== (string) $baseUri) {
             $baseUriComponents = self::parse($baseUri);
         }
 
@@ -378,39 +378,21 @@ final class UriString
         }
 
         if (null !== $uriComponents['scheme'] && '' !== $uriComponents['scheme']) {
-            return self::buildUri(
-                scheme: $uriComponents['scheme'],
-                authority: $authority,
-                path: $path,
-                query: $uriComponents['query'],
-                fragment: $uriComponents['fragment']
-            );
+            return self::buildUri($uriComponents['scheme'], $authority, $path, $uriComponents['query'], $uriComponents['fragment']);
         }
 
         if (null !== $authority) {
-            return self::buildUri(
-                scheme: $baseUriComponents['scheme'],
-                authority: $authority,
-                path: $path,
-                query: $uriComponents['query'],
-                fragment: $uriComponents['fragment']
-            );
+            return self::buildUri($baseUriComponents['scheme'], $authority, $path, $uriComponents['query'], $uriComponents['fragment']);
         }
 
+        $authority = self::buildAuthority($baseUriComponents);
         [$path, $query] = self::resolvePathAndQuery($uriComponents, $baseUriComponents);
         $path = self::removeDotSegments($path);
-        $baseAuthority = self::buildAuthority($baseUriComponents);
-        if (null !== $baseAuthority && '' !== $path && '/' !== $path[0]) {
+        if (null !== $authority && '' !== $path && '/' !== $path[0]) {
             $path = '/'.$path;
         }
 
-        return self::buildUri(
-            scheme: $baseUriComponents['scheme'],
-            authority: $baseAuthority,
-            path: $path,
-            query: $query,
-            fragment: $uriComponents['fragment']
-        );
+        return self::buildUri($baseUriComponents['scheme'], $authority, $path, $query, $uriComponents['fragment']);
     }
 
     /**
