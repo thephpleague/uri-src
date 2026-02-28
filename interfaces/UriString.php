@@ -385,8 +385,8 @@ final class UriString
             return self::buildUri($baseUriComponents['scheme'], $authority, $path, $uriComponents['query'], $uriComponents['fragment']);
         }
 
-        $authority = self::buildAuthority($baseUriComponents);
         [$path, $query] = self::resolvePathAndQuery($uriComponents, $baseUriComponents);
+        $authority = self::buildAuthority($baseUriComponents);
         $path = self::removeDotSegments($path);
         if (null !== $authority && '' !== $path && '/' !== $path[0]) {
             $path = '/'.$path;
