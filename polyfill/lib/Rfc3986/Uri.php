@@ -15,7 +15,6 @@ namespace Uri\Rfc3986;
 
 use Exception;
 use League\Uri\Encoder;
-use League\Uri\Exceptions\SyntaxError;
 use League\Uri\HostRecord;
 use League\Uri\UriString;
 use SensitiveParameter;
@@ -163,7 +162,7 @@ if (PHP_VERSION_ID < 80500) {
         {
             try {
                 $uri = UriString::build($this->prepareModification($components));
-            } catch (SyntaxError $exception) {
+            } catch (Exception $exception) {
                 throw new InvalidUriException($exception->getMessage(), previous: $exception);
             }
 
