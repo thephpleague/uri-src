@@ -21,7 +21,6 @@ use Uri\InvalidUriException;
 
 use function array_map;
 use function implode;
-use function str_replace;
 use function strpos;
 
 use const PHP_VERSION_ID;
@@ -216,14 +215,7 @@ if (PHP_VERSION_ID < 80600) {
          */
         public function setPathSegments(array $segments): self
         {
-            return $this->setPath(
-                [] === $segments
-                    ? null
-                    : implode('/', array_map(
-                        fn (string $segment): string => str_replace('/', '%2F', $segment),
-                        $segments
-                    ))
-            );
+            return $this->setPath([] === $segments ? null : implode('/', array_map(fn (string $segment): string => $segment, $segments)));
         }
 
         /**
