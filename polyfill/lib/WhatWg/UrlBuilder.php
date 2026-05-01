@@ -188,14 +188,6 @@ if (PHP_VERSION_ID < 80600) {
             return $this->assignPath(new OpaquePath(new PathSegment($path ?? '')));
         }
 
-        /**
-         * @param list<string> $segments
-         */
-        public function setPathSegments(array $segments): self
-        {
-            return $this->assignPath(new PathList(array_map(fn (string $s): PathSegment => new PathSegment($s), $segments)));
-        }
-
         private function assignPath(PathInterface $path): self
         {
             if ($this->urlRecord->path->__toString() !== $path->__toString()) {

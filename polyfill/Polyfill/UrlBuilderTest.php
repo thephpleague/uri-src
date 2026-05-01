@@ -29,7 +29,7 @@ final class UrlBuilderTest extends TestCase
             ->setPassword('pass')
             ->setHost('wiki.php.net')
             ->setPort(8080)
-            ->setPathSegments(['rf:c', 'uri_followup'])
+            ->setPath('rf:c/uri_followup')
             ->setQuery('a=1&b=2')
             ->setFragment('uri_building');
 
@@ -58,7 +58,7 @@ final class UrlBuilderTest extends TestCase
             ->setScheme('https')
             ->setUsername('user')
             ->setPassword('pass')
-            ->setPathSegments(['rf:c', 'uri_followup'])
+            ->setPath('rf:c/uri_followup')
             ->setQuery('a=1&b=2')
             ->setFragment('uri_building')
             ->build();
@@ -71,7 +71,7 @@ final class UrlBuilderTest extends TestCase
         (new UrlBuilder())
             ->setScheme('https')
             ->setPort(8080)
-            ->setPathSegments(['rf:c', 'uri_followup'])
+            ->setPath('rf:c/uri_followup')
             ->setQuery('a=1&b=2')
             ->setFragment('uri_building')
             ->build();
@@ -82,7 +82,7 @@ final class UrlBuilderTest extends TestCase
         $this->expectException(InvalidUrlException::class);
 
         (new UrlBuilder())
-            ->setPathSegments(['rf:c', 'uri_followup'])
+            ->setPath('rf:c/uri_followup')
             ->setQuery('a=1&b=2')
             ->setFragment('uri_building')
             ->build();
