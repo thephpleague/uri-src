@@ -23,7 +23,11 @@ use function strlen;
 
 use const PHP_VERSION_ID;
 
-if (PHP_VERSION_ID < 80600 && !function_exists('Uri\WhatWg\url_percent_encode')) {
+if (PHP_VERSION_ID >= 80600 || PHP_VERSION_ID <= 80100) {
+    return;
+}
+
+if (!function_exists('Uri\WhatWg\url_percent_encode')) {
     /**
      * This is a user-land polyfill to the native Uri\Rfc3986\HostType Enum included in PHP8.6.
      *
@@ -32,7 +36,7 @@ if (PHP_VERSION_ID < 80600 && !function_exists('Uri\WhatWg\url_percent_encode'))
     function url_percent_encode(string $input, UrlPercentEncodingMode $mode): string
     {
         static $hex = '0123456789ABCDEF';
-        /** @var array<key-of<UrlPercentEncodingMode>, array<int, bool>}> $tables */
+        /** @var array<key-of<UrlPercentEncodingMode>, list<bool>> $tables */
         static $tables = [];
         if (!array_key_exists($mode->name, $tables)) {
             $set = match ($mode) {

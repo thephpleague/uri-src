@@ -26,7 +26,11 @@ use function strtoupper;
 
 use const PHP_VERSION_ID;
 
-if (PHP_VERSION_ID < 80600 && ! function_exists('Uri\Rfc3986\uri_percent_encode')) {
+if (PHP_VERSION_ID >= 80600 || PHP_VERSION_ID <= 80100) {
+    return;
+}
+
+if (!function_exists('Uri\Rfc3986\uri_percent_encode')) {
     /**
      * This is a user-land polyfill to the native Uri\Rfc3986\HostType Enum included in PHP8.6.
      *
