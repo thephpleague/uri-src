@@ -27,7 +27,7 @@ final class UriBuilderTest extends TestCase
             ->setUserInfo('user:pass')
             ->setHost('wiki.php.net')
             ->setPort(8080)
-            ->setPathSegments(['rf:c', 'uri_followup'])
+            ->setPath('/rf:c/uri_followup')
             ->setQuery('a=1&b=2')
             ->setFragment('uri_building');
 
@@ -42,7 +42,7 @@ final class UriBuilderTest extends TestCase
         (new UriBuilder())
             ->setScheme('https')
             ->setUserInfo('user:pass')
-            ->setPathSegments(['rf:c', 'uri_followup'])
+            ->setPath('rf:c/uri_followup')
             ->setQuery('a=1&b=2')
             ->setFragment('uri_building')
             ->build();
@@ -55,7 +55,7 @@ final class UriBuilderTest extends TestCase
         (new UriBuilder())
             ->setScheme('https')
             ->setPort(8080)
-            ->setPathSegments(['rf:c', 'uri_followup'])
+            ->setPath('rf:c/uri_followup')
             ->setQuery('a=1&b=2')
             ->setFragment('uri_building')
             ->build();
@@ -66,7 +66,7 @@ final class UriBuilderTest extends TestCase
         $this->expectException(InvalidUriException::class);
 
         (new UriBuilder())
-            ->setPathSegments(['rf:c', 'uri_followup'])
+            ->setPath('rf:c/uri_followup')
             ->setQuery('a=1&b=2')
             ->setFragment('uri_building')
             ->build();
@@ -97,7 +97,7 @@ final class UriBuilderTest extends TestCase
     {
         $this->expectException(InvalidUriException::class);
 
-        (new UriBuilder())->setPathSegments(['rfc', 'uri_fòllowup'])->build();
+        (new UriBuilder())->setPath('rfc/uri_fòllowup')->build();
     }
 
     public function test_it_fails_if_the_query_contains_invalid_characters(): void
@@ -116,7 +116,7 @@ final class UriBuilderTest extends TestCase
 
     public function test_it_prepend_the_path_when_there_is_too_many_slashes(): void
     {
-        $uri = (new UriBuilder())->setPathSegments(['', '', ''])->build();
+        $uri = (new UriBuilder())->setPath('//')->build();
 
         self::assertSame('/.//', $uri->getPath());
     }

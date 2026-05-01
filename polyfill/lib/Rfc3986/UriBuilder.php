@@ -19,9 +19,6 @@ use League\Uri\UriString;
 use SensitiveParameter;
 use Uri\InvalidUriException;
 
-use function array_map;
-use function implode;
-use function str_replace;
 use function strpos;
 
 use const PHP_VERSION_ID;
@@ -207,23 +204,6 @@ if (PHP_VERSION_ID < 80600) {
             }
 
             return $this;
-        }
-
-        /**
-         * @param list<string> $segments
-         *
-         * @throws InvalidUriException
-         */
-        public function setPathSegments(array $segments): self
-        {
-            return $this->setPath(
-                [] === $segments
-                    ? null
-                    : implode('/', array_map(
-                        fn (string $segment): string => str_replace('/', '%2F', $segment),
-                        $segments
-                    ))
-            );
         }
 
         /**
