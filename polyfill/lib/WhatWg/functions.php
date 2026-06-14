@@ -23,7 +23,7 @@ use function strlen;
 
 use const PHP_VERSION_ID;
 
-if (PHP_VERSION_ID >= 80600 || PHP_VERSION_ID <= 80100) {
+if (PHP_VERSION_ID >= 80600) {
     return;
 }
 
