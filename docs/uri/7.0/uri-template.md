@@ -85,6 +85,31 @@ echo $uriTemplate->expandOrFail($params);
 <p class="message-notice"><code>expandToUriOrFail()</code> and <code>expandToUrlOrFail()</code> are available since
 version <code>7.6.0</code></p>
 
+### Literal Expansion
+
+The characters located outside of the template expressions are literals. As per
+[RFC6570 section 3.1](https://www.rfc-editor.org/rfc/rfc6570#section-3.1) a literal character is
+copied as is when it is allowed anywhere in the URI syntax, in other words when it belongs to the
+`unreserved / reserved / pct-encoded` set. Any other character is percent encoded using its UTF-8
+octets.
+
+~~~php
+$uriTemplate = new UriTemplate('https://example.com/café/{hotel}');
+
+echo $uriTemplate->expand(['hotel' => 'Rest & Relax']), PHP_EOL;
+// display https://example.com/caf%C3%A9/Rest%20%26%20Relax
+~~~
+
+Percent encoded triplets already present in the template are left untouched, they are never
+encoded a second time.
+
+~~~php
+$uriTemplate = new UriTemplate('https://example.com/caf%C3%A9/{hotel}');
+
+echo $uriTemplate->expand(['hotel' => 'Rest & Relax']), PHP_EOL;
+// display https://example.com/caf%C3%A9/Rest%20%26%20Relax
+~~~
+
 ## Template Variables
 
 <p class="message-notice">For maximum interoperability you should make sure your variables are 

@@ -174,6 +174,63 @@ final class TemplateTest extends TestCase
         ];
     }
 
+    #[DataProvider('providesLiteralEncoding')]
+    #[Test]
+    public function testItEncodesTheTemplateLiterals(string $notation, array $variables, string $expected): void
+    {
+        self::assertSame($expected, Template::new($notation)->expand($variables));
+    }
+
+    /**
+     * @see https://www.rfc-editor.org/rfc/rfc6570#section-3.1
+     */
+    public static function providesLiteralEncoding(): iterable
+    {
+        $variables = [
+            'var' => 'value',
+            'path' => '/foo/bar',
+            'hello' => 'Hello World!',
+        ];
+
+        return [
+            'a character disallowed in a URI is encoded as its UTF-8 octets' => [
+                'notation' => 'café/{var}',
+                'variables' => $variables,
+                'expected' => 'caf%C3%A9/value',
+            ],
+            'a percent encoded triplet is copied as is' => [
+                'notation' => 'x%20y/{var}',
+                'variables' => $variables,
+                'expected' => 'x%20y/value',
+            ],
+            'a percent encoded triplet is copied as is on both sides of an expression' => [
+                'notation' => 'x%20y{var}z%20w',
+                'variables' => $variables,
+                'expected' => 'x%20yvaluez%20w',
+            ],
+            'a space is encoded' => [
+                'notation' => 'a b/{var}',
+                'variables' => $variables,
+                'expected' => 'a%20b/value',
+            ],
+            'a percent sign which starts no triplet is encoded' => [
+                'notation' => '100%/{var}',
+                'variables' => $variables,
+                'expected' => '100%25/value',
+            ],
+            'reserved characters are copied as is' => [
+                'notation' => "/a[0]:b@c!d\$e&f'g(h)i*j+k,l;m=n?o#{var}",
+                'variables' => $variables,
+                'expected' => "/a[0]:b@c!d\$e&f'g(h)i*j+k,l;m=n?o#value",
+            ],
+            'the expanded expressions are never encoded twice' => [
+                'notation' => 'café{+path}{#hello}',
+                'variables' => $variables,
+                'expected' => 'caf%C3%A9/foo/bar#Hello%20World!',
+            ],
+        ];
+    }
+
     public function testExpandOrFailIfAtLeastOneVariableIsMissing(): void
     {
         $this->expectException(TemplateCanNotBeExpanded::class);

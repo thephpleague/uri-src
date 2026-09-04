@@ -20,14 +20,18 @@ use Stringable;
 
 use function array_filter;
 use function array_map;
-use function array_reduce;
 use function array_unique;
-use function preg_match_all;
+use function array_values;
+use function implode;
 use function preg_replace;
-use function str_replace;
+use function preg_replace_callback;
+use function preg_split;
+use function rawurlencode;
+use function str_starts_with;
 use function strpbrk;
 
-use const PREG_SET_ORDER;
+use const PREG_SPLIT_DELIM_CAPTURE;
+use const PREG_SPLIT_NO_EMPTY;
 
 /**
  * @internal The class exposes the internal representation of a Template and its usage
@@ -39,19 +43,36 @@ final class Template implements Stringable
      */
     private const REGEXP_EXPRESSION_DETECTOR = '/(?<expression>\{[^}]*})/x';
 
-    /** @var array<Expression> */
-    private readonly array $expressions;
+    /**
+     * Literal characters which must be percent encoded in the expanded
+     * template: everything outside "unreserved / reserved / pct-encoded", a
+     * "%" starting no triplet included.
+     *
+     * @link https://www.rfc-editor.org/rfc/rfc6570#section-3.1
+     */
+    private const REGEXP_LITERAL_TO_ENCODE = '/[^A-Za-z\d\-._~:\/?#\[\]@!$&\'()*+,;=%]+|%(?![A-Fa-f\d]{2})/';
+
+    /** @var array<string|Expression> */
+    private readonly array $parts;
     /** @var array<string> */
     public readonly array $variableNames;
 
-    private function __construct(public readonly string $value, Expression ...$expressions)
+    private function __construct(public readonly string $value, string|Expression ...$parts)
     {
-        $this->expressions = $expressions;
+        $this->parts = $parts;
+
+        $expressions = [];
+        foreach ($parts as $part) {
+            if ($part instanceof Expression) {
+                $expressions[$part->value] = $part;
+            }
+        }
+
         $this->variableNames = array_unique(
             array_merge(
                 ...array_map(
                     static fn (Expression $expression): array => $expression->variableNames,
-                    $expressions
+                    array_values($expressions)
                 )
             )
         );
@@ -72,17 +93,35 @@ final class Template implements Stringable
         $remainder = preg_replace(self::REGEXP_EXPRESSION_DETECTOR, '', $template);
         false === strpbrk($remainder, '{}') || throw new SyntaxError('The template "'.$template.'" contains invalid expressions.');
 
-        preg_match_all(self::REGEXP_EXPRESSION_DETECTOR, $template, $founds, PREG_SET_ORDER);
+        /** @var array<string> $segments */
+        $segments = preg_split(self::REGEXP_EXPRESSION_DETECTOR, $template, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
-        return new self($template, ...array_values(
-            array_reduce($founds, function (array $carry, array $found): array {
-                if (!isset($carry[$found['expression']])) {
-                    $carry[$found['expression']] = Expression::new($found['expression']);
-                }
+        $parts = [];
+        $expressions = [];
+        foreach ($segments as $segment) {
+            if (!str_starts_with($segment, '{')) {
+                $parts[] = self::encodeLiteral($segment);
+                continue;
+            }
 
-                return $carry;
-            }, [])
-        ));
+            $parts[] = $expressions[$segment] ??= Expression::new($segment);
+        }
+
+        return new self($template, ...$parts);
+    }
+
+    /**
+     * Percent encodes the template characters which are not allowed to be copied as-is into a URI.
+     *
+     * @link https://www.rfc-editor.org/rfc/rfc6570#section-3.1
+     */
+    private static function encodeLiteral(string $literal): string
+    {
+        return (string) preg_replace_callback(
+            self::REGEXP_LITERAL_TO_ENCODE,
+            static fn (array $matches): string => rawurlencode($matches[0]),
+            $literal
+        );
     }
 
     /**
@@ -116,11 +155,10 @@ final class Template implements Stringable
 
     private function expandAll(VariableBag $variables): string
     {
-        return array_reduce(
-            $this->expressions,
-            fn (string $uri, Expression $expr): string => str_replace($expr->value, $expr->expand($variables), $uri),
-            $this->value
-        );
+        return implode('', array_map(
+            static fn (string|Expression $part): string => $part instanceof Expression ? $part->expand($variables) : $part,
+            $this->parts
+        ));
     }
 
     public function __toString(): string
