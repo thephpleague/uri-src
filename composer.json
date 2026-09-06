@@ -35,6 +35,7 @@
         "http-interop/http-factory-tests": "^2.3",
         "laminas/laminas-diactoros": "^3.5.0",
         "nyholm/psr7": "^1.8.2",
+        "php-http/psr7-integration-tests": "^1.5.1",
         "phpbench/phpbench": "^1.4.3",
         "phpstan/phpstan": "^1.12.32",
         "phpstan/phpstan-deprecation-rules": "^1.2.1",
@@ -88,6 +89,7 @@
         "phpunit": "XDEBUG_MODE=coverage phpunit --coverage-text",
         "phpunit:no-polyfill": "XDEBUG_MODE=coverage phpunit --coverage-text --exclude-group=uri-polyfill",
         "phpunit:no-coverage": "phpunit --no-coverage",
+        "update-test-fixtures": "@php scripts/update-test-fixtures.php",
         "test": [
             "@phpunit",
             "@phpstan:stable",
@@ -107,8 +109,5 @@
     "prefer-stable": true,
     "config": {
         "sort-packages": true
-    },
-    "require-dev": {
-        "php-http/psr7-integration-tests": "^1.5.1"
     }
 }

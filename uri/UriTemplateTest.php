@@ -261,6 +261,17 @@ final class UriTemplateTest extends TestCase
         self::assertSame($expectedUri, $uriTemplate->expandToUrlOrFail($variables)->toAsciiString());
     }
 
+    public function testPrefixModifierTruncatesByCharacterNotByte(): void
+    {
+        $uriTemplate = new UriTemplate('{?currency:1}{clef:1}');
+        $variables = [
+            'currency' => "\u{20AC}uro",
+            'clef' => "\u{1D11E}stave",
+        ];
+
+        self::assertSame('?currency=%E2%82%AC%F0%9D%84%9E', $uriTemplate->expand($variables)->toString());
+    }
+
     public function testDisallowNestedArrayExpansion(): void
     {
         $template = 'http://example.com{?query,data*,foo*}';

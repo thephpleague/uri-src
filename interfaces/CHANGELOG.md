@@ -2,7 +2,7 @@
 
 All Notable changes to `League\Uri\Interfaces` will be documented in this file
 
-## [Next](https://github.com/thephpleague/uri-interfaces/compare/7.8.0...master) - TBD
+## [7.8.1](https://github.com/thephpleague/uri-interfaces/compare/7.8.0...7.8.1) - 2026-03-16
 
 ### Added
 
@@ -10,7 +10,8 @@ All Notable changes to `League\Uri\Interfaces` will be documented in this file
 
 ### Fixed
 
-- None
+- `Host::isIp` is fixed to be more strict.
+- `UriString::resolve` regression from previous minor version fixed see issue [#184](https://github.com/thephpleague/uri-src/issues/184)
 
 ### Deprecated
 

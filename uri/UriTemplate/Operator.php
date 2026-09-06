@@ -19,10 +19,10 @@ use Stringable;
 
 use function implode;
 use function is_array;
+use function mb_substr;
 use function preg_match;
 use function rawurlencode;
 use function str_contains;
-use function substr;
 
 /**
  * Processing behavior according to the expression type operator.
@@ -107,7 +107,6 @@ enum Operator: string
             throw new SyntaxError('The expression "'.$expression.'" is invalid.');
         }
 
-        /** @var array{operator:string, variables:string} $parts */
         $parts = $parts + ['operator' => ''];
         if ('' !== $parts['operator'] && str_contains(self::RESERVED_OPERATOR, $parts['operator'])) {
             throw new SyntaxError('The operator used in the expression "'.$expression.'" is reserved.');
@@ -156,7 +155,7 @@ enum Operator: string
         }
 
         if (':' === $varSpec->modifier) {
-            $value = substr($value, 0, $varSpec->position);
+            $value = mb_substr($value, 0, $varSpec->position, 'UTF-8');
         }
 
         return [$this->decode($value), $this->isNamed()];

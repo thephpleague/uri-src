@@ -2,7 +2,7 @@
 
 All Notable changes to `League\Uri` will be documented in this file
 
-## [Next](https://github.com/thephpleague/uri/compare/7.8.0...master) - TBD
+## [7.8.1](https://github.com/thephpleague/uri/compare/7.8.0...7.8.1) - 2026-03-16
 
 ### Added
 
@@ -10,7 +10,10 @@ All Notable changes to `League\Uri` will be documented in this file
 
 ### Fixed
 
-- None
+- Update requirement to use `uri-interfaces` 7.8.1
+- Simplify `VariableBag` implementation
+- Improve template expansion based on [#193](https://github.com/thephpleague/uri-src/pull/193) by [dualfroz](https://github.com/dualfroz)
+- Multibyte characters handling during template expansion [#192](https://github.com/thephpleague/uri-src/pull/192) by [dualfroz](https://github.com/dualfroz)
 
 ### Deprecated
 
