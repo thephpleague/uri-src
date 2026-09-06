@@ -156,8 +156,6 @@ enum Operator: string
         }
 
         if (':' === $varSpec->modifier) {
-            // RFC 6570 section 2.4.1: the prefix length counts characters, not octets,
-            // so truncating has to be multibyte aware.
             $value = mb_substr($value, 0, $varSpec->position, 'UTF-8');
         }
 
