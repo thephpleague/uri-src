@@ -99,7 +99,7 @@ if (PHP_VERSION_ID < 80600) {
                 $errors[] = new UrlValidationError($uri, UrlValidationErrorType::DomainInvalidCodePoint, true);
             }
 
-            [] === $errors || throw new InvalidUrlException('Invalid URL', $errors);
+            [] === $errors || throw new InvalidUrlException('The specified URL cannot have username', $errors);
 
             return new Url($uri, $baseUrl, $errors);
         }
@@ -109,18 +109,8 @@ if (PHP_VERSION_ID < 80600) {
          */
         public function setScheme(?string $scheme): self
         {
-            if (null !== $scheme) {
-                static $regexp = ',^(?<scheme>[a-zA-Z][a-zA-Z0-9+\-.]*)(:(?://?)?)?$,';
-                1 === preg_match($regexp, $scheme, $found) || throw new InvalidUrlException(
-                    'The scheme `'.$scheme.'` is invalid.',
-                    [new UrlValidationError($scheme, UrlValidationErrorType::MissingSchemeNonRelativeUrl, true)]
-                );
-
-                $scheme = $found['scheme'];
-            }
-
             $scheme = new Scheme($scheme ?? '');
-            if (! $this->urlRecord->scheme->equals($scheme)) {
+            if (!$this->urlRecord->scheme->equals($scheme)) {
                 $this->urlRecord->scheme = $scheme;
             }
 

@@ -22,6 +22,7 @@
       <directory suffix="Test.php">components</directory>
       <directory suffix="Test.php">interfaces</directory>
       <directory suffix="Test.php">polyfill</directory>
+      <directory suffix=".phpt">polyfill</directory>
     </testsuite>
   </testsuites>
   <logging>

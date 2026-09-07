@@ -41,10 +41,10 @@ if (PHP_VERSION_ID < 80600) {
 
         public function __construct()
         {
-            $this->clear();
+            $this->reset();
         }
 
-        public function clear(): self
+        public function reset(): self
         {
             $this->scheme = null;
             $this->userInfo = null;
@@ -76,8 +76,8 @@ if (PHP_VERSION_ID < 80600) {
         private function buildAuthority(): ?string
         {
             if (null === $this->host) {
-                (null === $this->userInfo && null === $this->port)
-                || throw new InvalidUriException('The User Information and/or the Port component(s) are set without a Host component being present.');
+                null === $this->port || throw new InvalidUriException('Cannot set a port without having a host');
+                null === $this->userInfo || throw new InvalidUriException('Cannot set a userinfo without having a host');
 
                 return null;
             }
@@ -104,23 +104,19 @@ if (PHP_VERSION_ID < 80600) {
             }
 
             if (null !== $authority) {
-                // If there is an authority, the path must start with a `/`
-                return str_starts_with($this->path, '/') ? $this->path : '/'.$this->path;
+                str_starts_with($this->path, '/') || throw new InvalidUriException('The specified path is malformed');
+
+                return $this->path;
             }
 
-            // If there is no authority, the path cannot start with `//`
-            if (str_starts_with($this->path, '//')) {
-                return '/.'.$this->path;
-            }
+            !str_starts_with($this->path, '//') || throw new InvalidUriException('The path must not begin with "//" when the URI does not contain a host');
 
             $colonPos = strpos($this->path, ':');
             if (false !== $colonPos && null === $this->scheme) {
                 // In the absence of a scheme and of an authority,
                 // the first path segment cannot contain a colon (":") character.'
                 $slashPos = strpos($this->path, '/');
-                (false !== $slashPos && $colonPos > $slashPos) || throw new InvalidUriException(
-                    'In absence of the scheme and authority components, the first path segment cannot contain a colon (":") character.'
-                );
+                (false !== $slashPos && $colonPos > $slashPos) || throw new InvalidUriException('The path must not begin with ":" when the URI does not contain a scheme');
             }
 
             return $this->path;
@@ -133,7 +129,7 @@ if (PHP_VERSION_ID < 80600) {
         {
             if ($scheme !== $this->scheme) {
                 UriString::isValidScheme($scheme)
-                || throw new InvalidUriException('The scheme `'.$scheme.'` is invalid.');
+                || throw new InvalidUriException('The specified scheme is malformed');
 
                 $this->scheme = $scheme;
             }
@@ -149,7 +145,7 @@ if (PHP_VERSION_ID < 80600) {
             if ($userInfo !== $this->userInfo) {
                 null === $userInfo
                 || (UriString::containsRfc3986Chars($userInfo) && Encoder::isUserInfoEncoded($userInfo))
-                || throw new InvalidUriException('The userInfo `'.$userInfo.'` contains invalid characters.');
+                || throw new InvalidUriException('The specified userinfo is malformed');
 
                 $this->userInfo = $userInfo;
             }
@@ -165,7 +161,7 @@ if (PHP_VERSION_ID < 80600) {
             if ($host !== $this->host) {
                 null === $host
                 || (UriString::containsRfc3986Chars($host) && HostRecord::isValid($host))
-                || throw new InvalidUriException('The host `'.$host.'` is invalid.');
+                || throw new InvalidUriException('The specified host is malformed');
 
                 $this->host = $host;
             }
@@ -179,9 +175,7 @@ if (PHP_VERSION_ID < 80600) {
         public function setPort(?int $port): self
         {
             if ($port !== $this->port) {
-                null === $port
-                || ($port >= 0 && $port < 65535)
-                || throw new InvalidUriException('The port value must be null or an integer between 0 and 65535.');
+                null === $port || $port >= 0 || throw new InvalidUriException('The specified port is malformed');
 
                 $this->port = $port;
             }
@@ -198,7 +192,7 @@ if (PHP_VERSION_ID < 80600) {
                 null === $path
                 || '' === $path
                 || (UriString::containsRfc3986Chars($path) && Encoder::isPathEncoded($path))
-                || throw new InvalidUriException('The path `'.$path.'` contains invalid characters.');
+                || throw new InvalidUriException('The specified path is malformed');
 
                 $this->path = $path;
             }
@@ -214,7 +208,7 @@ if (PHP_VERSION_ID < 80600) {
             if ($query !== $this->query) {
                 null === $query
                 || (UriString::containsRfc3986Chars($query) && Encoder::isQueryEncoded($query))
-                || throw new InvalidUriException('The query string `'.$query.'` contains invalid characters.');
+                || throw new InvalidUriException('The specified query is malformed');
 
                 $this->query = $query;
             }
@@ -230,7 +224,7 @@ if (PHP_VERSION_ID < 80600) {
             if ($fragment !== $this->fragment) {
                 null === $fragment
                 || (UriString::containsRfc3986Chars($fragment) && Encoder::isFragmentEncoded($fragment))
-                || throw new InvalidUriException('The fragment string `'.$fragment.'` contains invalid characters.');
+                || throw new InvalidUriException('The specified fragment is malformed');
 
                 $this->fragment = $fragment;
             }

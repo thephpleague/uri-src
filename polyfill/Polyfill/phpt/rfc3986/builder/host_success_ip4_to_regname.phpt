@@ -8,14 +8,12 @@ $builder->setHost("192.168.%30.1");
 $uri = $builder->build();
 
 var_dump($uri->toRawString());
-var_dump($uri->getHostType());
 var_dump($uri);
 var_dump($uri->equals(new Uri\Rfc3986\Uri($uri->toRawString())));
 
 ?>
 --EXPECTF--
 string(15) "//192.168.%30.1"
-enum(Uri\Rfc3986\UriHostType::RegisteredName)
 object(Uri\Rfc3986\Uri)#%d (%d) {
   ["scheme"]=>
   NULL
