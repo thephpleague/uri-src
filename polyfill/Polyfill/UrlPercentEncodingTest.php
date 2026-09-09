@@ -32,7 +32,8 @@ final class UrlPercentEncodingTest extends TestCase
         yield 'query encodes space' => [UrlPercentEncodingMode::Query, 'a b', 'a%20b'];
         yield 'path encodes ?' => [UrlPercentEncodingMode::Path, 'a?b', 'a%3Fb'];
         yield 'path segment encodes slash' => [UrlPercentEncodingMode::PathSegment, 'a/b', 'a%2Fb'];
-        yield 'userinfo encodes @' => [UrlPercentEncodingMode::UserInfo, 'a@b', 'a%40b'];
+        yield 'username encodes @' => [UrlPercentEncodingMode::Username, 'a@b', 'a%40b'];
+        yield 'password encodes @' => [UrlPercentEncodingMode::Password, 'a@b', 'a%40b'];
         yield 'fragment encodes space' => [UrlPercentEncodingMode::Fragment, 'a b', 'a%20b'];
         yield 'special query encodes apostrophe' => [UrlPercentEncodingMode::SpecialQuery, "a'b", 'a%27b'];
         yield 'form query converts space to plus' => [UrlPercentEncodingMode::FormQuery, 'a b', 'a+b'];
@@ -44,7 +45,7 @@ final class UrlPercentEncodingTest extends TestCase
     {
         self::assertSame(
             $expected,
-            url_percent_encode($input, UrlPercentEncodingMode::UserInfo)
+            url_percent_encode($input, UrlPercentEncodingMode::Username)
         );
     }
 
@@ -89,7 +90,7 @@ final class UrlPercentEncodingTest extends TestCase
     {
         self::assertSame(
             'a/b',
-            url_percent_encode('a/b', UrlPercentEncodingMode::OpaquePathSegment)
+            url_percent_encode('a/b', UrlPercentEncodingMode::OpaquePath)
         );
     }
 
@@ -101,11 +102,11 @@ final class UrlPercentEncodingTest extends TestCase
         );
     }
 
-    public function testOpaquePathSegmentEncodesQuestionMark(): void
+    public function testOpaquePathSegmentDoesNotEncodesQuestionMark(): void
     {
         self::assertSame(
-            'file%3Fname',
-            url_percent_encode('file?name', UrlPercentEncodingMode::OpaquePathSegment)
+            'file?name',
+            url_percent_encode('file?name', UrlPercentEncodingMode::OpaquePath)
         );
     }
 

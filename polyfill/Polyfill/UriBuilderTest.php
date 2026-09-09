@@ -116,9 +116,9 @@ final class UriBuilderTest extends TestCase
 
     public function test_it_prepend_the_path_when_there_is_too_many_slashes(): void
     {
-        $uri = (new UriBuilder())->setPath('//')->build();
+        $this->expectException(InvalidUriException::class);
 
-        self::assertSame('/.//', $uri->getPath());
+        (new UriBuilder())->setPath('//')->build();
     }
 
     public function test_building_without_calling_any_setter(): void

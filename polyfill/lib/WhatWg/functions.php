@@ -40,15 +40,16 @@ if (!function_exists('Uri\WhatWg\url_percent_encode')) {
         static $tables = [];
         if (!array_key_exists($mode->name, $tables)) {
             $set = match ($mode) {
-                UrlPercentEncodingMode::Query => ' "#<>',
-                UrlPercentEncodingMode::SpecialQuery => " \"#<>'",
-                UrlPercentEncodingMode::Path,
-                UrlPercentEncodingMode::OpaquePathSegment => ' "#<>?^`{}',
-                UrlPercentEncodingMode::PathSegment => ' "#<>?^`{}/',
-                UrlPercentEncodingMode::UserInfo => ' "#<>?^`{}/:;=@[]|',
-                UrlPercentEncodingMode::FormQuery => ' "#<>?^`{}/:;=@[]|$%&+,!\'()~',
+                UrlPercentEncodingMode::Query => ' "#<>%',
+                UrlPercentEncodingMode::SpecialQuery => ' "#\'<>%',
+                UrlPercentEncodingMode::Path => ' "#<>?^`{}%',
+                UrlPercentEncodingMode::OpaquePath => '%',
+                UrlPercentEncodingMode::PathSegment => ' "#<>?^`{}/%',
+                UrlPercentEncodingMode::Username,
+                UrlPercentEncodingMode::Password => ' "#<>?^`{}%/:;=@[]|',
+                UrlPercentEncodingMode::FormQuery => ' "#<>?^`{}/:;=@[]|%$&+,!\'()~',
                 UrlPercentEncodingMode::Fragment => ' "<>`',
-                UrlPercentEncodingMode::OpaqueHost => '',
+                UrlPercentEncodingMode::OpaqueHost => '%',
             };
 
             $table = array_fill(0, 256, false);

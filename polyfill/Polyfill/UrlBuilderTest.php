@@ -40,7 +40,7 @@ final class UrlBuilderTest extends TestCase
     public function test_it_can_build_a_new_uri_instance_with_delimiters_given(): void
     {
         $builder = (new UrlBuilder())
-            ->setScheme('https://')
+            ->setScheme('https')
             ->setHost('bébé.be')
             ->setPort(8080)
             ->setPath('rf:c/uri_followup')

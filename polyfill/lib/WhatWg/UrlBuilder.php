@@ -27,7 +27,6 @@ use SensitiveParameter;
 
 use function array_map;
 use function explode;
-use function preg_match;
 use function strtolower;
 use function substr;
 
@@ -107,9 +106,9 @@ if (PHP_VERSION_ID < 80600) {
         /**
          * @throws InvalidUrlException
          */
-        public function setScheme(?string $scheme): self
+        public function setScheme(string $scheme): self
         {
-            $scheme = new Scheme($scheme ?? '');
+            $scheme = new Scheme($scheme);
             if (!$this->urlRecord->scheme->equals($scheme)) {
                 $this->urlRecord->scheme = $scheme;
             }
@@ -163,7 +162,7 @@ if (PHP_VERSION_ID < 80600) {
                 null === $port
                 || ($port >= self::PORT_RANGE_MIN && $port <= self::PORT_RANGE_MAX)
                 || throw new InvalidUrlException(
-                    'The port value must be null or an integer between '.self::PORT_RANGE_MIN.' and '.self::PORT_RANGE_MAX.'.',
+                    'The specified port is malformed',
                     [new UrlValidationError((string) $port, UrlValidationErrorType::PortOutOfRange, true)]
                 );
 

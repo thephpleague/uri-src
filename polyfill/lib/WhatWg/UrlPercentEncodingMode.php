@@ -23,11 +23,12 @@ if (PHP_VERSION_ID < 80600) {
      */
     enum UrlPercentEncodingMode
     {
-        case UserInfo;
+        case Username;
+        case Password;
         case OpaqueHost;
         case Path;
+        case OpaquePath;
         case PathSegment;
-        case OpaquePathSegment;
         case Query;
         case SpecialQuery;
         case FormQuery;
