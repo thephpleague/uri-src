@@ -34,6 +34,7 @@ final class ExtractionResultTest extends TestCase
             'term' => 'john',
             'tags' => ['one', 'two'],
         ], $result->values());
+        self::assertFalse($result->isEmpty());
     }
 
     #[Test]

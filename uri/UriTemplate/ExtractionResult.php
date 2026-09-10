@@ -58,6 +58,11 @@ final class ExtractionResult implements Countable, IteratorAggregate
         yield from $this->variables;
     }
 
+    public function isEmpty(): bool
+    {
+        return [] === $this->variables;
+    }
+
     public function fetch(string $name): ?ExtractedValue
     {
         return $this->variables[$name] ?? null;
