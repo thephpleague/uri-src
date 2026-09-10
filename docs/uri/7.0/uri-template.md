@@ -309,25 +309,25 @@ $template = 'https://example.com/hotels/{hotel}/bookings/{booking}';
 $uriString = 'https://example.com/hotels/Rest%20%26%20Relax/bookings/42';
 
 $uriTemplate = new UriTemplate($template);
-$variables = $uriTemplate->extract($uriString); 
+$result = $uriTemplate->extract($uriString); 
 
-// UriTemplate::extract() returns a League\Uri\UriTemplate\ExtractionResult object
-$variables->isEmpty();      
+// $variables is a League\Uri\UriTemplate\ExtractionResult object
+$result->isEmpty();      
 // false
 
-count($variables);
+count($result);
 // 2
 
-echo $variables->value('booking');
+echo $result->value('booking');
 // '42'
 
-echo $variables->value('hotel');
+echo $result->value('hotel');
 // 'Rest & Relax'
 
-$variables->has('missing');
+$result->has('missing');
 // false
 
-$variables->values();
+$result->values();
 // [
 //   "hotel" => "Rest & Relax"
 //   "booking" => "42"
@@ -347,8 +347,8 @@ use League\Uri\UriTemplate;
 
 $template = '/{version}/search/{term:1}/{?q*,limit}';
 $uriTemplate = new UriTemplate($template, ['version' => 1.1]);
-$variables = $uriTemplate->extract("/1.1/search/j/?q=a&q=b&limit=10");
-$variables->values();
+$result = $uriTemplate->extract("/1.1/search/j/?q=a&q=b&limit=10");
+$result->values();
 // [
 //   "version" => "1.1"
 //   "term" => "j"
@@ -359,7 +359,7 @@ $variables->values();
 //   "limit" => "10"
 // ]
 
-$variable = $variables->fetch('term');
+$variable = $result->fetch('term');
 $variable->value;
 // "j"
 
@@ -383,12 +383,12 @@ use League\Uri\UriTemplate;
 
 $template = '/search/{term}/{?limit}';
 $uriTemplate = new UriTemplate($template);
-$variables = $uriTemplate->extract('/search/42/?limit=10');
+$result = $uriTemplate->extract('/search/42/?limit=10');
 
-$variables->value('term');
+$result->value('term');
 // "42"
 
-$variables->value('limit');
+$result->value('limit');
 // "10"
 ~~~
 
@@ -399,9 +399,9 @@ are returned. The `+` character is not treated as a space.
 use League\Uri\UriTemplate;
 
 $uriTemplate = new UriTemplate('/hotels/{hotel}');
-$variables = $uriTemplate->extract('/hotels/Rest%20%26%20Relax');
+$result = $uriTemplate->extract('/hotels/Rest%20%26%20Relax');
 
-$variables->value('hotel');
+$result->value('hotel');
 // 'Rest & Relax'
 ~~~
 
@@ -416,8 +416,8 @@ use League\Uri\UriTemplate;
 
 $template = '/{version}/search/{term:1}/{?q*,limit}';
 $uriTemplate = new UriTemplate($template, ['version' => 1.1]);
-$variables = $uriTemplate->extract("/foo/bar");
-$variables->isEmpty();
+$result = $uriTemplate->extract("/foo/bar");
+$result->isEmpty();
 // true
 
 $uriTemplate->extractOrFail("/foo/bar");
@@ -442,3 +442,30 @@ Extraction also has some inherent limitations:
 * **A template must provide enough structure to identify a value.** When different parts of a template can match the same input in multiple ways, extraction may fail rather than guessing which interpretation was intended.
 
 For these reasons, variable extraction should be considered a convenient way to recover variables from URIs that follow a known template, rather than a general-purpose URI parser.
+
+### Combining extraction and expansion
+
+An `ExtractionResult` can be passed directly to `UriTemplate::expand*()` methods. This makes it possible
+to extract variables from a URI, modify them if needed, and expand the template again.
+
+```php
+$template = 'https://api.twitter.com/{version}/search/{term:1}/{?q*,limit}';
+$uriTemplate = new UriTemplate($template, ['version' => 1.1]);
+$result = $uriTemplate->extract(
+    'https://api.twitter.com/1.1/search/j/?q=a&q=b&limit=10'
+);
+
+$uriTemplate->expand($result)->toString();
+// https://api.twitter.com/1.1/search/j/?q=a&q=b&limit=10
+```
+
+This provides a convenient extraction-to-expansion workflow:
+
+```text
+URI → extract() → ExtractionResult → expand() → URI
+```
+
+<p class="message-notice">The round trip is not necessarily lossless. A variable extracted as a 
+<strong>partial value</strong>, for example because of a prefix modifier, only contains the
+portion that could be recovered from the input. Expanding that result therefore uses the
+extracted value and cannot reconstruct information that was not captured.</p>

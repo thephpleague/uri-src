@@ -27,6 +27,7 @@ use League\Uri\UriTemplate\VariableCanNotBeExtracted;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use Stringable;
+use Traversable;
 use Uri\InvalidUriException;
 use Uri\Rfc3986\Uri as Rfc3986Uri;
 use Uri\WhatWg\InvalidUrlException;
@@ -64,6 +65,10 @@ final class UriTemplate implements Stringable
 
     private function filterVariables(iterable $variables): VariableBag
     {
+        if ($variables instanceof ExtractionResult) {
+            $variables = $variables->values();
+        }
+
         if (!$variables instanceof VariableBag) {
             $variables = new VariableBag($variables);
         }
