@@ -231,7 +231,7 @@ enum Operator: string
         return [implode(',', $pairs), $useQuery];
     }
 
-    public function extract(VarSpecifier $varSpecifier, string $value): VariableBag
+    public function extract(VarSpecifier $varSpecifier, string $value): ExtractionResult
     {
         if ('*' === $varSpecifier->modifier) {
             return $this->extractList($varSpecifier, $value);
@@ -240,11 +240,11 @@ enum Operator: string
         if ($this->isNamed()) {
             [$name, $value] = array_pad(explode('=', $value, 2), 2, '');
             if ($name !== $varSpecifier->name) {
-                return new VariableBag();
+                return new ExtractionResult();
             }
         }
 
-        return new VariableBag([$varSpecifier->name => self::decode($value)]);
+        return new ExtractionResult([$varSpecifier->name => ExtractedValue::fromValue(self::decode($value), $varSpecifier)]);
     }
 
     private static function decode(string $value): string
@@ -252,7 +252,7 @@ enum Operator: string
         return  rawurldecode($value);
     }
 
-    private function extractList(VarSpecifier $varSpecifier, string $value): VariableBag
+    private function extractList(VarSpecifier $varSpecifier, string $value): ExtractionResult
     {
         return $this->isNamed()
             ? $this->extractNamedList($varSpecifier, $value)
@@ -262,9 +262,9 @@ enum Operator: string
     private function extractNamedList(
         VarSpecifier $varSpecifier,
         string $value,
-    ): VariableBag {
+    ): ExtractionResult {
         if ('' === $value) {
-            return new VariableBag();
+            return new ExtractionResult();
         }
 
         /** @var non-empty-string $separator */
@@ -277,7 +277,9 @@ enum Operator: string
 
         $names = array_unique(array_column($pairs, 0));
         if (1 === count($names) && $varSpecifier->name === $names[0]) {
-            return new VariableBag([$varSpecifier->name => array_map(static fn (array $pair): string => rawurldecode($pair[1]), $pairs)]);
+            return new ExtractionResult([
+                $varSpecifier->name => new ExtractedValue(array_map(static fn (array $pair): string => rawurldecode($pair[1]), $pairs)),
+            ]);
         }
 
         ! in_array($varSpecifier->name, $names, true) || throw new SyntaxError('The value '.$value.' is malformed.');
@@ -287,13 +289,13 @@ enum Operator: string
             $result[rawurldecode($pName)] = rawurldecode($pValue);
         }
 
-        return new VariableBag([$varSpecifier->name => $result]);
+        return new ExtractionResult([$varSpecifier->name => new ExtractedValue($result)]);
     }
 
-    private function extractUnnamedList(VarSpecifier $varSpecifier, string $value): VariableBag
+    private function extractUnnamedList(VarSpecifier $varSpecifier, string $value): ExtractionResult
     {
         if ('' === $value) {
-            return new VariableBag();
+            return new ExtractionResult();
         }
 
         /** @var non-empty-string $separator */
@@ -315,8 +317,8 @@ enum Operator: string
         }
 
         return ($hasPairs && $hasValues)
-            ? new VariableBag()
-            : new VariableBag([$varSpecifier->name => $result]);
+            ? new ExtractionResult()
+            : new ExtractionResult([$varSpecifier->name => new ExtractedValue($result)]);
     }
 
     public function extractPattern(VarSpecifier $varSpecifier): ExtractionPattern

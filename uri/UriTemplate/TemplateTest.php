@@ -26,6 +26,7 @@ use const JSON_THROW_ON_ERROR;
 
 #[CoversClass(Literal::class)]
 #[CoversClass(Template::class)]
+#[CoversClass(ExtractionResult::class)]
 final class TemplateTest extends TestCase
 {
     private static string $rootPath = __DIR__.'/../../vendor/uri-templates/uritemplate-test';
@@ -273,7 +274,7 @@ final class TemplateTest extends TestCase
         string $value,
         array $expected,
     ): void {
-        self::assertTrue((new VariableBag($expected))->equals($template->extract($value)));
+        self::assertSame($expected, $template->extract($value)->values());
     }
 
     /**

@@ -14,9 +14,13 @@ declare(strict_types=1);
 namespace League\Uri\UriTemplate;
 
 use League\Uri\Exceptions\SyntaxError;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Operator::class)]
+#[CoversClass(ExtractedValue::class)]
+#[CoversClass(ExtractionResult::class)]
 final class OperatorTest extends TestCase
 {
     /**
@@ -25,9 +29,7 @@ final class OperatorTest extends TestCase
     #[DataProvider('provideExtractCases')]
     public function testExtract(Operator $operator, string $specifier, string $value, array $expected): void
     {
-        self::assertTrue(
-            (new VariableBag($expected))->equals($operator->extract(VarSpecifier::new($specifier), $value)),
-        );
+        self::assertSame($expected, $operator->extract(VarSpecifier::new($specifier), $value)->values());
     }
 
     /**

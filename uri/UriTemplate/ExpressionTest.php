@@ -269,11 +269,7 @@ final class ExpressionTest extends TestCase
         string $value,
         array $expected,
     ): void {
-        self::assertTrue(
-            (new VariableBag($expected))->equals(
-                $expression->extract($value),
-            ),
-        );
+        self::assertSame($expected, $expression->extract($value)->values());
     }
 
     /**

@@ -160,19 +160,4 @@ final class VariableBag implements ArrayAccess, Countable, IteratorAggregate
     {
         return new self(array_filter($this->variables, $fn, ARRAY_FILTER_USE_BOTH));
     }
-
-    public function reconcile(VariableBag $variables): ?self
-    {
-        $result = $this->variables;
-
-        foreach ($variables as $name => $value) {
-            if (array_key_exists($name, $result) && $result[$name] !== $value) {
-                return null;
-            }
-
-            $result[$name] = $value;
-        }
-
-        return new self($result);
-    }
 }

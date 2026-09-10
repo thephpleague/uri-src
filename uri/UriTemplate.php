@@ -19,6 +19,7 @@ use League\Uri\Contracts\UriException;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\Exceptions\MissingFeature;
 use League\Uri\Exceptions\SyntaxError;
+use League\Uri\UriTemplate\ExtractionResult;
 use League\Uri\UriTemplate\Template;
 use League\Uri\UriTemplate\TemplateCanNotBeExpanded;
 use League\Uri\UriTemplate\VariableBag;
@@ -284,7 +285,7 @@ final class UriTemplate implements Stringable
     /**
      * Extracts the variables from a URI using the template.
      */
-    public function extract(Rfc3986Uri|WhatWgUrl|BackedEnum|Stringable|string $uri): VariableBag
+    public function extract(Rfc3986Uri|WhatWgUrl|BackedEnum|Stringable|string $uri): ExtractionResult
     {
         return $this->template->extract(self::uriString($uri));
     }
@@ -292,7 +293,7 @@ final class UriTemplate implements Stringable
     /**
      * @throws VariableCanNotBeExtracted if the URI cannot be extracted using the template
      */
-    public function extractOrFail(Rfc3986Uri|WhatWgUrl|BackedEnum|Stringable|string $uri): VariableBag
+    public function extractOrFail(Rfc3986Uri|WhatWgUrl|BackedEnum|Stringable|string $uri): ExtractionResult
     {
         return $this->template->extractOrFail(self::uriString($uri));
     }
@@ -300,7 +301,7 @@ final class UriTemplate implements Stringable
     /**
      * Returns whether the URI matches the template.
      */
-    public function match(Rfc3986Uri|WhatWgUrl|BackedEnum|Stringable|string $uri,): bool
+    public function match(Rfc3986Uri|WhatWgUrl|BackedEnum|Stringable|string $uri): bool
     {
         return $this->template->match(self::uriString($uri));
     }

@@ -30,9 +30,9 @@ use function preg_replace;
 use function str_starts_with;
 use function strlen;
 use function strpbrk;
-
 use function strpos;
 use function substr;
+
 use const PREG_OFFSET_CAPTURE;
 use const PREG_SET_ORDER;
 
@@ -154,19 +154,19 @@ final class Template implements Stringable
      * Extract API
     ------------*/
 
-    public function extract(string $value): VariableBag
+    public function extract(string $value): ExtractionResult
     {
         try {
-            return $this->extractAll($value) ?? new VariableBag();
+            return $this->extractAll($value) ?? new ExtractionResult();
         } catch (SyntaxError $e) {
-            return new VariableBag();
+            return new ExtractionResult();
         }
     }
 
     /**
      * @throws VariableCanNotBeExtracted
      */
-    public function extractOrFail(string $value): VariableBag
+    public function extractOrFail(string $value): ExtractionResult
     {
         return $this->extractAll($value) ?? throw new VariableCanNotBeExtracted('The value "'.$value.'" does not match the template.');
     }
@@ -183,18 +183,11 @@ final class Template implements Stringable
     /**
      * @throws VariableCanNotBeExtracted
      */
-    private function extractAll(string $value): ?VariableBag
+    private function extractAll(string $value): ?ExtractionResult
     {
         return $this->matchParts($value, 0, 0);
     }
 
-    /**
-     * @param array<string, string|array<string>> $variables
-     *
-     * @throws VariableCanNotBeExtracted
-     *
-     * @return array<string, string|array<string>>|null
-     */
     /**
      * @throws VariableCanNotBeExtracted
      */
@@ -202,8 +195,8 @@ final class Template implements Stringable
         string $value,
         int $partOffset,
         int $valueOffset,
-        VariableBag $variables = new VariableBag(),
-    ): ?VariableBag {
+        ExtractionResult $variables = new ExtractionResult(),
+    ): ?ExtractionResult {
         if ($partOffset === count($this->parts)) {
             return $valueOffset === strlen($value) ? $variables : null;
         }

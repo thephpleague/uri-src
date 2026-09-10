@@ -49,9 +49,9 @@ final class Expression
             )
         );
         $this->value = '{'.$operator->value.implode(',', array_map(
-                static fn (VarSpecifier $varSpecifier): string => $varSpecifier->toString(),
-                $varSpecifiers
-            )).'}';
+            static fn (VarSpecifier $varSpecifier): string => $varSpecifier->toString(),
+            $varSpecifiers
+        )).'}';
     }
 
     /**
@@ -104,7 +104,7 @@ final class Expression
     /**
      * @throws VariableCanNotBeExtracted
      */
-    public function extract(string $value): VariableBag
+    public function extract(string $value): ExtractionResult
     {
         return $this->operator->isNamed()
             ? $this->extractNamedValue($value)
@@ -114,10 +114,10 @@ final class Expression
     /**
      * @throws VariableCanNotBeExtracted
      */
-    private function extractPositionalValue(string $value): VariableBag
+    private function extractPositionalValue(string $value): ExtractionResult
     {
         if ('' === $value) {
-            return new VariableBag();
+            return new ExtractionResult();
         }
 
         /** @var non-empty-string $separator */
@@ -144,16 +144,16 @@ final class Expression
             $offset += $length;
         }
 
-        return new VariableBag($variables);
+        return new ExtractionResult($variables);
     }
 
     /**
      * @throws VariableCanNotBeExtracted
      */
-    private function extractNamedValue(string $value): VariableBag
+    private function extractNamedValue(string $value): ExtractionResult
     {
         if ('' === $value) {
-            return new VariableBag();
+            return new ExtractionResult();
         }
 
         /** @var non-empty-string $separator */
@@ -172,7 +172,7 @@ final class Expression
             }
         }
 
-        return new VariableBag($variables);
+        return new ExtractionResult($variables);
     }
 
     /**
@@ -242,22 +242,17 @@ final class Expression
         return null;
     }
 
-    private function assertPrefixLength(VarSpecifier $varSpecifier, VariableBag $variables): void
+    private function assertPrefixLength(VarSpecifier $varSpecifier, ExtractionResult $variables): void
     {
         if (0 === $varSpecifier->position) {
             return;
         }
 
         $value = $variables->fetch($varSpecifier->name);
-
-        if (!is_string($value)) {
+        if (null === $value || !is_string($value->value)) {
             return;
         }
 
-        if (mb_strlen($value) > $varSpecifier->position) {
-            throw new VariableCanNotBeExtracted(
-                'The value for variable "'.$varSpecifier->name.'" exceeds the prefix length.'
-            );
-        }
+        (mb_strlen($value->value) <= $varSpecifier->position) || throw new VariableCanNotBeExtracted('The value for variable "'.$varSpecifier->name.'" exceeds the prefix length.');
     }
 }
