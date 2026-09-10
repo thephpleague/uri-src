@@ -85,14 +85,14 @@ echo $uriTemplate->expandOrFail($params);
 <p class="message-notice"><code>expandToUriOrFail()</code> and <code>expandToUrlOrFail()</code> are available since
 version <code>7.6.0</code></p>
 
-## Template Variables
+### Template Variables
 
 <p class="message-notice">For maximum interoperability you should make sure your variables are 
 strings or stringable objects otherwise the value will be cast to string following PHP rules 
 except for boolean values <code>true</code> and <code>false</code> which will be converted 
 to <code>1</code> and <code>0</code> respectively.</p>
 
-### Default Variables
+#### Default Variables
 
 The constructor takes an optional set of default variables that can be applied by default when
 expanding the URI template.
@@ -111,7 +111,7 @@ echo $uriTemplate->expand($params);
 //displays https://api.twitter.com/1.1/search/j/john/?q=a&q=b&limit=10
 ~~~
 
-### Runtime Variables
+#### Runtime Variables
 
 The default variables are overwritten by those supplied to the `expand` method.
 
@@ -179,7 +179,7 @@ $uri::class; // returns 'Laminas\Diactoros\Uri'
 
 By default, if no factory is provided, the returned PSR-7 `UriInterface` object is a `League\Uri\Http` instance.
 
-### Updating Variables
+#### Updating Variables
 
 At any given time you may update your default variables but since the `UriTemplate`
 is an immutable object instead of modifying the current instance, a new
@@ -221,9 +221,9 @@ $uriTemplate->expand($params);
 // will throw a League\Uri\UriTemplate\TemplateCanNotBeExpanded when trying to expand the `period` value.
 ~~~
 
-## Limitations
+### Limitations
 
-### Prefix Modifier
+#### Prefix Modifier
 
 While the RFC does not forbid this, the `UriTemplate` class will throw an exception 
 if an attempt is made to use the prefix modifier with a list of value. Other 
@@ -246,7 +246,7 @@ echo $uriTemplate->expand($params), PHP_EOL;
 // throw a League\Uri\UriTemplate\TemplateCanNotBeExpanded because the term variable is a list and not a string.
 ~~~
 
-### Braces Usage
+#### Braces Usage
 
 The following implementation disallows the use of braces `{` or  `}` outside of being URI
 template expression delimiters. If not used as the boundary of an expression an
@@ -269,7 +269,7 @@ echo $uriTemplate->expand($params), PHP_EOL;
 // https://example.com/hotels/%7B/Rest%20%26%20Relax
 ~~~
 
-## Interoperability
+### Interoperability
 
 <p class="message-notice">Available since <code>version 7.6</code></p>
 
@@ -292,3 +292,180 @@ $link = (new Link())
 ~~~
 
 The `Symfony\Component\WebLink\Link` package implements `PSR-13` interfaces.
+
+## Variable Extraction
+
+<p class="message-notice">available since version <code>7.9.0</code></p>
+
+While RFC 6570 only defines variable expansion and not extraction, this package provides an API
+for extracting variables using the same URI Template syntax.
+
+### Basic usage
+
+~~~php
+use League\Uri\UriTemplate;
+
+$template = 'https://example.com/hotels/{hotel}/bookings/{booking}';
+$uriString = 'https://example.com/hotels/Rest%20%26%20Relax/bookings/42';
+
+$uriTemplate = new UriTemplate($template);
+$result = $uriTemplate->extract($uriString); 
+
+// $variables is a League\Uri\UriTemplate\ExtractionResult object
+$result->isEmpty();      
+// false
+
+count($result);
+// 2
+
+echo $result->value('booking');
+// '42'
+
+echo $result->value('hotel');
+// 'Rest & Relax'
+
+$result->has('missing');
+// false
+
+$result->values();
+// [
+//   "hotel" => "Rest & Relax"
+//   "booking" => "42"
+// ]
+~~~
+
+The `UriTemplate::extract()` method accepts all supported URI objects as well as backed enums, string and `Stringable`
+instances.
+
+The returned object is an instanceof `League\Uri\UriTemplate\ExtractionResult`, with which you can access
+the extraction result. You can count or fetch a specific value based on its name.
+
+### Variable value
+
+~~~php
+use League\Uri\UriTemplate;
+
+$template = '/{version}/search/{term:1}/{?q*,limit}';
+$uriTemplate = new UriTemplate($template, ['version' => 1.1]);
+$result = $uriTemplate->extract("/1.1/search/j/?q=a&q=b&limit=10");
+$result->values();
+// [
+//   "version" => "1.1"
+//   "term" => "j"
+//   "q" => array:2 [
+//     0 => "a"
+//     1 => "b"
+//   ]
+//   "limit" => "10"
+// ]
+
+$variable = $result->fetch('term');
+$variable->value;
+// "j"
+
+$variable->isPartial;
+// true
+~~~
+
+While `ExtractionResult::value()` and `ExtractionResult::values()` return the extracted values directly,
+`ExtractionResult::fetch()` returns an `ExtractedValue` instance. `ExtractedValue` provides both the extracted
+value and information about whether the value is complete or partial.
+
+A partial value occurs when the value was extracted from a variable with a position modifier and the complete
+value was not present in the input.
+
+<p class="message-info">Extracted variables are never type-inferred. Values returned by variable extraction are
+always either a string or an array of strings. Numeric values, booleans, and other scalar representations
+are returned as strings. This means extraction preserves the textual representation of values from the URI.</p>
+
+~~~php
+use League\Uri\UriTemplate;
+
+$template = '/search/{term}/{?limit}';
+$uriTemplate = new UriTemplate($template);
+$result = $uriTemplate->extract('/search/42/?limit=10');
+
+$result->value('term');
+// "42"
+
+$result->value('limit');
+// "10"
+~~~
+
+Returned values are **URL-decoded**. Percent-encoded sequences in the input are decoded before the values
+are returned. The `+` character is not treated as a space.
+
+~~~php
+use League\Uri\UriTemplate;
+
+$uriTemplate = new UriTemplate('/hotels/{hotel}');
+$result = $uriTemplate->extract('/hotels/Rest%20%26%20Relax');
+
+$result->value('hotel');
+// 'Rest & Relax'
+~~~
+
+### Strict Mode
+
+`UriTemplate::extract()` always returns an `ExtractionResult`, even when the input cannot be matched by the template.
+If you need extraction to fail explicitly in this situation, use `UriTemplate::extractOrFail()` which throws
+a `VariableCanNotBeExtracted` exception if the extraction fails for any reason.
+
+~~~php
+use League\Uri\UriTemplate;
+
+$template = '/{version}/search/{term:1}/{?q*,limit}';
+$uriTemplate = new UriTemplate($template, ['version' => 1.1]);
+$result = $uriTemplate->extract("/foo/bar");
+$result->isEmpty();
+// true
+
+$uriTemplate->extractOrFail("/foo/bar");
+// throws a League\Uri\UriTemplate\VariableCanNotBeExtracted exception
+
+$uriTemplate->match("/foo/bar");
+// false
+~~~
+
+The `UriTemplate::match()` method can be used when you only need to know whether the input matches the template,
+without extracting its variables.
+
+### Limitations
+
+Variable extraction is an extension provided by this package; it is **not defined by RFC 6570**, which only specifies URI Template expansion.
+
+Extraction also has some inherent limitations:
+
+* **Extraction is based on the template structure.** A URI can match a template without containing enough information to reconstruct the complete value of a variable. In such cases, a variable may be returned as a partial value, for example when using a prefix modifier.
+* **Values are never type-inferred.** Extracted values are always strings or arrays of strings. The library does not determine whether a value represents a number, boolean, date, identifier, or another application-specific type.
+* **Extraction does not interpret application semantics.** The library extracts values from the URI according to the URI Template syntax; it does not validate whether those values are meaningful to your application.
+* **A template must provide enough structure to identify a value.** When different parts of a template can match the same input in multiple ways, extraction may fail rather than guessing which interpretation was intended.
+
+For these reasons, variable extraction should be considered a convenient way to recover variables from URIs that follow a known template, rather than a general-purpose URI parser.
+
+### Combining extraction and expansion
+
+An `ExtractionResult` can be passed directly to `UriTemplate::expand*()` methods. This makes it possible
+to extract variables from a URI, modify them if needed, and expand the template again.
+
+```php
+$template = 'https://api.twitter.com/{version}/search/{term:1}/{?q*,limit}';
+$uriTemplate = new UriTemplate($template, ['version' => 1.1]);
+$result = $uriTemplate->extract(
+    'https://api.twitter.com/1.1/search/j/?q=a&q=b&limit=10'
+);
+
+$uriTemplate->expand($result)->toString();
+// https://api.twitter.com/1.1/search/j/?q=a&q=b&limit=10
+```
+
+This provides a convenient extraction-to-expansion workflow:
+
+```text
+URI → extract() → ExtractionResult → expand() → URI
+```
+
+<p class="message-notice">The round trip is not necessarily lossless. A variable extracted as a 
+<strong>partial value</strong>, for example because of a prefix modifier, only contains the
+portion that could be recovered from the input. Expanding that result therefore uses the
+extracted value and cannot reconstruct information that was not captured.</p>
