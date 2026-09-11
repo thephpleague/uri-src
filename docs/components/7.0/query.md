@@ -207,7 +207,7 @@ echo $query->value(); // returns 'foo=bar|bar=baz%20bar'
 ~~~
 
 <p class="message-info">The <code>$params</code> input can be any argument type supported by <code>http_build_query</code> which means that it can be an <code>array</code> or an <code>object</code>.</p>
-<p class="message-notice">If you want a better parsing you can use the <a href="/components/7.0/query-parser-builder/">QueryString</a> class.</p>
+<p class="message-notice">If you want a better parsing you can use the <a href="/interfaces/7.0/query-parser-builder/">QueryString</a> class.</p>
 
 ### Accessing Parameters
 
