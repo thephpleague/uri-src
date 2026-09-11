@@ -310,10 +310,10 @@ $uriString = 'https://example.com/hotels/Rest%20%26%20Relax/bookings/42';
 
 $uriTemplate = new UriTemplate($template);
 $result = $uriTemplate->extract($uriString); 
+// $result is a League\Uri\UriTemplate\ExtractionResult object
 
-// $variables is a League\Uri\UriTemplate\ExtractionResult object
-$result->isEmpty();      
-// false
+$result->isSuccessful();      
+// true
 
 count($result);
 // 2
@@ -327,18 +327,44 @@ echo $result->value('hotel');
 $result->has('missing');
 // false
 
-$result->values();
+$result->variables();
 // [
 //   "hotel" => "Rest & Relax"
 //   "booking" => "42"
 // ]
 ~~~
 
-The `UriTemplate::extract()` method accepts all supported URI objects as well as backed enums, string and `Stringable`
-instances.
+The `UriTemplate::extract()` method accepts all supported URI objects, as well as
+backed enums, strings and `Stringable` instances.
 
-The returned object is an instanceof `League\Uri\UriTemplate\ExtractionResult`, with which you can access
-the extraction result. You can count or fetch a specific value based on its name.
+The returned object is an instance of `League\Uri\UriTemplate\ExtractionResult`,
+which provides access to the extraction state and result. You can:
+
+- determine whether the extraction was successful or failed
+- count, fetch or inspect extracted values by name
+- determine which variables are missing or why the extraction failed
+
+In case of failure, you can still inspect the result:
+
+~~~php
+use League\Uri\UriTemplate;
+
+$template = '/{term:1}/{term}{?a,b}';
+$uriString = '/j//thomas?a=1';
+
+$uriTemplate = new UriTemplate($template);
+$result = $uriTemplate->extract($uriString);
+// $result is a League\Uri\UriTemplate\ExtractionResult object
+
+$result->isSuccessful();
+// false
+
+$result->reasons();
+// [
+//   League\Uri\UriTemplate\ExtractionErrorReason::ReconciliationFailed,
+//   League\Uri\UriTemplate\ExtractionErrorReason::PrefixLengthExceeded,
+// ]
+~~~
 
 ### Variable value
 
@@ -348,7 +374,10 @@ use League\Uri\UriTemplate;
 $template = '/{version}/search/{term:1}/{?q*,limit}';
 $uriTemplate = new UriTemplate($template, ['version' => 1.1]);
 $result = $uriTemplate->extract("/1.1/search/j/?q=a&q=b&limit=10");
-$result->values();
+$result->isSuccessful();
+// true
+
+$result->variables();
 // [
 //   "version" => "1.1"
 //   "term" => "j"
@@ -367,7 +396,7 @@ $variable->isPartial;
 // true
 ~~~
 
-While `ExtractionResult::value()` and `ExtractionResult::values()` return the extracted values directly,
+While `ExtractionResult::value()` and `ExtractionResult::variables()` return the extracted values directly,
 `ExtractionResult::fetch()` returns an `ExtractedValue` instance. `ExtractedValue` provides both the extracted
 value and information about whether the value is complete or partial.
 
@@ -407,9 +436,10 @@ $result->value('hotel');
 
 ### Strict Mode
 
-`UriTemplate::extract()` always returns an `ExtractionResult`, even when the input cannot be matched by the template.
-If you need extraction to fail explicitly in this situation, use `UriTemplate::extractOrFail()` which throws
-a `VariableCanNotBeExtracted` exception if the extraction fails for any reason.
+`UriTemplate::extract()` always returns an `ExtractionResult`, even when the input cannot be matched by the template,
+or, when some variable can not be extracted because they are missing. If you need extraction to fail explicitly
+in these situations, use `UriTemplate::extractOrFail()` which throws a `VariableCanNotBeExtracted`
+exception if the extraction fails for any reason.
 
 ~~~php
 use League\Uri\UriTemplate;
@@ -417,8 +447,8 @@ use League\Uri\UriTemplate;
 $template = '/{version}/search/{term:1}/{?q*,limit}';
 $uriTemplate = new UriTemplate($template, ['version' => 1.1]);
 $result = $uriTemplate->extract("/foo/bar");
-$result->isEmpty();
-// true
+$result->isSuccessful();
+// false
 
 $uriTemplate->extractOrFail("/foo/bar");
 // throws a League\Uri\UriTemplate\VariableCanNotBeExtracted exception
@@ -427,8 +457,35 @@ $uriTemplate->match("/foo/bar");
 // false
 ~~~
 
-The `UriTemplate::match()` method can be used when you only need to know whether the input matches the template,
-without extracting its variables.
+When strict extraction fails, `VariableCanNotBeExtracted::getReasons()` returns the distinct
+`ExtractionErrorReason` cases encountered during extraction. `VariableCanNotBeExtracted::getMissingVariables()`
+returns the names of variables that were not provided by the input.
+
+~~~php
+use League\Uri\UriTemplate;
+
+$template = '/{version}/search/{term:1}/{?q*,limit}';
+try { 
+    $uriTemplate->extractOrFail('/foo/bar'); 
+} catch (VariableCanNotBeExtracted $exception) { 
+    $exception->getReasons(); 
+    // [ 
+    // ExtractionErrorReason::LiteralMismatch, 
+    // ... 
+    // ] 
+    
+    $exception->getMissingVariables(); 
+    // [...]
+}
+~~~
+
+The `UriTemplate::match()` method can be used when you only need to know whether an input
+matches the template, without extracting its variables. It uses the same strict matching
+rules as `UriTemplate::extractOrFail()`, while `UriTemplate::extract()` allows variables
+defined by the template to be missing.
+
+Unlike `extract()`, both `extractOrFail()` and `match()` require the input to
+completely match the template and all variables to be successfully extracted.
 
 ### Limitations
 
@@ -436,10 +493,99 @@ Variable extraction is an extension provided by this package; it is **not define
 
 Extraction also has some inherent limitations:
 
-* **Extraction is based on the template structure.** A URI can match a template without containing enough information to reconstruct the complete value of a variable. In such cases, a variable may be returned as a partial value, for example when using a prefix modifier.
-* **Values are never type-inferred.** Extracted values are always strings or arrays of strings. The library does not determine whether a value represents a number, boolean, date, identifier, or another application-specific type.
-* **Extraction does not interpret application semantics.** The library extracts values from the URI according to the URI Template syntax; it does not validate whether those values are meaningful to your application.
-* **A template must provide enough structure to identify a value.** When different parts of a template can match the same input in multiple ways, extraction may fail rather than guessing which interpretation was intended.
+#### Template structure.
+
+The Extraction is based on the template structure. A URI can match a template
+without containing enough information to reconstruct the complete value of a
+variable. In such cases, a variable may be returned as a partial value.
+
+  For example, with the template:
+
+~~~text
+  /{id:3}
+~~~
+
+  extracting from a given variable whose value is `123456` can only recover the first three characters:
+
+~~~php
+use League\Uri\UriTemplate;
+
+$uriTemplate = new UriTemplate('/{id:3}');
+$uri = $uriTemplate->expand(['id' => 123456]);
+echo $uri, PHP_EOL;
+// "/123"
+
+$res = $uriTemplate->extract($uri);
+dump($res->value('id'));
+// "123"
+~~~
+
+#### Type Inference
+
+Values are never type-inferred. Extracted values are always strings or arrays of strings.
+The library does not determine whether a value represents a number, boolean, date,
+identifier, or another application-specific type.
+
+  For example:
+
+~~~text
+  /users/{id}
+~~~
+
+  extracting from `/users/42` produces:
+
+~~~php
+  ['id' => '42']
+~~~
+
+  not:
+
+~~~php
+  ['id' => 42]
+~~~
+
+#### Application semantics
+
+Extraction does not interpret application semantics. The library extracts values from
+the URI according to the URI Template syntax; it does not validate whether those
+values are meaningful to your application.
+
+  For example:
+
+~~~text
+  /users/{id}
+~~~
+
+  extracting from `/users/abc` produces:
+
+~~~php
+  ['id' => 'abc']
+~~~
+
+  Whether `abc` is a valid user identifier is an application-level concern.
+
+#### Ambiguous templates
+
+Ambiguous templates require a deterministic match. When different parts of a
+template can match the same input in multiple ways, extraction uses the
+structure and delimiters of the template to determine the boundaries and
+may backtrack between possible matches. It cannot determine the
+application's intended interpretation when the template itself
+does not provide enough information.
+
+  For example:
+
+~~~text
+  {/segments*}/{file}
+~~~
+
+  can match:
+
+~~~text
+  /path/to/file
+~~~
+
+  in more than one way. The extraction algorithm uses the template's delimiters and matching rules to determine the boundary between `segments` and `file`; it cannot know an application's intended interpretation beyond those rules.
 
 For these reasons, variable extraction should be considered a convenient way to recover variables from URIs that follow a known template, rather than a general-purpose URI parser.
 
