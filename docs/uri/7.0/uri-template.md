@@ -436,10 +436,71 @@ Variable extraction is an extension provided by this package; it is **not define
 
 Extraction also has some inherent limitations:
 
-* **Extraction is based on the template structure.** A URI can match a template without containing enough information to reconstruct the complete value of a variable. In such cases, a variable may be returned as a partial value, for example when using a prefix modifier.
+* **Extraction is based on the template structure.** A URI can match a template without containing enough information to reconstruct the complete value of a variable. In such cases, a variable may be returned as a partial value.
+
+  For example, with the template:
+
+~~~text
+  /{id:3}
+~~~
+
+  extracting from `/123456` can only recover the first three characters:
+
+~~~php
+  ['id' => '123']
+~~~
+
 * **Values are never type-inferred.** Extracted values are always strings or arrays of strings. The library does not determine whether a value represents a number, boolean, date, identifier, or another application-specific type.
+
+  For example:
+
+~~~text
+  /users/{id}
+~~~
+
+  extracting from `/users/42` produces:
+
+~~~php
+  ['id' => '42']
+~~~
+
+  not:
+
+~~~php
+  ['id' => 42]
+~~~
+
 * **Extraction does not interpret application semantics.** The library extracts values from the URI according to the URI Template syntax; it does not validate whether those values are meaningful to your application.
-* **A template must provide enough structure to identify a value.** When different parts of a template can match the same input in multiple ways, extraction may fail rather than guessing which interpretation was intended.
+
+  For example:
+
+~~~text
+  /users/{id}
+~~~
+
+  extracting from `/users/abc` produces:
+
+~~~php
+  ['id' => 'abc']
+~~~
+
+  Whether `abc` is a valid user identifier is an application-level concern.
+
+* **Ambiguous templates require a deterministic match.** When different parts of a template can match the same input in multiple ways, extraction uses the structure and delimiters of the template to determine the boundaries and may backtrack between possible matches. It cannot determine the application's intended interpretation when the template itself does not provide enough information.
+
+  For example:
+
+~~~text
+  {/segments*}/{file}
+~~~
+
+  can match:
+
+~~~text
+  /path/to/file
+~~~
+
+  in more than one way. The extraction algorithm uses the template's delimiters and matching rules to determine the boundary between `segments` and `file`; it cannot know an application's intended interpretation beyond those rules.
 
 For these reasons, variable extraction should be considered a convenient way to recover variables from URIs that follow a known template, rather than a general-purpose URI parser.
 
