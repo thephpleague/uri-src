@@ -65,7 +65,7 @@ final class UriTemplate implements Stringable
     private function filterVariables(iterable $variables): VariableBag
     {
         if ($variables instanceof ExtractionResult) {
-            $variables = $variables->values();
+            $variables = $variables->variables();
         }
 
         if (!$variables instanceof VariableBag) {

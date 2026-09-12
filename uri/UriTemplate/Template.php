@@ -15,6 +15,7 @@ namespace League\Uri\UriTemplate;
 
 use BackedEnum;
 use Deprecated;
+use Generator;
 use League\Uri\Exceptions\SyntaxError;
 use Stringable;
 use ValueError;
@@ -171,7 +172,7 @@ final class Template implements Stringable
     public function extract(string $value): ExtractionResult
     {
         try {
-            return $this->extractOrFail($value);
+            return $this->extractAll($value);
         } catch (VariableCanNotBeExtracted) {
             return new ExtractionResult();
         }
@@ -181,6 +182,18 @@ final class Template implements Stringable
      * @throws VariableCanNotBeExtracted
      */
     public function extractOrFail(string $value): ExtractionResult
+    {
+        $result = $this->extractAll($value);
+
+        return [] === $result->missingVariables
+            ? $result
+            : throw VariableCanNotBeExtracted::dueToMissingVariables($value, $this, $result);
+    }
+
+    /**
+     * @throws VariableCanNotBeExtracted
+     */
+    private function extractAll(string $value): ExtractionResult
     {
         return $this->matchParts($value, 0, 0);
     }
@@ -307,8 +320,8 @@ final class Template implements Stringable
         $reconciliationFailed = false;
         foreach ($positions as $position) {
             try {
-                $extracted = $expression->extract(substr($value, $expressionOffset, $position - $expressionOffset));
-                $merged = $variables->reconcile($extracted);
+                $newVar = $expression->extract(substr($value, $expressionOffset, $position - $expressionOffset));
+                $merged = $variables->reconcile($newVar);
                 if (null === $merged) {
                     $reconciliationFailed = true;
                     continue;
@@ -328,13 +341,13 @@ final class Template implements Stringable
     }
 
     /**
-     * @return iterable<int>
+     * @return Generator<int>
      */
     private function delimiterPositions(
         string $value,
         int $offset,
         string $delimiter,
-    ): iterable {
+    ): Generator {
         '' !== $delimiter || throw new ValueError('The delimiter cannot be empty.');
 
         $position = $offset;

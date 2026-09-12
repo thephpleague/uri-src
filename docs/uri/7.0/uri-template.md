@@ -327,7 +327,7 @@ echo $result->value('hotel');
 $result->has('missing');
 // false
 
-$result->values();
+$result->variables();
 // [
 //   "hotel" => "Rest & Relax"
 //   "booking" => "42"
@@ -348,7 +348,7 @@ use League\Uri\UriTemplate;
 $template = '/{version}/search/{term:1}/{?q*,limit}';
 $uriTemplate = new UriTemplate($template, ['version' => 1.1]);
 $result = $uriTemplate->extract("/1.1/search/j/?q=a&q=b&limit=10");
-$result->values();
+$result->variables();
 // [
 //   "version" => "1.1"
 //   "term" => "j"
@@ -367,7 +367,7 @@ $variable->isPartial;
 // true
 ~~~
 
-While `ExtractionResult::value()` and `ExtractionResult::values()` return the extracted values directly,
+While `ExtractionResult::value()` and `ExtractionResult::variables()` return the extracted values directly,
 `ExtractionResult::fetch()` returns an `ExtractedValue` instance. `ExtractedValue` provides both the extracted
 value and information about whether the value is complete or partial.
 
@@ -407,9 +407,10 @@ $result->value('hotel');
 
 ### Strict Mode
 
-`UriTemplate::extract()` always returns an `ExtractionResult`, even when the input cannot be matched by the template.
-If you need extraction to fail explicitly in this situation, use `UriTemplate::extractOrFail()` which throws
-a `VariableCanNotBeExtracted` exception if the extraction fails for any reason.
+`UriTemplate::extract()` always returns an `ExtractionResult`, even when the input cannot be matched by the template,
+or, when some variable can not be extracted because they are missing. If you need extraction to fail explicitly
+in these situations, use `UriTemplate::extractOrFail()` which throws a `VariableCanNotBeExtracted`
+exception if the extraction fails for any reason.
 
 ~~~php
 use League\Uri\UriTemplate;
@@ -427,8 +428,10 @@ $uriTemplate->match("/foo/bar");
 // false
 ~~~
 
-The `UriTemplate::match()` method can be used when you only need to know whether the input matches the template,
-without extracting its variables.
+The `UriTemplate::match()` method can be used when you only need to know whether an input
+matches the template, without extracting its variables. It uses the same strict matching
+rules as `UriTemplate::extractOrFail()`, while `UriTemplate::extract()` allows variables
+defined by the template to be missing.
 
 ### Limitations
 

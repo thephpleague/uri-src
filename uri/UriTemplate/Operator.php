@@ -231,8 +231,12 @@ enum Operator: string
         return [implode(',', $pairs), $useQuery];
     }
 
-    public function extract(VarSpecifier $varSpecifier, string $value): ExtractionResult
+    public function extract(VarSpecifier $varSpecifier, string|null $value): ExtractionResult
     {
+        if (null === $value) {
+            return new ExtractionResult([$varSpecifier->name => new ExtractedValue(null)]);
+        }
+
         if ('*' === $varSpecifier->modifier) {
             return $this->extractList($varSpecifier, $value);
         }
@@ -282,7 +286,7 @@ enum Operator: string
             ]);
         }
 
-        ! in_array($varSpecifier->name, $names, true) || throw new SyntaxError('The value '.$value.' is malformed.');
+        ! in_array($varSpecifier->name, $names, true) || throw new VariableCanNotBeExtracted('The value '.$value.' is malformed.');
 
         $result = [];
         foreach ($pairs as [$pName, $pValue]) {
