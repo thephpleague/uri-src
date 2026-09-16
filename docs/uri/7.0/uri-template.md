@@ -318,13 +318,13 @@ $result->isSuccessful();
 count($result);
 // 2
 
-echo $result->value('booking');
+echo $result['booking'];
 // '42'
 
-echo $result->value('hotel');
+echo $result['hotel'];
 // 'Rest & Relax'
 
-$result->has('missing');
+isset($result['missing']);
 // false
 
 $result->variables();
@@ -414,10 +414,10 @@ $template = '/search/{term}/{?limit}';
 $uriTemplate = new UriTemplate($template);
 $result = $uriTemplate->extract('/search/42/?limit=10');
 
-$result->value('term');
+$result['term'];
 // "42"
 
-$result->value('limit');
+$result['limit'];
 // "10"
 ~~~
 
@@ -430,7 +430,7 @@ use League\Uri\UriTemplate;
 $uriTemplate = new UriTemplate('/hotels/{hotel}');
 $result = $uriTemplate->extract('/hotels/Rest%20%26%20Relax');
 
-$result->value('hotel');
+$result['hotel'];
 // 'Rest & Relax'
 ~~~
 
@@ -474,7 +474,7 @@ try {
     // ... 
     // ] 
     
-    $exception->getMissingVariables(); 
+    $exception->getMissingNames(); 
     // [...]
 }
 ~~~
@@ -516,7 +516,7 @@ echo $uri, PHP_EOL;
 // "/123"
 
 $res = $uriTemplate->extract($uri);
-dump($res->value('id'));
+dump($res['id']);
 // "123"
 ~~~
 
