@@ -396,29 +396,47 @@ $variable->isPartial;
 // true
 ~~~
 
-While `ExtractionResult::value()` and `ExtractionResult::variables()` return the extracted values directly,
-`ExtractionResult::fetch()` returns an `ExtractedValue` instance. `ExtractedValue` provides both the extracted
-value and information about whether the value is complete or partial.
+While `ExtractionResult` implements `ArrayAccess` and exposes `ExtractionResult::variables()` to return
+the extracted values directly, `ExtractionResult::fetch()` returns an `ExtractedValue` instance. 
+`ExtractedValue` provides both the raw extracted value and information about whether the value
+is complete or partial.
 
 A partial value occurs when the value was extracted from a variable with a position modifier and the complete
 value was not present in the input.
 
-<p class="message-info">Extracted variables are never type-inferred. Values returned by variable extraction are
-always either a string or an array of strings. Numeric values, booleans, and other scalar representations
-are returned as strings. This means extraction preserves the textual representation of values from the URI.</p>
+To support type-inference you can use the following methods:
+
+- `ExtractionResult::string()`
+- `ExtractionResult::boolean()`
+- `ExtractionResult::integer()`
+- `ExtractionResult::float()`
+- `ExtractionResult::date()`
+- `ExtractionResult::enum()`
+
+Those method will read the raw value and will try to convert them to their respective type.
+If the conversion is not possible `null` is returned.
+
+<p class="message-info">Extracted list are never type-inferred. Values returned by variable extraction as list
+are always an array of strings. This means extraction preserves the textual representation
+of values from the URI.</p>
 
 ~~~php
 use League\Uri\UriTemplate;
 
 $template = '/search/{term}/{?limit}';
 $uriTemplate = new UriTemplate($template);
-$result = $uriTemplate->extract('/search/42/?limit=10');
+$result = $uriTemplate->extract('/search/42/?limit=10.5');
 
 $result['term'];
 // "42"
+$result->integer('term');
+// 42
 
-$result['limit'];
-// "10"
+$result["limit"];
+// "10.5"
+
+$result->float("limit");
+// 10.5
 ~~~
 
 Returned values are **URL-decoded**. Percent-encoded sequences in the input are decoded before the values
@@ -518,30 +536,6 @@ echo $uri, PHP_EOL;
 $res = $uriTemplate->extract($uri);
 dump($res['id']);
 // "123"
-~~~
-
-#### Type Inference
-
-Values are never type-inferred. Extracted values are always strings or arrays of strings.
-The library does not determine whether a value represents a number, boolean, date,
-identifier, or another application-specific type.
-
-  For example:
-
-~~~text
-  /users/{id}
-~~~
-
-  extracting from `/users/42` produces:
-
-~~~php
-  ['id' => '42']
-~~~
-
-  not:
-
-~~~php
-  ['id' => 42]
 ~~~
 
 #### Application semantics
