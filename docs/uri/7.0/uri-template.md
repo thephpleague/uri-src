@@ -366,7 +366,7 @@ $result->reasons();
 // ]
 ~~~
 
-### Variable value
+### Extracted values
 
 ~~~php
 use League\Uri\UriTemplate;
@@ -376,73 +376,42 @@ $uriTemplate = new UriTemplate($template, ['version' => 1.1]);
 $result = $uriTemplate->extract("/1.1/search/j/?q=a&q=b&limit=10");
 $result->isSuccessful();
 // true
+~~~
 
-$result->variables();
-// [
-//   "version" => "1.1"
-//   "term" => "j"
-//   "q" => array:2 [
-//     0 => "a"
-//     1 => "b"
-//   ]
-//   "limit" => "10"
-// ]
+#### Accessing extracted values
 
+`ExtractionResult::fetch()` returns an `ExtractedValue` instance for a variable that was
+successfully extracted, or `null` if the variable is not present.
+
+`ExtractedValue` provides access to both the extracted value and information about whether
+the value is complete or partial.
+
+```php
 $variable = $result->fetch('term');
+
 $variable->value;
 // "j"
 
 $variable->isPartial;
 // true
-~~~
+```
 
-While `ExtractionResult` implements `ArrayAccess` and exposes `ExtractionResult::variables()` to return
-the extracted values directly, `ExtractionResult::fetch()` returns an `ExtractedValue` instance. 
-`ExtractedValue` provides both the raw extracted value and information about whether the value
-is complete or partial.
+A value is partial when it was extracted from a variable with a position modifier and the
+complete value was not present in the input.
 
-A partial value occurs when the value was extracted from a variable with a position modifier and the complete
-value was not present in the input.
+If you only need the extracted value itself, `ExtractionResult` implements `ArrayAccess`.
+Array access returns the extracted value directly, without the additional `ExtractedValue`
+metadata.
 
-To support type-inference you can use the following methods:
+```php
+$variable = $result['term'];
+// "j"
+```
 
-- `ExtractionResult::string()`
-- `ExtractionResult::boolean()`
-- `ExtractionResult::integer()`
-- `ExtractionResult::float()`
-- `ExtractionResult::date()`
-- `ExtractionResult::enum()`
+Extracted values are **URL-decoded**. Percent-encoded sequences in the input are decoded
+before the values are returned. The `+` character is not interpreted as a space.
 
-Those method will read the raw value and will try to convert them to their respective type.
-If the conversion is not possible `null` is returned.
-
-<p class="message-info">Extracted list are never type-inferred. Values returned by variable extraction as list
-are always an array of strings. This means extraction preserves the textual representation
-of values from the URI.</p>
-
-~~~php
-use League\Uri\UriTemplate;
-
-$template = '/search/{term}/{?limit}';
-$uriTemplate = new UriTemplate($template);
-$result = $uriTemplate->extract('/search/42/?limit=10.5');
-
-$result['term'];
-// "42"
-$result->integer('term');
-// 42
-
-$result["limit"];
-// "10.5"
-
-$result->float("limit");
-// 10.5
-~~~
-
-Returned values are **URL-decoded**. Percent-encoded sequences in the input are decoded before the values
-are returned. The `+` character is not treated as a space.
-
-~~~php
+```php
 use League\Uri\UriTemplate;
 
 $uriTemplate = new UriTemplate('/hotels/{hotel}');
@@ -450,7 +419,111 @@ $result = $uriTemplate->extract('/hotels/Rest%20%26%20Relax');
 
 $result['hotel'];
 // 'Rest & Relax'
-~~~
+```
+
+#### Retrieving all extracted values
+
+`ExtractionResult::variables()` returns all extracted values as an associative array.
+Each key is a variable name and each value is the corresponding extracted value.
+
+```php
+$result->variables();
+// [
+//   "version" => "1.1"
+//   "term" => "j"
+//   "q" => [
+//     "a",
+//     "b",
+//   ]
+//   "limit" => "10"
+// ]
+```
+
+#### Retrieving values as a specific type
+
+`ExtractionResult` also provides typed accessors for retrieving an extracted value in a
+specific type:
+
+* `ExtractionResult::string()`
+* `ExtractionResult::boolean()`
+* `ExtractionResult::integer()`
+* `ExtractionResult::float()`
+* `ExtractionResult::date()`
+* `ExtractionResult::enum()`
+
+These methods retrieve the raw extracted value and attempt to convert it to the requested
+type. If the value is missing or cannot be converted, `null` is returned.
+
+```php
+use League\Uri\UriTemplate;
+
+$uriTemplate = new UriTemplate('/search/{when}/{?limit,status}');
+$result = $uriTemplate->extract('/search/2025-03-08/?limit=10&status=published');
+
+$result['limit'];
+// "10"
+
+$result->string('limit');
+// "10"
+
+$result->integer('limit');
+// 10
+
+$result->float('limit');
+// 10.0
+
+$result->boolean('limit');
+// false
+
+$result->date('when', '!Y-m-d');
+// DateTimeImmutable object
+
+$result->enum('status', Status::class);
+// Status::Published
+```
+
+#### Retrieving arrays of values
+
+The same typed accessors are available for extracted values that are expected to be
+arrays:
+
+* `ExtractionResult::strings()`
+* `ExtractionResult::booleans()`
+* `ExtractionResult::integers()`
+* `ExtractionResult::floats()`
+* `ExtractionResult::dates()`
+* `ExtractionResult::enums()`
+
+These methods return an empty array if the value is missing, is not an array, or if any
+member of the array cannot be converted to the requested type.
+
+```php
+$template = '/search{.format}{?date*}';
+$uri = '/search.json?to=2026-09-14&from=2026-01-01';
+
+$uriTemplate = Template::new($template);
+$result = $uriTemplate->extract($uri);
+
+$result['date'];
+// [
+//   "to" => "2026-09-14"
+//   "from" => "2026-01-01"
+// ]
+
+$result->dates('date', '!Y-m-d', 'Europe/Brussels');
+// [
+//   "to" => DateTimeImmutable::createFromFormat(
+//       '!Y-m-d',
+//       '2026-09-14',
+//       new DateTimeZone('Europe/Brussels'),
+//   ),
+//   "from" => DateTimeImmutable::createFromFormat(
+//       '!Y-m-d',
+//       '2026-01-01',
+//       new DateTimeZone('Europe/Brussels'),
+//   ),
+// ]
+```
 
 ### Strict Mode
 
@@ -534,7 +607,7 @@ echo $uri, PHP_EOL;
 // "/123"
 
 $res = $uriTemplate->extract($uri);
-dump($res['id']);
+$res['id'];
 // "123"
 ~~~
 
