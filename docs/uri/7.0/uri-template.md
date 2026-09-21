@@ -378,7 +378,7 @@ $result->isSuccessful();
 // true
 ~~~
 
-#### Accessing extracted values
+#### Value Access
 
 `ExtractionResult::fetch()` returns an `ExtractedValue` instance for a variable that was
 successfully extracted, or `null` if the variable is not present.
@@ -421,7 +421,25 @@ $result['hotel'];
 // 'Rest & Relax'
 ```
 
-#### Retrieving all extracted values
+Some scalar extracted values also have an alternative list interpretation available
+through `ExtractedValue::asList`. This allows values that can be represented as a list to
+be accessed as such without changing their original scalar value.
+
+```php
+$uriTemplate = new UriTemplate('{count}');
+$result = $uriTemplate->extract('one,two,three');
+
+$variable = $result->fetch('count');
+
+$variable->value;
+// "one,two,three"
+
+$variable->asList;
+// ["one", "two", "three"]
+```
+
+The original scalar value remains available through `value` and `string()`, while
+`array()` uses the list interpretation when one is available.
 
 `ExtractionResult::variables()` returns all extracted values as an associative array.
 Each key is a variable name and each value is the corresponding extracted value.
@@ -439,7 +457,7 @@ $result->variables();
 // ]
 ```
 
-#### Retrieving values as a specific type
+#### Type Inference
 
 `ExtractionResult` also provides typed accessors for retrieving an extracted value in a
 specific type:
@@ -448,6 +466,7 @@ specific type:
 * `ExtractionResult::boolean()`
 * `ExtractionResult::integer()`
 * `ExtractionResult::float()`
+* `ExtractionResult::array()`
 * `ExtractionResult::date()`
 * `ExtractionResult::enum()`
 
@@ -482,7 +501,24 @@ $result->enum('status', Status::class);
 // Status::Published
 ```
 
-#### Retrieving arrays of values
+`ExtractionResult::array()` returns an extracted `array` directly. When the extracted value
+is scalar but provides an alternative list interpretation through `ExtractedValue::asList`,
+that list is returned instead. Scalar values without a list interpretation and missing
+values return an empty array.
+
+```php
+use League\Uri\UriTemplate;
+
+$uriTemplate = new UriTemplate('{count}'); 
+$result = $uriTemplate->extract('one,two,three'); 
+$result->string('count');
+// "one,two,three"
+
+$result->array('count');
+// ["one", "two", "three"]
+```
+
+#### Collection
 
 The same typed accessors are available for extracted values that are expected to be
 arrays:
@@ -494,8 +530,9 @@ arrays:
 * `ExtractionResult::dates()`
 * `ExtractionResult::enums()`
 
-These methods return an empty array if the value is missing, is not an array, or if any
-member of the array cannot be converted to the requested type.
+These methods are based on the value returned by the `array()` method.
+An empty array is returned if the `array()` method returns an empty array,
+or if any member of the array cannot be converted to the requested type.
 
 ```php
 $template = '/search{.format}{?date*}';
@@ -580,7 +617,8 @@ completely match the template and all variables to be successfully extracted.
 
 ### Limitations
 
-Variable extraction is an extension provided by this package; it is **not defined by RFC 6570**, which only specifies URI Template expansion.
+Variable extraction is an extension provided by this package; it is **not defined by RFC 6570**,
+which only specifies URI Template expansion.
 
 Extraction also has some inherent limitations:
 
@@ -646,20 +684,23 @@ does not provide enough information.
   {/segments*}/{file}
 ~~~
 
-  can match:
+can match:
 
 ~~~text
   /path/to/file
 ~~~
 
-  in more than one way. The extraction algorithm uses the template's delimiters and matching rules to determine the boundary between `segments` and `file`; it cannot know an application's intended interpretation beyond those rules.
+in more than one way. The extraction algorithm uses the template's delimiters and matching rules
+to determine the boundary between `segments` and `file`; it cannot know an application's
+intended interpretation beyond those rules.
 
-For these reasons, variable extraction should be considered a convenient way to recover variables from URIs that follow a known template, rather than a general-purpose URI parser.
+For these reasons, variable extraction should be considered a convenient way to recover variables
+from URIs that follow a known template, rather than a general-purpose URI parser.
 
 ### Combining extraction and expansion
 
 An `ExtractionResult` can be passed directly to `UriTemplate::expand*()` methods. This makes it possible
-to extract variables from a URI, modify them if needed, and expand the template again.
+to extract variables from a URI, modify them if needed, and expand a different template.
 
 ```php
 $template = 'https://api.twitter.com/{version}/search/{term:1}/{?q*,limit}';
@@ -678,7 +719,8 @@ This provides a convenient extraction-to-expansion workflow:
 URI → extract() → ExtractionResult → expand() → URI
 ```
 
-<p class="message-notice">The round trip is not necessarily lossless. A variable extracted as a 
-<strong>partial value</strong>, for example because of a prefix modifier, only contains the
-portion that could be recovered from the input. Expanding that result therefore uses the
-extracted value and cannot reconstruct information that was not captured.</p>
+<p class="message-warning"><strong>The round trip is not necessarily lossless.</strong> A variable 
+extracted as a <strong>partial value</strong>, for example because of a prefix modifier, only
+contains the portion that could be recovered from the input. Expanding that result
+therefore uses the extracted value and cannot reconstruct information that was
+not captured.</p>
