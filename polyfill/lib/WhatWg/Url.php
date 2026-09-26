@@ -19,6 +19,7 @@ use ReflectionClass;
 use ReflectionProperty;
 use Rowbot\Idna\Idna;
 use Rowbot\URL\BasicURLParser;
+use Rowbot\URL\Component\Host\NullHost;
 use Rowbot\URL\Component\Host\StringHost;
 use Rowbot\URL\ParserState;
 use Rowbot\URL\URL as WhatWgURL;
@@ -229,10 +230,15 @@ if (PHP_VERSION_ID < 80500) {
             return $result->getDomain();
         }
 
-        private function setAsciiHost(): string
+        private function setAsciiHost(): ?string
         {
+            $host = self::urlRecord($this)->host;
+            if ($host instanceof NullHost) {
+                return null;
+            }
+
             $host = $this->url->hostname;
-            if ('' === $host || null === $host || 1 !== preg_match(self::REGEXP_IDNA_PATTERN, $host)) {
+            if ('' === $host || 1 !== preg_match(self::REGEXP_IDNA_PATTERN, $host)) {
                 return $host;
             }
 
@@ -245,11 +251,7 @@ if (PHP_VERSION_ID < 80500) {
                 'IgnoreInvalidPunycode' => false,
             ]);
 
-            if ($result->hasErrors()) {
-                return $host;
-            }
-
-            return $result->getDomain();
+            return $result->hasErrors() ? $host : $result->getDomain();
         }
 
         /**
