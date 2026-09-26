@@ -19,7 +19,6 @@ use ReflectionClass;
 use ReflectionProperty;
 use Rowbot\Idna\Idna;
 use Rowbot\URL\BasicURLParser;
-use Rowbot\URL\Component\Host\NullHost;
 use Rowbot\URL\Component\Host\StringHost;
 use Rowbot\URL\ParserState;
 use Rowbot\URL\URL as WhatWgURL;
