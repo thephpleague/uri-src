@@ -207,7 +207,7 @@ echo $query->value(); // returns 'foo=bar|bar=baz%20bar'
 ~~~
 
 <p class="message-info">The <code>$params</code> input can be any argument type supported by <code>http_build_query</code> which means that it can be an <code>array</code> or an <code>object</code>.</p>
-<p class="message-notice">If you want a better parsing you can use the <a href="/components/7.0/query-parser-builder/">QueryString</a> class.</p>
+<p class="message-notice">If you want a better parsing you can use the <a href="/interfaces/7.0/query-parser-builder/">QueryString</a> class.</p>
 
 ### Accessing Parameters
 
@@ -487,6 +487,159 @@ $query->hasPair('foo', 'bar');  //return true
 $query->hasPair('foo', 'p');    //return false
 $query->has('foo', 'p');        //return true
 ~~~
+
+#### Retrieving values by type
+
+<p class="message-info">available since version <code>7.9</code></p>
+
+`Query` provides typed accessors to retrieve a query pair value as a specific type:
+
+* `Query::string()`
+* `Query::boolean()`
+* `Query::integer()`
+* `Query::float()`
+* `Query::date()`
+* `Query::enum()`
+
+These methods have the same semantics as `Query::get()` (and therefore `Query::first()`):
+they retrieve the first value associated with the given key and attempt to convert it to the
+requested type.
+
+If the key does not exist or the value cannot be converted, `null` is returned.
+
+~~~php
+$query = Query::fromRFC3986(
+    'name=John&age=42&score=10.5&active=true&when=2026-09-14'
+);
+
+$query->string('name');
+// 'John'
+
+$query->integer('age');
+// 42
+
+$query->float('score');
+// 10.5
+
+$query->boolean('active');
+// true
+
+$query->date('when', '!Y-m-d');
+// DateTimeImmutable object
+~~~
+
+When a key occurs more than once, the singular typed accessors only consider the first value,
+just like `Query::get()` and `Query::first()`.
+
+~~~php
+$query = Query::fromRFC3986('foo=1&foo=2');
+
+$query->integer('foo');
+// 1
+~~~
+
+#### Retrieving all values by type
+
+`Query` also provides plural typed accessors to retrieve and convert all values associated
+with a query pair:
+
+* `Query::strings()`
+* `Query::booleans()`
+* `Query::integers()`
+* `Query::floats()`
+* `Query::dates()`
+* `Query::enums()`
+
+These methods have the same semantics as `Query::getAll()`: all values associated with the
+given key are retrieved and each value is converted to the requested type.
+
+```php
+$query = Query::fromRFC3986('foo=1&foo=2');
+
+$query->integers('foo');
+// [1, 2]
+```
+
+If the key does not exist, or if the value cannot be converted to the requested type, the
+method returns an empty array.
+
+```php
+$query = Query::fromRFC3986('foo=1&foo=invalid');
+
+$query->integers('foo');
+// []
+```
+
+The plural accessors therefore provide a convenient typed equivalent of `Query::getAll()`,
+while the singular accessors provide a typed equivalent of `Query::get()` / `Query::first()`.
+
+If a default value is provided, it is used for each value that cannot be converted to the
+requested type. Successfully converted values are preserved.
+
+```php
+$query = Query::fromRFC3986('foo=1&foo=invalid');
+
+$query->integers('foo', 42);
+// [
+//   0 => 1,
+//   1 => 42,
+// ]
+```
+
+In this example, the first value is successfully converted to an integer, while the second
+value cannot be converted and is therefore replaced by the default value `42`.
+
+The default value is not used when the key is not present:
+
+```php id="n4z7kp"
+$query = Query::fromRFC3986('foo=1');
+$query->integers('bar', 42);
+// []
+```
+
+Without a default value, an empty array is returned when the key is missing or when a value
+cannot be converted.
+
+```php id="v6c3rx"
+$query = Query::fromRFC3986('foo=1&foo=invalid');
+
+$query->integers('foo');
+// []
+```
+
+#### Dates and enums
+
+`Query::date()` and `Query::dates()` convert values to `DateTimeImmutable` instances using
+the supplied format and, optionally, timezone.
+
+```php
+$query = Query::fromRFC3986(
+    'from=2026-01-01&to=2026-09-14'
+);
+
+$query->date('from', '!Y-m-d', 'Europe/Brussels');
+// DateTimeImmutable object
+
+$query->dates('from', '!Y-m-d', 'Europe/Brussels');
+// [
+//   DateTimeImmutable object,
+// ]
+```
+
+`Query::enum()` and `Query::enums()` convert values to the specified backed enum.
+
+```php
+$query = Query::fromRFC3986('status=published&status=draft');
+
+$query->enum('status', Status::class);
+// Status::Published
+
+$query->enums('status', Status::class);
+// [
+//   Status::Published,
+//   Status::Draft,
+// ]
+```
 
 #### Collection methods
 

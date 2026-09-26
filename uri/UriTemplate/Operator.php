@@ -17,10 +17,20 @@ use League\Uri\Encoder;
 use League\Uri\Exceptions\SyntaxError;
 use Stringable;
 
+use function array_chunk;
+use function array_column;
+use function array_map;
+use function array_pad;
+use function array_unique;
+use function count;
+use function explode;
 use function implode;
+use function in_array;
 use function is_array;
+use function is_string;
 use function mb_substr;
 use function preg_match;
+use function rawurldecode;
 use function rawurlencode;
 use function str_contains;
 
@@ -57,6 +67,26 @@ enum Operator: string
     case QueryPair = '&';
     case Fragment = '#';
 
+    public function nextDelimiter(): ?string
+    {
+        return match ($this) {
+            self::Query,
+            self::QueryPair,
+            self::ReservedChars => '#',
+            self::Fragment => null,
+            default => '?#',
+        };
+    }
+
+    public function supportsNamedListValue(): bool
+    {
+        return match ($this) {
+            self::PathParam,
+            self::Fragment => true,
+            default => false,
+        };
+    }
+
     public function first(): string
     {
         return match ($this) {
@@ -74,6 +104,18 @@ enum Operator: string
         };
     }
 
+    public function supportsListValue(): bool
+    {
+        return match ($this) {
+            self::None,
+            self::Path,
+            self::PathParam,
+            self::Query,
+            self::QueryPair => true,
+            default => false,
+        };
+    }
+
     public function isNamed(): bool
     {
         return match ($this) {
@@ -82,10 +124,18 @@ enum Operator: string
         };
     }
 
+    public function allowEmpty(): bool
+    {
+        return match ($this) {
+            self::None, self::ReservedChars => false,
+            default => true,
+        };
+    }
+
     /**
      * Removes percent encoding on reserved characters (used with + and # modifiers).
      */
-    public function decode(string $var): string
+    public function encode(string $var): string
     {
         return match ($this) {
             Operator::ReservedChars, Operator::Fragment => (string) Encoder::encodeQueryOrFragment($var),
@@ -158,7 +208,7 @@ enum Operator: string
             $value = mb_substr($value, 0, $varSpec->position, 'UTF-8');
         }
 
-        return [$this->decode($value), $this->isNamed()];
+        return [$this->encode($value), $this->isNamed()];
     }
 
     /**
@@ -188,7 +238,7 @@ enum Operator: string
                 $key = rawurlencode((string) $key);
             }
 
-            $var = $this->decode($var);
+            $var = $this->encode($var);
             if ('*' === $varSpec->modifier) {
                 if (!$isList) {
                     $var = $key.'='.$var;
@@ -220,5 +270,165 @@ enum Operator: string
         }
 
         return [implode(',', $pairs), $useQuery];
+    }
+
+    /**
+     * Extracts a variable from an operator value.
+     *
+     * A null value represents an absent variable. Exploded variables are delegated
+     * to list extraction, while named non-exploded variables must contain the
+     * expected variable name. Path and fragment operators may represent non-exploded
+     * values as key/value pairs. Extracted values are percent-decoded before being
+     * returned.
+     *
+     * @throws VariableCanNotBeExtracted If the value cannot be extracted according
+     *                                   to the variable specifier.
+     */
+    public function extract(VarSpecifier $varSpecifier, string|null $value): ExtractionResult
+    {
+        if (null === $value) {
+            return ExtractionResult::success([$varSpecifier->name => new ExtractedValue(null)]);
+        }
+
+        if ('*' === $varSpecifier->modifier) {
+            return $this->extractList($varSpecifier, $value);
+        }
+
+        if ($this->isNamed()) {
+            [$name, $value] = array_pad(explode('=', $value, 2), 2, '');
+            if ($name !== $varSpecifier->name) {
+                return ExtractionResult::success();
+            }
+        }
+
+        // Path and Fragment parameters can represent a list of key/value pairs without using
+        // the explode-modifier. In that form, the value is encoded as alternating names
+        // and values separated by commas. Split the encoded value before decoding so
+        // that percent-encoded commas (%2C) are preserved as data.
+        if ($this->supportsNamedListValue() && str_contains($value, ',')) {
+            $parts = explode(',', $value);
+            $parts = 0 === (count($parts) % 2) ? $parts : [...$parts, ''];
+            $result = [];
+            foreach (array_chunk($parts, 2) as [$key, $val]) {
+                $result[self::decode($key)] = self::decode($val);
+            }
+
+            return ExtractionResult::success([$varSpecifier->name => ExtractedValue::fromValue($result, $varSpecifier)]);
+        }
+
+        $list = [];
+        if (is_string($value)) {
+            $list = array_map(
+                static fn (string|null $var): ?string => null !== $var ? self::decode($var) : null,
+                '' !== $value && $this->supportsListValue() ? explode(',', $value) : []
+            );
+            $value = self::decode($value);
+        }
+
+        return ExtractionResult::success([$varSpecifier->name => ExtractedValue::fromValue($value, $varSpecifier, $list)]);
+    }
+
+    /**
+     * Decodes a URI template value.
+     */
+    private static function decode(string $value): string
+    {
+        return rawurldecode($value);
+    }
+
+    /**
+     * Extracts an exploded variable according to the operator's named or
+     * positional representation.
+     *
+     * @throws VariableCanNotBeExtracted If the exploded value is malformed.
+     */
+    private function extractList(VarSpecifier $varSpecifier, string $value): ExtractionResult
+    {
+        return $this->isNamed()
+            ? $this->extractNamedList($varSpecifier, $value)
+            : $this->extractUnnamedList($varSpecifier, $value);
+    }
+
+    /**
+     * Extracts an exploded variable from a named representation.
+     *
+     * The value may consist of repeated occurrences of the variable name or of
+     * name/value pairs. When all pairs use the variable's name, the values are
+     * returned as a list. Otherwise, the complete name/value mapping is returned,
+     * provided the variable's name is not mixed with other names.
+     */
+    private function extractNamedList(
+        VarSpecifier $varSpecifier,
+        string $value,
+    ): ExtractionResult {
+        if ('' === $value) {
+            return ExtractionResult::success();
+        }
+
+        /** @var non-empty-string $separator */
+        $separator = $this->separator();
+        $items = explode($separator, $value);
+        $pairs = [];
+        foreach ($items as $item) {
+            $pairs[] = str_contains($item, '=') ? explode('=', $item, 2) : [$varSpecifier->name, $item];
+        }
+
+        $names = array_unique(array_column($pairs, 0));
+        if (1 === count($names) && $varSpecifier->name === $names[0]) {
+            return ExtractionResult::success([$varSpecifier->name => new ExtractedValue(array_map(static fn (array $pair): string => self::decode($pair[1]), $pairs))]);
+        }
+
+        !in_array($varSpecifier->name, $names, true) || throw VariableCanNotBeExtracted::dueTo('The value "'.$value.'" is malformed.', ExtractionErrorReason::MalformedValue);
+
+        $result = [];
+        foreach ($pairs as [$pName, $pValue]) {
+            $result[self::decode($pName)] = self::decode($pValue);
+        }
+
+        return ExtractionResult::success([$varSpecifier->name => new ExtractedValue($result)]);
+    }
+
+    /**
+     * Extracts an exploded variable from a positional representation.
+     *
+     * Positional exploded values may contain either plain values or name/value
+     * pairs, but not both representations at the same time.
+     */
+    private function extractUnnamedList(VarSpecifier $varSpecifier, string $value): ExtractionResult
+    {
+        if ('' === $value) {
+            return ExtractionResult::success();
+        }
+
+        /** @var non-empty-string $separator */
+        $separator = $this->separator();
+        $values = explode($separator, $value);
+        $hasPairs = false;
+        $hasValues = false;
+        $result = [];
+
+        foreach ($values as $pValue) {
+            if (str_contains($pValue, '=')) {
+                $hasPairs = true;
+                [$key, $qValue] = explode('=', $pValue, 2);
+                $result[self::decode($key)] = self::decode($qValue);
+                continue;
+            }
+
+            $hasValues = true;
+            $result[] = self::decode($pValue);
+        }
+
+        if ($hasPairs && $hasValues) {
+            return ExtractionResult::success();
+        }
+
+        if (!$hasPairs && 1 === count($result)) {
+            $result = $result[0];
+        }
+
+        return ExtractionResult::success([
+            $varSpecifier->name => new ExtractedValue($result),
+        ]);
     }
 }

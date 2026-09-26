@@ -422,4 +422,82 @@ final class UrlTest extends TestCase
 
         $url1->withScheme("usern\0me");
     }
+
+    #[DataProvider('usernameAndPasswordProvider')]
+    public function test_it_cast_username_and_password_on_presence(
+        string $url,
+        ?string $username,
+        ?string $password,
+    ): void {
+        $url = new Url($url);
+        self::assertSame($username, $url->getUsername());
+        self::assertSame($password, $url->getPassword());
+    }
+
+    /**
+     * @return iterable<non-empty-string, array{
+     *     url: non-empty-string,
+     *     username: ?string,
+     *     password: ?string
+     * }>
+     */
+    public static function usernameAndPasswordProvider(): iterable
+    {
+        yield 'only the username is present' => [
+            'url' => 'https://user@github.com/',
+            'username' => 'user',
+            'password' => '',
+        ];
+
+        yield 'only the password is present' => [
+            'url' => 'https://:password@github.com/',
+            'username' => '',
+            'password' => 'password',
+        ];
+
+        yield 'username and password are missing' => [
+            'url' => 'https://@github.com/',
+            'username' => null,
+            'password' => null,
+        ];
+
+        yield 'username and password are present' => [
+            'url' => 'https://username:password@github.com/',
+            'username' => 'username',
+            'password' => 'password',
+        ];
+    }
+
+    #[DataProvider('hostCastingProvider')]
+    public function test_it_cann_handle_correctly_host_issue_199(
+        string $url,
+        ?string $expectedAsciiHost,
+        ?string $expectedUnicodeHost,
+    ): void {
+        $url = new Url($url);
+
+        self::assertSame($expectedAsciiHost, $url->getAsciiHost());
+        self::assertSame($expectedUnicodeHost, $url->getUnicodeHost());
+    }
+
+    public static function hostCastingProvider(): iterable
+    {
+        yield 'url without host' => [
+            'url' => 'mailto:user@example.com',
+            'expectedAsciiHost' => null,
+            'expectedUnicodeHost' => null,
+        ];
+
+        yield 'url with host' => [
+            'url' => 'https://example.com',
+            'expectedAsciiHost' => 'example.com',
+            'expectedUnicodeHost' => 'example.com',
+        ];
+
+        yield 'url with unicode host' => [
+            'url' => 'https://bébé.be',
+            'expectedAsciiHost' => 'xn--bb-bjab.be',
+            'expectedUnicodeHost' => 'bébé.be',
+        ];
+    }
 }
