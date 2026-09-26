@@ -19,6 +19,7 @@ use ReflectionClass;
 use ReflectionProperty;
 use Rowbot\Idna\Idna;
 use Rowbot\URL\BasicURLParser;
+use Rowbot\URL\Component\Host\NullHost;
 use Rowbot\URL\Component\Host\StringHost;
 use Rowbot\URL\ParserState;
 use Rowbot\URL\URL as WhatWgURL;
@@ -26,6 +27,7 @@ use Rowbot\URL\URLRecord;
 use SensitiveParameter;
 use Uri\UriComparisonMode;
 
+use function dd;
 use function in_array;
 use function preg_match;
 use function substr;
@@ -135,7 +137,9 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getUsername(): ?string
         {
-            return '' === $this->url->username ? null : $this->url->username;
+            return ('' !== $this->url->username || '' !== $this->url->password)
+                ? $this->url->username
+                : null;
         }
 
         /**
@@ -155,7 +159,9 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getPassword(): ?string
         {
-            return  '' === $this->url->password ? null : $this->url->password;
+            return ('' !== $this->url->username || '' !== $this->url->password)
+                ? $this->url->password
+                : null;
         }
 
         /**
@@ -175,10 +181,6 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getAsciiHost(): ?string
         {
-            if ($this->asciiHostInitialized) {
-                return $this->asciiHost;
-            }
-
             $this->asciiHost = $this->setAsciiHost();
             $this->asciiHostInitialized = true;
 
@@ -204,6 +206,10 @@ if (PHP_VERSION_ID < 80500) {
          */
         private function setUnicodeHost(): ?string
         {
+            if (null === $this->url->host) {
+                return null;
+            }
+
             $host = $this->getAsciiHost();
             if ('' === $host || null === $host) {
                 return $host;
@@ -225,8 +231,12 @@ if (PHP_VERSION_ID < 80500) {
             return $result->getDomain();
         }
 
-        private function setAsciiHost(): string
+        private function setAsciiHost(): ?string
         {
+            if ($this->url->host instanceof NullHost) {
+                return null;
+            }
+
             $host = $this->url->hostname;
             if ('' === $host || null === $host || 1 !== preg_match(self::REGEXP_IDNA_PATTERN, $host)) {
                 return $host;
