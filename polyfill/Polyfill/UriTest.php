@@ -618,4 +618,19 @@ final class UriTest extends TestCase
         self::assertSame('foo:bar%25bar', $uri->getRawUserInfo());
         self::assertSame('foo:bar%25bar', $uri->getUserInfo());
     }
+
+    #[Test]
+    public function test_uri_encoding_after_normalization(): void
+    {
+        $uri = new Uri('https://example.com/a%2Fb/%7Euser?x=%2F%3F%26%41#%2F');
+
+        self::assertSame('/a%2Fb/~user', $uri->getPath());
+        self::assertSame('x=%2F%3F%26A', $uri->getQuery());
+        self::assertSame('%2F', $uri->getFragment());
+
+        $uri = new Uri('index.php?route=%2Ftable%2Fsql');
+
+        self::assertSame('route=%2Ftable%2Fsql', $uri->getQuery());
+        self::assertSame('index.php?route=%2Ftable%2Fsql', $uri->toString());
+    }
 }
