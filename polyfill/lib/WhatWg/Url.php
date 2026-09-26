@@ -138,7 +138,9 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getUsername(): ?string
         {
-            return '' === $this->url->username ? null : $this->url->username;
+            return ('' !== $this->url->username || '' !== $this->url->password)
+                ? $this->url->username
+                : null;
         }
 
         /**
@@ -158,7 +160,9 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getPassword(): ?string
         {
-            return  '' === $this->url->password ? null : $this->url->password;
+            return ('' !== $this->url->username || '' !== $this->url->password)
+                ? $this->url->password
+                : null;
         }
 
         /**
