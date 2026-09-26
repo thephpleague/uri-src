@@ -422,4 +422,37 @@ final class UrlTest extends TestCase
 
         $url1->withScheme("usern\0me");
     }
+
+    #[DataProvider('hostCastingProvider')]
+    public function test_it_cann_handle_correctly_host_issue_199(
+        string $url,
+        ?string $expectedAsciiHost,
+        ?string $expectedUnicodeHost,
+    ): void {
+        $url = new Url($url);
+
+        self::assertSame($expectedAsciiHost, $url->getAsciiHost());
+        self::assertSame($expectedUnicodeHost, $url->getUnicodeHost());
+    }
+
+    public static function hostCastingProvider(): iterable
+    {
+        yield 'url without host' => [
+            'url' => 'mailto:user@example.com',
+            'expectedAsciiHost' => null,
+            'expectedUnicodeHost' => null,
+        ];
+
+        yield 'url with host' => [
+            'url' => 'https://example.com',
+            'expectedAsciiHost' => 'example.com',
+            'expectedUnicodeHost' => 'example.com',
+        ];
+
+        yield 'url with unicode host' => [
+            'url' => 'https://bébé.be',
+            'expectedAsciiHost' => 'xn--bb-bjab.be',
+            'expectedUnicodeHost' => 'bébé.be',
+        ];
+    }
 }
