@@ -27,7 +27,7 @@ if (PHP_VERSION_ID < 80500) {
     {
         public function __construct(string $message, int $code = 0, ?Exception $previous = null)
         {
-            parent::__construct('The specified URI is malformed; '.$message, $code, $previous);
+            parent::__construct($message, $code, $previous);
         }
     }
 }

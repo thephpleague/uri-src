@@ -80,7 +80,7 @@ if (PHP_VERSION_ID < 80500) {
                 $uri = null !== $baseUri ? UriString::resolve($uri, $baseUri->toRawString()) : $uri;
                 $components = self::addUserInfoComponent(UriString::parse($uri));
             } catch (Exception $exception) {
-                throw new InvalidUriException($exception->getMessage(), previous: $exception);
+                throw new InvalidUriException('The specified base URI must be absolute', previous: $exception);
             }
 
             Encoder::isUserInfoEncoded($components['userInfo']) || throw new InvalidUriException('The encoded userInfo string component `'.$components['userInfo'].'` contains invalid characters.');
