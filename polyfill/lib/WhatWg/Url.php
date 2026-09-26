@@ -27,8 +27,6 @@ use Rowbot\URL\URLRecord;
 use SensitiveParameter;
 use Uri\UriComparisonMode;
 
-use function dd;
-use function dump;
 use function in_array;
 use function preg_match;
 use function substr;
