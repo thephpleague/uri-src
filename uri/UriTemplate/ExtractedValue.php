@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace League\Uri\UriTemplate;
 
-use function array_chunk;
 use function array_column;
 use function array_key_exists;
 use function array_map;
@@ -126,24 +125,12 @@ final class ExtractedValue
         $separator = $operator->separator();
         $parts = explode($separator, $value);
         $result = [];
-
         for ($i = 0, $count = count($parts); $i < $count;) {
             $key = $parts[$i++];
-
-            if ($i >= $count) {
-                throw VariableCanNotBeExtracted::dueTo(
-                    'The value "'.$value.'" is malformed.',
-                    ExtractionErrorReason::MalformedValue,
-                );
-            }
-
+            $i < $count || throw VariableCanNotBeExtracted::dueTo('The value "'.$value.'" is malformed.', ExtractionErrorReason::MalformedValue);
             $part = $parts[$i++];
-
             if ('' === $part) {
-                if ($i >= $count || '' !== $parts[$i]) {
-                    throw VariableCanNotBeExtracted::dueTo('The value "'.$value.'" is malformed.', ExtractionErrorReason::MalformedValue);
-                }
-
+                ($i < $count && '' === $parts[$i]) || throw VariableCanNotBeExtracted::dueTo('The value "'.$value.'" is malformed.', ExtractionErrorReason::MalformedValue);
                 ++$i;
                 $part = $separator;
             }
@@ -195,32 +182,16 @@ final class ExtractedValue
         VarSpecifier $varSpecifier,
         Operator $operator,
     ): self {
-        // Path and Fragment parameters can represent a list of key/value pairs without using
-        // the explode-modifier. In that form, the value is encoded as alternating names
-        // and values separated by commas. Split the encoded value before decoding so
-        // that percent-encoded commas (%2C) are preserved as data.
-        if ($operator->supportsNamedListValue() && str_contains($value, ',')) {
-            $parts = explode(',', $value);
-            $parts = 0 === (count($parts) % 2) ? $parts : [...$parts, ''];
-            $result = [];
-            foreach (array_chunk($parts, 2) as [$key, $val]) {
-                $result[$operator->decode($key)] = $operator->decode($val);
-            }
-
-            return new self($result, 0 === $varSpecifier->position ? -1 : $varSpecifier->position, []);
-        }
-
-        if ('*' === $varSpecifier->modifier) {
-            return self::fromUnnamedList($value, $operator);
-        }
-
         $list = array_map(
-            fn (string|null $var): ?string => null !== $var ? $operator->decode($var) : null,
+            static fn (string $value): string => $operator->decode($value),
             '' !== $value && $operator->supportsListValue() ? explode(',', $value) : []
         );
-        $value = $operator->decode($value);
 
-        return new self($value, 0 === $varSpecifier->position ? -1 : $varSpecifier->position, $list);
+        return new self(
+            $operator->decode($value),
+            0 === $varSpecifier->position ? -1 : $varSpecifier->position,
+            $list,
+        );
     }
 
     public function equals(mixed $value): bool
