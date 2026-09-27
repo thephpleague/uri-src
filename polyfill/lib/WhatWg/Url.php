@@ -28,6 +28,7 @@ use SensitiveParameter;
 use Uri\UriComparisonMode;
 
 use function in_array;
+use function is_string;
 use function preg_match;
 use function substr;
 
@@ -91,7 +92,13 @@ if (PHP_VERSION_ID < 80500) {
                     previous: $exception
                 );
             } finally {
-                $softErrors = $collector->recoverableErrors();
+                $errors = $collector->recoverableErrors();
+                $softErrors = null === $baseUrl
+                    ? $errors
+                    : array_values(array_filter(
+                        $errors,
+                        static fn (UrlValidationError $error): bool => $baseUrl->url->href !== $error->context,
+                    ));
             }
         }
 
@@ -111,27 +118,33 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @throws InvalidUrlException
          */
-        public function withScheme(?string $scheme): self
+        public function withScheme(string $scheme): self
         {
-            $scheme = strtolower((string) $scheme);
-            if ($scheme === $this->getScheme() || $scheme === $this->url->protocol) {
+            static $regexp = ',^(?<scheme>[a-zA-Z][a-zA-Z0-9+\-.]*)(:(?://?)?)?$,';
+
+            ('' !== $scheme && 1 === preg_match($regexp, $scheme, $matches)) || throw new InvalidUrlException('The specified scheme is malformed.');
+
+            if ('' === $this->url->username && '' === $this->url->password) {
+                $this->url->protocol = $scheme;
+
                 return $this;
             }
 
-            $copy = $this->copy();
-            if ('' === $scheme) {
-                $copy->url->protocol = '';
+            // Work around the dependency refusing protocol mutation
+            // when credentials are present.
+            $username = $this->url->username;
+            $password = $this->url->password;
+            $this->url->username = '';
+            $this->url->password = '';
 
-                return $copy;
-            }
+            // apply scheme changes
+            $this->url->protocol = $scheme;
 
-            static $regexp = ',^(?<scheme>[a-zA-Z][a-zA-Z0-9+\-.]*)(:(?://?)?)?$,';
+            // restore username and password info
+            $this->url->username = $username;
+            $this->url->password = $password;
 
-            1 === preg_match($regexp, $scheme, $matches) || throw new InvalidUrlException('The specified scheme is malformed.');
-
-            $copy->url->protocol = $matches['scheme'];
-
-            return $copy;
+            return $this;
         }
 
         public function getUsername(): ?string
@@ -269,6 +282,8 @@ if (PHP_VERSION_ID < 80500) {
                 return $this;
             }
 
+            !is_string($host) || !str_contains($host, ':') || throw new InvalidUrlException('The specified host is malformed');
+
             $copy = $this->copy();
             $urlRecord = self::urlRecord($copy);
 
@@ -300,9 +315,12 @@ if (PHP_VERSION_ID < 80500) {
                 return $this;
             }
 
-            null === $port ||
-            (self::PORT_RANGE_MIN <= $port && self::PORT_RANGE_MAX >= $port) ||
-            throw new InvalidUrlException('The specified port is malformed.');
+            // No host present, it must be a noop, as per the WHATWG URL Standard.
+            if (self::urlRecord($this)->host->isNull()) {
+                return $this;
+            }
+
+            null === $port || (self::PORT_RANGE_MIN <= $port && self::PORT_RANGE_MAX >= $port) || throw new InvalidUrlException('The specified port is malformed.');
 
             $copy = $this->copy();
             $copy->url->port = (string) $port;
@@ -332,7 +350,7 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getQuery(): ?string
         {
-            return '' === $this->url->search ? null : substr($this->url->search, 1);
+            return self::urlRecord($this)->query;
         }
 
         /**
@@ -352,7 +370,7 @@ if (PHP_VERSION_ID < 80500) {
 
         public function getFragment(): ?string
         {
-            return '' === $this->url->hash ? null : substr($this->url->hash, 1);
+            return self::urlRecord($this)->fragment;
         }
 
         /**
@@ -360,7 +378,7 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function withFragment(?string $fragment): self
         {
-            if ($fragment === $this->url->hash || $fragment === $this->getFragment()) {
+            if ($fragment === self::urlRecord($this)->fragment) {
                 return $this;
             }
 
