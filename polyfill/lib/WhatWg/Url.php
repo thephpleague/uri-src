@@ -130,21 +130,20 @@ if (PHP_VERSION_ID < 80500) {
                 return $this;
             }
 
+            $copy = $this->copy();
             // Work around the dependency refusing protocol mutation
             // when credentials are present.
-            $username = $this->url->username;
-            $password = $this->url->password;
-            $this->url->username = '';
-            $this->url->password = '';
+            $copy->url->username = '';
+            $copy->url->password = '';
 
             // apply scheme changes
-            $this->url->protocol = $scheme;
+            $copy->url->protocol = $scheme;
 
             // restore username and password info
-            $this->url->username = $username;
-            $this->url->password = $password;
+            $copy->url->username = $this->url->username;
+            $copy->url->password = $this->url->password;
 
-            return $this;
+            return $copy;
         }
 
         public function getUsername(): ?string

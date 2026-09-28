@@ -545,7 +545,7 @@ final class UrlTest extends TestCase
 
         $url = new Url('https://example.com');
 
-        self::assertNull( $url->getQuery());
+        self::assertNull($url->getQuery());
         self::assertNull($url->getFragment());
     }
 
@@ -586,43 +586,43 @@ final class UrlTest extends TestCase
         ];
 
         yield 'domain encoded' => [
-            "https://exam%70le.org",
+            'https://exam%70le.org',
         ];
 
-        yield "invalid IPv4 domain" => [
-            "https://127.0.0.1./",
+        yield 'invalid IPv4 domain' => [
+            'https://127.0.0.1./',
         ];
 
-        yield "invalid IPv4 domain; fewer parts" => [
-            "https://1.2.3/",
+        yield 'invalid IPv4 domain; fewer parts' => [
+            'https://1.2.3/',
         ];
 
-        yield "invalid IPv4 domain; using non decimal numbers" => [
-            "https://127.0.0x0.1",
+        yield 'invalid IPv4 domain; using non decimal numbers' => [
+            'https://127.0.0x0.1',
         ];
 
-        yield "invalid IPv4 domain; derived from non-ascii characters" => [
-            "https://①.②.③.④",
+        yield 'invalid IPv4 domain; derived from non-ascii characters' => [
+            'https://①.②.③.④',
         ];
 
-        yield "invalid IPv6 domain; fewer parts" => [
-            "https://[::01]",
+        yield 'invalid IPv6 domain; fewer parts' => [
+            'https://[::01]',
         ];
 
-        yield "invalid codepoint in the domain" => [
-            " https://example.org ",
+        yield 'invalid codepoint in the domain' => [
+            ' https://example.org ',
         ];
 
-        yield "invalid scheme + authority" => [
-            "file:c:/my-secret-folder",
+        yield 'invalid scheme + authority' => [
+            'file:c:/my-secret-folder',
         ];
 
-        yield "invalid special scheme character" => [
+        yield 'invalid special scheme character' => [
             "https://example.org\path\to\file",
         ];
 
-        yield "A file: URL’s host is a Windows drive letter." => [
-            "file://c:",
+        yield 'A file: URL’s host is a Windows drive letter.' => [
+            'file://c:',
         ];
     }
 
