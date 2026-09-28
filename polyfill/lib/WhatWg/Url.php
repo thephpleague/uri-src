@@ -282,7 +282,19 @@ if (PHP_VERSION_ID < 80500) {
                 return $this;
             }
 
-            !is_string($host) || !str_contains($host, ':') || throw new InvalidUrlException('The specified host is malformed');
+            // we do not parse the host
+            // instead, we quickly check if a port
+            // is potentially attached to it
+            // if an IPv4 or IPv6 is malformed
+            // the underlying parser will catch
+            // the error a throw anyway
+            if (
+                is_string($host) &&
+                str_contains($host, ':') &&
+                (!str_contains($host, '[') || str_contains($host, ']:'))
+            ) {
+                throw new InvalidUrlException('The specified host is malformed');
+            }
 
             $copy = $this->copy();
             $urlRecord = self::urlRecord($copy);

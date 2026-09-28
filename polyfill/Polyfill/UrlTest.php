@@ -626,13 +626,29 @@ final class UrlTest extends TestCase
         ];
     }
 
-    public function test_with_host_should_throw_with_a_hostname_including_the_port_issue_207(): void
+    #[DataProvider('provideInvalidHost')]
+    public function test_with_host_should_throw_with_a_hostname_including_the_port_issue_207(string $host): void
     {
         $url = new Url('https://example.com/path');
 
         $this->expectException(InvalidUrlException::class);
 
-        $url->withHost('other.com:8080');
+        $url->withHost($host);
+    }
+
+    public static function provideInvalidHost(): iterable
+    {
+        yield 'registered name with port' => [
+            'host' => 'other.com:8080',
+        ];
+
+        yield 'IPv4 name with port' => [
+            'host' => '127.0.0.1:8080',
+        ];
+
+        yield 'IPv6 name with port' => [
+            'host' => '[::1]:8080',
+        ];
     }
 
     public function test_with_port_does_not_throw_in_absence_of_host_issue_208(): void
