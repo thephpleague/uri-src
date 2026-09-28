@@ -27,6 +27,8 @@ use Rowbot\URL\URLRecord;
 use SensitiveParameter;
 use Uri\UriComparisonMode;
 
+use function array_filter;
+use function array_values;
 use function in_array;
 use function is_string;
 use function preg_match;
@@ -92,14 +94,24 @@ if (PHP_VERSION_ID < 80500) {
                     previous: $exception
                 );
             } finally {
-                $errors = $collector->recoverableErrors();
-                $softErrors = null === $baseUrl
-                    ? $errors
-                    : array_values(array_filter(
-                        $errors,
-                        static fn (UrlValidationError $error): bool => $baseUrl->url->href !== $error->context,
-                    ));
+                $softErrors = $this->collectSoftErrors($collector, $baseUrl);
             }
+        }
+
+        /**
+         * @return list<UrlValidationError>
+         */
+        private function collectSoftErrors(UrlValidationErrorCollector $collector, ?self $baseUrl): array
+        {
+            $errors = $collector->recoverableErrors();
+
+            return null === $baseUrl
+                ? $errors
+                : array_values(array_filter(
+                    $errors,
+                    static fn (UrlValidationError $error): bool => $baseUrl->url->href !== $error->context,
+                ));
+
         }
 
         private function copy(): self
