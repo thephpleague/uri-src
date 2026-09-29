@@ -29,10 +29,9 @@ use function str_replace;
 
 final class Encoder
 {
-    private const REGEXP_CHARS_INVALID = '/[\x00-\x1f\x7f]/';
+    private const REGEXP_CHARS_INVALID = ',[\x00-\x1f\x7f],';
     private const REGEXP_CHARS_ENCODED = ',%[A-Fa-f0-9]{2},';
-    private const REGEXP_PART_UNRESERVED = 'A-Za-z\d_\-.~';
-    private const REGEXP_ENCODER = '/[^' . self::REGEXP_PART_UNRESERVED . '!$&\'()*+,;=%:@\/?]+|%(?![A-Fa-f0-9]{2})/';
+    private const REGEXP_CHARS_TO_ENCODE = '/[^A-Za-z0-9_\-.~!$&\'()*+,;=%:@\/?]+|%(?![A-Fa-f0-9]{2})/';
 
     private function __construct()
     {
@@ -50,16 +49,12 @@ final class Encoder
     public static function encode(BackedEnum|Stringable|string|null $value): ?string
     {
         $value = self::normalizeInput($value);
-        if (null === $value) {
-            return null;
-        }
-
-        if ('' === $value) {
+        if (null === $value || '' === $value) {
             return $value;
         }
 
-        $encoder = static fn (array $found): string => 1 === preg_match('/[^'.self::REGEXP_PART_UNRESERVED.']/', rawurldecode($found[0])) ? rawurlencode($found[0]) : $found[0];
-        $encoded = (string) preg_replace_callback(self::REGEXP_ENCODER, $encoder, $value);
+        $encoder = static fn (array $matches): string => 1 === preg_match('/[^A-Za-z0-9_\-.~]/', rawurldecode($matches[0])) ? rawurlencode($matches[0]) : $matches[0];
+        $encoded = (string) preg_replace_callback(self::REGEXP_CHARS_TO_ENCODE, $encoder, $value);
 
         return strtr($encoded, ['-' => '%2D', ',' => '%2C', '&' => '%26']);
     }
@@ -67,11 +62,7 @@ final class Encoder
     public static function decode(BackedEnum|Stringable|string|null $value): ?string
     {
         $value = self::normalizeInput($value);
-        if (null === $value) {
-            return null;
-        }
-
-        if ('' === $value) {
+        if (null === $value || '' === $value) {
             return $value;
         }
 
