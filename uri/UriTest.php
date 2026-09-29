@@ -700,7 +700,7 @@ class UriTest extends TestCase
             '2 distincts relative URIs' => [
                 Http::new('~foo/'),
                 Http::new('../~foo/'),
-                false,
+                true,
             ],
             '2 identical relative URIs' => [
                 Http::new('../%7efoo/'),

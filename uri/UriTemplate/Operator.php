@@ -13,16 +13,17 @@ declare(strict_types=1);
 
 namespace League\Uri\UriTemplate;
 
-use League\Uri\Encoder;
 use League\Uri\Exceptions\SyntaxError;
 use Stringable;
 
 use function array_pad;
 use function explode;
 use function implode;
+use function in_array;
 use function is_array;
 use function mb_substr;
 use function preg_match;
+use function preg_replace_callback;
 use function rawurldecode;
 use function rawurlencode;
 use function str_contains;
@@ -37,6 +38,13 @@ use function str_contains;
  */
 enum Operator: string
 {
+    private const REGEXP_CHARS_INVALID = '/[\x00-\x1f\x7f]/';
+    private const REGEXP_CHARS_ENCODED = ',%[A-Fa-f0-9]{2},';
+    private const REGEXP_PART_SUBDELIM = "\!\$&'\(\)\*\+,;\=%";
+    private const REGEXP_PART_UNRESERVED = 'A-Za-z\d_\-.~';
+    private const REGEXP_PART_ENCODED = '%(?![A-Fa-f\d]{2})';
+    private const REGEXP_DECODER = '/[^'.self::REGEXP_PART_UNRESERVED.self::REGEXP_PART_SUBDELIM.':@\/?]+|'.self::REGEXP_PART_ENCODED.'/x';
+
     /**
      * Expression regular expression pattern.
      *
@@ -121,10 +129,17 @@ enum Operator: string
      */
     public function encode(string $var): string
     {
-        return match ($this) {
-            Operator::ReservedChars, Operator::Fragment => (string) Encoder::encodeQueryOrFragment($var),
-            default => rawurlencode($var),
-        };
+        if ('' === $var) {
+            return $var;
+        }
+
+        return (Operator::ReservedChars !== $this && Operator::Fragment !== $this)
+            ? rawurlencode($var)
+            : (string) preg_replace_callback(
+                self::REGEXP_DECODER,
+                static fn (array $found): string => 1 === preg_match('/[^'.self::REGEXP_PART_UNRESERVED.']/', rawurldecode($found[0])) ? rawurlencode($found[0]) : $found[0],
+                $var
+            );
     }
 
     /**
@@ -132,10 +147,21 @@ enum Operator: string
      */
     public function decode(string $value): string
     {
-        return match ($this) {
-            Operator::ReservedChars, Operator::Fragment => (string) Encoder::decodeFragment($value),
-            default => rawurldecode($value),
-        };
+        if ('' === $value) {
+            return '';
+        }
+
+        if (Operator::ReservedChars !== $this && Operator::Fragment !== $this) {
+            return rawurldecode($value);
+        }
+
+        1 !== preg_match(self::REGEXP_CHARS_INVALID, $value) || throw new SyntaxError('Invalid component string: '.$value.'.');
+
+        return (string) preg_replace_callback(
+            self::REGEXP_CHARS_ENCODED,
+            static fn (array $matches): string => in_array($matches[0], ['%20', '%2F'], true) ? $matches[0] : rawurldecode($matches[0]),
+            $value
+        );
     }
 
     /**

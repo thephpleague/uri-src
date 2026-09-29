@@ -25,7 +25,6 @@ use Throwable;
 use function explode;
 use function filter_var;
 use function gettype;
-use function in_array;
 use function preg_match;
 use function preg_replace_callback;
 use function rawurldecode;
@@ -53,6 +52,7 @@ final class Encoder
     private const REGEXP_PART_SUBDELIM = "\!\$&'\(\)\*\+,;\=%";
     private const REGEXP_PART_UNRESERVED = 'A-Za-z\d_\-.~';
     private const REGEXP_PART_ENCODED = '%(?![A-Fa-f\d]{2})';
+    private const RFC3986_RESERVED_CHARACTERS = ':/?#[]@!$&\'()*+,;=';
 
     /**
      * Unreserved characters.
@@ -284,8 +284,9 @@ final class Encoder
     {
         $decoder = static function (array $matches): string {
             $encodedChar = strtoupper($matches[0]);
+            $decodedChar = rawurldecode($encodedChar);
 
-            return in_array($encodedChar, ['%2F', '%20', '%3F', '%23'], true) ? $encodedChar : rawurldecode($encodedChar);
+            return str_contains(self::RFC3986_RESERVED_CHARACTERS, $decodedChar) ? $encodedChar : $decodedChar;
         };
 
         return self::decode($path, $decoder);
@@ -319,15 +320,18 @@ final class Encoder
     /**
      * Decodes the query component while preserving characters that should not be decoded in the context of a full valid URI.
      */
-    public static function decodeQuery(BackedEnum|Stringable|string|null $path): ?string
+    public static function decodeQuery(BackedEnum|Stringable|string|null $query): ?string
     {
         $decoder = static function (array $matches): string {
             $encodedChar = strtoupper($matches[0]);
+            $decodedChar = rawurldecode($encodedChar);
 
-            return in_array($encodedChar, ['%26', '%3D', '%20', '%23', '%3F', '%2F'], true) ? $encodedChar : rawurldecode($encodedChar);
+            return str_contains(self::RFC3986_RESERVED_CHARACTERS, $decodedChar)
+                ? $encodedChar
+                : $decodedChar;
         };
 
-        return self::decode($path, $decoder);
+        return self::decode($query, $decoder);
     }
 
     /**
@@ -359,9 +363,16 @@ final class Encoder
     /**
      * Decodes the fragment component while preserving characters that should not be decoded in the context of a full valid URI.
      */
-    public static function decodeFragment(BackedEnum|Stringable|string|null $path): ?string
+    public static function decodeFragment(BackedEnum|Stringable|string|null $fragment): ?string
     {
-        return self::decode($path, static fn (array $matches): string => in_array($matches[0], ['%20', '%2F'], true) ? $matches[0] : rawurldecode($matches[0]));
+        return self::decode($fragment, static function (array $matches): string {
+            $encodedChar = strtoupper($matches[0]);
+            $decodedChar = rawurldecode($encodedChar);
+
+            return str_contains(self::RFC3986_RESERVED_CHARACTERS, $decodedChar)
+                ? $encodedChar
+                : $decodedChar;
+        });
     }
 
     /**
