@@ -41,18 +41,11 @@ final class Encoder
 {
     private const REGEXP_CHARS_INVALID = '/[\x00-\x1f\x7f]/';
     private const REGEXP_CHARS_ENCODED = ',%[A-Fa-f0-9]{2},';
-    private const REGEXP_CHARS_PREVENTS_DECODING = ',%
-        2[A-F1-24-9]|
-        3[0-9BD]|
-        4[1-9A-F]|
-        5[0-9AF]|
-        6[1-9A-F]|
-        7[0-9E]
-    ,ix';
-    private const RFC3986_RESERVED_CHARACTERS = ':/?#[]@!$&\'()*+,;=';
+    private const REGEXP_CHARS_PREVENTS_DECODING = ',%2[A-F1-24-9]|3[0-9BD]|4[1-9A-F]|5[0-9AF]|6[1-9A-F]|7[0-9E],i';
     private const REGEXP_PART_SUBDELIM = "\!\$&'\(\)\*\+,;\=%";
     private const REGEXP_PART_UNRESERVED = 'A-Za-z\d_\-.~';
     private const REGEXP_PART_ENCODED = '%(?![A-Fa-f\d]{2})';
+    private const RFC3986_RESERVED_CHARACTERS = ':/?#[]@!$&\'()*+,;=';
 
     /**
      * Unreserved characters.
