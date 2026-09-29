@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Uri;
 
-use Exception;
+use Throwable;
 
 use const PHP_VERSION_ID;
 
@@ -25,7 +25,7 @@ if (PHP_VERSION_ID < 80500) {
      */
     class InvalidUriException extends UriException
     {
-        public function __construct(string $message, int $code = 0, ?Exception $previous = null)
+        public function __construct(string $message = '', int $code = 0, ?Throwable $previous = null)
         {
             parent::__construct($message, $code, $previous);
         }

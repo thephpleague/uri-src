@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Uri\WhatWg;
 
-use Exception;
+use Throwable;
 use Uri\InvalidUriException;
 use ValueError;
 
@@ -36,16 +36,12 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @param list<UrlValidationError> $errors
          */
-        public function __construct(string $message, array $errors = [], int $code = 0, ?Exception $previous = null)
+        public function __construct(string $message = '', array $errors = [], int $code = 0, ?Throwable $previous = null)
         {
-            if (!array_is_list($errors)) {
-                throw new ValueError('Argument #2 ($errors) must be a list of '.UrlValidationError::class);
-            }
+            array_is_list($errors) || throw new ValueError('the error argument must be a list.');
 
             $filter = static fn (mixed $error): bool => $error instanceof UrlValidationError;
-            if ($errors !== array_filter($errors, $filter)) {
-                throw new ValueError('Argument #2 ($errors) must be a list of '.UrlValidationError::class);
-            }
+            $errors === array_filter($errors, $filter) || throw new ValueError('the error argument must be a list containing only '.UrlValidationError::class);
 
             $title = [];
             foreach ($errors as $error) {

@@ -2,6 +2,25 @@
 
 All Notable changes to `League\Uri\Interfaces` will be documented in this file
 
+## [Next](https://github.com/thephpleague/uri-interfaces/compare/7.8.1...master) - TBD
+
+### Added
+
+- None
+
+### Fixed
+
+- `Encoder` URI component encodig
+- `UriString` URI normalization algorithm to be inline with PHP's Uri extension
+
+### Deprecated
+
+- None
+
+### Removed
+
+- None
+
 ## [7.8.1](https://github.com/thephpleague/uri-interfaces/compare/7.8.0...7.8.1) - 2026-03-16
 
 ### Added
@@ -12,6 +31,7 @@ All Notable changes to `League\Uri\Interfaces` will be documented in this file
 
 - `Host::isIp` is fixed to be more strict.
 - `UriString::resolve` regression from previous minor version fixed see issue [#184](https://github.com/thephpleague/uri-src/issues/184)
+- `IPv6\Converter::normalize` to handle IPv6 normalization [#22618](https://github.com/php/php-src/issues/22618)
 
 ### Deprecated
 

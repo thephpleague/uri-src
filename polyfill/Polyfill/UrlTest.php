@@ -500,4 +500,181 @@ final class UrlTest extends TestCase
             'expectedUnicodeHost' => 'bébé.be',
         ];
     }
+
+    #[DataProvider('providesUrlWithUserInfo')]
+    public function test_it_can_change_the_url_scheme_with_unser_info_issue_204(
+        string $url,
+        string $scheme,
+        string $expectedAsciiString,
+    ): void {
+        self::assertSame(
+            $expectedAsciiString,
+            (new Url($url))
+                ->withScheme($scheme)
+                ->toAsciiString()
+        );
+    }
+
+    public static function providesUrlWithUserInfo(): iterable
+    {
+        yield 'url without userinfo' => [
+            'url' => 'https://example.com/path',
+            'scheme' => 'http',
+            'expectedAsciiString' => 'http://example.com/path',
+        ];
+/**
+        yield 'url with username' => [
+            'url' => 'https://user@example.com/path',
+            'scheme' => 'http',
+            'expectedAsciiString' => 'http://user@example.com/path',
+        ];
+
+        yield 'url with username and password' => [
+            'url' => 'https://user:pass@example.com/path',
+            'scheme' => 'http',
+            'expectedAsciiString' => 'http://user:pass@example.com/path',
+        ];
+ */
+    }
+
+    public function test_getters_can_return_null_or_string_issue_205(): void
+    {
+        $url = new Url('https://example.com/?#');
+
+        self::assertSame('', $url->getQuery());
+        self::assertSame('', $url->getFragment());
+
+        $url = new Url('https://example.com');
+
+        self::assertNull($url->getQuery());
+        self::assertNull($url->getFragment());
+    }
+
+    #[DataProvider('provide_base_urls_with_recoverable_errors')]
+    public function test_parse_does_not_report_recoverable_errors_from_base_url(
+        string $baseUrl,
+    ): void {
+        $base = new Url($baseUrl);
+        $errors = [];
+        $url = Url::parse('c', $base, $errors);
+
+        self::assertNotNull($url);
+        self::assertSame([], $errors);
+    }
+
+    #[DataProvider('provide_base_urls_with_recoverable_errors')]
+    public function test_resolve_does_not_report_recoverable_errors_from_base_url_issue_206(
+        string $baseUrl,
+    ): void {
+        $base = new Url($baseUrl);
+        $errors = [];
+        $base->resolve('c', $errors);
+
+        self::assertSame([], $errors);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function provide_base_urls_with_recoverable_errors(): iterable
+    {
+        yield 'invalid credentials' => [
+            'https://user:pass@example.com/a/b',
+        ];
+
+        yield 'missing slashes' => [
+            'https:example.org',
+        ];
+
+        yield 'domain encoded' => [
+            'https://exam%70le.org',
+        ];
+
+        yield 'invalid IPv4 domain' => [
+            'https://127.0.0.1./',
+        ];
+
+        yield 'invalid IPv4 domain; fewer parts' => [
+            'https://1.2.3/',
+        ];
+
+        yield 'invalid IPv4 domain; using non decimal numbers' => [
+            'https://127.0.0x0.1',
+        ];
+
+        yield 'invalid IPv4 domain; derived from non-ascii characters' => [
+            'https://①.②.③.④',
+        ];
+
+        yield 'invalid IPv6 domain; fewer parts' => [
+            'https://[::01]',
+        ];
+
+        yield 'invalid codepoint in the domain' => [
+            ' https://example.org ',
+        ];
+
+        yield 'invalid scheme + authority' => [
+            'file:c:/my-secret-folder',
+        ];
+
+        yield 'invalid special scheme character' => [
+            "https://example.org\path\to\file",
+        ];
+
+        yield 'A file: URL’s host is a Windows drive letter.' => [
+            'file://c:',
+        ];
+    }
+
+    #[DataProvider('provideInvalidHost')]
+    public function test_with_host_should_throw_with_a_hostname_including_the_port_issue_207(string $host): void
+    {
+        $url = new Url('https://example.com/path');
+
+        $this->expectException(InvalidUrlException::class);
+
+        $url->withHost($host);
+    }
+
+    public static function provideInvalidHost(): iterable
+    {
+        yield 'registered name with port' => [
+            'host' => 'other.com:8080',
+        ];
+
+        yield 'IPv4 name with port' => [
+            'host' => '127.0.0.1:8080',
+        ];
+
+        yield 'IPv6 name with port' => [
+            'host' => '[::1]:8080',
+        ];
+    }
+
+    public function test_with_port_does_not_throw_in_absence_of_host_issue_208(): void
+    {
+        $url = new Url('mailto:user@example.com');
+        foreach ([65536, -1] as $port) {
+            self::assertSame($url->toAsciiString(), $url->withPort($port)->toAsciiString());
+        }
+    }
+
+    public function test_with_port_throws_in_presence_of_host_issue_208(): void
+    {
+        $url = new Url('http://example.com');
+        foreach ([65536, -1] as $port) {
+            $this->expectException(InvalidUrlException::class);
+            $url->withPort($port);
+        }
+    }
+
+    public function test_with_scheme_throws_with_emptu_string_issue_209(): void
+    {
+        $url = new Url('https://example.com/path');
+
+        $this->expectException(InvalidUrlException::class);
+
+        $url->withScheme('');
+    }
 }

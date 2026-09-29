@@ -40,16 +40,16 @@ final class TemplateTest extends TestCase
 {
     private static string $rootPath = __DIR__.'/../../vendor/uri-templates/uritemplate-test';
 
-    /** @var array<string> */
-    private static array $testFilenames = [
+    /** @var array<non-empty-string> */
+    private static array $expandTestFilenames = [
         'spec-examples.json',
         'negative-tests.json',
         'extended-tests.json',
     ];
 
-    #[DataProvider('uriTemplateSpecificationDataProvider')]
+    #[DataProvider('uriTemplateSpecificationExpandDataProvider')]
     #[Test]
-    public function testItCompliesWithUriTemplatesExpansionTests(
+    public function it_complies_with_Uri_templates_exxpansion_tests(
         array $variables,
         string $input,
         string|array|false $expected
@@ -76,13 +76,11 @@ final class TemplateTest extends TestCase
      *     expected:string|array<string>|false
      * }>
      */
-    public static function uriTemplateSpecificationDataProvider(): iterable
+    public static function uriTemplateSpecificationExpandDataProvider(): iterable
     {
-        foreach (static::$testFilenames as $path) {
+        foreach (static::$expandTestFilenames as $path) {
             $path = static::$rootPath.'/'.ltrim($path, '/');
-            if (false === $content = file_get_contents($path)) {
-                throw new RuntimeException("unable to connect to the path `$path`.");
-            }
+            (false !== $content = file_get_contents($path)) || throw new RuntimeException("unable to connect to the path `$path`.");
 
             /** @var array $records */
             $records = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
@@ -748,7 +746,7 @@ final class TemplateTest extends TestCase
         yield 'decodes a percent-encoded fragment value' => [
             'template' => '{#value}',
             'value' => '#foo%20bar',
-            'expected' => ['value' => 'foo bar'],
+            'expected' => ['value' => 'foo%20bar'],
         ];
 
         yield 'decodes a percent-encoded fragment delimiter' => [
@@ -794,7 +792,7 @@ final class TemplateTest extends TestCase
         yield 'decodes percent-encoded characters from a reserved expression' => [
             'template' => '{+value}',
             'value' => 'foo%20bar/baz',
-            'expected' => ['value' => 'foo bar/baz'],
+            'expected' => ['value' => 'foo%20bar/baz'],
         ];
 
         yield 'extracts a reserved expression before a literal' => [
@@ -824,7 +822,19 @@ final class TemplateTest extends TestCase
         yield 'extracts key-value pairs from a fragment parameter' => [
             'template' => '{#keys}',
             'value' => '#key1,val1%2F,key2,val2%2F',
-            'expected' => ['keys' => ['key1' => 'val1/', 'key2' => 'val2/']],
+            'expected' => ['keys' => ['key1' => 'val1%2F', 'key2' => 'val2%2F']],
+        ];
+
+        yield 'fragment list with different names' => [
+            'template' => '{#keys}',
+            'value' => '#key1,val1,key2',
+            'expected' => [],
+        ];
+
+        yield 'fragment positional pairs with separator as value' => [
+            'template' => '{#keys}',
+            'value' => '#key1,,key2,val2',
+            'expected' => [],
         ];
     }
 

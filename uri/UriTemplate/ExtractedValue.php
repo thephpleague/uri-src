@@ -13,7 +13,13 @@ declare(strict_types=1);
 
 namespace League\Uri\UriTemplate;
 
+use function array_column;
+use function array_key_exists;
+use function array_map;
+use function array_unique;
 use function count;
+use function explode;
+use function in_array;
 use function is_array;
 use function is_string;
 
@@ -22,28 +28,174 @@ final class ExtractedValue
     public readonly bool $isPartial;
 
     /**
-     * @param array<string>|string|null $value
      *
      * @throws VariableCanNotBeExtracted
      */
-    public function __construct(
+    private function __construct(
         public readonly array|string|null $value,
         private readonly int $maxLength = -1,
         public readonly array $asList = [],
     ) {
-        -1 === $maxLength || (is_string($value) && 0 < $maxLength) || throw VariableCanNotBeExtracted::dueTo('A prefix position can only be associated with a string value.', ExtractionErrorReason::UnsupportedOperation);
+        if (is_array($value)) {
+            foreach ($value as $key => $item) {
+                is_string($item) || throw VariableCanNotBeExtracted::dueTo('The extracted value contains a list with an invalid value at key "'.$key.'".', ExtractionErrorReason::TypeMismatch);
+            }
+        }
+        - 1 === $maxLength || (is_string($value) && 0 < $maxLength) || throw VariableCanNotBeExtracted::dueTo('A prefix position can only be associated with a string value.', ExtractionErrorReason::UnsupportedOperation);
+
         $this->isPartial = -1 !== $maxLength;
     }
 
-    public static function fromValue(
-        array|string|null $value,
+    public static function fromNull(): self
+    {
+        return new self(null);
+    }
+
+    public static function fromString(string $value, int $maxLength = -1): self
+    {
+        return new self($value, $maxLength);
+    }
+
+    public static function fromArray(array $value): self
+    {
+        return new self($value, -1);
+    }
+
+    /**
+     * @throws VariableCanNotBeExtracted
+     */
+    public static function fromList(
+        string $value,
         VarSpecifier $varSpecifier,
-        array $asList = [],
+        Operator $operator,
     ): self {
+        return $operator->isNamed()
+             ? self::fromNamedList($value, $varSpecifier, $operator)
+             : self::fromUnnamedList($value, $operator);
+    }
+
+    /**
+     * Extracts an exploded variable from a positional representation.
+     *
+     * Positional exploded values may contain either plain values or name/value
+     * pairs, but not both representations at the same time.
+     */
+    public static function fromUnnamedList(string $value, Operator $operator): ExtractedValue
+    {
+        return match ($operator) {
+            Operator::ReservedChars,
+            Operator::Fragment => self::fromPositionalPairs($value, $operator),
+            default => self::fromGenericList($value, $operator),
+        };
+    }
+
+    /**
+     * Extracts an exploded variable from a positional representation.
+     *
+     * Positional exploded values may contain either plain values or name/value
+     * pairs, but not both representations at the same time.
+     */
+    public static function fromGenericList(string $value, Operator $operator): ExtractedValue
+    {
+        /** @var non-empty-string $separator */
+        $separator = $operator->separator();
+        $values = explode($separator, $value);
+        $hasPairs = false;
+        $result = [];
+
+        foreach ($values as $pValue) {
+            if (str_contains($pValue, '=')) {
+                $hasPairs = true;
+                [$key, $qValue] = explode('=', $pValue, 2);
+                $result[$operator->decode($key)] = $operator->decode($qValue);
+                continue;
+            }
+
+            !$hasPairs || throw VariableCanNotBeExtracted::dueTo('The value "'.$value.'" is malformed.', ExtractionErrorReason::MalformedValue);
+            $result[] = $operator->decode($pValue);
+        }
+
+        if (!$hasPairs && 1 === count($result)) {
+            $result = $result[0];
+        }
+
+        return new self($result);
+    }
+
+    private static function fromPositionalPairs(
+        string $value,
+        Operator $operator,
+    ): self {
+        /** @var non-empty-string $separator */
+        $separator = $operator->separator();
+        $parts = explode($separator, $value);
+        $result = [];
+        for ($i = 0, $count = count($parts); $i < $count;) {
+            $key = $parts[$i++];
+            $i < $count || throw VariableCanNotBeExtracted::dueTo('The value "'.$value.'" is malformed.', ExtractionErrorReason::MalformedValue);
+            $part = $parts[$i++];
+            if ('' === $part) {
+                ($i < $count && '' === $parts[$i]) || throw VariableCanNotBeExtracted::dueTo('The value "'.$value.'" is malformed.', ExtractionErrorReason::MalformedValue);
+                ++$i;
+                $part = $separator;
+            }
+
+            $result[$operator->decode($key)] = $operator->decode($part);
+        }
+
+        return new self($result);
+    }
+
+    /**
+     * Extracts an exploded variable from a named representation.
+     *
+     * The value may consist of repeated occurrences of the variable name or of
+     * name/value pairs. When all pairs use the variable's name, the values are
+     * returned as a list. Otherwise, the complete name/value mapping is returned,
+     * provided the variable's name is not mixed with other names.
+     */
+    public static function fromNamedList(
+        string $value,
+        VarSpecifier $varSpecifier,
+        Operator $operator,
+    ): self {
+        /** @var non-empty-string $separator */
+        $separator = $operator->separator();
+        $items = explode($separator, $value);
+        $pairs = [];
+        foreach ($items as $item) {
+            $pairs[] = str_contains($item, '=') ? explode('=', $item, 2) : [$varSpecifier->name, $item];
+        }
+
+        $names = array_unique(array_column($pairs, 0));
+        if (1 === count($names) && $varSpecifier->name === $names[0]) {
+            return new self(array_map(fn (array $pair): string => $operator->decode($pair[1]), $pairs));
+        }
+
+        !in_array($varSpecifier->name, $names, true) || throw VariableCanNotBeExtracted::dueTo('The value "'.$value.'" is malformed.', ExtractionErrorReason::MalformedValue);
+
+        $result = [];
+        foreach ($pairs as [$pName, $pValue]) {
+            $result[$operator->decode($pName)] = $operator->decode($pValue);
+        }
+
+        return new self($result);
+    }
+
+    public static function fromValue(
+        string $value,
+        VarSpecifier $varSpecifier,
+        Operator $operator,
+    ): self {
+        $list = array_map(
+            static fn (string $value): string => $operator->decode($value),
+            '' !== $value && $operator->supportsListValue() ? explode(',', $value) : []
+        );
+
         return new self(
-            $value,
+            $operator->decode($value),
             0 === $varSpecifier->position ? -1 : $varSpecifier->position,
-            $asList
+            $list,
         );
     }
 

@@ -239,7 +239,7 @@ final class Expression implements IteratorAggregate
             value: $value,
             varSpecifierOffset: 0,
             valueOffset: 0,
-            previousResult: ExtractionResult::success(),
+            previousResult: ExtractionResult::empty(),
         );
     }
 
@@ -251,7 +251,6 @@ final class Expression implements IteratorAggregate
     ): ExtractionResult {
         $varSpecifier = $this->varSpecifiers[$varSpecifierOffset];
         $lastVarSpecifier = $varSpecifierOffset + 1 === count($this->varSpecifiers);
-
         if ($lastVarSpecifier) {
             $extracted = $this->operator->extract(
                 $varSpecifier,

@@ -56,10 +56,10 @@ if (PHP_VERSION_ID < 80500) {
         private ?string $normalizedUri = null;
         private bool $isNormalized;
 
-        public static function parse(string $uri, ?self $baseUri = null): ?Uri
+        public static function parse(string $uri, ?self $baseUrl = null): ?Uri
         {
             try {
-                return new self($uri, $baseUri);
+                return new self($uri, $baseUrl);
             } catch (Exception) {
                 return null;
             }
@@ -68,7 +68,7 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @throws InvalidUriException
          */
-        public function __construct(string $uri, ?self $baseUri = null)
+        public function __construct(string $uri, ?self $baseUrl = null)
         {
             if (!UriString::containsRfc3986Chars($uri)) {
                 $formatter = fn (string $input): ?string => preg_replace_callback('/[\x00-\x1F\x7F]/', fn (array $m): string => '\\x'.bin2hex($m[0]), $input);
@@ -77,10 +77,18 @@ if (PHP_VERSION_ID < 80500) {
             }
 
             try {
-                $uri = null !== $baseUri ? UriString::resolve($uri, $baseUri->toRawString()) : $uri;
+                $uri = null !== $baseUrl ? UriString::resolve($uri, $baseUrl->toRawString()) : $uri;
                 $components = self::addUserInfoComponent(UriString::parse($uri));
             } catch (Exception $exception) {
                 throw new InvalidUriException('The specified base URI must be absolute', previous: $exception);
+            }
+
+            $colonPos = strpos($components['path'], ':');
+            if (false !== $colonPos && null === $components['scheme']) {
+                // In the absence of a scheme and of an authority,
+                // the first path segment cannot contain a colon (":") character.'
+                $slashPos = strpos($components['path'], '/');
+                (false !== $slashPos && $colonPos > $slashPos) || throw new InvalidUriException('In absence of the scheme and authority components, the first path segment cannot contain a colon (":") character.');
             }
 
             Encoder::isUserInfoEncoded($components['userInfo']) || throw new InvalidUriException('The encoded userInfo string component `'.$components['userInfo'].'` contains invalid characters.');
@@ -210,6 +218,10 @@ if (PHP_VERSION_ID < 80500) {
                 return $components;
             }
 
+            if (null !== ($components['scheme'] ?? null)) {
+                return $components;
+            }
+
             // In the absence of a scheme and of an authority,
             // the first path segment cannot contain a colon (":") character.'
             $slashPos = strpos($path, '/');
@@ -256,19 +268,19 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @throws InvalidUriException
          */
-        public function withUserInfo(#[SensitiveParameter] ?string $userInfo): self
+        public function withUserInfo(#[SensitiveParameter] ?string $userinfo): self
         {
-            null === $userInfo || !str_contains($userInfo, "\0") || throw new ValueError('Argument #1 ($userInfo) must not contain any null bytes');
-            if ($this->getRawUserInfo() === $userInfo) {
+            null === $userinfo || !str_contains($userinfo, "\0") || throw new ValueError('Argument #1 ($userInfo) must not contain any null bytes');
+            if ($this->getRawUserInfo() === $userinfo) {
                 return $this;
             }
 
-            Encoder::isUserInfoEncoded($userInfo) || throw new InvalidUriException('The encoded userInfo string component `'.$userInfo.'` contains invalid characters.');
+            Encoder::isUserInfoEncoded($userinfo) || throw new InvalidUriException('The encoded userInfo string component `'.$userinfo.'` contains invalid characters.');
 
             $user = null;
             $pass = null;
-            if (null !== $userInfo) {
-                [$user, $pass] = explode(':', $userInfo, 2) + [1 => null];
+            if (null !== $userinfo) {
+                [$user, $pass] = explode(':', $userinfo, 2) + [1 => null];
             }
 
             return $this->withComponent(['user' => $user, 'pass' => $pass]);
@@ -419,11 +431,11 @@ if (PHP_VERSION_ID < 80500) {
             };
         }
 
-        public function equals(self $uri, UriComparisonMode $uriComparisonMode = UriComparisonMode::ExcludeFragment): bool
+        public function equals(self $uri, UriComparisonMode $comparisonMode = UriComparisonMode::ExcludeFragment): bool
         {
             return match (true) {
                 $this->getFragment() === $uri->getFragment(),
-                UriComparisonMode::IncludeFragment === $uriComparisonMode => $this->normalizedComponents === $uri->normalizedComponents,
+                UriComparisonMode::IncludeFragment === $comparisonMode => $this->normalizedComponents === $uri->normalizedComponents,
                 default => [...$this->normalizedComponents, ...['fragment' => null]] === [...$uri->normalizedComponents, ...['fragment' => null]],
             };
         }
@@ -436,6 +448,7 @@ if (PHP_VERSION_ID < 80500) {
         public function toString(): string
         {
             $this->setNormalizedComponents();
+
             $this->normalizedUri ??= UriString::build($this->normalizedComponents);
 
             return $this->normalizedUri;

@@ -490,8 +490,6 @@ $query->has('foo', 'p');        //return true
 
 #### Retrieving values by type
 
-<p class="message-info">available since version <code>7.9</code></p>
-
 `Query` provides typed accessors to retrieve a query pair value as a specific type:
 
 * `Query::string()`
@@ -507,7 +505,7 @@ requested type.
 
 If the key does not exist or the value cannot be converted, `null` is returned.
 
-~~~php
+```php
 $query = Query::fromRFC3986(
     'name=John&age=42&score=10.5&active=true&when=2026-09-14'
 );
@@ -526,17 +524,51 @@ $query->boolean('active');
 
 $query->date('when', '!Y-m-d');
 // DateTimeImmutable object
-~~~
+```
 
 When a key occurs more than once, the singular typed accessors only consider the first value,
 just like `Query::get()` and `Query::first()`.
 
-~~~php
+```php
 $query = Query::fromRFC3986('foo=1&foo=2');
 
 $query->integer('foo');
 // 1
-~~~
+```
+
+If you want to retrieve another occurrence for a given key, you can use the `Occurrence` enum.
+
+```php
+use League\Uri\Components\Query;
+use League\Uri\Occurrence;
+
+$query = Query::fromRFC3986('foo=1&foo=2&foo=5');
+
+$query->first('foo');
+// "1"
+
+$query->integer('foo');
+// 1
+
+$query->last('foo');
+// "5"
+
+$query->integer(key: 'foo', occurrence: Occurrence::Last);
+// 5
+```
+
+Each of these methods accepts an optional default value that is returned when the value is not
+found.
+
+```php
+$query = Query::fromRFC3986('foo=1&foo=2&foo=5');
+
+$query->integer('foo');
+// 1
+
+$query->integer(key: 'notfound', default: 42);
+// 42
+```
 
 #### Retrieving all values by type
 
@@ -579,7 +611,7 @@ requested type. Successfully converted values are preserved.
 ```php
 $query = Query::fromRFC3986('foo=1&foo=invalid');
 
-$query->integers('foo', 42);
+$query->integers(key: 'foo', default: 42);
 // [
 //   0 => 1,
 //   1 => 42,
