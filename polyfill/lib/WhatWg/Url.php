@@ -411,11 +411,11 @@ if (PHP_VERSION_ID < 80500) {
             return $copy;
         }
 
-        public function equals(self $url, UriComparisonMode $uriComparisonMode = UriComparisonMode::ExcludeFragment): bool
+        public function equals(self $url, UriComparisonMode $comparisonMode = UriComparisonMode::ExcludeFragment): bool
         {
             return match (true) {
                 $this->url->hash === $url->url->hash,
-                UriComparisonMode::IncludeFragment === $uriComparisonMode => $this->url->href === $url->url->href,
+                UriComparisonMode::IncludeFragment === $comparisonMode => $this->url->href === $url->url->href,
                 default => self::urlRecord($this)->isEqual(self::urlRecord($url), true),
             };
         }

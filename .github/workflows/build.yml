@@ -20,7 +20,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
@@ -34,7 +34,7 @@ jobs:
 
             # Cache "vendor" so stable builds skip installation entirely
             - name: Cache vendor
-              uses: actions/cache@v3
+              uses: actions/cache@v6
               with:
                   path: vendor
                   key: ${{ runner.os }}-vendor-${{ hashFiles('composer.lock') }}
