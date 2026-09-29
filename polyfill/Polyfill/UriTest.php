@@ -649,6 +649,16 @@ final class UriTest extends TestCase
         self::assertSame('http://example.com/%3A%40%21%24%26%27%28%29%2A%2B%2C%3B%3D?%3A%40%21%24%27%28%29#%3A%40%3F%26', $uri->toString());
     }
 
+    public function test_uri_avoid_double_decoding_encoding(): void
+    {
+        $raw = 'http://a/%2e%2e/%2541/';
+        $normalized = "http://a/%2541/";
+
+        $uri = new Uri('http://a/%2e%2e/%2541/');
+        self::assertSame($raw, $uri->toRawString());
+        self::assertSame($normalized, $uri->toString());
+    }
+
     public function test_resolved_encoded_dot_segments_issue_211(): void
     {
         $uri1 = new Uri('http://example.com/a/%2e%2E/b');

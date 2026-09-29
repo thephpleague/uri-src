@@ -272,14 +272,25 @@ final class Encoder
      */
     public static function decodePath(BackedEnum|Stringable|string|null $path): ?string
     {
-        $decoder = static function (array $matches): string {
-            $encodedChar = strtoupper($matches[0]);
-            $decodedChar = rawurldecode($encodedChar);
+        $path = self::filterComponent($path);
+        if (null === $path || '' === $path) {
+            return $path;
+        }
 
-            return str_contains(self::RFC3986_RESERVED_CHARACTERS, $decodedChar) ? $encodedChar : $decodedChar;
-        };
+        1 !== preg_match(self::REGEXP_CHARS_INVALID, $path) || throw new SyntaxError('Invalid component string: '.$path.'.');
 
-        return self::decode($path, $decoder);
+        return (string) preg_replace_callback(
+            '/%(?!25[A-Fa-f0-9]{2})[A-Fa-f0-9]{2}/',
+            static function (array $matches): string {
+                $encodedChar = strtoupper($matches[0]);
+                $decodedChar = rawurldecode($encodedChar);
+
+                return str_contains(self::RFC3986_RESERVED_CHARACTERS, $decodedChar)
+                    ? $encodedChar
+                    : $decodedChar;
+            },
+            $path,
+        );
     }
 
     /**
