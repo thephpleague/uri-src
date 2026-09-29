@@ -652,7 +652,7 @@ final class UriTest extends TestCase
     public function test_uri_avoid_double_decoding_encoding(): void
     {
         $raw = 'http://a/%2e%2e/%2541/';
-        $normalized = "http://a/%2541/";
+        $normalized = 'http://a/%2541/';
 
         $uri = new Uri('http://a/%2e%2e/%2541/');
         self::assertSame($raw, $uri->toRawString());
