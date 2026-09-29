@@ -638,28 +638,28 @@ final class UriTest extends TestCase
     {
         $uri = new Uri('http://example.com/%3A%40%21%24%26%27%28%29%2A%2B%2C%3B%3D?%3A%40%21%24%27%28%29#%3A%40%3F%26');
 
-        self::assertSame("/%3A%40%21%24%26%27%28%29%2A%2B%2C%3B%3D", $uri->getRawPath());
-        self::assertSame("%3A%40%21%24%27%28%29", $uri->getRawQuery());
-        self::assertSame("%3A%40%3F%26", $uri->getRawFragment());
-        self::assertSame("http://example.com/%3A%40%21%24%26%27%28%29%2A%2B%2C%3B%3D?%3A%40%21%24%27%28%29#%3A%40%3F%26", $uri->toRawString());
+        self::assertSame('/%3A%40%21%24%26%27%28%29%2A%2B%2C%3B%3D', $uri->getRawPath());
+        self::assertSame('%3A%40%21%24%27%28%29', $uri->getRawQuery());
+        self::assertSame('%3A%40%3F%26', $uri->getRawFragment());
+        self::assertSame('http://example.com/%3A%40%21%24%26%27%28%29%2A%2B%2C%3B%3D?%3A%40%21%24%27%28%29#%3A%40%3F%26', $uri->toRawString());
 
-        self::assertSame("/%3A%40%21%24%26%27%28%29%2A%2B%2C%3B%3D", $uri->getPath());
-        self::assertSame("%3A%40%21%24%27%28%29", $uri->getQuery());
-        self::assertSame("%3A%40%3F%26", $uri->getFragment());
-        self::assertSame("http://example.com/%3A%40%21%24%26%27%28%29%2A%2B%2C%3B%3D?%3A%40%21%24%27%28%29#%3A%40%3F%26", $uri->toString());
+        self::assertSame('/%3A%40%21%24%26%27%28%29%2A%2B%2C%3B%3D', $uri->getPath());
+        self::assertSame('%3A%40%21%24%27%28%29', $uri->getQuery());
+        self::assertSame('%3A%40%3F%26', $uri->getFragment());
+        self::assertSame('http://example.com/%3A%40%21%24%26%27%28%29%2A%2B%2C%3B%3D?%3A%40%21%24%27%28%29#%3A%40%3F%26', $uri->toString());
     }
 
     public function test_resolved_encoded_dot_segments_issue_211(): void
     {
         $uri1 = new Uri('http://example.com/a/%2e%2E/b');
 
-        self::assertSame("/a/%2e%2E/b", $uri1->getRawPath());
-        self::assertSame("/b", $uri1->getPath());
+        self::assertSame('/a/%2e%2E/b', $uri1->getRawPath());
+        self::assertSame('/b', $uri1->getPath());
 
         $uri2 = (new Uri('http://example.com/a/b/c'))->resolve('%2e%2e/g');
 
         self::assertSame('/a/b/%2e%2e/g', $uri2->getRawPath());
-        self::assertSame("/a/g", $uri2->getPath());
+        self::assertSame('/a/g', $uri2->getPath());
     }
 
     public function test_uri_parsing_with_path_prefixed_with_colon_issue_213(): void
@@ -672,10 +672,10 @@ final class UriTest extends TestCase
         $uri = new Uri('./a');
 
         self::assertSame('./a', $uri->getRawPath());
-        self::assertSame("a", $uri->getPath());
+        self::assertSame('a', $uri->getPath());
 
         self::assertSame('./a', $uri->toRawString());
-        self::assertSame("a", $uri->toString());
+        self::assertSame('a', $uri->toString());
     }
 
     public function test_uri_prepend_when_authority_is_missing_issue_214(): void
@@ -686,6 +686,6 @@ final class UriTest extends TestCase
         self::assertSame('a:b', $uri->getPath());
 
         self::assertSame('mailto:a:b', $uri->toRawString());
-        self::assertSame("mailto:a:b", $uri->toString());
+        self::assertSame('mailto:a:b', $uri->toString());
     }
 }

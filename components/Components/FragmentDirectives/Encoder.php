@@ -26,6 +26,7 @@ use function str_replace;
 final class Encoder
 {
     private const REGEXP_CHARS_INVALID = ',[\x00-\x1f\x7f],';
+    private const REGEXP_CHARS_NOT_UNRESERVED = '/[^A-Za-z0-9_\-.~]/';
     private const REGEXP_CHARS_ENCODED = ',%[A-Fa-f0-9]{2},';
     private const REGEXP_CHARS_TO_ENCODE = '/[^A-Za-z0-9_\-.~!$&\'()*+,;=%:@\/?]+|%(?![A-Fa-f0-9]{2})/';
 
@@ -40,9 +41,9 @@ final class Encoder
             return $value;
         }
 
-        $encoder = static fn (array $matches): string => 1 === preg_match('/[^A-Za-z0-9_\-.~]/', rawurldecode($matches[0]))
-                ? rawurlencode($matches[0])
-                : $matches[0];
+        $encoder = static fn (array $matches): string => 1 === preg_match(self::REGEXP_CHARS_NOT_UNRESERVED, rawurldecode($matches[0]))
+            ? rawurlencode($matches[0])
+            : $matches[0];
 
         $encoded = (string) preg_replace_callback(self::REGEXP_CHARS_TO_ENCODE, $encoder, $value);
 
@@ -61,9 +62,10 @@ final class Encoder
 
         1 !== preg_match(self::REGEXP_CHARS_INVALID, $value) || throw new SyntaxError('The value contains invalid encoded characters; "'.$value.'".');
 
-        $decoder = static fn (array $matches): string => ('%20' === $matches[0] || '%2F' === $matches[0])
-                ? $matches[0]
-                : rawurldecode($matches[0]);
+        $decoder = static fn (array $matches): string => match ($matches[0]) {
+            '%20', '%2F' => $matches[0],
+            default => rawurldecode($matches[0]),
+        };
 
         $decoded = (string) preg_replace_callback(self::REGEXP_CHARS_ENCODED, $decoder, $value);
 

@@ -42,17 +42,17 @@ final class Encoder
     private const REGEXP_CHARS_INVALID = '/[\x00-\x1f\x7f]/';
     private const REGEXP_CHARS_ENCODED = ',%[A-Fa-f0-9]{2},';
     private const REGEXP_CHARS_PREVENTS_DECODING = ',%
-     	2[A-F|1-2|4-9]|
-        3[0-9|B|D]|
-        4[1-9|A-F]|
-        5[0-9|A|F]|
-        6[1-9|A-F]|
-        7[0-9|E]
+        2[A-F1-24-9]|
+        3[0-9BD]|
+        4[1-9A-F]|
+        5[0-9AF]|
+        6[1-9A-F]|
+        7[0-9E]
     ,ix';
+    private const RFC3986_RESERVED_CHARACTERS = ':/?#[]@!$&\'()*+,;=';
     private const REGEXP_PART_SUBDELIM = "\!\$&'\(\)\*\+,;\=%";
     private const REGEXP_PART_UNRESERVED = 'A-Za-z\d_\-.~';
     private const REGEXP_PART_ENCODED = '%(?![A-Fa-f\d]{2})';
-    private const RFC3986_RESERVED_CHARACTERS = ':/?#[]@!$&\'()*+,;=';
 
     /**
      * Unreserved characters.
@@ -216,17 +216,14 @@ final class Encoder
     }
 
     /**
-     * Decodes the URI component without decoding the unreserved characters which are already encoded.
+     * Decodes the URI component while preserving percent-encoded characters that must remain encoded.
      */
     public static function decodeNecessary(BackedEnum|Stringable|string|int|null $component): ?string
     {
-        $decoder = static function (array $matches): string {
-            if (1 === preg_match(self::REGEXP_CHARS_PREVENTS_DECODING, $matches[0])) {
-                return strtoupper($matches[0]);
-            }
-
-            return rawurldecode($matches[0]);
-        };
+        $decoder = static fn (array $matches): string =>
+            1 === preg_match(self::REGEXP_CHARS_PREVENTS_DECODING, $matches[0])
+                ? strtoupper($matches[0])
+                : rawurldecode($matches[0]);
 
         return self::decode($component, $decoder);
     }
@@ -487,15 +484,9 @@ final class Encoder
             return $component;
         }
 
-        if (1 === preg_match(self::REGEXP_CHARS_INVALID, $component)) {
-            throw new SyntaxError('Invalid component string: '.$component.'.');
-        }
+        1 !== preg_match(self::REGEXP_CHARS_INVALID, $component) || throw new SyntaxError('Invalid component string: '.$component.'.');
 
-        if (1 === preg_match(self::REGEXP_CHARS_ENCODED, $component)) {
-            return (string) preg_replace_callback(self::REGEXP_CHARS_ENCODED, $decoder, $component);
-        }
-
-        return $component;
+        return (string) preg_replace_callback(self::REGEXP_CHARS_ENCODED, $decoder, $component);
     }
 
     /**
