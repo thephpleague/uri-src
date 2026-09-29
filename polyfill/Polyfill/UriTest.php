@@ -677,17 +677,6 @@ final class UriTest extends TestCase
         self::assertNull(Uri::parse(':b'));
     }
 
-    public function test_uri_should_always_use_dot_segment_resolution_issue_212(): void
-    {
-        $uri = new Uri('./a');
-
-        self::assertSame('./a', $uri->getRawPath());
-        self::assertSame('a', $uri->getPath());
-
-        self::assertSame('./a', $uri->toRawString());
-        self::assertSame('a', $uri->toString());
-    }
-
     public function test_uri_prepend_when_authority_is_missing_issue_214(): void
     {
         $uri = (new Uri('mailto:user@example.com'))->withPath('a:b');

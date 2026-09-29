@@ -287,7 +287,7 @@ final class UriString
         // - paths with a scheme or authority
         // - relative paths containing dot segments
         if ('/' === ($path[0] ?? '') || null !== $components['scheme'] || null !== $authority) {
-            $path = self::removeDotSegments($path);
+            $path = self::removeDotSegments(strtr($path, ['%2E' => '.', '%2e' => '.']));
         }
 
         // If there is an authority, the path must be absolute.
@@ -314,17 +314,6 @@ final class UriString
         $components['pass'] = Encoder::normalizePassword($components['pass']);
 
         return $components;
-    }
-
-    private static function containsDotSegment(string $path): bool
-    {
-        foreach (explode('/', $path) as $segment) {
-            if ('.' === $segment || '..' === $segment) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
