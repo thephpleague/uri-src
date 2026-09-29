@@ -17,9 +17,7 @@ use BackedEnum;
 use League\Uri\Exceptions\SyntaxError;
 use League\Uri\StringCoercionMode;
 use Stringable;
-use Throwable;
 
-use function get_debug_type;
 use function in_array;
 use function preg_match;
 use function preg_replace_callback;
@@ -37,19 +35,15 @@ final class Encoder
     {
     }
 
-    private static function normalizeInput(BackedEnum|Stringable|string|null $value): ?string
-    {
-        try {
-            return StringCoercionMode::Native->coerce($value);
-        } catch (Throwable $exception) {
-            throw new SyntaxError('The component must be a scalar value `'.get_debug_type($value).'` given.', previous: $exception);
-        }
-    }
-
     public static function encode(BackedEnum|Stringable|string|null $value): ?string
     {
-        $value = self::normalizeInput($value);
-        if (null === $value || '' === $value) {
+        if (null === $value) {
+            return null;
+        }
+
+        /** @var string $value */
+        $value = StringCoercionMode::Native->coerce($value);
+        if ('' === $value) {
             return $value;
         }
 
@@ -59,14 +53,22 @@ final class Encoder
         return strtr($encoded, ['-' => '%2D', ',' => '%2C', '&' => '%26']);
     }
 
+    /**
+     * @throws SyntaxError if the value contains invalid encoded characters
+     */
     public static function decode(BackedEnum|Stringable|string|null $value): ?string
     {
-        $value = self::normalizeInput($value);
-        if (null === $value || '' === $value) {
+        if (null === $value) {
+            return null;
+        }
+
+        /** @var string $value */
+        $value = StringCoercionMode::Native->coerce($value);
+        if ('' === $value) {
             return $value;
         }
 
-        1 !== preg_match(self::REGEXP_CHARS_INVALID, $value) || throw new SyntaxError('Invalid component string: '.$value.'.');
+        1 !== preg_match(self::REGEXP_CHARS_INVALID, $value) || throw new SyntaxError('The value contains invalid encoded characters; "'.$value.'".');
 
         $decoder = static fn (array $matches): string => in_array($matches[0], ['%20', '%2F'], true) ? $matches[0] : rawurldecode($matches[0]);
         $decoded = (string) preg_replace_callback(self::REGEXP_CHARS_ENCODED, $decoder, $value);
