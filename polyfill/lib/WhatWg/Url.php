@@ -130,30 +130,19 @@ if (PHP_VERSION_ID < 80500) {
         /**
          * @throws InvalidUrlException
          */
-        public function withScheme(string $scheme): self
+        public function withScheme(?string $scheme): self
         {
+            $scheme = strtolower((string) $scheme);
+            if ($scheme === $this->getScheme() || $scheme === $this->url->protocol) {
+                return $this;
+            }
+
             static $regexp = ',^(?<scheme>[a-zA-Z][a-zA-Z0-9+\-.]*)(:(?://?)?)?$,';
 
             ('' !== $scheme && 1 === preg_match($regexp, $scheme, $matches)) || throw new InvalidUrlException('The specified scheme is malformed.');
 
-            if ('' === $this->url->username && '' === $this->url->password) {
-                $this->url->protocol = $scheme;
-
-                return $this;
-            }
-
             $copy = $this->copy();
-            // Work around the dependency refusing protocol mutation
-            // when credentials are present.
-            $copy->url->username = '';
-            $copy->url->password = '';
-
-            // apply scheme changes
-            $copy->url->protocol = $scheme;
-
-            // restore username and password info
-            $copy->url->username = $this->url->username;
-            $copy->url->password = $this->url->password;
+            $copy->url->protocol = $matches['scheme'];
 
             return $copy;
         }
