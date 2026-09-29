@@ -286,8 +286,8 @@ final class UriString
         // - absolute paths
         // - paths with a scheme or authority
         // - relative paths containing dot segments
-        if ('/' === ($path[0] ?? '') || '' !== $components['scheme'].$authority || self::containsDotSegment($path)) {
-            $path = self::removeDotSegments(strtr($path, ['%2E' => '.', '%2e' => '.']));
+        if ('/' === ($path[0] ?? '') || null !== $components['scheme'] || null !== $authority) {
+            $path = self::removeDotSegments($path);
         }
 
         // If there is an authority, the path must be absolute.

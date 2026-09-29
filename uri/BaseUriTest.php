@@ -316,7 +316,7 @@ final class BaseUriTest extends TestCase
             '2 distincts relative URIs' => [
                 Http::new('~foo/'),
                 Http::new('../~foo/'),
-                true,
+                false,
             ],
             '2 identical relative URIs' => [
                 Http::new('../%7efoo/'),
