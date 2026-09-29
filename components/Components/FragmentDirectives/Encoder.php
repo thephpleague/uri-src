@@ -15,7 +15,6 @@ namespace League\Uri\Components\FragmentDirectives;
 
 use BackedEnum;
 use League\Uri\Exceptions\SyntaxError;
-use League\Uri\StringCoercionMode;
 use Stringable;
 
 use function in_array;
@@ -37,17 +36,15 @@ final class Encoder
 
     public static function encode(BackedEnum|Stringable|string|null $value): ?string
     {
-        if (null === $value) {
-            return null;
-        }
-
-        /** @var string $value */
-        $value = StringCoercionMode::Native->coerce($value);
-        if ('' === $value) {
+        $value = self::normalizeInput($value);
+        if (null === $value || '' === $value) {
             return $value;
         }
 
-        $encoder = static fn (array $matches): string => 1 === preg_match('/[^A-Za-z0-9_\-.~]/', rawurldecode($matches[0])) ? rawurlencode($matches[0]) : $matches[0];
+        $encoder = static fn (array $matches): string => 1 === preg_match('/[^A-Za-z0-9_\-.~]/', rawurldecode($matches[0]))
+                ? rawurlencode($matches[0])
+                : $matches[0];
+
         $encoded = (string) preg_replace_callback(self::REGEXP_CHARS_TO_ENCODE, $encoder, $value);
 
         return strtr($encoded, ['-' => '%2D', ',' => '%2C', '&' => '%26']);
@@ -58,21 +55,28 @@ final class Encoder
      */
     public static function decode(BackedEnum|Stringable|string|null $value): ?string
     {
-        if (null === $value) {
-            return null;
-        }
-
-        /** @var string $value */
-        $value = StringCoercionMode::Native->coerce($value);
-        if ('' === $value) {
+        $value = self::normalizeInput($value);
+        if (null === $value || '' === $value) {
             return $value;
         }
 
         1 !== preg_match(self::REGEXP_CHARS_INVALID, $value) || throw new SyntaxError('The value contains invalid encoded characters; "'.$value.'".');
 
-        $decoder = static fn (array $matches): string => in_array($matches[0], ['%20', '%2F'], true) ? $matches[0] : rawurldecode($matches[0]);
+        $decoder = static fn (array $matches): string => ('%20' === $matches[0] || '%2F' === $matches[0])
+                ? $matches[0]
+                : rawurldecode($matches[0]);
+
         $decoded = (string) preg_replace_callback(self::REGEXP_CHARS_ENCODED, $decoder, $value);
 
         return str_replace('%20', ' ', $decoded);
+    }
+
+    private static function normalizeInput(BackedEnum|Stringable|string|null $value): ?string
+    {
+        return match (true) {
+            null === $value => null,
+            $value instanceof BackedEnum => (string) $value->value,
+            default => (string) $value,
+        };
     }
 }
