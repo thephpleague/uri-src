@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace League\Uri\Polyfill;
+namespace League\Uri\Polyfill\Whatwg;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;

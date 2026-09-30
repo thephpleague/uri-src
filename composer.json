@@ -74,6 +74,9 @@
         },
         "classmap": [
             "polyfill/lib"
+        ],
+        "files": [
+            "polyfill/lib/Rfc3986/functions.php"
         ]
     },
     "scripts": {
