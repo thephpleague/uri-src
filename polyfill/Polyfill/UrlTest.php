@@ -522,19 +522,19 @@ final class UrlTest extends TestCase
             'scheme' => 'http',
             'expectedAsciiString' => 'http://example.com/path',
         ];
-/**
-        yield 'url with username' => [
-            'url' => 'https://user@example.com/path',
-            'scheme' => 'http',
-            'expectedAsciiString' => 'http://user@example.com/path',
-        ];
+        /*
+                yield 'url with username' => [
+                    'url' => 'https://user@example.com/path',
+                    'scheme' => 'http',
+                    'expectedAsciiString' => 'http://user@example.com/path',
+                ];
 
-        yield 'url with username and password' => [
-            'url' => 'https://user:pass@example.com/path',
-            'scheme' => 'http',
-            'expectedAsciiString' => 'http://user:pass@example.com/path',
-        ];
- */
+                yield 'url with username and password' => [
+                    'url' => 'https://user:pass@example.com/path',
+                    'scheme' => 'http',
+                    'expectedAsciiString' => 'http://user:pass@example.com/path',
+                ];
+         */
     }
 
     public function test_getters_can_return_null_or_string_issue_205(): void
