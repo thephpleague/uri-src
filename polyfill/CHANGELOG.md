@@ -9,6 +9,7 @@ All Notable changes to `League\Uri` will be documented in this file
 - `Uri\Rfc3986\UriType`
 - `Uri\Rfc3986\UriHostType`
 - `Uri\WhatWg\UriHostType`
+- `Uri\Rfc3986\uri_percent_encode` function
 
 ### Fixed
 

@@ -28,6 +28,10 @@
         },
         "classmap": [
             "lib"
+        ],
+        "files": [
+            "lib/Rfc3986/functions.php",
+            "lib/WhatWg/functions.php"
         ]
     },
     "require": {
