@@ -16,15 +16,14 @@ namespace League\Uri\Polyfill;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
 use Stringable;
-use Uri\WhatWg\Url;
 use Uri\WhatWg\UrlValidationError;
 use Uri\WhatWg\UrlValidationErrorType;
 use ValueError;
 
-use function array_filter;
 use function array_values;
 use function is_scalar;
 use function is_string;
+use function mb_substr;
 
 /**
  * This class allows collecting WHATWG errors emitted by \Rowbot\URL\URL
@@ -32,7 +31,7 @@ use function is_string;
  */
 final class UrlValidationErrorCollector extends AbstractLogger
 {
-    /** @var list<UrlValidationError> */
+    /** @var array<string, list<UrlValidationError>> */
     private array $errors;
 
     public function __construct()
@@ -50,7 +49,7 @@ final class UrlValidationErrorCollector extends AbstractLogger
      */
     public function errors(): array
     {
-        return $this->errors;
+        return array_merge(...array_values($this->errors));
     }
 
     /**
@@ -58,16 +57,25 @@ final class UrlValidationErrorCollector extends AbstractLogger
      */
     public function recoverableErrors(?string $baseUrl = null): array
     {
-        return array_values(
-            array_filter(
-                $this->errors,
-                static fn (UrlValidationError $error): bool => !$error->failure && $baseUrl !== $error->context
-            )
-        );
+        $errors = [];
+        foreach ($this->errors as $offset => $error) {
+            if ($offset === $baseUrl) {
+                continue;
+            }
+
+            foreach ($error as $item) {
+                if (!$item->failure) {
+                    $errors[] = $item;
+                }
+            }
+        }
+
+        return $errors;
     }
 
     public function log(mixed $level, string|Stringable $message, array $context = []): void
     {
+        // the 'input' field contains the URL where the error occurred.
         $errorContext = $context['input'] ?? null;
         if (is_scalar($errorContext) || $errorContext instanceof Stringable) {
             $errorContext = (string) $errorContext;
@@ -77,8 +85,16 @@ final class UrlValidationErrorCollector extends AbstractLogger
             return;
         }
 
-        $this->errors[] = new UrlValidationError(
-            $errorContext,
+        // the 'column' field contains the last position where the soft error occurred.
+        $column = $context['column'] ?? 1;
+        if (!is_int($column)) {
+            return;
+        }
+
+        //PHP's UrlValidationError loses the full URL and only exposes the
+        //part of the URL which was not parsed after the error is detected.
+        $this->errors[$errorContext][] = new UrlValidationError(
+            mb_substr($errorContext, $column - 1),
             // \Rowbot\URL\URL makes no usage of string interpolation
             // the message is a string representing one of
             // \Uri\WhatWg\UrlValidationErrorType case
