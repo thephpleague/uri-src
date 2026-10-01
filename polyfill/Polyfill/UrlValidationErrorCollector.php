@@ -16,6 +16,7 @@ namespace League\Uri\Polyfill;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
 use Stringable;
+use Uri\WhatWg\Url;
 use Uri\WhatWg\UrlValidationError;
 use Uri\WhatWg\UrlValidationErrorType;
 use ValueError;
@@ -55,12 +56,12 @@ final class UrlValidationErrorCollector extends AbstractLogger
     /**
      * @return list<UrlValidationError>
      */
-    public function recoverableErrors(): array
+    public function recoverableErrors(?string $baseUrl = null): array
     {
         return array_values(
             array_filter(
                 $this->errors,
-                fn (UrlValidationError $error): bool => !$error->failure
+                static fn (UrlValidationError $error): bool => !$error->failure && $baseUrl !== $error->context
             )
         );
     }

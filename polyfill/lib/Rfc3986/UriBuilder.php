@@ -60,13 +60,17 @@ if (PHP_VERSION_ID < 80600) {
         /**
          * @throws InvalidUriException
          */
-        public function build(?Uri $baseUri = null): Uri
+        public function build(?Uri $baseUrl = null): Uri
         {
-            $path = $this->buildPath($authority = $this->buildAuthority());
-
             return new Uri(
-                UriString::buildUri($this->scheme, $authority, $path, $this->query, $this->fragment),
-                $baseUri
+                UriString::buildUri(
+                    $this->scheme,
+                    $authority = $this->buildAuthority(),
+                    $this->buildPath($authority),
+                    $this->query,
+                    $this->fragment,
+                ),
+                $baseUrl,
             );
         }
 
@@ -104,20 +108,22 @@ if (PHP_VERSION_ID < 80600) {
             }
 
             if (null !== $authority) {
-                str_starts_with($this->path, '/') || throw new InvalidUriException('The specified path is malformed');
+                str_starts_with($this->path, '/') || throw new InvalidUriException('The path must begin with "/" when the URI contain an authority');
 
                 return $this->path;
             }
 
-            !str_starts_with($this->path, '//') || throw new InvalidUriException('The path must not begin with "//" when the URI does not contain a host');
+            !str_starts_with($this->path, '//') || throw new InvalidUriException('The path must not begin with "//" when the URI does not contain an authority');
 
             $colonPos = strpos($this->path, ':');
-            if (false !== $colonPos && null === $this->scheme) {
-                // In the absence of a scheme and of an authority,
-                // the first path segment cannot contain a colon (":") character.'
-                $slashPos = strpos($this->path, '/');
-                (false !== $slashPos && $colonPos > $slashPos) || throw new InvalidUriException('The path must not begin with ":" when the URI does not contain a scheme');
+            if (false === $colonPos || null !== $this->scheme) {
+                return $this->path;
             }
+
+            // In the absence of a scheme and of an authority,
+            // the first path segment cannot contain a colon (":") character.'
+            $slashPos = strpos($this->path, '/');
+            (false !== $slashPos && $colonPos > $slashPos) || throw new InvalidUriException('The path must not begin with ":" when the URI does not contain a scheme');
 
             return $this->path;
         }
@@ -128,8 +134,7 @@ if (PHP_VERSION_ID < 80600) {
         public function setScheme(?string $scheme): self
         {
             if ($scheme !== $this->scheme) {
-                UriString::isValidScheme($scheme)
-                || throw new InvalidUriException('The specified scheme is malformed');
+                UriString::isValidScheme($scheme) || throw new InvalidUriException('The specified scheme is malformed');
 
                 $this->scheme = $scheme;
             }
@@ -140,14 +145,14 @@ if (PHP_VERSION_ID < 80600) {
         /**
          * @throws InvalidUriException
          */
-        public function setUserInfo(#[SensitiveParameter] ?string $userInfo): self
+        public function setUserInfo(#[SensitiveParameter] ?string $userinfo): self
         {
-            if ($userInfo !== $this->userInfo) {
-                null === $userInfo
-                || (UriString::containsRfc3986Chars($userInfo) && Encoder::isUserInfoEncoded($userInfo))
+            if ($userinfo !== $this->userInfo) {
+                null === $userinfo
+                || (UriString::containsRfc3986Chars($userinfo) && Encoder::isUserInfoEncoded($userinfo))
                 || throw new InvalidUriException('The specified userinfo is malformed');
 
-                $this->userInfo = $userInfo;
+                $this->userInfo = $userinfo;
             }
 
             return $this;

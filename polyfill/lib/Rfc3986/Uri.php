@@ -88,13 +88,13 @@ if (PHP_VERSION_ID < 80500) {
                 // In the absence of a scheme and of an authority,
                 // the first path segment cannot contain a colon (":") character.'
                 $slashPos = strpos($components['path'], '/');
-                (false !== $slashPos && $colonPos > $slashPos) || throw new InvalidUriException('In absence of the scheme and authority components, the first path segment cannot contain a colon (":") character.');
+                (false !== $slashPos && $colonPos > $slashPos) || throw new InvalidUriException('The specified URI is malformed');
             }
 
-            Encoder::isUserInfoEncoded($components['userInfo']) || throw new InvalidUriException('The encoded userInfo string component `'.$components['userInfo'].'` contains invalid characters.');
-            Encoder::isPathEncoded($components['path']) || throw new InvalidUriException('The encoded path component `'.$components['path'].'` contains invalid characters.');
-            Encoder::isQueryEncoded($components['query']) || throw new InvalidUriException('The encoded query string component `'.$components['query'].'` contains invalid characters.');
-            Encoder::isFragmentEncoded($components['fragment']) || throw new InvalidUriException('The encoded fragment string component `'.$components['fragment'].'` contains invalid characters.');
+            Encoder::isUserInfoEncoded($components['userInfo']) || throw new InvalidUriException('The specified URI is malformed');
+            Encoder::isPathEncoded($components['path']) || throw new InvalidUriException('The specified URI is malformed');
+            Encoder::isQueryEncoded($components['query']) || throw new InvalidUriException('The specified URI is malformed');
+            Encoder::isFragmentEncoded($components['fragment']) || throw new InvalidUriException('The specified URI is malformed');
 
             $this->rawUri = $uri;
             $this->rawComponents = $components;
@@ -251,7 +251,7 @@ if (PHP_VERSION_ID < 80500) {
                 null !== $scheme && str_contains($scheme, "\0") => throw new ValueError('Argument #1 ($scheme) must not contain any null bytes'),
                 $scheme === $this->getRawScheme() => $this,
                 UriString::isValidScheme($scheme) => $this->withComponent(['scheme' => $scheme]),
-                default => throw new InvalidUriException('The scheme string component `'.$scheme.'` is an invalid scheme.'),
+                default => throw new InvalidUriException('The specified scheme is malformed'),
             };
         }
 
@@ -270,12 +270,12 @@ if (PHP_VERSION_ID < 80500) {
          */
         public function withUserInfo(#[SensitiveParameter] ?string $userinfo): self
         {
-            null === $userinfo || !str_contains($userinfo, "\0") || throw new ValueError('Argument #1 ($userInfo) must not contain any null bytes');
+            null === $userinfo || !str_contains($userinfo, "\0") || throw new ValueError('The specified userinfo is malformed ');
             if ($this->getRawUserInfo() === $userinfo) {
                 return $this;
             }
 
-            Encoder::isUserInfoEncoded($userinfo) || throw new InvalidUriException('The encoded userInfo string component `'.$userinfo.'` contains invalid characters.');
+            Encoder::isUserInfoEncoded($userinfo) || throw new InvalidUriException('The specified userinfo is malformed ');
 
             $user = null;
             $pass = null;
@@ -332,10 +332,10 @@ if (PHP_VERSION_ID < 80500) {
         public function withHost(?string $host): self
         {
             return match (true) {
-                null !== $host && str_contains($host, "\0") => throw new ValueError('Argument #1 ($host) must not contain any null bytes'),
+                null !== $host && str_contains($host, "\0") => throw new ValueError('The specified host is malformed '),
                 $host === $this->getRawHost() => $this,
                 HostRecord::isValid($host) => $this->withComponent(['host' => $host]),
-                default => throw new InvalidUriException('The host component value `'.$host.'` is not a valid host.'),
+                default => throw new InvalidUriException('The specified host is malformed '),
             };
         }
 
@@ -352,7 +352,7 @@ if (PHP_VERSION_ID < 80500) {
             return match (true) {
                 $port === $this->getPort() => $this,
                 null === $port || 0 <= $port => $this->withComponent(['port' => $port]),
-                default => throw new InvalidUriException('The port component value must be null or an integer between 0 and 65535.'),
+                default => throw new InvalidUriException('The specified port is malformed'),
             };
         }
 
@@ -381,7 +381,7 @@ if (PHP_VERSION_ID < 80500) {
                 str_contains($path, "\0") => throw new ValueError('Argument #1 ($path) must not contain any null bytes'),
                 $path === $this->getRawPath() => $this,
                 Encoder::isPathEncoded($path) => $this->withComponent(['path' => $path]),
-                default => throw new InvalidUriException('The encoded path component `'.$path.'` contains invalid characters.'),
+                default => throw new InvalidUriException('The specified path is malformed'),
             };
         }
 
@@ -404,7 +404,7 @@ if (PHP_VERSION_ID < 80500) {
                 null !== $query && str_contains($query, "\0") => throw new ValueError('Argument #1 ($query) must not contain any null bytes'),
                 $query === $this->getRawQuery() => $this,
                 Encoder::isQueryEncoded($query) => $this->withComponent(['query' => $query]),
-                default => throw new InvalidUriException('The encoded query string component `'.$query.'` contains invalid characters.'),
+                default => throw new InvalidUriException('The specified query is malformed'),
             };
         }
 
@@ -427,7 +427,7 @@ if (PHP_VERSION_ID < 80500) {
                 null !== $fragment && str_contains($fragment, "\0") => throw new ValueError('Argument #1 ($fragment) must not contain any null bytes'),
                 $fragment === $this->getRawFragment() => $this,
                 Encoder::isFragmentEncoded($fragment) => $this->withComponent(['fragment' => $fragment]),
-                default => throw new InvalidUriException('The encoded fragment string component `'.$fragment.'` contains invalid characters.'),
+                default => throw new InvalidUriException('The specified fragment is malformed'),
             };
         }
 

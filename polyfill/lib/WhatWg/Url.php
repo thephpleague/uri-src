@@ -27,8 +27,6 @@ use Rowbot\URL\URLRecord;
 use SensitiveParameter;
 use Uri\UriComparisonMode;
 
-use function array_filter;
-use function array_values;
 use function in_array;
 use function is_string;
 use function preg_match;
@@ -89,29 +87,13 @@ if (PHP_VERSION_ID < 80500) {
                 $this->url = new WhatWgURL($uri, $baseUrl?->url->href, ['logger' => $collector]);
             } catch (Exception $exception) {
                 throw new InvalidUrlException(
-                    message: $exception->getMessage(),
+                    message: 'The specified URL is malformed',
                     errors: $collector->errors(),
                     previous: $exception
                 );
             } finally {
-                $softErrors = $this->collectSoftErrors($collector, $baseUrl);
+                $softErrors = $collector->recoverableErrors($baseUrl?->url->href);
             }
-        }
-
-        /**
-         * @return list<UrlValidationError>
-         */
-        private function collectSoftErrors(UrlValidationErrorCollector $collector, ?self $baseUrl): array
-        {
-            $errors = $collector->recoverableErrors();
-
-            return null === $baseUrl
-                ? $errors
-                : array_values(array_filter(
-                    $errors,
-                    static fn (UrlValidationError $error): bool => $baseUrl->url->href !== $error->context,
-                ));
-
         }
 
         private function copy(): self
@@ -139,7 +121,7 @@ if (PHP_VERSION_ID < 80500) {
 
             static $regexp = ',^(?<scheme>[a-zA-Z][a-zA-Z0-9+\-.]*)(:(?://?)?)?$,';
 
-            ('' !== $scheme && 1 === preg_match($regexp, $scheme, $matches)) || throw new InvalidUrlException('The specified scheme is malformed.');
+            ('' !== $scheme && 1 === preg_match($regexp, $scheme, $matches)) || throw new InvalidUrlException('The specified scheme is malformed');
 
             $copy = $this->copy();
             $copy->url->protocol = $matches['scheme'];
