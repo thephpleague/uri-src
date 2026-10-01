@@ -14,11 +14,8 @@ declare(strict_types=1);
 namespace Uri\WhatWg;
 
 use function array_fill;
-use function array_key_exists;
 use function function_exists;
 use function ord;
-use function str_replace;
-use function str_split;
 use function strlen;
 
 use const PHP_VERSION_ID;
@@ -38,40 +35,44 @@ if (!function_exists('Uri\WhatWg\url_percent_encode')) {
         static $hex = '0123456789ABCDEF';
         /** @var array<key-of<UrlPercentEncodingMode>, list<bool>> $tables */
         static $tables = [];
-        if (!array_key_exists($mode->name, $tables)) {
+        $modeName = $mode->name;
+        if (!isset($tables[$modeName])) {
             $set = match ($mode) {
                 UrlPercentEncodingMode::Query => ' "#<>%',
-                UrlPercentEncodingMode::SpecialQuery => ' "#\'<>%',
+                UrlPercentEncodingMode::SpecialQuery => ' "#<>%\'',
                 UrlPercentEncodingMode::Path => ' "#<>?^`{}%',
                 UrlPercentEncodingMode::OpaquePath => '%',
                 UrlPercentEncodingMode::PathSegment => ' "#<>?^`{}/%',
                 UrlPercentEncodingMode::Username,
                 UrlPercentEncodingMode::Password => ' "#<>?^`{}%/:;=@[]|',
-                UrlPercentEncodingMode::FormQuery => ' "#<>?^`{}/:;=@[]|%$&+,!\'()~',
+                UrlPercentEncodingMode::FormQuery => ' "#<>?^`{}/%:;=@[]|$&+,!\'()~',
                 UrlPercentEncodingMode::Fragment => ' "<>`',
                 UrlPercentEncodingMode::OpaqueHost => '%',
             };
 
             $table = array_fill(0, 256, false);
-            foreach (str_split($set) as $char) {
-                $table[ord($char)] = true;
+            for ($i = 0, $length = strlen($set); $i < $length; $i++) {
+                $table[ord($set[$i])] = true;
             }
 
-            $tables[$mode->name] = $table;
+            $tables[$modeName] = $table;
         }
 
-        $lookupTable = $tables[$mode->name];
+        $lookupTable = $tables[$modeName];
         $result = '';
         $length = strlen($input);
         for ($i = 0; $i < $length; $i++) {
             $ord = ord($input[$i]);
-            $result .= ($ord <= 0x1F || 0x7F === $ord || $ord > 0x7E || $lookupTable[$ord])
-                ? '%'.$hex[$ord >> 4].$hex[$ord & 0x0F]
-                : $input[$i];
+            $result .= match (true) {
+                0x20 === $ord && UrlPercentEncodingMode::FormQuery === $mode => '+',
+                0x1F >= $ord,
+                0x7F === $ord,
+                0x7E < $ord,
+                $lookupTable[$ord] => '%'.$hex[$ord >> 4].$hex[$ord & 0x0F],
+                default => $input[$i],
+            };
         }
 
-        return UrlPercentEncodingMode::FormQuery === $mode
-            ? str_replace('%20', '+', $result)
-            : $result;
+        return $result;
     }
 }

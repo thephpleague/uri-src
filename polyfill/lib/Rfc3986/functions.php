@@ -45,29 +45,27 @@ if (!function_exists('Uri\Rfc3986\uri_percent_encode')) {
         if ([] === $settings) {
             $regexpPartUnreserved = 'A-Za-z0-9\-._~';
             $regexpPartSubDelims = '!\$&\'\(\)\*\+,;=';
-            $genDelims = ':/?#[]@';
-            $baseRexp = $regexpPartUnreserved.$regexpPartSubDelims;
 
             foreach (UriPercentEncodingMode::cases() as $case) {
-                $extra = match ($case) {
+                $extra = preg_quote(match ($case) {
                     UriPercentEncodingMode::UserInfo => ':',
                     UriPercentEncodingMode::Path => '/:@',
                     UriPercentEncodingMode::Query,
-                    UriPercentEncodingMode::FormQuery => '/?:@&=',
-                    UriPercentEncodingMode::Fragment => '/?:@&=#',
+                    UriPercentEncodingMode::FormQuery => '/:@?&=',
+                    UriPercentEncodingMode::Fragment => '/:@?&=#',
                     default => '',
-                };
+                }, '/');
 
                 $settings[$case->name] = match ($case) {
-                    UriPercentEncodingMode::AllReservedCharacters => '/['.preg_quote($genDelims, '/').$regexpPartSubDelims.']/',
+                    UriPercentEncodingMode::AllReservedCharacters => '/[\:\/\?\#\[\]@'.$regexpPartSubDelims.']/',
                     UriPercentEncodingMode::AllButUnreservedCharacters => '/(?:%[0-9A-Fa-f]{2}|[^'.$regexpPartUnreserved.'])/u',
-                    default => '/%(?![0-9A-Fa-f]{2})|[^'.$baseRexp.preg_quote($extra, '/').'%]+/',
+                    default => '/%(?![0-9A-Fa-f]{2})|[^'.$regexpPartUnreserved.$regexpPartSubDelims.$extra.'%]+/',
                 };
             }
         }
 
         if (UriPercentEncodingMode::RegisteredNameHost === $mode) {
-            HostRecord::isValid($input) || throw new InvalidUriException('Host must not contain invalid characters.');
+            HostRecord::isValid($input) || throw new InvalidUriException('The specified host is malformed');
             if (HostRecord::isIp($input)) {
                 return $input;
             }
@@ -75,18 +73,9 @@ if (!function_exists('Uri\Rfc3986\uri_percent_encode')) {
             $input = strtolower($input);
         }
 
-        $result = (string) preg_replace_callback(
-            pattern: '/%[0-9a-f]{2}/',
-            callback: static fn (array $matches): string => strtoupper($matches[0]),
-            subject: (string) preg_replace_callback(
-                pattern: $settings[$mode->name],
-                callback: static fn (array $matches): string => rawurlencode($matches[0]),
-                subject: $input
-            )
-        );
+        $result = (string) preg_replace_callback($settings[$mode->name], static fn (array $matches): string => rawurlencode($matches[0]), $input);
+        $result = (string) preg_replace_callback('/%[0-9a-f]{2}/', static fn (array $matches): string => strtoupper($matches[0]), $result);
 
-        return UriPercentEncodingMode::FormQuery === $mode
-            ? str_replace('%20', '+', $result)
-            : $result;
+        return UriPercentEncodingMode::FormQuery === $mode ? str_replace('%20', '+', $result) : $result;
     }
 }
