@@ -26,6 +26,7 @@ use function bin2hex;
 use function explode;
 use function preg_replace_callback;
 use function str_contains;
+use function str_starts_with;
 use function strpos;
 
 use const PHP_VERSION_ID;
@@ -150,10 +151,13 @@ if (PHP_VERSION_ID < 80500) {
             ];
 
             $authority = UriString::buildAuthority($components);
-            // preserving the first `/./` segment in case of normalization
-            // when no authority is present,
-            // see https://github.com/php/php-src/issues/19897
-            if (str_starts_with($this->rawComponents['path'], '/./') && null === $authority) {
+            // Preserve the parser protection for a path that originally started
+            // with `/.//` when no authority is present.
+            if (
+                str_starts_with($this->rawComponents['path'], '/./')
+                && null === $authority
+                && !str_starts_with($components['path'], '/./')
+            ) {
                 $components['path'] = '/.'.$components['path'];
             }
 
@@ -178,9 +182,9 @@ if (PHP_VERSION_ID < 80500) {
         }
 
         /**
-         * Formatting the path when setting the path to avoid
-         * exception to be thrown on an invalid path.
-         * see https://github.com/php/php-src/issues/19897.
+         * Formats the path before applying a modification to avoid
+         * exceptions being thrown for invalid paths.
+         * See https://github.com/php/php-src/issues/19897.
          *
          * @param InputComponentMap $newComponents
          *
@@ -195,42 +199,36 @@ if (PHP_VERSION_ID < 80500) {
 
             $path = $components['path'];
             $authority = UriString::buildAuthority($components);
+
             if (null !== $authority) {
-                if (null === UriString::buildAuthority($this->rawComponents)) {
-                    // If there is an authority, the path must start with a `/`
-                    $components['path'] = str_starts_with($path, '/') ? $path : '/'.$path;
+                // An authority requires an absolute path.
+                if (!str_starts_with($path, '/')) {
+                    $components['path'] = '/'.$path;
                 }
 
                 return $components;
             }
 
-            // If there is no authority, the path cannot start with `//`
+            // Protect a path that would otherwise be interpreted as an authority.
             if (str_starts_with($path, '//')) {
                 $components['path'] = '/.'.$path;
 
                 return $components;
             }
 
-            $colonPos = strpos($path, ':');
-            if (false === $colonPos) {
-                $components['path'] = $path;
-
-                return $components;
-            }
-
-            if (null !== ($components['scheme'] ?? null)) {
-                return $components;
-            }
-
-            // In the absence of a scheme and of an authority,
-            // the first path segment cannot contain a colon (":") character.'
-            $slashPos = strpos($path, '/');
-            if (false === $slashPos || $colonPos < $slashPos) {
-                $components['path'] =  './'.$path;
+            // Protect a rootless path whose first segment would otherwise be
+            // interpreted as a scheme.
+            if (
+                null === ($components['scheme'] ?? null)
+                && !str_starts_with($path, '/')
+                && str_contains(explode('/', $path, 2)[0], ':')
+            ) {
+                $components['path'] = './'.$path;
             }
 
             return $components;
         }
+
 
         public function getRawScheme(): ?string
         {
@@ -378,6 +376,7 @@ if (PHP_VERSION_ID < 80500) {
         public function withPath(string $path): self
         {
             return match (true) {
+                ! str_starts_with($path, '/') && null !== UriString::buildAuthority($this->rawComponents) => throw new InvalidUriException('The specified path is malformed'),
                 str_contains($path, "\0") => throw new ValueError('Argument #1 ($path) must not contain any null bytes'),
                 $path === $this->getRawPath() => $this,
                 Encoder::isPathEncoded($path) => $this->withComponent(['path' => $path]),
