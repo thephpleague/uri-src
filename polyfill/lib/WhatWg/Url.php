@@ -26,7 +26,10 @@ use Rowbot\URL\URL as WhatWgURL;
 use Rowbot\URL\URLRecord;
 use SensitiveParameter;
 use Uri\UriComparisonMode;
+use ValueError;
 
+use function array_filter;
+use function array_is_list;
 use function in_array;
 use function is_string;
 use function preg_match;
@@ -79,20 +82,20 @@ if (PHP_VERSION_ID < 80500) {
          *
          * @throws InvalidUrlException
          */
-        public function __construct(string $uri, ?self $baseUrl = null, array|null &$softErrors = [])
+        public function __construct(string $uri, ?self $baseUrl = null, array|null &$softErrors = null)
         {
             $softErrors ??= [];
+            $filter = static fn (mixed $error): bool => $error instanceof UrlValidationError;
+            (array_is_list($softErrors) && $softErrors === array_filter($softErrors, $filter)) || throw new ValueError('the error argument must be a list containing only '.UrlValidationError::class);
+
             $collector = new UrlValidationErrorCollector();
             try {
                 $this->url = new WhatWgURL($uri, $baseUrl?->url->href, ['logger' => $collector]);
+                $softErrors = $collector->recoverableErrors($baseUrl?->url->href, $softErrors);
             } catch (Exception $exception) {
-                throw new InvalidUrlException(
-                    message: 'The specified URL is malformed',
-                    errors: $collector->errors(),
-                    previous: $exception
-                );
-            } finally {
-                $softErrors = $collector->recoverableErrors($baseUrl?->url->href);
+                $errors = $collector->errors($softErrors);
+                $softErrors = [];
+                throw new InvalidUrlException('The specified URL is malformed', $errors, previous: $exception);
             }
         }
 

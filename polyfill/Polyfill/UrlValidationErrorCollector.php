@@ -16,11 +16,14 @@ namespace League\Uri\Polyfill;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
 use Stringable;
+use TypeError;
 use Uri\WhatWg\UrlValidationError;
 use Uri\WhatWg\UrlValidationErrorType;
 use ValueError;
 
+use function array_merge;
 use function array_values;
+use function get_debug_type;
 use function is_scalar;
 use function is_string;
 use function mb_substr;
@@ -28,6 +31,8 @@ use function mb_substr;
 /**
  * This class allows collecting WHATWG errors emitted by \Rowbot\URL\URL
  * and converts them into \Uri\WhatWg\UrlValidationError instances.
+ *
+ * @internal
  */
 final class UrlValidationErrorCollector extends AbstractLogger
 {
@@ -47,17 +52,32 @@ final class UrlValidationErrorCollector extends AbstractLogger
     /**
      * @return list<UrlValidationError>
      */
-    public function errors(): array
+    public function errors(iterable $additionalErrors = []): array
     {
-        return array_merge(...array_values($this->errors));
+        $errors = [];
+        foreach ($additionalErrors as $error) {
+            $error instanceof UrlValidationError || throw new TypeError('additional errors must be instance of UrlValidationError; '.get_debug_type($error).'given');
+            $errors[] = $error;
+        }
+
+        $found = array_merge(...array_values($this->errors));
+
+        return [...$errors, ...$found];
     }
 
     /**
+     * @param iterable<UrlValidationError> $additionalErrors
+     *
      * @return list<UrlValidationError>
      */
-    public function recoverableErrors(?string $baseUrl = null): array
+    public function recoverableErrors(?string $baseUrl = null, iterable $additionalErrors = []): array
     {
         $errors = [];
+        foreach ($additionalErrors as $error) {
+            $error instanceof UrlValidationError || throw new TypeError('additional errors must be instance of UrlValidationError; '.get_debug_type($error).'given');
+            $errors[] = $error;
+        }
+
         foreach ($this->errors as $offset => $error) {
             if ($offset === $baseUrl) {
                 continue;
