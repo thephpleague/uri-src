@@ -98,7 +98,7 @@ if (PHP_VERSION_ID < 80600) {
             }
 
             if (
-                ($hostIsEmpty || 'file' === strtolower((string) $urlRecord->scheme)) &&
+                ($hostIsEmpty || $urlRecord->scheme->isFile()) &&
                 ('' !== $urlRecord->password || '' !== $urlRecord->username || null !== $urlRecord->port)
             ) {
                 $softErrors[] = new UrlValidationError($url, UrlValidationErrorType::InvalidUrlUnit, true);
@@ -123,7 +123,7 @@ if (PHP_VERSION_ID < 80600) {
             $urlRecord = $parser->parse(input: Utf8String::fromUnsafe($scheme.':'), url: $record, stateOverride: ParserState::SCHEME);
             false !== $urlRecord || throw new InvalidUrlException('The specified scheme is malformed', $log->errors());
 
-            $this->urlRecord->scheme = new Scheme($scheme);
+            $this->urlRecord->scheme = new Scheme(strtolower($scheme));
 
             return $this;
         }

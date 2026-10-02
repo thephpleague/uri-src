@@ -126,10 +126,11 @@ final class UrlBuilderTest extends TestCase
         $uribis = (new UrlBuilder())
             ->setPath('text/plain;base64,SGVsbG8gV29ybGQh')
             ->setScheme('HttP')
+            ->setHost('example.com')
             ->build();
 
         self::assertSame('data:text/plain;base64,SGVsbG8gV29ybGQh', $uri->toUnicodeString());
-        self::assertSame('http://text/plain;base64,SGVsbG8gV29ybGQh', $uribis->toUnicodeString());
+        self::assertSame('http://example.com/text/plain;base64,SGVsbG8gV29ybGQh', $uribis->toUnicodeString());
     }
 
     public function test_it_can_build_from_a_base_url_with_a_relative_url(): void
