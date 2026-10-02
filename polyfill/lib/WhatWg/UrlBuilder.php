@@ -20,6 +20,7 @@ use Rowbot\URL\Component\OpaquePath;
 use Rowbot\URL\Component\PathInterface;
 use Rowbot\URL\Component\PathList;
 use Rowbot\URL\Component\PathSegment;
+use Rowbot\URL\Component\Scheme;
 use Rowbot\URL\ParserState;
 use Rowbot\URL\String\Utf8String;
 use Rowbot\URL\URLRecord;
@@ -116,17 +117,23 @@ if (PHP_VERSION_ID < 80600) {
 
             $log = new UrlValidationErrorCollector();
             $parser = new BasicURLParser($log);
-            $urlRecord = $parser->parse(input: Utf8String::fromUnsafe($scheme), url: new URLRecord(), stateOverride: ParserState::SCHEME);
+            $record = new URLRecord();
+            // we need to suffix the submitted scheme with the ":"
+            // otherwise parsing is incorrect
+            $urlRecord = $parser->parse(input: Utf8String::fromUnsafe($scheme.':'), url: $record, stateOverride: ParserState::SCHEME);
             false !== $urlRecord || throw new InvalidUrlException('The specified scheme is malformed', $log->errors());
 
-            $this->urlRecord->scheme = $urlRecord->scheme;
+            $this->urlRecord->scheme = new Scheme($scheme);
 
             return $this;
         }
 
         public function setUsername(?string $username): self
         {
-            $username = Utf8String::fromUnsafe($username ?? '');
+            $username ??= '';
+            false === strpbrk($username, '@/?#') || throw new InvalidUrlException('The specified username is malformed');
+
+            $username = Utf8String::fromUnsafe($username);
             if ($this->urlRecord->username !== (string) $username) {
                 $this->urlRecord->setUsername($username);
             }
@@ -136,7 +143,10 @@ if (PHP_VERSION_ID < 80600) {
 
         public function setPassword(#[SensitiveParameter] ?string $password): self
         {
-            $password = Utf8String::fromUnsafe($password ?? '');
+            $password ??= '';
+            false === strpbrk($password, '@/?#') || throw new InvalidUrlException('The specified password is malformed');
+
+            $password = Utf8String::fromUnsafe($password);
             if ($this->urlRecord->password !== (string) $password) {
                 $this->urlRecord->setPassword($password);
             }
