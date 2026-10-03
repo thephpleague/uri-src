@@ -1,0 +1,243 @@
+<?php
+
+/**
+ * League.Uri (https://uri.thephpleague.com)
+ *
+ * (c) Ignace Nyamagana Butera <nyamsprod@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace Uri\WhatWg;
+
+use League\Uri\Polyfill\UrlValidationErrorCollector;
+use Rowbot\URL\BasicURLParser;
+use Rowbot\URL\Component\Host\NullHost;
+use Rowbot\URL\Component\OpaquePath;
+use Rowbot\URL\Component\PathInterface;
+use Rowbot\URL\Component\PathList;
+use Rowbot\URL\Component\PathSegment;
+use Rowbot\URL\Component\Scheme;
+use Rowbot\URL\ParserState;
+use Rowbot\URL\String\Utf8String;
+use Rowbot\URL\URLRecord;
+use SensitiveParameter;
+
+use function array_filter;
+use function array_map;
+use function explode;
+use function strpbrk;
+use function strtolower;
+use function substr;
+
+use const PHP_VERSION_ID;
+
+if (PHP_VERSION_ID < 80600) {
+    final class UrlBuilder
+    {
+        /** @var int */
+        private const PORT_RANGE_MIN = 0;
+        /** @var int */
+        private const PORT_RANGE_MAX = 65535;
+        private URLRecord $urlRecord;
+
+        public function __construct()
+        {
+            $this->reset();
+        }
+
+        public function reset(): self
+        {
+            $this->urlRecord = new URLRecord();
+
+            return $this;
+        }
+
+        /**
+         * @param ?list<UrlValidationError> $softErrors
+         *
+         * @throws InvalidUrlException
+         */
+        public function build(?Url $baseUrl = null, ?array &$softErrors = null): Url
+        {
+            // To avoid internal rewrite of user input
+            // building is done on a copy of user input
+            $urlRecord = clone $this->urlRecord;
+            if ($urlRecord->scheme->isSpecial() && $urlRecord->path instanceof OpaquePath) {
+                $path = (string) $urlRecord->path;
+                $path = str_starts_with($path, '/') ? substr($path, 1) : $path;
+
+                $urlRecord->path = new PathList(array_map(
+                    fn (string $path): PathSegment => new PathSegment($path),
+                    explode('/', $path)
+                ));
+            }
+
+            $url = $urlRecord->serializeURL();
+            $schemeIsEmpty = '' === (string) $urlRecord->scheme;
+            $hostIsEmpty = $urlRecord->host->isNull() || $urlRecord->host->isEmpty();
+            // Rowbot\URL\URLRecord always assume the scheme to be non-empty
+            // in case of relative URI the scheme ':' delimiter character
+            // must be removed
+            if ($schemeIsEmpty) {
+                $url = substr($url, 1);
+            }
+
+            // Validation is done after the uri string is generated
+            // to build the Uri\WhatWg\UrlValidationError instances
+            $softErrors = [];
+            if ($schemeIsEmpty && null === $baseUrl) {
+                $softErrors[] = new UrlValidationError($url, UrlValidationErrorType::MissingSchemeNonRelativeUrl, true);
+            }
+
+            if ($hostIsEmpty && $urlRecord->scheme->isSpecial()) {
+                $softErrors[] = new UrlValidationError($url, UrlValidationErrorType::HostMissing, true);
+            }
+
+            if (
+                ($hostIsEmpty || $urlRecord->scheme->isFile()) &&
+                ('' !== $urlRecord->password || '' !== $urlRecord->username || null !== $urlRecord->port)
+            ) {
+                $softErrors[] = new UrlValidationError($url, UrlValidationErrorType::InvalidUrlUnit, true);
+            }
+
+            $errorFilter = static fn (UrlValidationError $err): bool => $err->failure;
+
+            [] === array_filter($softErrors, $errorFilter) || throw new InvalidUrlException('The specified URL is malformed', $softErrors);
+
+            return new Url($url, $baseUrl, $softErrors);
+        }
+
+        public function setScheme(string $scheme): self
+        {
+            false === strpbrk($scheme, ':@/?#') || throw new InvalidUrlException('The specified scheme is malformed');
+
+            $log = new UrlValidationErrorCollector();
+            $parser = new BasicURLParser($log);
+            $record = new URLRecord();
+            // we need to suffix the submitted scheme with the ":"
+            // otherwise parsing is incorrect
+            $urlRecord = $parser->parse(input: Utf8String::fromUnsafe($scheme.':'), url: $record, stateOverride: ParserState::SCHEME);
+            false !== $urlRecord || throw new InvalidUrlException('The specified scheme is malformed', $log->errors());
+
+            $this->urlRecord->scheme = new Scheme(strtolower($scheme));
+
+            return $this;
+        }
+
+        public function setUsername(?string $username): self
+        {
+            $username ??= '';
+            false === strpbrk($username, '@/?#') || throw new InvalidUrlException('The specified username is malformed');
+
+            $username = Utf8String::fromUnsafe($username);
+            if ($this->urlRecord->username !== (string) $username) {
+                $this->urlRecord->setUsername($username);
+            }
+
+            return $this;
+        }
+
+        public function setPassword(#[SensitiveParameter] ?string $password): self
+        {
+            $password ??= '';
+            false === strpbrk($password, '@/?#') || throw new InvalidUrlException('The specified password is malformed');
+
+            $password = Utf8String::fromUnsafe($password);
+            if ($this->urlRecord->password !== (string) $password) {
+                $this->urlRecord->setPassword($password);
+            }
+
+            return $this;
+        }
+
+        /**
+         * @throws InvalidUrlException
+         */
+        public function setHost(?string $host): self
+        {
+            if (null === $host) {
+                $this->urlRecord->host = new NullHost();
+
+                return $this;
+            }
+
+            false === strpbrk($host, '/?#') || throw new InvalidUrlException('The specified host is malformed', [new UrlValidationError('', UrlValidationErrorType::HostInvalidCodePoint, true)]);
+
+            $log = new UrlValidationErrorCollector();
+            $parser = new BasicURLParser($log);
+            $urlRecord = $parser->parse(input: Utf8String::fromUnsafe($host), url: new URLRecord(), stateOverride: ParserState::HOST);
+            false !== $urlRecord || throw new InvalidUrlException('The specified host is malformed', $log->errors());
+
+            $this->urlRecord->host = $urlRecord->host;
+
+            return $this;
+        }
+
+        /**
+         * @throws InvalidUrlException
+         */
+        public function setPort(?int $port): self
+        {
+            if ($this->urlRecord->port !== $port) {
+                null === $port
+                || ($port >= self::PORT_RANGE_MIN && $port <= self::PORT_RANGE_MAX)
+                || throw new InvalidUrlException('The specified port is malformed', [new UrlValidationError((string) $port, UrlValidationErrorType::PortOutOfRange, true)]);
+
+                $this->urlRecord->port = $port;
+            }
+
+            return $this;
+        }
+
+        public function setPath(?string $path): self
+        {
+            $path ??= '';
+            false === strpbrk($path, '?#') || throw new InvalidUrlException('The specified path is malformed');
+
+            return $this->assignPath(new OpaquePath(new PathSegment($path)));
+        }
+
+        private function assignPath(PathInterface $path): self
+        {
+            if ($this->urlRecord->path->__toString() !== $path->__toString()) {
+                $this->urlRecord->path = $path;
+            }
+
+            return $this;
+        }
+
+        public function setQuery(?string $query): self
+        {
+            if (null !== $query && '?' === $query[0]) {
+                $query = substr($query, 1);
+            }
+
+            if (null !== $query) {
+                false === str_contains($query, '#') || throw new InvalidUrlException('The specified query is malformed');
+            }
+
+            if ($this->urlRecord->query !== $query) {
+                $this->urlRecord->query = $query;
+            }
+
+            return $this;
+        }
+
+        public function setFragment(?string $fragment): self
+        {
+            if (null !== $fragment && '#' === $fragment[0]) {
+                $fragment = substr($fragment, 1);
+            }
+
+            if ($this->urlRecord->fragment !== $fragment) {
+                $this->urlRecord->fragment = $fragment;
+            }
+
+            return $this;
+        }
+    }
+}

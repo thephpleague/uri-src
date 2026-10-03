@@ -39,7 +39,6 @@ if (PHP_VERSION_ID < 80500) {
         public function __construct(string $message = '', array $errors = [], int $code = 0, ?Throwable $previous = null)
         {
             array_is_list($errors) || throw new ValueError('the error argument must be a list.');
-
             $filter = static fn (mixed $error): bool => $error instanceof UrlValidationError;
             $errors === array_filter($errors, $filter) || throw new ValueError('the error argument must be a list containing only '.UrlValidationError::class);
 

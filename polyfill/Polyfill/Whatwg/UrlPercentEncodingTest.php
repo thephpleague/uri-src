@@ -118,5 +118,29 @@ final class UrlPercentEncodingTest extends TestCase
             'expected' => 'b%C3%A9b%C3%A9.be',
             'mode' => UrlPercentEncodingMode::OpaqueHost,
         ];
+
+        yield 'form query sucess' => [
+            'input' => "\x11",
+            'expected' => '%11',
+            'mode' => UrlPercentEncodingMode::FormQuery,
+        ];
+
+        yield 'form query - percent sign code point' => [
+            'input' => 'WHATWG%20url',
+            'expected' => 'WHATWG%2520url',
+            'mode' => UrlPercentEncodingMode::FormQuery,
+        ];
+
+        yield 'form query - space code point' => [
+            'input' => 'WHATWG url',
+            'expected' => 'WHATWG+url',
+            'mode' => UrlPercentEncodingMode::FormQuery,
+        ];
+
+        yield 'form query - special code points in the percent-encode set' => [
+            'input' => '"#<>&+,',
+            'expected' => '%22%23%3C%3E%26%2B%2C',
+            'mode' => UrlPercentEncodingMode::FormQuery,
+        ];
     }
 }
