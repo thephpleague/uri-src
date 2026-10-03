@@ -49,6 +49,14 @@ The RFC introduces:
 
 Full documentation can be found on the [Add RFC 3986 and WHATWG compliant URI parsing support RFC](https://wiki.php.net/rfc/url_parsing_api).
 
+- `Uri\Rfc3986\UriBuilder` class, a `Uri\Rfc3986\Uri` instance builder
+- `Uri\WhatWg\UrlBuilder` class, a `Uri\WhatWg\Url` instance builder
+- `Uri\Rfc3986\uri_percent_encode` to encode string according to [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986)
+- `Uri\WhatWg\url_percent_encode` to encode string according to [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986)]([WHATWG](https://url.spec.whatwg.org/))
+- And complementary `Enums` to describe URI shape and state.
+
+Full documentation can be found on the [PHP RFC: Followup Improvements for ext/uri](https://wiki.php.net/rfc/uri_followup).
+
 # Contributing
 
 Contributions are welcome and will be fully credited. Please see [CONTRIBUTING](.github/CONTRIBUTING.md) and [CONDUCT](.github/CODE_OF_CONDUCT.md) for details.

@@ -63,3 +63,5 @@ $url = new Uri\WhatWg\Url("HTTPS://🐘.com:443/foo/../bar/./baz?#fragment");
 echo $url->toAsciiString();   // returns "https://xn--go8h.com/bar/baz?#fragment"
 echo $url->toUnicodeString(); // returns "https://🐘.com/bar/baz?#fragment"
 ````
+
+Version `7.9.0` implements the class, Enums and function as defined by the [PHP RFC: Followup Improvements for ext/uri](https://wiki.php.net/rfc/uri_followup).
