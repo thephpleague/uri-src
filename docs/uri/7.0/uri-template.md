@@ -585,9 +585,10 @@ $uriTemplate->match("/foo/bar");
 // false
 ~~~
 
-When strict extraction fails, `VariableCanNotBeExtracted::getReasons()` returns the distinct
-`ExtractionErrorReason` cases encountered during extraction. `VariableCanNotBeExtracted::getMissingVariables()`
-returns the names of variables that were not provided by the input.
+When strict extraction fails, `VariableCanNotBeExtracted::reasons` returns the distinct
+`ExtractionErrorReason` cases encountered during extraction. `VariableCanNotBeExtracted::missingNames`
+returns the names of variables that were not provided by the input and `VariableCanNotBeExtracted::names`,
+the name of the variables expected to be present in the template.
 
 ~~~php
 use League\Uri\UriTemplate;
@@ -596,14 +597,17 @@ $template = '/{version}/search/{term:1}/{?q*,limit}';
 try { 
     $uriTemplate->extractOrFail('/foo/bar'); 
 } catch (VariableCanNotBeExtracted $exception) { 
-    $exception->getReasons(); 
+    $exception->reasons; 
     // [ 
     // ExtractionErrorReason::LiteralMismatch, 
     // ... 
     // ] 
     
-    $exception->getMissingNames(); 
+    $exception->missingNames; 
     // [...]
+
+    $exception->names; 
+    // ['version', 'term', 'q', 'limit']
 }
 ~~~
 
