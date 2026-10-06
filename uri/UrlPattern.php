@@ -15,9 +15,9 @@ namespace League\Uri;
 
 use BackedEnum;
 use League\Uri\Exceptions\SyntaxError;
-use League\Uri\UrlPattern\MatchMode;
 use League\Uri\UrlPattern\Component;
 use League\Uri\UrlPattern\ComponentResult;
+use League\Uri\UrlPattern\MatchMode;
 use League\Uri\UrlPattern\PartType;
 use League\Uri\UrlPattern\Result;
 use Stringable;
@@ -111,7 +111,7 @@ final class UrlPattern
             default => $input,
         };
 
-        $components = array_map(static fn (?string $value): string => (string) $value, UriString::parse($uriString));
+        $components = array_map(static fn (string|int|null $value): string => (string) $value, UriString::parse($uriString));
         $components['username'] = $components['user'];
         $components['password'] = $components['pass'];
 

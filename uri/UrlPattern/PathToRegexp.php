@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace League\Uri\UrlPattern;
 
 use League\Uri\Exceptions\SyntaxError;
-use LogicException;
 
 use function count;
 use function ord;
@@ -242,20 +241,11 @@ final class PathToRegexp
             &$pendingFixedValue,
             &$result,
         ): void {
-            if ('' === $pendingFixedValue) {
-                return;
+            /* @phpstan-ignore-next-line */
+            if ('' !== $pendingFixedValue) {
+                $result[] = new Part(PartType::Fixed, '', '', $pendingFixedValue, '', Modifier::None);
+                $pendingFixedValue = '';
             }
-
-            $result[] = new Part(
-                PartType::Fixed,
-                '',
-                '',
-                $pendingFixedValue,
-                '',
-                Modifier::None,
-            );
-
-            $pendingFixedValue = '';
         };
 
         $addPart = static function (
@@ -322,7 +312,7 @@ final class PathToRegexp
             !isset($names[$name]) || throw new SyntaxError(sprintf("Duplicate name '%s'.", $name));
 
             $names[$name] = true;
-            $result[] = new Part($type, $name, $prefix, $regexValue, $suffix, $modifier);
+            $result[] = new Part($type, (string) $name, $prefix, $regexValue, $suffix, $modifier);
         };
 
         while ($index < count($tokens)) {
@@ -423,7 +413,6 @@ final class PathToRegexp
                 PartType::SegmentWildcard => $segmentWildcardRegex,
                 PartType::FullWildcard => '.*',
                 PartType::Regex => $part->value,
-                default => throw new LogicException('Unsupported part type.'),
             };
 
             if ('' === $part->prefix && '' === $part->suffix) {
@@ -488,13 +477,8 @@ final class PathToRegexp
                 $result .= $delimiterRegex.'?';
             }
 
-            if ('' === $endsWith) {
-                $result .= '$';
-            } else {
-                $result .= '(?='.$endsWithRegex.')';
-            }
-
-            return $result;
+            /* @phpstan-ignore-next-line  */
+            return '' === $endsWith ? $result.'$' : $result.'(?='.$endsWithRegex.')';
         }
 
         if (! $strict) {

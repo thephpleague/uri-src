@@ -15,8 +15,8 @@ namespace League\Uri;
 
 use BackedEnum;
 use League\Uri\Contracts\Conditionable;
-use League\Uri\UrlPattern\MatchMode;
 use League\Uri\UrlPattern\Component;
+use League\Uri\UrlPattern\MatchMode;
 use League\Uri\UrlPattern\Parser;
 use Stringable;
 use Uri\Rfc3986\Uri as Rfc3986Uri;
@@ -59,7 +59,7 @@ final class UrlPatternBuilder implements Conditionable
 
     public static function from(Stringable|string $pattern, MatchMode $matchMode = MatchMode::CaseSensitive): self
     {
-        $components = (new Parser($pattern))->components();
+        $components = (new Parser((string) $pattern))->components();
 
         return (new self())
             ->scheme($components['scheme'] ?? null)
@@ -150,16 +150,6 @@ final class UrlPatternBuilder implements Conditionable
         };
 
         return $components;
-    }
-
-    private static function uriString(Rfc3986Uri|WhatWgUrl|BackedEnum|Stringable|string $uri): string
-    {
-        return match (true) {
-            $uri instanceof Rfc3986Uri => $uri->toRawString(),
-            $uri instanceof WhatWgUrl => $uri->toUnicodeString(),
-            $uri instanceof BackedEnum => (string) $uri->value,
-            default => (string) $uri,
-        };
     }
 
     private static function resolvePathname(Component $pathname, string $basePathname): Component

@@ -388,7 +388,7 @@ final class Parser
 
     private function setComponent(State $name): void
     {
-        $this->components[$name->value] = Component::fromPattern($this->makeComponentString());
+        $this->components[$name->value] = Component::fromPattern($this->makeComponentString())->pattern;
     }
 
     private function makeComponentString(): string

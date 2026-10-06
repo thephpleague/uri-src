@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace League\Uri;
 
 use League\Uri\Exceptions\SyntaxError;
+use League\Uri\UrlPattern\Result;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -24,7 +25,12 @@ final class UrlPatternTest extends TestCase
     #[DataProvider('provideOptionalId')]
     public function it_extracts_optional_parameters(string $pattern, string $input, ?string $expected): void
     {
-        self::assertSame($expected, UrlPattern::from($pattern)->extract($input)->path['id']);
+        $result = UrlPattern::from($pattern)->extract($input);
+
+        self::assertInstanceOf(Result::class, $result);
+        self::assertSame($expected, $result->path['id']);
+        self::assertSame($expected, $result->path['id']);
+
     }
 
     public static function provideOptionalId(): iterable
@@ -111,9 +117,9 @@ final class UrlPatternTest extends TestCase
     public function it_decodes_path_captures(): void
     {
         $pattern = UrlPatternBuilder::from('/:foo')->build();
-
         $result = $pattern->extract('/%F0%9F%8D%85');
 
+        self::assertInstanceOf(Result::class, $result);
         self::assertSame('🍅', $result->path['foo']);
     }
 
@@ -123,6 +129,7 @@ final class UrlPatternTest extends TestCase
         $pattern = UrlPattern::from('/users/:user/books/:book');
 
         $result = $pattern->extract('/users/42/books/123');
+        self::assertInstanceOf(Result::class, $result);
 
         self::assertSame('42', $result->path['user']);
         self::assertSame('123', $result->path['book']);
