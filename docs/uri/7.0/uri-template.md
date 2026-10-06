@@ -463,6 +463,7 @@ $result->variables();
 specific type:
 
 * `ExtractionResult::string()`
+* `ExtractionResult::host()`
 * `ExtractionResult::boolean()`
 * `ExtractionResult::integer()`
 * `ExtractionResult::float()`
@@ -518,12 +519,27 @@ $result->array('count');
 // ["one", "two", "three"]
 ```
 
+`ExtractionResult::host()` returns the string representation of a decoded host. This specific
+conversion is added to take into account i18n domain names.
+
+```php
+use League\Uri\UriTemplate;
+
+$uriTemplate = new UriTemplate('{host}.example.com');
+$result = $uriTemplate->extract("xn--fi8h.example.com");
+$result['host']; 
+// "xn--fi8h"
+$result->host('host');
+// "🍅"
+```
+
 #### Collection
 
 The same typed accessors are available for extracted values that are expected to be
 arrays:
 
 * `ExtractionResult::strings()`
+* `ExtractionResult::hosts()`
 * `ExtractionResult::booleans()`
 * `ExtractionResult::integers()`
 * `ExtractionResult::floats()`
