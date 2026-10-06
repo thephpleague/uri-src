@@ -37,11 +37,7 @@ final class Component
 
     public static function fromPattern(string $pattern): self
     {
-        return new self(
-            pattern: $pattern,
-            parts: PathToRegexp::parse($pattern),
-            regexp: PathToRegexp::stringToRegexp($pattern),
-        );
+        return new self($pattern, PathToRegexp::parse($pattern), PathToRegexp::stringToRegexp($pattern));
     }
 
     public static function fromAsterix(): self

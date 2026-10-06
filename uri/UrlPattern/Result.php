@@ -27,6 +27,7 @@ final class Result
         public readonly ComponentResult $query,
         public readonly ComponentResult $fragment,
     ) {
+
     }
 
     /**
@@ -41,14 +42,14 @@ final class Result
         }
 
         return new self(
-            scheme: $extraction['scheme'] ?? ComponentResult::fromNull(),
-            username: $extraction['user'] ?? ComponentResult::fromNull(),
-            password: $extraction['pass'] ?? ComponentResult::fromNull(),
-            host: $extraction['host'] ?? ComponentResult::fromNull(),
-            port: $extraction['port'] ?? ComponentResult::fromNull(),
-            path: $extraction['path'] ?? ComponentResult::fromNull(),
-            query: $extraction['query'] ?? ComponentResult::fromNull(),
-            fragment: $extraction['fragment'] ?? ComponentResult::fromNull(),
+            scheme: $extraction['scheme'] ?? ComponentResult::empty(),
+            username: $extraction['username'] ?? ComponentResult::empty(),
+            password: $extraction['password'] ?? ComponentResult::empty(),
+            host: $extraction['host'] ?? ComponentResult::empty(),
+            port: $extraction['port'] ?? ComponentResult::empty(),
+            path: $extraction['path'] ?? ComponentResult::empty(),
+            query: $extraction['query'] ?? ComponentResult::empty(),
+            fragment: $extraction['fragment'] ?? ComponentResult::empty(),
         );
     }
 }

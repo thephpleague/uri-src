@@ -38,13 +38,15 @@ final class ComponentResult implements ArrayAccess, Countable
     /**
      * @param array<array-key, string|null> $data
      */
-    public function __construct(private readonly array $data)
-    {
+    public function __construct(
+        public readonly string $input,
+        private readonly array $data
+    ){
     }
 
-    public static function fromNull(): self
+    public static function empty(): self
     {
-        return new self([]);
+        return new self('', []);
     }
 
     public function count(): int

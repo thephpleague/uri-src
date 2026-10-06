@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace League\Uri;
 
 use BackedEnum;
+use League\Uri\Contracts\Conditionable;
+use League\Uri\UrlPattern\CaseMode;
 use League\Uri\UrlPattern\Component;
 use League\Uri\UrlPattern\Parser;
 use Stringable;
@@ -21,10 +23,11 @@ use Uri\Rfc3986\Uri as Rfc3986Uri;
 use Uri\WhatWg\Url as WhatWgUrl;
 
 use function array_map;
+use function is_bool;
 use function strrpos;
 use function substr;
 
-final class UrlPatternBuilder
+final class UrlPatternBuilder implements Conditionable
 {
     private ?Component $scheme = null;
     private ?Component $username = null;
@@ -34,6 +37,7 @@ final class UrlPatternBuilder
     private ?Component $path = null;
     private ?Component $query = null;
     private ?Component $fragment = null;
+    private CaseMode $sensitivity = CaseMode::Sensitive;
 
     public function __construct()
     {
@@ -50,6 +54,7 @@ final class UrlPatternBuilder
         $this->path = null;
         $this->query = null;
         $this->fragment = null;
+        $this->sensitivity = CaseMode::Sensitive;
     }
 
     public static function from(Stringable|string $pattern): self
@@ -89,7 +94,20 @@ final class UrlPatternBuilder
             $components
         );
 
-        return new UrlPattern($components);
+        return new UrlPattern($components, $this->sensitivity);
+    }
+
+    public function when(callable|bool $condition, callable $onSuccess, ?callable $onFail = null): static
+    {
+        if (!is_bool($condition)) {
+            $condition = $condition($this);
+        }
+
+        return match (true) {
+            $condition => $onSuccess($this),
+            null !== $onFail => $onFail($this),
+            default => $this,
+        } ?? $this;
     }
 
     private static function applyBaseUrl(array $components, string $baseUrl): array
@@ -153,8 +171,8 @@ final class UrlPatternBuilder
     private static function filter(Component|Stringable|string|null $component): ?Component
     {
         return match (true) {
-            $component instanceof Component,
-            null == $component => $component,
+            $component instanceof Component => $component,
+            null === $component => null,
             default => Component::fromPattern((string) $component),
         };
     }
@@ -211,6 +229,20 @@ final class UrlPatternBuilder
     public function fragment(Component|Stringable|string|null $fragment): self
     {
         $this->fragment = self::filter($fragment);
+
+        return $this;
+    }
+
+    public function ignoreCase(): self
+    {
+        $this->sensitivity = CaseMode::Insensitive;
+
+        return $this;
+    }
+
+    public function preserveCase(): self
+    {
+        $this->sensitivity = CaseMode::Sensitive;
 
         return $this;
     }

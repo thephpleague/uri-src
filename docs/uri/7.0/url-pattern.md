@@ -92,7 +92,35 @@ $pattern->match("https://example.com/books/");
 // false
 ```
 
+### Case sensitivity
+
+The URL Pattern API treats many parts of the URL as case-sensitive by default when matching.
+An `League\Uri\UrlPattern\CasMode` enum is available on `UrLPattern` constructor to enable
+case-insensitive matching if desired.
+
+~~~php
+use League\Uri\UrlPattern;
+use League\Uri\UrlPattern\CaseMode;
+use League\Uri\UrlPatternBuilder;
+
+$pattern = UrlPattern::from(pattern: "https://example.com/2022/feb/*", caseMode: CaseMode::Insensitive);
+$pattern->match("https://example.com/2022/feb/xc44rsz"); // true
+$pattern->match("https://example.com/2022/Feb/xc44rsz"); // true
+$pattern->caseMode; // UrlPattern\CaseMode::Insensitive
+
+$pattern = UrlPatternBuilder::from("https://example.com/2022/feb/*")
+    ->preserveCase() // this is the default behavior
+    ->build();
+
+$pattern = UrlPattern::from("https://example.com/2022/feb/*");
+$pattern->match("https://example.com/2022/feb/xc44rsz"); // true
+$pattern->match("https://example.com/2022/Feb/xc44rsz"); // false
+$pattern->caseMode; // UrlPattern\CaseMode::Sensitive
+~~~
+
 ## Extracted values
+
+Values are attached to the `ComponentResult` instance used by each property of the `Result` class.
 
 ~~~php
 use League\Uri\UrlPatternBuilder;
