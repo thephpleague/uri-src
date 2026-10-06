@@ -4,14 +4,19 @@ title: URL Pattern
 description: URL Pattern matches URIs or parts of URIs against a pattern.
 ---
 
-URLPattern
+URL Pattern
 =========
 
-The URL Pattern API defines a syntax that is used to create URL pattern matchers. These patterns can be matched against URLs or individual URL components.
+<p class="message-notice">Available since version <code>7.9.0</code></p>
 
-## Concept
+The URL Pattern API defines a syntax that is used to create URL pattern matchers.
+These patterns can be matched against URLs or individual URL components.
+
+## Introduction
 
 Patterns are specified using the `URLPattern` class. The pattern syntax is based on the syntax from the [path-to-regexp library](https://github.com/pillarjs/path-to-regexp). 
+
+### Available patterns
 
 Patterns can contain:
 
@@ -21,56 +26,58 @@ Patterns can contain:
 - **Groups:** `/books{/old}` — groups part of a pattern.
 - **Regex groups:** `/books/:id(\d+)` — constrains a captured value with a regular expression.
 - **Optional groups:** `/books/:id?` — makes a group optional.
-- **Repeated groups:** `/books/:id+` — matches one or more occurrences; * matches zero or more.
+- **Repeated groups:** `/books/:id+` — matches one or more occurrences; 
+- **Repeated groups:** `/books/:id*` — matches zero or more occurrences.
+
+### URLPattern API
 
 The API follows [the WHATWG URL Pattern specification](https://urlpattern.spec.whatwg.org/). The PHP implementation
 uses PHP-oriented names and types where they differ from the WHATWG API.
 
-| WHATWG API                          | PHP implementation                                              |
-|-------------------------------------|-----------------------------------------------------------------|
-| `URLPattern::test()`                | `UrlPattern::match()`                                           |
-| `URLPattern::exec()`                | `UrlPattern::extract()`                                         |
-| `URLPattern::protocol`              | `UrlPattern::scheme`                                            |
-| `URLPattern::hostname`              | `UrlPattern::host`                                              |
-| `URLPattern::pathname`              | `UrlPattern::path`                                              |
-| `URLPattern::hash`                  | `UrlPattern::fragment`                                          |
-| `URLPatternResult::protocol`        | `UrlPattern\Result::scheme`                                     |
-| `URLPatternResult::hostname`        | `UrlPattern\Result::host`                                       |
-| `URLPatternResult::pathname`        | `UrlPattern\Result::path`                                       |
-| `URLPatternResult::hash`            | `UrlPattern\Result::fragment`                                   |
-| `URLPatternComponentResult::groups` | `UrlPattern\ComponentResult` implements `ArrayAccess` interface |
+| WHATWG API                          | PHP implementation                        |
+|-------------------------------------|-------------------------------------------|
+| `URLPattern::test()`                | `UrlPattern::match()`                     |
+| `URLPattern::exec()`                | `UrlPattern::extract()`                   |
+| `URLPattern::protocol`              | `UrlPattern::scheme`                      |
+| `URLPattern::hostname`              | `UrlPattern::host`                        |
+| `URLPattern::pathname`              | `UrlPattern::path`                        |
+| `URLPattern::hash`                  | `UrlPattern::fragment`                    |
+| `URLPatternResult::protocol`        | `UrlPattern\Result::scheme`               |
+| `URLPatternResult::hostname`        | `UrlPattern\Result::host`                 |
+| `URLPatternResult::pathname`        | `UrlPattern\Result::path`                 |
+| `URLPatternResult::hash`            | `UrlPattern\Result::fragment`             |
+| `URLPatternComponentResult::groups` | `UrlPattern\ComponentResult::variables()` |
 
-`UrlPattern\Result` and `UrlPattern\ComponentResult` contain only the extracted values; they do not retain
-the `UrlPattern` instance or the pattern strings used for extraction.
+- `UrlPattern\Result` contain only the extracted values; they do not retain the `UrlPattern` instance or the pattern strings used for extraction.
+- `UrlPattern\ComponentResult` implements PHP's `ArrayAccess`, allowing extracted values to be accessed using their variable names.
 
-## Basic Usage
+## Usage
 
-The package comes bundles with two classes `UrlPatternBuilder` and `UrlPattern`, the former is a builder class to
-ease generating `UrlPattern` instances.
-
-The `UrlPatternBuilder` shares a similar logic as `UriBuilder` and using tis `build` method to returns an
-instantiated `UrlPattern` instance.
+The package comes bundled with the `League\Uri\UrlPattern` to generate and process `UrlPattern` instances.
 
 ```php
-use League\Uri\UrlPatternBuilder;
+use League\Uri\UrlPattern;
 
 // create a new instance
-$pattern = new UrlPatternBuilder()
-    ->path('/book/:id?')
-    ->build();
+$pattern = UrlPattern::from('/book/:id?');
 
 // test if the submitted URI matches
 if ($pattern->match('https://example.com/books/123')) {
     echo "The URI matches", PHP_EOL;
 }
 
-// Since the URI matches we can extract the matching part
+// Since the URI matches we can extract the match variables
 $result = $pattern->extract('https://example.com/books/123');
 $result->path['id']; // "123"
 $result->path->integer('id'); // 123
 ```
 
-You may generate a `UrlPattern` instance from a base URL
+### Using a Base URL
+
+You may create a `UrlPattern` instance from a base URL. For URL Patterns, the base URL
+affects only the scheme, host, port, and path components. All other components are unaffected.
+Please refer to [MDN URL Pattern API](https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API#inheritance_from_a_base_url)
+for a complete explanation on how base URL resolution works and differs from URI Base resolution.
 
 ```php
 use League\Uri\UrlPattern;
@@ -78,9 +85,6 @@ use League\Uri\UrlPatternBuilder;
 
 // create a new instance using the UrlPattern class
 $pattern = UrlPattern::from("/books/:id(\\d+)", "https://example.com"); // the base URL
-
-// or using the UrlPatternBuilder builder
-$pattern = UrlPatternBuilder::from("/books/:id(\\d+)")->build("https://example.com")
 
 $pattern->match("https://example.com/books/123");
 // true
@@ -95,32 +99,86 @@ $pattern->match("https://example.com/books/");
 ### Case sensitivity
 
 The URL Pattern API treats many parts of the URL as case-sensitive by default when matching.
-An `League\Uri\UrlPattern\CasMode` enum is available on `UrLPattern` constructor to enable
-case-insensitive matching if desired.
+
+Matching is case-sensitive by default. The `League\Uri\UrlPattern\MatchMode` enum allows you
+to enable case-insensitive matching. The selected mode is immutable once the `UrlPattern`
+has been created.You can retrieve its state via the `UrlPattern::matchMode` public
+read-only property.
 
 ~~~php
 use League\Uri\UrlPattern;
 use League\Uri\UrlPattern\MatchMode;
-use League\Uri\UrlPatternBuilder;
 
-$pattern = UrlPattern::from(pattern: "https://example.com/2022/feb/*", matchMode: MatchMode::CaseInsensitive);
+$pattern = UrlPattern::from(
+    pattern: "https://example.com/2022/feb/*",
+    matchMode: MatchMode::CaseInsensitive
+);
 $pattern->match("https://example.com/2022/feb/xc44rsz"); // true
 $pattern->match("https://example.com/2022/Feb/xc44rsz"); // true
-$pattern->matchMode; // UrlPattern\CaseMode::Insensitive
-
-$pattern = UrlPatternBuilder::from("https://example.com/2022/feb/*")
-    ->preserveCase() // this is the default behavior
-    ->build();
+$pattern->matchMode; // UrlPattern\MatchMode::CaseInsensitive
 
 $pattern = UrlPattern::from("https://example.com/2022/feb/*");
 $pattern->match("https://example.com/2022/feb/xc44rsz"); // true
 $pattern->match("https://example.com/2022/Feb/xc44rsz"); // false
-$pattern->matchMode; // UrlPattern\CaseMode::Sensitive
+$pattern->matchMode; // UrlPattern\MatchMode::CaseSensitive
+~~~
+
+### Matching specific components
+
+The `League\Uri\UrlPatternBuilder` class allows specifying individual pattern
+per URI component.
+
+Once instantiated you can retrieve each pattern per component using the component name public
+read-only property. Per default, if no pattern was given to a specific component the `*` is
+returned.
+
+~~~php
+use League\Uri\UrlPatternBuilder;
+
+$pattern = new UrlPatternBuilder()
+    ->path("/books/:id(\\d+)")
+    ->host("{*.}?example.com")
+    ->build();
+
+$pattern->match("https://shop.example.com/books/123"); // true
+$pattern->match("https://www.example.com/books/123?search=foo#fragment"); // true
+$pattern->match("https://shop.example.com/books/abc"); // false
+$pattern->match("https://shop.my-blog.com/books/123"); // false
+$pattern->scheme;   // "*"
+$pattern->username; // "*"
+$pattern->password; // "*"
+$pattern->host;     // "{*.}?example.com"
+$pattern->port;     // "*"
+$pattern->path;     // "/books/:id(\\d+)"
+$pattern->query;    // "*"
+$pattern->fragment; // "*"
+~~~
+
+The `UrlPattern` returned by the `UrlPatternBuilder::build()` method will only match
+the submitted URI against the specified URI components pattern. The `UrlPatternBuilder::build()`
+takes an optional base URL. And, to allow setting the case sensitivity, The `UrlPatternBuilder`
+class provides two methods for configuring case sensitivity: `UrlPatternBuilder::ignoreCase()` 
+and `UrlPatternBuilder::preserveCase()`.
+
+~~~php
+use League\Uri\UrlPatternBuilder;
+
+$pattern = new UrlPatternBuilder()
+    ->path("/2022/feb/*")
+    ->ignoreCase()
+    ->build("https://example.com/users");
+
+$pattern->match("https://example.com/2022/feb/xc44rsz"); // true
+$pattern->match("https://example.com/2022/Feb/xc44rsz"); // true
+$pattern->matchMode; // UrlPattern\MatchMode::CaseInsensitive
 ~~~
 
 ## Extracted values
 
-Values are attached to the `ComponentResult` instance used by each property of the `Result` class.
+Each component of a `Result` is represented by a `ComponentResult` containing:
+
+- the values extracted for that component
+- the source pattern used to extract them.
 
 ~~~php
 use League\Uri\UrlPatternBuilder;
@@ -130,8 +188,11 @@ $pattern = new UrlPatternBuilder()
     ->build();
 
 $result = $pattern->extract('https://example.com/books/123');
-$result->path['id']; // "123"
-$result->path->integer('id'); // 123
+$result->path->input; 
+// '/book/:id?'
+
+$result->path->variables(); 
+// ["book" => "123"]
 ~~~
 
 ### Value Access
@@ -152,21 +213,21 @@ $pattern = new UrlPatternBuilder()
 
 // Since the URI matches we can extract the matching part
 $result = $pattern->extract('https://example.com/books/123');
-$resut->host->isEmpty(); 
+$result->host->isEmpty(); 
 // true 
 
-$resut->path->isEmpty();
+$result->path->isEmpty();
 // false 
 
-count($resut->path); 
+count($result->path); 
 // 1
 
 $result->path['id'];
 // "123"
 ~~~
 
-Extracted values are **URL-decoded**. Percent-encoded sequences in the input are decoded
-before the values are returned.
+Extracted values are decoded according to the rules of their URL component. Percent-encoded
+sequences are decoded before the values are returned.
 
 ```php
 use League\Uri\UrlPatternBuilder;
@@ -197,7 +258,7 @@ $result->host['foo'];
 ```
 
 `ComponentResult::variables()` returns all extracted values as an associative array.
-Each key is a variable name and each value is the corresponding extracted value.
+Each key is the variable name or index and each value is the corresponding extracted value.
 
 ```php
 $result->variables();
