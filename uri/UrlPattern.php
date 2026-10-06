@@ -15,7 +15,7 @@ namespace League\Uri;
 
 use BackedEnum;
 use League\Uri\Exceptions\SyntaxError;
-use League\Uri\UrlPattern\CaseMode;
+use League\Uri\UrlPattern\MatchMode;
 use League\Uri\UrlPattern\Component;
 use League\Uri\UrlPattern\ComponentResult;
 use League\Uri\UrlPattern\PartType;
@@ -46,19 +46,19 @@ final class UrlPattern
     private const COMPONENT_NAMES = ['scheme', 'username', 'password', 'host', 'port', 'path', 'query', 'fragment'];
     /** @var array<'scheme'|'username'|'password'|'host'|'port'|'path'|'query'|'fragment', Component> $components */
     private readonly array $components;
-    public readonly CaseMode $caseMode;
+    public readonly MatchMode $matchMode;
     public readonly bool $hasRegexpGroup;
 
     /**
      * @param array<'scheme'|'username'|'password'|'host'|'port'|'path'|'query'|'fragment', Component> $patternComponents
      */
-    public function __construct(array $patternComponents, CaseMode $caseMode = CaseMode::Sensitive)
+    public function __construct(array $patternComponents, MatchMode $matchMode = MatchMode::CaseSensitive)
     {
         $hasRegexpGroup = false;
         $components = [];
         foreach (self::COMPONENT_NAMES as $name) {
             if (!array_key_exists($name, $patternComponents)) {
-                $components[$name] = Component::fromAsterix();
+                $components[$name] = Component::fromAsterisk();
             }
 
             $component = $patternComponents[$name];
@@ -71,17 +71,17 @@ final class UrlPattern
 
         $this->components = $components;
         $this->hasRegexpGroup = $hasRegexpGroup;
-        $this->caseMode = $caseMode;
+        $this->matchMode = $matchMode;
     }
 
     public static function from(
         Stringable|string $pattern,
         Rfc3986Uri|WhatWgUrl|BackedEnum|Stringable|string|null $baseUrl = null,
-        CaseMode $caseMode = CaseMode::Sensitive
+        MatchMode $matchMode = MatchMode::CaseSensitive
     ): self {
         return UrlPatternBuilder::from($pattern)
             ->when(
-                CaseMode::Insensitive === $caseMode,
+                MatchMode::CaseInsensitive === $matchMode,
                 fn (UrlPatternBuilder $builder) => $builder->ignoreCase(),
                 fn (UrlPatternBuilder $builder) => $builder->preserveCase()
             )
@@ -105,7 +105,13 @@ final class UrlPattern
      */
     public function extract(Rfc3986Uri|WhatWgUrl|BackedEnum|Stringable|string $input): ?Result
     {
-        $components = array_map(static fn (?string $value): string => (string) $value, UriString::parse(self::uriString($input)));
+        $uriString = match (true) {
+            $input instanceof Rfc3986Uri => $input->toRawString(),
+            $input instanceof WhatWgUrl => $input->toAsciiString(),
+            default => $input,
+        };
+
+        $components = array_map(static fn (?string $value): string => (string) $value, UriString::parse($uriString));
         $components['username'] = $components['user'];
         $components['password'] = $components['pass'];
 
@@ -125,7 +131,7 @@ final class UrlPattern
     private function extractComponent(Component $component, string $source, string $name): ?ComponentResult
     {
         $matches = [];
-        $modifier = CaseMode::Insensitive === $this->caseMode ? 'i' : '';
+        $modifier = MatchMode::CaseInsensitive === $this->matchMode ? 'i' : '';
         $regexp = '~'.$component->regexp.'~'.$modifier;
         if (1 !== preg_match($regexp, $source, $matches)) {
             return null;
@@ -139,22 +145,19 @@ final class UrlPattern
             }
 
             $content = $matches[$matchIndex++] ?? null;
-            $data[$part->name] = match ($name) {
-                'host' => HostRecord::from($content)->toUnicode(),
-                default => Encoder::decodeAll($content),
-            };
+            $data[$part->name] = 'host' === $name
+                ? HostRecord::from($content)->toUnicode()
+                : Encoder::decodeAll($content);
         }
 
         return new ComponentResult($component->pattern, $data);
     }
 
-    private static function uriString(Rfc3986Uri|WhatWgUrl|BackedEnum|Stringable|string $uri): string
+    /**
+     * @return array<'scheme'|'username'|'password'|'host'|'port'|'path'|'query'|'fragment', string>
+     */
+    public function __debugInfo(): array
     {
-        return match (true) {
-            $uri instanceof Rfc3986Uri => $uri->toRawString(),
-            $uri instanceof WhatWgUrl => $uri->toAsciiString(),
-            $uri instanceof BackedEnum => (string) $uri->value,
-            default => (string) $uri,
-        };
+        return array_map(static fn (Component $component): string => $component->pattern, $this->components);
     }
 }

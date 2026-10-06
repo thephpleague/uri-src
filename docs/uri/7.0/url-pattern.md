@@ -100,13 +100,13 @@ case-insensitive matching if desired.
 
 ~~~php
 use League\Uri\UrlPattern;
-use League\Uri\UrlPattern\CaseMode;
+use League\Uri\UrlPattern\MatchMode;
 use League\Uri\UrlPatternBuilder;
 
-$pattern = UrlPattern::from(pattern: "https://example.com/2022/feb/*", caseMode: CaseMode::Insensitive);
+$pattern = UrlPattern::from(pattern: "https://example.com/2022/feb/*", matchMode: MatchMode::CaseInsensitive);
 $pattern->match("https://example.com/2022/feb/xc44rsz"); // true
 $pattern->match("https://example.com/2022/Feb/xc44rsz"); // true
-$pattern->caseMode; // UrlPattern\CaseMode::Insensitive
+$pattern->matchMode; // UrlPattern\CaseMode::Insensitive
 
 $pattern = UrlPatternBuilder::from("https://example.com/2022/feb/*")
     ->preserveCase() // this is the default behavior
@@ -115,7 +115,7 @@ $pattern = UrlPatternBuilder::from("https://example.com/2022/feb/*")
 $pattern = UrlPattern::from("https://example.com/2022/feb/*");
 $pattern->match("https://example.com/2022/feb/xc44rsz"); // true
 $pattern->match("https://example.com/2022/Feb/xc44rsz"); // false
-$pattern->caseMode; // UrlPattern\CaseMode::Sensitive
+$pattern->matchMode; // UrlPattern\CaseMode::Sensitive
 ~~~
 
 ## Extracted values

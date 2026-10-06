@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace League\Uri\UrlPattern;
 
-enum CaseMode
+enum MatchMode
 {
-    case Sensitive;
-    case Insensitive;
+    case CaseSensitive;
+    case CaseInsensitive;
 }

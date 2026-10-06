@@ -35,16 +35,16 @@ final class Component
         $this->hasRegexpGroup = $hasRegexpGroup;
     }
 
+    public static function fromAsterisk(): self
+    {
+        static $asterisk;
+        $asterisk ??= self::fromPattern('*');
+
+        return $asterisk;
+    }
+
     public static function fromPattern(string $pattern): self
     {
         return new self($pattern, PathToRegexp::parse($pattern), PathToRegexp::stringToRegexp($pattern));
-    }
-
-    public static function fromAsterix(): self
-    {
-        static $asterix;
-        $asterix ??= self::fromPattern('*');
-
-        return $asterix;
     }
 }
