@@ -49,7 +49,6 @@ uses PHP-oriented names and types where they differ from the WHATWG API.
 | `URLPatternComponentResult::groups` | `UrlPattern\ComponentResult::variables()` |
 
 - `UrlPattern\Result` contain only the extracted values; they do not retain the `UrlPattern` instance or the pattern strings used for extraction.
-- `UrlPattern\ComponentResult` implements PHP's `ArrayAccess`, allowing extracted values to be accessed using their variable names.
 
 ## Usage
 
@@ -175,6 +174,12 @@ $pattern->matchMode; // UrlPattern\MatchMode::CaseInsensitive
 
 ## Extracted values
 
+`League\Uri\UrlPattern::extract()`: 
+
+- returns an `League\Uri\UrlPattern\Result` which is a container for every component individual results. Each result is a `League\Uri\UrlPattern\ComponentResult` instance.
+- returns `null` if the submitted URI does not match the pattern
+- throws an exception if the submitted URI is invalid
+
 Each component of a `Result` is represented by a `ComponentResult` containing:
 
 - the values extracted for that component
@@ -186,6 +191,7 @@ use League\Uri\UrlPatternBuilder;
 $pattern = new UrlPatternBuilder()
     ->path('/book/:id?')
     ->build();
+$pattern->hasVariable; // returns true    
 
 $result = $pattern->extract('https://example.com/books/123');
 $result->path->input; 
@@ -195,10 +201,30 @@ $result->path->variables();
 // ["book" => "123"]
 ~~~
 
-### Value Access
+### Value presence
 
-`League\Uri\UrlPattern::extract()` returns an `League\Uri\UrlPattern\Result` which is a container for every component
-individual results. Each result is a `League\Uri\UrlPattern\ComponentResult` instance.
+As shown previously, not all patterns yield values. To quickly determine whether a pattern can produce values during
+extraction, you can use the `UrlPattern::hasVariable` property. It returns `true` if the pattern contains a variable
+that can be extracted, and `false` otherwise.
+
+```php
+use League\Uri\UrlPatternBuilder;
+
+$pattern = new UrlPatternBuilder()
+    ->host('www.example.com')
+    ->build();
+
+$pattern->hasVariable;
+// false
+
+$pattern->match('https://www.example.com/2022/feb/xc44rsz');
+// true
+
+$result = $pattern->extract('https://www.example.com/2022/feb/xc44rsz');
+// $result is a Result instance whose ComponentResult objects contain no extracted values.
+```
+
+### Value Access
 
 If the extraction was successful the `ComponentResult::isEmpty()` method will return `false`.
 You may access each variable individually using the `ArrayAccess` interface.
