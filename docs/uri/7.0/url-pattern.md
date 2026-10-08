@@ -194,11 +194,26 @@ $pattern = new UrlPatternBuilder()
 $pattern->hasVariable; // returns true    
 
 $result = $pattern->extract('https://example.com/books/123');
+$result->isEmpty();
+// return false
+
 $result->path->input; 
 // '/book/:id?'
 
 $result->path->variables(); 
 // ["book" => "123"]
+~~~
+
+The `Result::isEmpty()` method returns `true` if all `ComponentResult` instance are empty (ie: no variable is attached to any of them).
+
+~~~php
+$pattern = UrlPattern::from('/book/123');
+$pattern->match('/book/123');
+// true
+
+$result = $pattern->extract('/book/123');
+$result->isEmpty();
+// true
 ~~~
 
 ### Value presence
