@@ -194,11 +194,11 @@ $pattern = new UrlPatternBuilder()
 $pattern->hasVariable; // returns true    
 
 $result = $pattern->extract('https://example.com/books/123');
-$result->isEmpty();
+$result->hasValue();
 // return false
 
 $result->path->input; 
-// '/book/:id?'
+// '/book/123'
 
 $result->path->variables(); 
 // ["book" => "123"]
@@ -254,10 +254,10 @@ $pattern = new UrlPatternBuilder()
 
 // Since the URI matches we can extract the matching part
 $result = $pattern->extract('https://example.com/books/123');
-$result->host->isEmpty(); 
+$result->host->hasValue(); 
 // true 
 
-$result->path->isEmpty();
+$result->path->hasValue();
 // false 
 
 count($result->path); 
