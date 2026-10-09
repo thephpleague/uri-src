@@ -308,6 +308,40 @@ $result->variables();
 // ]
 ```
 
+If no pattern is specified for a URL component, the `*` wildcard is used as
+its component pattern. This allows the component's value to be implicitly
+extracted when present. The `ComponentResult::implicit()` method returns
+that value, or `null`if no value was extracted or the component uses
+an explicit pattern.
+
+```php
+use League\Uri\UrlPatternBuilder;
+
+$pattern = (new UrlPatternBuilder())
+    ->path('/hello/{:name}')
+    ->host('{:subdomain.}?localhost')
+    ->build();
+
+$result = $pattern->extract('http://api.localhost:4000/hello/john?search=world');
+
+$result->path->string('name', 'World');    // "john"
+$result->host->string('subdomain', 'www'); // "api"
+$result->port->integer(0, 80);             // 4000
+
+$result->port->implicit();      // "4000"
+$result->query->implicit();     // "search=world"
+$result->fragment->implicit();  // null: no fragment found
+$result->path->implicit();      // null: an explicit pattern is defined
+```
+
+In this example, the `port` and `query` components have implicit values, while
+the `fragment` component does not because the URL contains no fragment.
+The `path` component returns `null` from `implicit()` because
+an explicit pattern is defined for it.
+
+Implicit values can also be accessed using the `0` index, since each component's
+implicit value is its first and only extracted value.
+
 ### Type Inference
 
 `ComponentResult` also provides typed accessors for retrieving an extracted value in a
