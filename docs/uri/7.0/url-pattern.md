@@ -58,7 +58,7 @@ The package comes bundled with the `League\Uri\UrlPattern` to generate and proce
 use League\Uri\UrlPattern;
 
 // create a new instance
-$pattern = UrlPattern::from('/book/:id?');
+$pattern = UrlPattern::from('/book/:id?', 'https://example.com');
 
 // test if the submitted URI matches
 if ($pattern->match('https://example.com/books/123')) {
