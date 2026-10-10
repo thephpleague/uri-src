@@ -58,7 +58,7 @@ The package comes bundled with the `League\Uri\UrlPattern` to generate and proce
 use League\Uri\UrlPattern;
 
 // create a new instance
-$pattern = UrlPattern::from('/book/:id?');
+$pattern = UrlPattern::from('/book/:id?', 'https://example.com');
 
 // test if the submitted URI matches
 if ($pattern->match('https://example.com/books/123')) {
@@ -155,22 +155,30 @@ $pattern->fragment; // "*"
 
 The `UrlPattern` returned by the `UrlPatternBuilder::build()` method will only match
 the submitted URI against the specified URI components pattern. The `UrlPatternBuilder::build()`
-takes an optional base URL. And, to allow setting the case sensitivity, The `UrlPatternBuilder`
-class provides two methods for configuring case sensitivity: `UrlPatternBuilder::ignoreCase()` 
-and `UrlPatternBuilder::preserveCase()`.
+takes two optional enums:
+
+- to allow setting the case sensitivity via the  `UrlPattern\MatchMode` enum
+- to force the UrlPattern object to be abosulte or not via The `UrlPattern\PatternType` enum.
 
 ~~~php
-use League\Uri\UrlPatternBuilder;
+use League\Uri\UrlPattern\MatchMode;
+use League\Uri\UrlPattern\PatternType;use League\Uri\UrlPatternBuilder;
 
 $pattern = new UrlPatternBuilder()
     ->path("/2022/feb/*")
-    ->ignoreCase()
-    ->build("https://example.com/users");
+    ->baseUrl("https://example.com/users")
+    ->build(
+        matchMode: MatchMode::CaseInsensitive,
+        type: PatternType::Absolute,
+    );
 
 $pattern->match("https://example.com/2022/feb/xc44rsz"); // true
 $pattern->match("https://example.com/2022/Feb/xc44rsz"); // true
 $pattern->matchMode; // UrlPattern\MatchMode::CaseInsensitive
 ~~~
+
+In the example above if the return object was not an absolute URLPattern, the `build`
+method would have thrown a `SyntaxError` exception.
 
 ## Extracted values
 
@@ -188,9 +196,7 @@ Each component of a `Result` is represented by a `ComponentResult` containing:
 ~~~php
 use League\Uri\UrlPatternBuilder;
 
-$pattern = new UrlPatternBuilder()
-    ->path('/book/:id?')
-    ->build();
+$pattern = new UrlPatternBuilder(path: '/book/:id?')->build();
 $pattern->hasVariable; // returns true    
 
 $result = $pattern->extract('https://example.com/books/123');
@@ -207,11 +213,11 @@ $result->path->variables();
 The `Result::hasValue()` method returns `true` if at least one `ComponentResult` instance has extracted values.
 
 ~~~php
-$pattern = UrlPattern::from('/book/123');
-$pattern->match('/book/123');
+$pattern = UrlPattern::from('/book/123', 'http://example,com');
+$pattern->match('http://example,com/book/123');
 // true
 
-$result = $pattern->extract('/book/123');
+$result = $pattern->extract('http://example,com/book/123');
 $result->hasValue();
 // false
 ~~~
@@ -225,8 +231,7 @@ that can be extracted, and `false` otherwise.
 ```php
 use League\Uri\UrlPatternBuilder;
 
-$pattern = new UrlPatternBuilder()
-    ->host('www.example.com')
+$pattern = new UrlPatternBuilder(host: 'www.example.com')
     ->build();
 
 $pattern->hasVariable;
@@ -248,9 +253,7 @@ You may access each variable individually using the `ArrayAccess` interface.
 use League\Uri\UrlPatternBuilder;
 
 // create a new instance
-$pattern = new UrlPatternBuilder()
-    ->path('/book/:id?')
-    ->build();
+$pattern = new UrlPatternBuilder(path: '/book/:id?')->build();
 
 // Since the URI matches we can extract the matching part
 $result = $pattern->extract('https://example.com/books/123');
@@ -287,9 +290,10 @@ The decoding is component specific
 ```php
 use League\Uri\UrlPatternBuilder;
 
-$pattern = new UrlPatternBuilder()
-    ->path('/:foo')
-    ->host('{:foo}.example.com')
+$pattern = new UrlPatternBuilder(
+    path: '/:foo',
+    host: '{:foo}.example.com'
+)
     ->build();
 $result = $pattern->extract('http://xn--fi8h.example.com/%F0%9F%8D%85');
 $result->path['foo'];
@@ -317,7 +321,7 @@ an explicit pattern.
 ```php
 use League\Uri\UrlPatternBuilder;
 
-$pattern = (new UrlPatternBuilder())
+$pattern = new UrlPatternBuilder()
     ->path('/hello/{:name}')
     ->host('{:subdomain.}?localhost')
     ->build();
@@ -361,9 +365,7 @@ If the value is missing or cannot be converted, they return `null`.
 use League\Uri\UrlPatternBuilder;
 
 // create a new instance
-$pattern = new UrlPatternBuilder()
-    ->path('/book/:id?')
-    ->build();
+$pattern = new UrlPatternBuilder(path: '/book/:id?')->build();
 
 // Since the URI matches we can extract the matching part
 $result = $pattern->extract('https://example.com/books/123');
