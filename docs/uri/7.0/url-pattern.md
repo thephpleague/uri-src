@@ -195,7 +195,7 @@ $pattern->hasVariable; // returns true
 
 $result = $pattern->extract('https://example.com/books/123');
 $result->hasValue();
-// return false
+// return true
 
 $result->path->input; 
 // '/book/123'
@@ -204,7 +204,7 @@ $result->path->variables();
 // ["book" => "123"]
 ~~~
 
-The `Result::isEmpty()` method returns `true` if all `ComponentResult` instance are empty (ie: no variable is attached to any of them).
+The `Result::hasValue()` method returns `true` if at least one `ComponentResult` instance has extracted values.
 
 ~~~php
 $pattern = UrlPattern::from('/book/123');
@@ -212,8 +212,8 @@ $pattern->match('/book/123');
 // true
 
 $result = $pattern->extract('/book/123');
-$result->isEmpty();
-// true
+$result->hasValue();
+// false
 ~~~
 
 ### Value presence
@@ -241,7 +241,7 @@ $result = $pattern->extract('https://www.example.com/2022/feb/xc44rsz');
 
 ### Value Access
 
-If the extraction was successful the `ComponentResult::isEmpty()` method will return `false`.
+If the extraction was successful and values are present, the `ComponentResult::hasValue()` method will return `true`.
 You may access each variable individually using the `ArrayAccess` interface.
 
 ~~~php
