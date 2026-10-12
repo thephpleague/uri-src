@@ -21,7 +21,7 @@ Patterns are specified using the `URLPattern` class. The pattern syntax is based
 Patterns can contain:
 
 - **Literal strings:** `/books` — matches exactly.
-- **Wildcards:** `/posts/*` — matches any characters.
+- **Wildcards:** `/books/*` — matches any characters.
 - **Named groups:** `/books/:id` — captures a value as id.
 - **Groups:** `/books{/old}` — groups part of a pattern.
 - **Regex groups:** `/books/:id(\d+)` — constrains a captured value with a regular expression.
@@ -73,10 +73,12 @@ $result->path->integer('id'); // 123
 
 ### Using a Base URL
 
-You may create a `UrlPattern` instance from a base URL. For URL Patterns, the base URL
-affects only the scheme, host, port, and path components. All other components are unaffected.
-Please refer to [MDN URL Pattern API](https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API#inheritance_from_a_base_url)
-for a complete explanation on how base URL resolution works and differs from URI Base resolution.
+URLPattern generated from the `UrlPattern` class must always be absolute, just like with WHATWG URL.
+To get an absolute URL, you either submit a pattern containing at least a scheme or you provide a base URL.
+
+For URL Patterns, the base URL affects only the scheme, host, port, and path components. All other
+components are unaffected. Please refer to [MDN URL Pattern API](https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API#inheritance_from_a_base_url) for a complete
+explanation on how base URL resolution works and differs from URI Base resolution.
 
 ```php
 use League\Uri\UrlPattern;
@@ -125,7 +127,8 @@ $pattern->matchMode; // UrlPattern\MatchMode::CaseSensitive
 ### Matching specific components
 
 The `League\Uri\UrlPatternBuilder` class allows specifying individual pattern
-per URI component.
+per URI component. the returns `UrlPattern` can be relative instead of strictly absolute
+which is the case for `UrlPattern::from()`.
 
 Once instantiated you can retrieve each pattern per component using the component name public
 read-only property. Per default, if no pattern was given to a specific component the `*` is
@@ -152,6 +155,20 @@ $pattern->path;     // "/books/:id(\\d+)"
 $pattern->query;    // "*"
 $pattern->fragment; // "*"
 ~~~
+
+You can, alternatively, use the constructor to set each component patter:
+
+~~~php
+use League\Uri\UrlPatternBuilder;
+
+$pattern = new UrlPatternBuilder(
+    path: "/books/:id(\\d+)",
+    host: "{*.}?example.com",
+)->build();
+~~~
+
+The is an alternate rewrite of the previous pattern. Of course both notation can be used
+simultaneously>
 
 The `UrlPattern` returned by the `UrlPatternBuilder::build()` method will only match
 the submitted URI against the specified URI components pattern. The `UrlPatternBuilder::build()`
