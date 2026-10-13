@@ -57,7 +57,7 @@ if (PHP_VERSION_ID < 80600) {
         }
 
         /**
-         * @param ?list<UrlValidationError> $softErrors
+         * @param-out list<UrlValidationError> $softErrors
          *
          * @throws InvalidUrlException
          */
