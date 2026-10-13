@@ -12,28 +12,37 @@ parameters:
 		- polyfill
 	ignoreErrors:
 		- identifier: missingType.iterableValue
-		- '#deprecated class League\\Uri\\BaseUri#'
-		- '#deprecated interface League\\Uri\\Contracts\\UriAccess#'
-		-
-		  message: '#Call to deprecated method fromBaseUri\(\) of class#'
-		  path: uri/FactoryTest.php
 		-
 		  identifier: binaryOp.invalid
-		  path: interfaces/IPv4/NativeCalculator.php
+		  paths:
+		    - interfaces/IPv4/NativeCalculator.php
+		    - interfaces/IPv4/Converter.php
 		-
 		  identifier: cast.string
-		  path: interfaces/IPv4/NativeCalculator.php
+		  paths:
+		    - interfaces/IPv4/NativeCalculator.php
+		    - interfaces/IPv4/BCMathCalculator.php
 		-
 		  identifier: argument.type
-		  path: interfaces/IPv4/BCMathCalculator.php
+		  paths:
+		    - interfaces/IPv4/BCMathCalculator.php
+		    - interfaces/IPv4/GMPCalculator.php
 		-
-		  identifier: cast.string
-		  path: interfaces/IPv4/BCMathCalculator.php
+		   identifier: staticMethod.deprecated
+		   path: uri/FactoryTest.php
 		-
-		  identifier: argument.type
-		  path: interfaces/IPv4/GMPCalculator.php
+		   identifier: method.deprecatedClass
+		   path: uri/BaseUriTest.php
 		-
-		  identifier: binaryOp.invalid
-		  path: interfaces/IPv4/Converter.php
+		   identifier: staticMethod.deprecatedClass
+		   path: uri/BaseUriTest.php
+		-
+		   identifier: classConstant.deprecatedClass
+		   path: uri/BaseUriTest.php
+		-
+		   identifier: class.implementsDeprecatedInterface
+		   path: components/Modifier.php
 	reportUnmatchedIgnoredErrors: true
 	treatPhpDocTypesAsCertain: false
+	parallel:
+		processTimeout: 300.0
