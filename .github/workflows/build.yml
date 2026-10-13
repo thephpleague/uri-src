@@ -73,7 +73,7 @@ jobs:
             # STATIC ANALYSIS (only once)
             - name: Run static analysis
               if: ${{ matrix.php == '8.4' && matrix.stability == 'prefer-stable' }}
-              run: composer phpstan:stable
+              run: composer phpstan
 
             # CODING STYLE (only once)
             - name: Run Coding style rules

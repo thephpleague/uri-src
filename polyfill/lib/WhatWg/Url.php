@@ -63,28 +63,34 @@ if (PHP_VERSION_ID < 80500) {
         private ?string $urlAsciiString = null;
 
         /**
-         * @param list<UrlValidationError> $errors
+         * @param list<UrlValidationError>|null $softErrors
+         * @param-out list<UrlValidationError> $softErrors
          */
-        public static function parse(string $uri, ?self $baseUrl = null, array|null &$errors = []): ?self
+        public static function parse(string $uri, ?self $baseUrl = null, array|null &$softErrors = []): ?self
         {
-            $errors ??= [];
+            if (null === $softErrors) {
+                $softErrors = [];
+            }
+
             try {
-                return new self($uri, $baseUrl, $errors);
+                return new self($uri, $baseUrl, $softErrors);
             } catch (InvalidUrlException $exception) {
-                $errors = $exception->errors;
+                $softErrors = $exception->errors;
 
                 return null;
             }
         }
 
         /**
-         * @param list<UrlValidationError> $softErrors
+         * @param-out list<UrlValidationError> $softErrors
          *
          * @throws InvalidUrlException
          */
-        public function __construct(string $uri, ?self $baseUrl = null, array|null &$softErrors = null)
+        public function __construct(string $uri, ?self $baseUrl = null, array|null &$softErrors = [])
         {
-            $softErrors ??= [];
+            if (null === $softErrors) {
+                $softErrors = [];
+            }
             $filter = static fn (mixed $error): bool => $error instanceof UrlValidationError;
             (array_is_list($softErrors) && $softErrors === array_filter($softErrors, $filter)) || throw new ValueError('the error argument must be a list containing only '.UrlValidationError::class);
 

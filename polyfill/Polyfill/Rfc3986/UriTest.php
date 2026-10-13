@@ -43,7 +43,7 @@ final class UriTest extends TestCase
             /** @var Uri $uri */
             $uri = (new ReflectionClass(Uri::class))->newInstanceWithoutConstructor();
             $this->expectException(Error::class);
-            $uri->toRawString();
+            $uri->toRawString(); /* @phpstan-ignore-line */
         } else {
             self::markTestSkipped('This test requires PHP < 8.5');
         }
