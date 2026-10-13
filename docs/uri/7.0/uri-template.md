@@ -315,8 +315,11 @@ $result = $uriTemplate->extract($uriString);
 $result->isSuccessful();      
 // true
 
+$result->hasValue();      
+// true
+
 count($result);
-// 2
+// 2 - The number of variables found
 
 echo $result['booking'];
 // '42'
@@ -365,6 +368,28 @@ $result->reasons();
 //   League\Uri\UriTemplate\ExtractionErrorReason::PrefixLengthExceeded,
 // ]
 ~~~
+
+An extraction does not always yield variables. To be sure that some variable are
+present you can use the `hasValue()` method which returns `false` if an extraction
+was succesful but yield no variables.
+
+~~~php
+use League\Uri\UriTemplate;
+
+$template = '/j//thomas?a=1';
+$uriString = '/j//thomas?a=1';
+
+$uriTemplate = new UriTemplate($template);
+$result = $uriTemplate->extract($uriString);
+// $result is a League\Uri\UriTemplate\ExtractionResult object
+
+$result->isSuccessful();
+// true
+
+$result->hasValue();
+// false
+~~~
+
 
 ### Extracted values
 
