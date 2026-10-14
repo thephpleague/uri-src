@@ -231,8 +231,8 @@ Each component of a `Result` is represented by a `ComponentResult` containing:
 use League\Uri\UrlPatternBuilder;
 
 $pattern = new UrlPatternBuilder(path: '/book/:id?')->build();
-$pattern->hasVariable; // returns true    
-
+$pattern->hasVariable(); // returns true    
+    
 $result = $pattern->extract('https://example.com/books/123');
 $result->hasValue();
 // return true
@@ -259,7 +259,7 @@ $result->hasValue();
 ### Value presence
 
 As shown previously, not all patterns yield values. To quickly determine whether a pattern can produce values during
-extraction, you can use the `UrlPattern::hasVariable` property. It returns `true` if the pattern contains a variable
+extraction, you can use the `UrlPattern::hasVariable()` method. It returns `true` if the pattern contains a variable
 that can be extracted, and `false` otherwise.
 
 ```php
@@ -268,7 +268,7 @@ use League\Uri\UrlPatternBuilder;
 $pattern = new UrlPatternBuilder(host: 'www.example.com')
     ->build();
 
-$pattern->hasVariable;
+$pattern->hasVariable();
 // false
 
 $pattern->match('https://www.example.com/2022/feb/xc44rsz');
@@ -292,10 +292,10 @@ $pattern = new UrlPatternBuilder(path: '/book/:id?')->build();
 // Since the URI matches we can extract the matching part
 $result = $pattern->extract('https://example.com/books/123');
 $result->host->hasValue(); 
-// true 
+// false 
 
 $result->path->hasValue();
-// false 
+// true 
 
 count($result->path); 
 // 1
