@@ -1891,9 +1891,12 @@ code {
   padding: 0.5rem;
 }
 
-.content tr:nth-child(even) {
+.content tr:nth-child(even) td,
+.content tr:nth-child(even) th {
   --tw-bg-opacity: 1;
   background-color: rgb(115 154 255 / var(--tw-bg-opacity, 1));
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
 
 .header-permalink {

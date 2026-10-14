@@ -463,8 +463,9 @@ code {
   @apply border border-slate-300 p-2
 }
 
-.content tr:nth-child(even) {
-  @apply bg-uri-light
+.content tr:nth-child(even) td,
+.content tr:nth-child(even) th {
+  @apply bg-uri-light text-white
 }
 
 .header-permalink {
