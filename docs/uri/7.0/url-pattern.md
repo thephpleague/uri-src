@@ -127,8 +127,26 @@ $pattern->matchMode; // UrlPattern\MatchMode::CaseSensitive
 ### Matching specific components
 
 The `League\Uri\UrlPatternBuilder` class allows specifying individual pattern
-per URI component. the returns `UrlPattern` can be relative instead of strictly absolute
-which is the case for `UrlPattern::from()`.
+per URI component. Unlike `UrlPattern::from()`, which requires an absolute
+pattern, the builder can produce either an absolute or a relative pattern.
+
+~~~php
+use League\Uri\UrlPatternBuilder;
+use League\Uri\UrlPatternBuilder\PatternType;
+
+$patternRelative = new UrlPatternBuilder()
+    ->path("/books/:id(\\d+)")
+    ->host("{*.}?example.com")
+    ->build();
+    
+$patternRelative->type; // PatternType::Relative
+    
+$patternAbsolute = UrlPattern::from(
+    pattern: "https://example.com/2022/feb/*",
+    matchMode: MatchMode::CaseInsensitive
+);
+$patternAbsolute->type // PatternType::Absolute
+~~~
 
 Once instantiated you can retrieve each pattern per component using the component name public
 read-only property. Per default, if no pattern was given to a specific component the `*` is
@@ -167,7 +185,7 @@ $pattern = new UrlPatternBuilder(
 )->build();
 ~~~
 
-The is an alternate rewrite of the previous pattern. Of course both notation can be used
+This is an alternate rewrite of the previous pattern. Of course both notation can be used
 simultaneously>
 
 The `UrlPattern` returned by the `UrlPatternBuilder::build()` method will only match
@@ -179,19 +197,18 @@ takes two optional enums:
 
 ~~~php
 use League\Uri\UrlPattern\MatchMode;
-use League\Uri\UrlPattern\PatternType;use League\Uri\UrlPatternBuilder;
+use League\Uri\UrlPattern\PatternType;
+use League\Uri\UrlPatternBuilder;
 
 $pattern = new UrlPatternBuilder()
     ->path("/2022/feb/*")
     ->baseUrl("https://example.com/users")
-    ->build(
-        matchMode: MatchMode::CaseInsensitive,
-        type: PatternType::Absolute,
-    );
+    ->build(matchMode: MatchMode::CaseInsensitive);
 
 $pattern->match("https://example.com/2022/feb/xc44rsz"); // true
 $pattern->match("https://example.com/2022/Feb/xc44rsz"); // true
-$pattern->matchMode; // UrlPattern\MatchMode::CaseInsensitive
+$pattern->matchMode; // MatchMode::CaseInsensitive
+$pattern->type;      // PatternType::Absolute
 ~~~
 
 In the example above if the return object was not an absolute URLPattern, the `build`
