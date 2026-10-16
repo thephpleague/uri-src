@@ -185,15 +185,15 @@ $pattern = new UrlPatternBuilder(
 )->build();
 ~~~
 
-This is an alternate rewrite of the previous pattern. Of course both notation can be used
-simultaneously>
+This is an alternate rewrite of the previous pattern. Of course both notations can be used
+simultaneously.
 
 The `UrlPattern` returned by the `UrlPatternBuilder::build()` method will only match
 the submitted URI against the specified URI components pattern. The `UrlPatternBuilder::build()`
 takes two optional enums:
 
 - to allow setting the case sensitivity via the  `UrlPattern\MatchMode` enum
-- to force the UrlPattern object to be abosulte or not via The `UrlPattern\PatternType` enum.
+- to force the UrlPattern object to be absolute or not via The `UrlPattern\PatternType` enum.
 
 ~~~php
 use League\Uri\UrlPattern\MatchMode;
