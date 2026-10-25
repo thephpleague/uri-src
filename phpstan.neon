@@ -42,6 +42,8 @@ parameters:
 		-
 		   identifier: class.implementsDeprecatedInterface
 		   path: components/Modifier.php
+		-
+		   message: '#Call to deprecated method expectExceptionMessage\(\) of class PHPUnit\\Framework\\TestCase:#'
 	reportUnmatchedIgnoredErrors: true
 	treatPhpDocTypesAsCertain: false
 	parallel:
