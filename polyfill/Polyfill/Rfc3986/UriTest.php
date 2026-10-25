@@ -186,6 +186,17 @@ final class UriTest extends TestCase
     }
 
     #[Test]
+    public function it_will_normalize_percent_encoded_host_letters_to_lowercase(): void
+    {
+        $uri = new Uri('http://Ex%41mple.com/');
+
+        self::assertSame('Ex%41mple.com', $uri->getRawHost());
+        self::assertSame('example.com', $uri->getHost());
+        self::assertSame('http://example.com/', $uri->toString());
+        self::assertTrue($uri->equals(new Uri('http://example.com/')));
+    }
+
+    #[Test]
     public function it_can_be_unserialized(): void
     {
         $uri = new Uri('HTTPS://EXAMPLE.COM/foo/../bar/');
