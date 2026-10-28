@@ -189,4 +189,103 @@
       dropDownList.classList.add('hidden');
     }
   });
+
+  const patterns = [
+    {
+      pattern: new URLPattern({
+        protocol: 'https',
+        hostname: 'github.com',
+        pathname: '/thephpleague/uri-src/:kind(pull|issues)/:number(\\d+)',
+      }),
+      label: ({ number }) => `#${number}`,
+    },
+    {
+      pattern: new URLPattern({
+        protocol: 'https',
+        hostname: 'github.com',
+        pathname: '/thephpleague/uri-src/:kind(pull|issues)/:number(\\d+).diff',
+      }),
+      label: ({ number }) => `#${number}`,
+    },
+    {
+      pattern: new URLPattern({
+        protocol: 'https',
+        hostname: 'github.com',
+        pathname: '/thephpleague/uri-src/:kind(pull|issues)/:number(\\d+).patch',
+      }),
+      label: ({ number }) => `#${number}`,
+    },
+    {
+      pattern: new URLPattern({
+        protocol: 'https',
+        hostname: 'github.com',
+        pathname: '/thephpleague/uri-src/commit/:sha([0-9a-fA-F]+).diff',
+      }),
+      label: ({ sha }) => `${sha.slice(0, 7)} diff`,
+    },
+    {
+      pattern: new URLPattern({
+        protocol: 'https',
+        hostname: 'github.com',
+        pathname: '/thephpleague/uri-src/commit/:sha([0-9a-fA-F]+).patch',
+      }),
+      label: ({ sha }) => `${sha.slice(0, 7)} patch`,
+    },
+  ];
+
+  const comparePattern = new URLPattern({
+    protocol: 'https',
+    hostname: 'github.com',
+    pathname: '/thephpleague/uri-src/compare/:range*',
+  });
+
+  function shortenLinks(root) {
+    root.querySelectorAll('a[href]').forEach((link) => {
+      if (link.closest('pre, code')) {
+        return;
+      }
+
+      let url;
+
+      try {
+        url = new URL(link.href);
+      } catch {
+        return;
+      }
+
+      // Preserve meaningful Markdown link labels.
+      const text = link.textContent.trim();
+
+      if (![link.href, url.href, url.pathname].includes(text)) {
+        return;
+      }
+
+      for (const { pattern, label } of patterns) {
+        const result = pattern.exec(url.href);
+
+        if (result) {
+          link.textContent = label(result.pathname.groups);
+          return;
+        }
+      }
+
+      // Compare diff and patch links.
+      const result = comparePattern.exec(url.href);
+
+      if (
+        result
+        && /\.(diff|patch)$/.test(url.pathname)
+      ) {
+        const range = url.pathname
+          .slice('/thephpleague/uri-src/compare/'.length)
+          .replace(/\.(diff|patch)$/, '');
+
+        link.textContent = range.replace('...', '…');
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.release-notes').forEach(shortenLinks);
+  });
 })();
