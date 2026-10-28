@@ -48,7 +48,8 @@ The URI manipulation package
 
 - Full validation of common URI schemes
 - URN support following **RFC 8141**
-- URI Template expansion **RFC 6570**
+- URI Template expansion **RFC 6570** and extraction
+- WHATWG **URLPattern*** support
 - **PSR-7** and **PSR-17** URI adapters
 - Resolves, Normalizes and Relativizes URIs
 
@@ -67,6 +68,8 @@ The URI Polyfill package
 
 - **Uri\Rfc3986\Uri** for PHP8.1+
 - **Uri\WhatWg\Url** for PHP8.1+
+- **Url and Uri Builders** for PHP8.1+</li>
+- **Percent-Encoding Support** for PHP8.1+</li>
 
 **Once a new major version is released, the previous stable release remains supported
 for six more months with patches and security fixes.**
