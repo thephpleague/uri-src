@@ -239,7 +239,72 @@
     pathname: '/thephpleague/uri-src/compare/:range*',
   });
 
+
   function shortenLinks(root) {
+    // Convert plain-text GitHub URLs into links first.
+    const walker = document.createTreeWalker(
+      root,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode(node) {
+          if (node.parentElement.closest('a, pre, code, script, style')) {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          return /https:\/\/github\.com\/thephpleague\/uri-src\//.test(
+            node.nodeValue
+          )
+            ? NodeFilter.FILTER_ACCEPT
+            : NodeFilter.FILTER_REJECT;
+        },
+      }
+    );
+
+    const nodes = [];
+
+    while (walker.nextNode()) {
+      nodes.push(walker.currentNode);
+    }
+
+    const urlRegex =
+      /https:\/\/github\.com\/thephpleague\/uri-src\/(?:pull|issues)\/\d+(?:\.(?:diff|patch))?|https:\/\/github\.com\/thephpleague\/uri-src\/compare\/[^\s<>"']+\.(?:diff|patch)/g;
+
+    for (const node of nodes) {
+      const text = node.nodeValue;
+      const fragment = document.createDocumentFragment();
+      let lastIndex = 0;
+      let match;
+
+      while ((match = urlRegex.exec(text)) !== null) {
+        let url = match[0];
+
+        // Strip trailing punctuation that belongs to the sentence.
+        const trailing = url.match(/[),.;!?]+$/)?.[0] ?? '';
+        url = url.slice(0, url.length - trailing.length);
+
+        if (!url) {
+          continue;
+        }
+
+        fragment.append(
+          document.createTextNode(text.slice(lastIndex, match.index))
+        );
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.textContent = url;
+        fragment.append(link, document.createTextNode(trailing));
+
+        lastIndex = match.index + match[0].length;
+      }
+
+      if (lastIndex > 0) {
+        fragment.append(document.createTextNode(text.slice(lastIndex)));
+        node.replaceWith(fragment);
+      }
+    }
+
+    // Shorten existing and newly created links.
     root.querySelectorAll('a[href]').forEach((link) => {
       if (link.closest('pre, code')) {
         return;
@@ -253,9 +318,9 @@
         return;
       }
 
-      // Preserve meaningful Markdown link labels.
       const text = link.textContent.trim();
 
+      // Preserve meaningful Markdown link labels.
       if (![link.href, url.href, url.pathname].includes(text)) {
         return;
       }
@@ -269,13 +334,9 @@
         }
       }
 
-      // Compare diff and patch links.
       const result = comparePattern.exec(url.href);
 
-      if (
-        result
-        && /\.(diff|patch)$/.test(url.pathname)
-      ) {
+      if (result && /\.(diff|patch)$/.test(url.pathname)) {
         const range = url.pathname
           .slice('/thephpleague/uri-src/compare/'.length)
           .replace(/\.(diff|patch)$/, '');
@@ -284,6 +345,7 @@
       }
     });
   }
+
 
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.release-notes').forEach(shortenLinks);
