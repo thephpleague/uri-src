@@ -698,4 +698,26 @@ final class UriTest extends TestCase
         self::assertSame('mailto:a:b', $uri->toRawString());
         self::assertSame('mailto:a:b', $uri->toString());
     }
+
+    #[DataProvider('providesValidQueryCharacters')]
+    public function test_uri_reject_valid_query_characters_issue_229(string $uri, string $query): void
+    {
+        $uri = Uri::parse($uri);
+
+        self::assertInstanceOf(Uri::class, $uri);
+        self::assertSame($query, $uri->getRawQuery());
+    }
+
+    public static function providesValidQueryCharacters(): iterable
+    {
+        yield 'query containing a `:` character' => [
+            'uri' => 'https://example.com/?next=https://example.org/',
+            'query' => 'next=https://example.org/',
+        ];
+
+        yield 'query containing a `@` character' => [
+            'uri' => 'https://example.com/?email=a@example.org',
+            'query' => 'email=a@example.org',
+        ];
+    }
 }
