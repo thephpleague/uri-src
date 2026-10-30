@@ -38,7 +38,7 @@ but allow to check if the host is:
 - an IPvFuture address using `HostRecord::isIpvFuture`
 - an IP address using `HostRecord::isIp`
 - a Registered Name address using `HostRecord::isRegisteredName`
-- a Domain Name address using `HostRecord::isDomain`
+- a Domain Name address using `HostRecord::isDomainType`
 
 ## Host Record
 
@@ -49,14 +49,15 @@ a `HostRecord` instance is returned and give you access to the following methods
 use League\Uri\HostRecord;
 
 $hostRecord = HostRecord::from('[fe80:1234::]');
-$hostRecord->value;          // returns '[fe80:1234::]'
-$hostRecord->type;           // HostType::Ipv6
-$hostRecord->format;         // HostFormat::Ascii
-$hostRecord->toAscii();      // returns '[fe80:1234::]'
-$hostRecord->toUnicode();    // returns '[fe80:1234::]'
-$hostRecord->isDomainType(); // returns false
-$hostRecord->ipValue();      // returns 'fe80:1234::'
-$hostRecord->ipVersion();    // returns '6'
+$hostRecord->value;             // returns '[fe80:1234::]'
+$hostRecord->type;              // HostType::Ipv6
+$hostRecord->format;            // HostFormat::Ascii
+$hostRecord->toAscii();         // returns '[fe80:1234::]'
+$hostRecord->toUnicode();       // returns '[fe80:1234::]'
+$hostRecord->percentEncoded();  // returns '[fe80:1234::]'
+$hostRecord->isDomainType();    // returns false
+$hostRecord->ipValue();         // returns 'fe80:1234::'
+$hostRecord->ipVersion();       // returns '6'
 ```
 
 In case of an error, a `League\Uri\Contracts\UriException` is thrown.
