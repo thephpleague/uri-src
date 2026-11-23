@@ -58,7 +58,7 @@ use function is_iterable;
 use function is_object;
 use function is_scalar;
 use function iterator_to_array;
-use function spl_object_hash;
+use function spl_object_id;
 use function str_starts_with;
 use function substr;
 
@@ -249,14 +249,14 @@ final class URLSearchParams implements Countable, IteratorAggregate, UriComponen
         $pairs = [];
         foreach ($yieldParameters($data) as $name => $value) {
             if (is_object($data)) {
-                $id = spl_object_hash($data);
+                $id = spl_object_id($data);
                 if (!array_key_exists($id, $recursive)) {
                     $recursive[$id] = 1;
                 }
             }
 
             if (is_object($value)) {
-                $id = spl_object_hash($value);
+                $id = spl_object_id($value);
                 if (array_key_exists($id, $recursive)) {
                     return [];
                 }
