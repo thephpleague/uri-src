@@ -720,4 +720,40 @@ final class UriTest extends TestCase
             'query' => 'email=a@example.org',
         ];
     }
+
+    #[DataProvider('providesInvalidReferences')]
+    public function test_resolving_an_invalid_reference_fails_issue_240(string $reference): void
+    {
+        $baseUri = new Uri('http://example.com/a/b');
+
+        self::assertNull(Uri::parse($reference));
+        self::assertNull(Uri::parse($reference, $baseUri));
+
+        $this->expectException(InvalidUriException::class);
+
+        $baseUri->resolve($reference);
+    }
+
+    public static function providesInvalidReferences(): iterable
+    {
+        yield 'colon only' => ['reference' => ':'];
+        yield 'colon as the first character of the first segment' => ['reference' => ':foo/bar'];
+        yield 'invalid scheme' => ['reference' => '1a:b'];
+        yield 'colon in the first segment before the query' => ['reference' => '::1?foo=bar'];
+    }
+
+    #[DataProvider('providesReferencesWithColon')]
+    public function test_resolving_a_reference_with_a_colon_issue_240(string $reference, string $expected): void
+    {
+        self::assertSame($expected, (new Uri('http://example.com/a/b'))->resolve($reference)->toRawString());
+    }
+
+    public static function providesReferencesWithColon(): iterable
+    {
+        yield 'colon after the first segment' => ['reference' => 'foo/b:ar', 'expected' => 'http://example.com/a/foo/b:ar'];
+        yield 'dot segment before the colon' => ['reference' => './:', 'expected' => 'http://example.com/a/:'];
+        yield 'absolute path' => ['reference' => '/:', 'expected' => 'http://example.com/:'];
+        yield 'colon in the query' => ['reference' => '?:', 'expected' => 'http://example.com/a/b?:'];
+        yield 'colon in the fragment' => ['reference' => '#:', 'expected' => 'http://example.com/a/b#:'];
+    }
 }

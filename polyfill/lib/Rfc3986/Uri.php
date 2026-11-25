@@ -77,6 +77,11 @@ if (PHP_VERSION_ID < 80500) {
                 throw new InvalidUriException('The URI `'.$formatter($uri).'` contains invalid RFC3986 characters.');
             }
 
+            if (null !== $baseUrl) {
+                // a relative reference must be valid on its own, resolving it could hide an invalid path (e.g. ":")
+                new self($uri);
+            }
+
             try {
                 $uri = null !== $baseUrl ? UriString::resolve($uri, $baseUrl->toRawString()) : $uri;
                 $components = self::addUserInfoComponent(UriString::parse($uri));
