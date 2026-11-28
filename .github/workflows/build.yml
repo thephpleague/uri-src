@@ -30,6 +30,13 @@ jobs:
                   coverage: xdebug
                   tools: composer:v2
 
+            - name: Inspect native URI extension
+              if: ${{ matrix.php == '8.6' || matrix.php == '8.7' }}
+              run: |
+                  php --ri uri
+                  php -r "var_dump(get_extension_funcs('uri'));"
+                  php -r "var_dump(function_exists('Uri\\Rfc3986\\uri_percent_encode'));"
+
             - name: Verify native URI extension
               if: ${{ matrix.php == '8.6' || matrix.php == '8.7' }}
               run: |
