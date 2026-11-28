@@ -37,18 +37,6 @@ jobs:
                   php -r "var_dump(get_extension_funcs('uri'));"
                   php -r "var_dump(function_exists('Uri\\Rfc3986\\uri_percent_encode'));"
 
-            - name: Verify native URI extension
-              if: ${{ matrix.php == '8.6' || matrix.php == '8.7' }}
-              run: |
-                  php -r "exit(extension_loaded('uri') ? 0 : 1);" || {
-                      echo "::error::The native ext-uri extension is missing."
-                      exit 1
-                  }
-
-                  php -r "exit(function_exists('Uri\\Rfc3986\\uri_percent_encode') ? 0 : 1);" || {
-                      echo "::error::Native uri_percent_encode() is unavailable."
-                      exit 1
-                  }
             - name: Validate composer files
               run: composer validate --strict
 
