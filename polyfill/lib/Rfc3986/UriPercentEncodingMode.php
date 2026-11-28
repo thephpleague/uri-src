@@ -15,7 +15,7 @@ namespace Uri\Rfc3986;
 
 use const PHP_VERSION_ID;
 
-if (PHP_VERSION_ID < 80600) {
+
     /**
      * This is a user-land polyfill to the native Uri\Rfc3986\HostType Enum included in PHP8.6.
      *
@@ -33,4 +33,3 @@ if (PHP_VERSION_ID < 80600) {
         case AllReservedCharacters;
         case AllButUnreservedCharacters;
     }
-}
