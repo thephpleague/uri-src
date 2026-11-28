@@ -99,7 +99,7 @@ final class UrlBuilderTest extends TestCase
     {
         $this->expectException(InvalidUrlException::class);
 
-        (new UrlBuilder())->setHost("\0bébé.be");
+        (new UrlBuilder())->setHost("\0bébé.be")->build();
     }
 
     public function test_building_without_calling_any_setter(): void
