@@ -2,6 +2,25 @@
 
 All Notable changes to `League\Uri\Components` will be documented in this file
 
+## [7.10.1](https://github.com/thephpleague/uri-components/compare/7.10.0...7.10.1) - 2026-11-04
+
+### Added
+
+- None
+
+### Fixed
+
+- Bump `uri` requirement.
+- URLSearchParams: Replace PHP 8.6 deprecated spl_object_hash [#241](https://github.com/thephpleague/uri-src/pull/239) by [bardrop](https://github.com/reedy)
+
+### Deprecated
+
+- None
+
+### Removed
+
+- None
+
 ## [7.10.0](https://github.com/thephpleague/uri-components/compare/7.9.1...7.10.0) - 2026-11-04
 
 ### Added

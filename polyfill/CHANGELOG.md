@@ -11,6 +11,25 @@ All Notable changes to `League\Uri` will be documented in this file
 ### Fixed
 
 - Bump `uri-interfaces` requirement.
+- `uri_percent_encode` and it's related enum are made available for PHP8.6+ because its implementation has yet to land in PHP.
+
+### Deprecated
+
+- None
+
+### Removed
+
+- None
+
+## [7.10.0](https://github.com/thephpleague/uri-polyfill/compare/7.9.1...7.10.0) - 2026-11-04
+
+### Added
+
+- None
+
+### Fixed
+
+- Bump `uri-interfaces` requirement.
 
 ### Deprecated
 
