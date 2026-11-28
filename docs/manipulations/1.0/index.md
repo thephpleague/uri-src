@@ -36,7 +36,7 @@ Installation
 --------
 
 ~~~
-$ composer require league/uri-manipulations
+composer require league/uri-manipulations
 ~~~
 
 Dependencies

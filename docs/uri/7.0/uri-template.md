@@ -7,7 +7,7 @@ description: The UriTemplate class enables expanding a URI template and its subm
 URI Template
 =======
 
-The `League\Uri\UriTemplate` class enables expanding a URI object based on a URI template and its 
+The `League\Uri\UriTemplate` class enables expanding a URI object based on a URI template and its
 submitted parameters following [RFC 6570 URI Template](http://tools.ietf.org/html/rfc6570).
 
 ## Template Expansion
@@ -87,9 +87,9 @@ version <code>7.6.0</code></p>
 
 ### Template Variables
 
-<p class="message-notice">For maximum interoperability you should make sure your variables are 
-strings or stringable objects otherwise the value will be cast to string following PHP rules 
-except for boolean values <code>true</code> and <code>false</code> which will be converted 
+<p class="message-notice">For maximum interoperability you should make sure your variables are
+strings or stringable objects otherwise the value will be cast to string following PHP rules
+except for boolean values <code>true</code> and <code>false</code> which will be converted
 to <code>1</code> and <code>0</code> respectively.</p>
 
 #### Default Variables
@@ -225,10 +225,10 @@ $uriTemplate->expand($params);
 
 #### Prefix Modifier
 
-While the RFC does not forbid this, the `UriTemplate` class will throw an exception 
-if an attempt is made to use the prefix modifier with a list of value. Other 
+While the RFC does not forbid this, the `UriTemplate` class will throw an exception
+if an attempt is made to use the prefix modifier with a list of value. Other
 implementations will silently ignore the modifier **but** this package will
-trigger the exception to alert the user that something might be wrong and 
+trigger the exception to alert the user that something might be wrong and
 that the generated URI might not be the one expected.
 
 ~~~php
@@ -250,7 +250,7 @@ echo $uriTemplate->expand($params), PHP_EOL;
 
 The following implementation disallows the use of braces `{` or  `}` outside of being URI
 template expression delimiters. If not used as the boundary of an expression an
-exception will be triggered. 
+exception will be triggered.
 
 ~~~php
 $template = 'https://example.com/hotels/{/book{?query*}';
@@ -390,7 +390,6 @@ $result->hasValue();
 // false
 ~~~
 
-
 ### Extracted values
 
 ~~~php
@@ -487,14 +486,14 @@ $result->variables();
 `ExtractionResult` also provides typed accessors for retrieving an extracted value in a
 specific type:
 
-* `ExtractionResult::string()`
-* `ExtractionResult::host()`
-* `ExtractionResult::boolean()`
-* `ExtractionResult::integer()`
-* `ExtractionResult::float()`
-* `ExtractionResult::array()`
-* `ExtractionResult::date()`
-* `ExtractionResult::enum()`
+- `ExtractionResult::string()`
+- `ExtractionResult::host()`
+- `ExtractionResult::boolean()`
+- `ExtractionResult::integer()`
+- `ExtractionResult::float()`
+- `ExtractionResult::array()`
+- `ExtractionResult::date()`
+- `ExtractionResult::enum()`
 
 These methods retrieve the raw extracted value and attempt to convert it to the requested
 type. If the value is missing or cannot be converted, `null` is returned.
@@ -563,13 +562,13 @@ $result->host('host');
 The same typed accessors are available for extracted values that are expected to be
 arrays:
 
-* `ExtractionResult::strings()`
-* `ExtractionResult::hosts()`
-* `ExtractionResult::booleans()`
-* `ExtractionResult::integers()`
-* `ExtractionResult::floats()`
-* `ExtractionResult::dates()`
-* `ExtractionResult::enums()`
+- `ExtractionResult::strings()`
+- `ExtractionResult::hosts()`
+- `ExtractionResult::booleans()`
+- `ExtractionResult::integers()`
+- `ExtractionResult::floats()`
+- `ExtractionResult::dates()`
+- `ExtractionResult::enums()`
 
 These methods are based on the value returned by the `array()` method.
 An empty array is returned if the `array()` method returns an empty array,
@@ -667,7 +666,7 @@ which only specifies URI Template expansion.
 
 Extraction also has some inherent limitations:
 
-#### Template structure.
+#### Template structure
 
 The Extraction is based on the template structure. A URI can match a template
 without containing enough information to reconstruct the complete value of a
@@ -764,7 +763,7 @@ This provides a convenient extraction-to-expansion workflow:
 URI → extract() → ExtractionResult → expand() → URI
 ```
 
-<p class="message-warning"><strong>The round trip is not necessarily lossless.</strong> A variable 
+<p class="message-warning"><strong>The round trip is not necessarily lossless.</strong> A variable
 extracted as a <strong>partial value</strong>, for example because of a prefix modifier, only
 contains the portion that could be recovered from the input. Expanding that result
 therefore uses the extracted value and cannot reconstruct information that was

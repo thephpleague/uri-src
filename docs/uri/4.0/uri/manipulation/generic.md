@@ -131,9 +131,9 @@ $origUri = Http::createFromString("http://스타벅스코리아.com/to/the/sky/"
 $origUri2 = Http::createFromString("http://xn--oy2b35ckwhba574atvuzkc.com/path/../to/the/./sky/");
 
 $modifier = (new Pipeline())
-	->pipe(new RemoveDotSegment())
-	->pipe(new HostToAscii())
-	->pipe(new KsortQuery());
+    ->pipe(new RemoveDotSegment())
+    ->pipe(new HostToAscii())
+    ->pipe(new KsortQuery());
 
 $origUri1Alt = $modifier->process($origUri1);
 $origUri2Alt = $modifier->process($origUri2);

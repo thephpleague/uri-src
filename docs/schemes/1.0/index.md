@@ -23,7 +23,6 @@ The following URI objects are defined (order alphabetically):
 - [URI](/5.0/uri/schemes/uri/) : represents a generic RFC3986 URI object
 - [Ws](/5.0/uri/schemes/ws/) : represents a WS/WSS scheme URI
 
-
 <p class="message-info">But you can easily <a href="/5.0/uri/extension/">create your own class</a> to manage others scheme specific URI.</p>
 
 To ease URI objects creation a [Factory](/5.0/uri/factory) is introduced as well as a [create](/5.0/uri/functions) function.
@@ -41,7 +40,7 @@ Installation
 --------
 
 ~~~
-$ composer require league/uri-schemes
+composer require league/uri-schemes
 ~~~
 
 Dependencies

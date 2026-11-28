@@ -6,7 +6,7 @@ title: URI resolver - relativizer
 URI resolver - relativizer
 =======
 
-The `League\Uri\UriResolver` class enable resolving or relativizing a URI object based on a base URI. 
+The `League\Uri\UriResolver` class enable resolving or relativizing a URI object based on a base URI.
 
 ## Resolving a relative URI
 

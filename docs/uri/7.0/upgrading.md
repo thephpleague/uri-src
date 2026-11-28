@@ -29,21 +29,21 @@ This will edit (or create) your `composer.json` file.
 The following methods are marked as deprecated. They are still present to allow an easier upgrade path
 to version `7.0`, but it is recommended not to use them for new projects.
 
-| Deprecated methods           | New stable methods      |
-|------------------------------|-------------------------|
-| `Uri::createFromString`      | `Uri::new`              |
-| `Uri::createFromUri`         | `Uri::new`              |
-| `Uri::createFromComponents`  | `Uri::fromComponents`   |
-| `Uri::createFromServer`      | `Uri::fromServer`       |
-| `Uri::createFromBaseUri`     | `Uri::fromBaseUri`      |
-| `Uri::createFromDataPath`    | `Uri::fromFileContents` |
-| `Uri::createFromUnixPath`    | `Uri::fromUnixPath`     |
-| `Uri::createFromWindowsPath` | `Uri::fromWindowsPath`  |
-| `Http::createFromString`     | `Http::new`             |
-| `Http::createFromUri`        | `Http::new`             |
-| `Http::createFromComponents` | `Http::fromComponents`  |
-| `Http::createFromServer`     | `Http::fromServer`      |
-| `Http::createFromBaseUri`    | `Http::fromBaseUri`     |
+| Deprecated methods | New stable methods |
+| ------------------------------ | ------------------------- |
+| `Uri::createFromString` | `Uri::new` |
+| `Uri::createFromUri` | `Uri::new` |
+| `Uri::createFromComponents` | `Uri::fromComponents` |
+| `Uri::createFromServer` | `Uri::fromServer` |
+| `Uri::createFromBaseUri` | `Uri::fromBaseUri` |
+| `Uri::createFromDataPath` | `Uri::fromFileContents` |
+| `Uri::createFromUnixPath` | `Uri::fromUnixPath` |
+| `Uri::createFromWindowsPath` | `Uri::fromWindowsPath` |
+| `Http::createFromString` | `Http::new` |
+| `Http::createFromUri` | `Http::new` |
+| `Http::createFromComponents` | `Http::fromComponents` |
+| `Http::createFromServer` | `Http::fromServer` |
+| `Http::createFromBaseUri` | `Http::fromBaseUri` |
 
 ## Deprecated Classes
 
@@ -123,6 +123,6 @@ All the static public methods are now attached to the `BaseUri` as method to the
 
 - `__set_state` named constructors is removed without replacements.
 
-| Removed Classes                                  | New Classes                                       |
-|--------------------------------------------------|---------------------------------------------------|
+| Removed Classes | New Classes |
+| -------------------------------------------------- | --------------------------------------------------- |
 | `League\Uri\Exceptions\TemplateCanNotBeExpanded` | `League\Uri\UriTemplate\TemplateCanNotBeExpanded` |

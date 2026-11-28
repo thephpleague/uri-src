@@ -19,7 +19,7 @@ Install
 --------
 
 ```
-$ composer require league/uri-interfaces
+composer require league/uri-interfaces
 ```
 
 Documentation

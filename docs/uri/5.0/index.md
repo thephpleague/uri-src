@@ -18,9 +18,9 @@ The library is a **meta package** which provides simple and intuitive classes to
 
 ## System Requirements
 
-* **PHP >= 7.0.13** but the latest stable version of PHP is recommended;
-* `mbstring` extension;
-* `intl` extension;
+- **PHP >= 7.0.13** but the latest stable version of PHP is recommended;
+- `mbstring` extension;
+- `intl` extension;
 
 ## Install
 
@@ -39,7 +39,7 @@ The primary use case for installing the entire suite is when upgrading from a ve
 If you decide you still want to install the entire [suite]( https://packagist.org/packages/league/uri) use [Composer](https://getcomposer.org/). This can be done by running the following command on a composer installed box:
 
 ~~~bash
-$ composer require league/uri
+composer require league/uri
 ~~~
 
 Most modern frameworks will include Composer out of the box, but ensure the following file is included:
@@ -50,4 +50,3 @@ Most modern frameworks will include Composer out of the box, but ensure the foll
 // Include the Composer autoloader
 require 'vendor/autoload.php';
 ~~~
-

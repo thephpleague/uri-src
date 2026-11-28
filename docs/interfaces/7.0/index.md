@@ -42,5 +42,5 @@ Install
 --------
 
 ```
-$ composer require league/uri-interfaces:^7.0
+composer require league/uri-interfaces:^7.0
 ```

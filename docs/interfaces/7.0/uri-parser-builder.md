@@ -12,7 +12,7 @@ function predates RFC3986 and as such does not fully comply to the specification
 around the limitation the tooklit provides the `League\Uri\UriString` class. It is a
 user-land PHP URI parser and builder compliant with [RFC 3986](http://tools.ietf.org/html/rfc3986) and [RFC 3987](http://tools.ietf.org/html/rfc3987)
 The class act as a drop-in replacement for PHP's `parse_url` feature.
-The class provides other core features of RFC3986 like dot segment removal, URI resolution, 
+The class provides other core features of RFC3986 like dot segment removal, URI resolution,
 and URI normalization.
 
 ## URI parsing
@@ -206,4 +206,3 @@ UriString::isValidScheme('foo '); //returns false because of the trailing space
 UriString::containsRfc3986Chars('http://bébé.be'); //returns false non-ascii character are not allowed
 UriString::containsRfc3987Chars('http://bébé.be'); //returns true
 ~~~
-

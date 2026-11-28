@@ -33,7 +33,7 @@ UserInfo::new('user:pass')->value(); //returns 'user:pass'
 UserInfo::fromUri("http://www.example.com/path/to/the/sky")->getUser(); //return null;
 UserInfo::new()->value(); //return null;
 UserInfo::fromComponents(
-	UriString::parse("http://user:pass@example.com:42/5.0/uri/api")
+    UriString::parse("http://user:pass@example.com:42/5.0/uri/api")
 )->value(); //returns 'user:pass'
 ~~~
 

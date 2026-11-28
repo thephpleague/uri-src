@@ -68,7 +68,6 @@ $arr = Uri\extract_query($query_string);
 // $arr = ['foo.bar' => 'bar', 'foo_bar' => baz'];
 ~~~
 
-
 ## QueryParser::parse
 
 ~~~php
@@ -105,7 +104,6 @@ $arr = $parser->parse($query_string, '&');
 // ]
 ~~~
 
-
 <p class="message-warning"><code>QueryParser::parse</code> is not simlar to <code>parse_str</code>, <code>QueryParser::extract</code> is.</p>
 
 <p class="message-warning"><code>QueryParser::parse</code> and <code>QueryParser::extract</code> both convert the query string into an array but <code>QueryParser::parse</code> logic don't result in data loss.</p>
@@ -129,7 +127,6 @@ $arr = Uri\parse_query($query_string, '&');
 ## QueryParser::convert
 
 <p class="message-info">Available since version <code>1.5.0</code>.</p>
-
 
 ~~~php
 <?php
@@ -162,7 +159,6 @@ $arr = $parser->convert(['foo.bar' => ['2', 3, true]]);
 $arr = Uri\pairs_to_params(['foo.bar' => ['2', 3, true]]);
 //in both cases $arr = ['foo.bar' => 'true'];
 ~~~
-
 
 ## QueryBuilder::build
 

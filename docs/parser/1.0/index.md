@@ -28,9 +28,8 @@ While the library no longer requires out of the box the `intl` extension startin
 
 ## Installation
 
-
 ~~~bash
-$ composer require league/uri-parser
+composer require league/uri-parser
 ~~~
 
 ## URI parsing
@@ -71,7 +70,7 @@ var_export(parse_url('http://foo.com?@bar.com/'));
 // Depending on the PHP version
 ~~~
 
-### The Parser returns all URI components.
+### The Parser returns all URI components
 
 ~~~php
 <?php
@@ -144,7 +143,7 @@ $parser($uri)['path'];         //returns ''
 parse_url($uri, PHP_URL_PATH); //returns null
 ~~~
 
-### The parser throws exception instead of returning `false`.
+### The parser throws exception instead of returning `false`
 
 ~~~php
 <?php

@@ -62,17 +62,16 @@ $uri = Uri\Http::createFromString(':');
 
 <p class="message-info"><code>League\Uri\Exception</code> extends PHP's SPL <code>InvalidArgumentException</code>.</p>
 
-
 ~~~php
 <?php
 
 use League\Uri;
 
 try {
-	$uri = Uri\Http::createFromString(':');
+    $uri = Uri\Http::createFromString(':');
 } catch (Uri\Exception $e) {
-	//$e is either League\Uri\Exception
-	//or League\Uri\UriException
+    //$e is either League\Uri\Exception
+    //or League\Uri\UriException
 }
 ~~~
 

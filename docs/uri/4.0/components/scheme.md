@@ -10,7 +10,7 @@ The library provides a `Scheme` class to ease scheme creation and manipulation.
 
 ## Instantiation
 
-### Using the default constructor.
+### Using the default constructor
 
 ~~~php
 <?php

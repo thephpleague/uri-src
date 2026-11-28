@@ -172,7 +172,7 @@ $query = Query::createFromParams($params, '|');
 echo $query->getContent(); // returns 'foo=bar|bar=baz%20bar'
 ~~~
 
-<p class="message-info">The <code>$params</code> input can be any argument type supported by <code>http_build_query</code> which means that it can be an <code>iterable</code> or 
+<p class="message-info">The <code>$params</code> input can be any argument type supported by <code>http_build_query</code> which means that it can be an <code>iterable</code> or
 an object with public properties.</p>
 
 <p class="message-notice">If you want a better parsing you can use the <a href="/components/2.0/query-parser-builder/">QueryString</a> class.</p>
@@ -191,7 +191,6 @@ $arr = Query::createFromRFC3986($query_string))->params();
 // $arr = ['foo.bar' => 'bar', 'foo_bar' => baz']];
 ~~~
 
-
 If you are only interested in a given argument you can access it directly by supplyling the argument name as show below:
 
 ~~~php
@@ -201,7 +200,6 @@ $query->params('gweta'); //return null
 ~~~
 
 The method returns the value of a specific argument. If the argument does not exist it will return `null`.
-
 
 ### Query::withoutParam
 
@@ -264,9 +262,9 @@ The `$pairs` input must an iterable which exposes the same structure as `QuerySt
 
 Returns a new `Query` object from an `array` or a `Traversable` object.
 
-* `$pairs` : The submitted data must be an `array` or a `Traversable` key/value structure similar to the result of [Query::parse](#parsing-the-query-string-into-an-array).
+- `$pairs` : The submitted data must be an `array` or a `Traversable` key/value structure similar to the result of [Query::parse](#parsing-the-query-string-into-an-array).
 
-* `$separator` : The query string separator used for string representation. By default equals to `&`;
+- `$separator` : The query string separator used for string representation. By default equals to `&`;
 
 #### Examples
 

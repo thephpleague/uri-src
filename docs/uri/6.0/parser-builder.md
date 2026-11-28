@@ -41,7 +41,7 @@ var_export(parse_url('http://foo.com?@bar.com/'));
 // Depending on the PHP version
 ~~~
 
-### The Parser returns all URI components.
+### The Parser returns all URI components
 
 ~~~php
 var_export(UriString::parse('http://www.example.com/'));
@@ -93,7 +93,7 @@ UriString::parse($uri)['path']; //returns ''
 parse_url($uri, PHP_URL_PATH);  //returns null
 ~~~
 
-### The parser throws exception instead of returning `false`.
+### The parser throws exception instead of returning `false`
 
 ~~~php
 parse_url($uri); //returns false

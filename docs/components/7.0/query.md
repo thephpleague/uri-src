@@ -191,8 +191,8 @@ public Query::mergeParameters(array $data): self
 public Query::replaceParameter(string $name, mixed $value): self;
 ~~~
 
-<p class="message-info"><code>Query::fromVariable</code> replaced the deprecated 
-<code>Query::fromParameters</code> named constructor which was 
+<p class="message-info"><code>Query::fromVariable</code> replaced the deprecated
+<code>Query::fromParameters</code> named constructor which was
 not inconsistent against <code>http_build_query</code> algorithm.</p>
 
 ### Instantiation
@@ -211,7 +211,7 @@ echo $query->value(); // returns 'foo=bar|bar=baz%20bar'
 
 ### Accessing Parameters
 
-If you already have an instantiated `Query` object you can return all the query string deserialized 
+If you already have an instantiated `Query` object you can return all the query string deserialized
 arguments using the `Query::parameters` method:
 
 ~~~php
@@ -340,8 +340,8 @@ The `$pairs` input must an iterable which exposes the same structure as `QuerySt
 
 Returns a new `Query` object from an `array` or a `Traversable` object.
 
-* `$pairs` : The submitted data must be an `array` or a `Traversable` key/value structure similar to the result of [Query::parse](#parsing-the-query-string-into-an-array).
-* `$separator` : The query string separator used for string representation, by default, equals to `&`;
+- `$pairs` : The submitted data must be an `array` or a `Traversable` key/value structure similar to the result of [Query::parse](#parsing-the-query-string-into-an-array).
+- `$separator` : The query string separator used for string representation, by default, equals to `&`;
 
 ~~~php
 $query =  Query::fromPairs([
@@ -433,7 +433,7 @@ the WHATWG documentation. If the key does not exist `null` will be returned.
 
 <p class="message-info">The returned data are fully decoded.</p>
 
-Since version `7.7.0`, `Query::get()` is an alias of `Query::first()`, `Query::last()` is the 
+Since version `7.7.0`, `Query::get()` is an alias of `Query::first()`, `Query::last()` is the
 complementary method which returns the last value of a specific pair key as explained.
 If the key does not exist `null` will be returned. This value is more in line with what PHP
 developer expects when using `_GET` or `parse_str` on non-array like value.
@@ -492,12 +492,12 @@ $query->has('foo', 'p');        //return true
 
 `Query` provides typed accessors to retrieve a query pair value as a specific type:
 
-* `Query::string()`
-* `Query::boolean()`
-* `Query::integer()`
-* `Query::float()`
-* `Query::date()`
-* `Query::enum()`
+- `Query::string()`
+- `Query::boolean()`
+- `Query::integer()`
+- `Query::float()`
+- `Query::date()`
+- `Query::enum()`
 
 These methods have the same semantics as `Query::get()` (and therefore `Query::first()`):
 they retrieve the first value associated with the given key and attempt to convert it to the
@@ -575,12 +575,12 @@ $query->integer(key: 'notfound', default: 42);
 `Query` also provides plural typed accessors to retrieve and convert all values associated
 with a query pair:
 
-* `Query::strings()`
-* `Query::booleans()`
-* `Query::integers()`
-* `Query::floats()`
-* `Query::dates()`
-* `Query::enums()`
+- `Query::strings()`
+- `Query::booleans()`
+- `Query::integers()`
+- `Query::floats()`
+- `Query::dates()`
+- `Query::enums()`
 
 These methods have the same semantics as `Query::getAll()`: all values associated with the
 given key are retrieved and each value is converted to the requested type.
@@ -739,10 +739,10 @@ Query::new('foo=bar&p=y+olo&z=')->appendTo('foo', 'new')->toString();
 
 `Query::withoutPairByKey` returns a new `Query` object with deleted pairs according to their keys.
 `Query::withoutPairByValue` does similar but delete the pairs according to their values. Last
-but not least `Query::withoutPairByKeyAndValue` does the deletion depending on the presence of 
+but not least `Query::withoutPairByKeyAndValue` does the deletion depending on the presence of
 the pair key and value.
 
-`Query::withoutPairByKey` and `Query::withoutPairByValue` expect a variable list of key or value to 
+`Query::withoutPairByKey` and `Query::withoutPairByValue` expect a variable list of key or value to
 be removed as its sole arguments. `Query::withoutPairByKeyAndValue` on the other hand expect two (2)
 parameter the pair's key and value.
 
@@ -806,6 +806,7 @@ $query = Query::fromUri('http://example.com/?b=2&a[]=1&a[]=2&a[]=3');
 $query->hasList('a'); // true
 $query->hasList('b'); // false
 ```
+
 The parameter `a` is written using bracket notation (`a[]`), after parsing using
 PHP algorithm, an array is generated. On the otherhand the `b` parameter does not
 exist as an array, it is a scalar value so `hasList` returns false.

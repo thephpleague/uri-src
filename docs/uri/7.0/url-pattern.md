@@ -14,7 +14,7 @@ These patterns can be matched against URLs or individual URL components.
 
 ## Introduction
 
-Patterns are specified using the `URLPattern` class. The pattern syntax is based on the syntax from the [path-to-regexp library](https://github.com/pillarjs/path-to-regexp). 
+Patterns are specified using the `URLPattern` class. The pattern syntax is based on the syntax from the [path-to-regexp library](https://github.com/pillarjs/path-to-regexp).
 
 ### Available patterns
 
@@ -26,7 +26,7 @@ Patterns can contain:
 - **Groups:** `/books{/old}` — groups part of a pattern.
 - **Regex groups:** `/books/:id(\d+)` — constrains a captured value with a regular expression.
 - **Optional groups:** `/books/:id?` — makes a group optional.
-- **Repeated groups:** `/books/:id+` — matches one or more occurrences; 
+- **Repeated groups:** `/books/:id+` — matches one or more occurrences;
 - **Repeated groups:** `/books/:id*` — matches zero or more occurrences.
 
 ### URLPattern API
@@ -34,18 +34,18 @@ Patterns can contain:
 The API follows [the WHATWG URL Pattern specification](https://urlpattern.spec.whatwg.org/). The PHP implementation
 uses PHP-oriented names and types where they differ from the WHATWG API.
 
-| WHATWG API                          | PHP implementation                        |
-|-------------------------------------|-------------------------------------------|
-| `URLPattern::test()`                | `UrlPattern::match()`                     |
-| `URLPattern::exec()`                | `UrlPattern::extract()`                   |
-| `URLPattern::protocol`              | `UrlPattern::scheme`                      |
-| `URLPattern::hostname`              | `UrlPattern::host`                        |
-| `URLPattern::pathname`              | `UrlPattern::path`                        |
-| `URLPattern::hash`                  | `UrlPattern::fragment`                    |
-| `URLPatternResult::protocol`        | `UrlPattern\Result::scheme`               |
-| `URLPatternResult::hostname`        | `UrlPattern\Result::host`                 |
-| `URLPatternResult::pathname`        | `UrlPattern\Result::path`                 |
-| `URLPatternResult::hash`            | `UrlPattern\Result::fragment`             |
+| WHATWG API | PHP implementation |
+| ------------------------------------- | ------------------------------------------- |
+| `URLPattern::test()` | `UrlPattern::match()` |
+| `URLPattern::exec()` | `UrlPattern::extract()` |
+| `URLPattern::protocol` | `UrlPattern::scheme` |
+| `URLPattern::hostname` | `UrlPattern::host` |
+| `URLPattern::pathname` | `UrlPattern::path` |
+| `URLPattern::hash` | `UrlPattern::fragment` |
+| `URLPatternResult::protocol` | `UrlPattern\Result::scheme` |
+| `URLPatternResult::hostname` | `UrlPattern\Result::host` |
+| `URLPatternResult::pathname` | `UrlPattern\Result::path` |
+| `URLPatternResult::hash` | `UrlPattern\Result::fragment` |
 | `URLPatternComponentResult::groups` | `UrlPattern\ComponentResult::variables()` |
 
 - `UrlPattern\Result` contain only the extracted values; they do not retain the `UrlPattern` instance or the pattern strings used for extraction.
@@ -216,7 +216,7 @@ method would have thrown a `SyntaxError` exception.
 
 ## Extracted values
 
-`League\Uri\UrlPattern::extract()`: 
+`League\Uri\UrlPattern::extract()`:
 
 - returns an `League\Uri\UrlPattern\Result` which is a container for every component individual results. Each result is a `League\Uri\UrlPattern\ComponentResult` instance.
 - returns `null` if the submitted URI does not match the pattern
@@ -375,12 +375,12 @@ the `fragment` component does not because the URL contains no fragment.
 `ComponentResult` also provides typed accessors for retrieving an extracted value in a
 specific type:
 
-* `ComponentResult::string()`
-* `ComponentResult::boolean()`
-* `ComponentResult::integer()`
-* `ComponentResult::float()`
-* `ComponentResult::date()`
-* `ComponentResult::enum()`
+- `ComponentResult::string()`
+- `ComponentResult::boolean()`
+- `ComponentResult::integer()`
+- `ComponentResult::float()`
+- `ComponentResult::date()`
+- `ComponentResult::enum()`
 
 These methods retrieve an extracted value and attempt to convert it to the requested PHP type.
 If the value is missing or cannot be converted, they return `null`.

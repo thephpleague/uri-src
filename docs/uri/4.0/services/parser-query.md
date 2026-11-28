@@ -24,9 +24,9 @@ The `QueryParser::parse` method returns an `array` representation of the query s
 - The query string;
 - The query string separator, by default it is set to `&`;
 - The query string encoding. It can be:
-    - `PHP_QUERY_RFC3986`
-    - `PHP_QUERY_RFC1738`
-    - `false` if you don't want any encoding.
+  - `PHP_QUERY_RFC3986`
+  - `PHP_QUERY_RFC1738`
+  - `false` if you don't want any encoding.
 
 <p class="message-info">By default or if the submitted encoding is invalid the encoding is set to PHP constant <code>PHP_QUERY_RFC3986</code></p>
 
@@ -43,7 +43,7 @@ $arr = $parser->parse($query_string, '&', PHP_QUERY_RFC3986);
 // $arr is an array containing ["toto.foo" => ["bar", "baz"]]
 ~~~
 
-### Main differences with `parse_str`:
+### Main differences with `parse_str`
 
 - `parse_str` replaces any invalid characters from the query string pair key that can not be included in a PHP variable name by an underscore `_`.
 - `parse_str` merges query string values.
@@ -71,9 +71,9 @@ The `QueryParser::build` method returns and preserves string representation of t
 - A valid `array` of data to convert;
 - The query string separator, by default it is set to `&`;
 - The query string encoding. It can be:
-    - `PHP_QUERY_RFC3986`
-    - `PHP_QUERY_RFC1738`
-    - `false` if you don't want any encoding.
+  - `PHP_QUERY_RFC3986`
+  - `PHP_QUERY_RFC1738`
+  - `false` if you don't want any encoding.
 
 <p class="message-notice">By default or if the submitted encoding is invalid the encoding is set to PHP constant <code>PHP_QUERY_RFC3986</code></p>
 
@@ -96,7 +96,7 @@ $res = $parser->build($arr, '&', false);
 
 No key indexes are added and the query string is safely recreated
 
-### Main differences with `http_build_query`:
+### Main differences with `http_build_query`
 
 `http_build_query` always adds array numeric prefix to the query string even when they are not needed.
 

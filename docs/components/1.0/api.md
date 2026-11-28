@@ -19,16 +19,16 @@ This interface is used to normalized URI component representation while taking i
 
 interface ComponentInterface
 {
-	const NO_ENCODING = 0;
-	const RFC1738_ENCODING = 1;
-	const RFC3986_ENCODING = 2;
-	const RFC3987_ENCODING = 3;
+    const NO_ENCODING = 0;
+    const RFC1738_ENCODING = 1;
+    const RFC3986_ENCODING = 2;
+    const RFC3987_ENCODING = 3;
 
-	public function __toString(void): string
-	public function getContent(int $enc_type = self::RFC3986_ENCODING): mixed
-	public function getUriComponent(void): string
-	public function isEmpty(void): bool
-	public function isNull(void): bool
+    public function __toString(void): string
+    public function getContent(int $enc_type = self::RFC3986_ENCODING): mixed
+    public function getUriComponent(void): string
+    public function isEmpty(void): bool
+    public function isNull(void): bool
 }
 ~~~
 
@@ -78,15 +78,14 @@ $port->isEmpty(); //returns false
 echo $port->getContent(); //displays (int) 23;
 ~~~
 
-
 - `ComponentInterface::__toString` returns the normalized and RFC3986 encoded string version of the component.
 - `ComponentInterface::getUriComponent` returns the same output as `ComponentInterface::__toString` with the component optional delimiter.
 
 For a more generalized representation you must use the `ComponentInterface::getContent` method. This method returns type can be:
 
-* `null` : If `ComponentInterface::isNull` returns `true`;
-* `string` : If `ComponentInterface::isNull` returns `false`;
-* `int`: For a defined URI component Port object;
+- `null` : If `ComponentInterface::isNull` returns `true`;
+- `string` : If `ComponentInterface::isNull` returns `false`;
+- `int`: For a defined URI component Port object;
 
  The string is normalized and encoded according to the component rules and the optional `$enc_type` parameter. The `$enc_type` parameter can take on of the following values:
 

@@ -54,8 +54,8 @@ $uri = Http::fromServer($_SERVER);
 <p class="message-warning">If you supply your own hash to <code>fromComponents</code>,
 you are responsible for providing well parsed components without their URI delimiters.</p>
 
-<p class="message-warning">The <code>fromServer</code> method only relies on the server's 
-safe parameters to determine the current URI. If you are using the library behind a 
+<p class="message-warning">The <code>fromServer</code> method only relies on the server's
+safe parameters to determine the current URI. If you are using the library behind a
 proxy the result may differ from your expectation as no <code>$_SERVER['HTTP_X_*']</code>
 header is taken into account for security reasons.</p>
 
@@ -121,8 +121,8 @@ echo (string) Uri::new('http://example.com/path/to?#');
 <p class="message-info">This improved compliance is available since version <code>7.5.0</code></p>
 
 Because `PSR-7` UriInterface implementing object `getPath` may be used in
-header. A security issue may rise if the path is not stripped of multiple starting `/`. 
-As such, `getPath` yield a different result depending on its raw value. 
+header. A security issue may rise if the path is not stripped of multiple starting `/`.
+As such, `getPath` yield a different result depending on its raw value.
 
 ~~~php
 echo Http::new('https://example.com//miscillaneous.tld')->getPath();

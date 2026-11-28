@@ -62,8 +62,8 @@ The method expects at most 2 arguments:
 - The first required argument must be a collection of label (an `array` or a `Traversable` object). **The labels must be ordered hierarchically, this mean that the array should have the top-level domain in its first entry**.
 
 - The second optional argument, a `Host` constant, tells whether this is an <abbr title="Fully Qualified Domain Name">FQDN</abbr> or not:
-    - `Host::IS_ABSOLUTE` creates an a fully qualified domain name `Host` object;
-    - `Host::IS_RELATIVE` creates an a partially qualified domain name `Host` object;
+  - `Host::IS_ABSOLUTE` creates an a fully qualified domain name `Host` object;
+  - `Host::IS_RELATIVE` creates an a partially qualified domain name `Host` object;
 
 By default this optional argument equals to `Host::IS_RELATIVE`.
 
@@ -445,9 +445,9 @@ To replace a label you must use the `Host::replace` method with two arguments:
 
 - The label's key to replace if it exists.
 - The data to replace the key with. This data can be:
-    - another `Host` object;
-    - an object which implements the `__toString` method;
-    - a string;
+  - another `Host` object;
+  - an object which implements the `__toString` method;
+  - a string;
 
 ~~~php
 <?php
@@ -514,7 +514,7 @@ use League\Uri\Components\Host;
 
 $host    = new Host('www.11.be');
 $newHost = $host->filter(function ($value) {
-	return !is_numeric($value);
+    return !is_numeric($value);
 }, Host::FILTER_USE_VALUE);
 echo $newHost; //displays 'www.be'
 ~~~
@@ -528,7 +528,7 @@ use League\Uri\Components\Host;
 
 $host    = new Host('www.11.be');
 $newHost = $host->filter(function ($value) {
-	return $value != 2;
+    return $value != 2;
 }, Host::FILTER_USE_KEY);
 echo $newHost; //displays '11.be'
 ~~~

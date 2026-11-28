@@ -83,7 +83,6 @@ In addition to merging the query to the URI, `MergeQuery` has:
 - not mangle your data during merging;
 - returned an URI object of the same class as the one it received;
 
-
 ## URI Middleware Interface
 
 ~~~php
@@ -96,8 +95,8 @@ The `UriMiddlewareInterface::process` :
 
 - expects its single argument to be an URI object which implements either:
 
-    - `Psr\Http\Message\UriInteface`;
-    - `League\Uri\Interfaces\Uri`;
+  - `Psr\Http\Message\UriInteface`;
+  - `League\Uri\Interfaces\Uri`;
 
 - must return a instance of the same type as the submitted object.
 - is transparent when dealing with error and exceptions. It must not alter of silence them apart from validating their own parameters.

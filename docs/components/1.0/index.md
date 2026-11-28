@@ -11,14 +11,12 @@ Uri Components
 
 This package contains concrete URI components object represented as immutable value object as well as function to ease component parsing.
 
-
 List of URI component objects
 --------
 
 Each URI component object implements the `League\Uri\Components\ComponentInterface` interface.
 
 All URI components objects are located under the following namespace : `League\Uri\Components`
-
 
 The following URI component objects are defined (order alphabetically):
 
@@ -44,7 +42,7 @@ Installation
 --------
 
 ~~~
-$ composer require league/uri-components
+composer require league/uri-components
 ~~~
 
 Dependencies

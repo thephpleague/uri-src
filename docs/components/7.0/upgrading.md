@@ -8,8 +8,8 @@ description: This guide will help you migrate from a 2.x version to the package 
 
 `league\uri-components 7.0` is a new major version that comes with backward compatibility breaks.
 
-This guide will help you migrate from a 2.x version to 7.0. It will only explain backward 
-compatibility breaks, it will not present the new features 
+This guide will help you migrate from a 2.x version to 7.0. It will only explain backward
+compatibility breaks, it will not present the new features
 ([read the documentation for that](/uri-components/7.0/)).
 
 ## Installation
@@ -106,49 +106,48 @@ Deprecated methods
 The following methods are marked as deprecated. They are still present to allow an easier upgrade path
 to version `7.0`, but it is recommended not to use them for new projects.
 
-| Deprecated methods                             | New stable methods                |
-|------------------------------------------------|-----------------------------------|
-| `Authority::createFromString`                  | `Authority::new`                  |
-| `Authority::createFromUri`                     | `Authority::new`                  |
-| `Authority::createFromNull`                    | `Authority::new`                  |
-| `Authority::createFromServer`                  | `Authority::fromServer`           |
-| `Authority::createFromComponents`              | `Authority::fromComponents`       |
-| `DataPath::createFromString`                   | `DataPath::new`                   |
-| `DataPath::createFromUri`                      | `DataPath::fromUri`               |
-| `DataPath::createFromFilePath`                 | `DataPath::fromFileContents`      |
-| `Domain::createFromHost`                       | `Domain::new`                     |
-| `Domain::createFromString`                     | `Domain::new`                     |
-| `Domain::createFromLabels`                     | `Domain::fromLabels`              |
-| `Domain::createFromUri`                        | `Domain::fromUri`                 |
-| `Domain::createFromAuthority`                  | `Domain::fromAuthority`           |
-| `Fragment::createFromString`                   | `Fragment::new`                   |
-| `Fragment::createFromUri`                      | `Fragment::fromUri`               |
-| `Scheme::createFromString`                     | `Scheme::new`                     |
-| `Scheme::createFromUri`                        | `Scheme::fromUri`                 |
-| `Path::createFromString`                       | `Path::new`                       |
-| `Path::createFromUri`                          | `Path::fromUri`                   |
-| `Port::fromInt`                                | `Port::new`                       |
-| `Port::createFromUri`                          | `Port::fromUri`                   |
-| `Port::createFromAuthority`                    | `Port::fromAuthority`             |
-| `Host::createFromString`                       | `Host::new`                       |
-| `Host::createFromUri`                          | `Host::new`                       |
-| `Host::createFromNull`                         | `Host::new`                       |
-| `Host::createFromIp`                           | `Host::fromIp`                    |
-| `HierarchicalPath::createFromString`           | `HierarchicalPath::new`           |
-| `HierarchicalPath::createFromUri`              | `HierarchicalPath::new`           |
-| `HierarchicalPath::createFromPath`             | `HierarchicalPath::new`           |
-| `HierarchicalPath::createRelativeFromSegments` | `HierarchicalPath::fromRelative`  |
-| `HierarchicalPath::createAbsoluteFromSegments` | `HierarchicalPath::fromAbsolute`  |
-| `Query::createFromParams`                      | `Query::fromParameters`           |
-| `Query::createFromPairs`                       | `Query::fromPairs`                |
-| `Query::createFromUri`                         | `Query::fromUri()`                |
-| `Query::createFromRFC3986`                     | `Query::fromRFC3986`              |
-| `Query::createFromRFC1738`                     | `Query::fromRFC1738`              |
-| `Query::params`                                | `Query::parameter`                |
-| `Query::params`                                | `Query::parameters`               |
-| `Query::withoutParams`                         | `Query::withoutParameters`        |
-| `Query::toRFC3986`                             | `Query::value`                    |
-
+| Deprecated methods | New stable methods |
+| ------------------------------------------------ | ----------------------------------- |
+| `Authority::createFromString` | `Authority::new` |
+| `Authority::createFromUri` | `Authority::new` |
+| `Authority::createFromNull` | `Authority::new` |
+| `Authority::createFromServer` | `Authority::fromServer` |
+| `Authority::createFromComponents` | `Authority::fromComponents` |
+| `DataPath::createFromString` | `DataPath::new` |
+| `DataPath::createFromUri` | `DataPath::fromUri` |
+| `DataPath::createFromFilePath` | `DataPath::fromFileContents` |
+| `Domain::createFromHost` | `Domain::new` |
+| `Domain::createFromString` | `Domain::new` |
+| `Domain::createFromLabels` | `Domain::fromLabels` |
+| `Domain::createFromUri` | `Domain::fromUri` |
+| `Domain::createFromAuthority` | `Domain::fromAuthority` |
+| `Fragment::createFromString` | `Fragment::new` |
+| `Fragment::createFromUri` | `Fragment::fromUri` |
+| `Scheme::createFromString` | `Scheme::new` |
+| `Scheme::createFromUri` | `Scheme::fromUri` |
+| `Path::createFromString` | `Path::new` |
+| `Path::createFromUri` | `Path::fromUri` |
+| `Port::fromInt` | `Port::new` |
+| `Port::createFromUri` | `Port::fromUri` |
+| `Port::createFromAuthority` | `Port::fromAuthority` |
+| `Host::createFromString` | `Host::new` |
+| `Host::createFromUri` | `Host::new` |
+| `Host::createFromNull` | `Host::new` |
+| `Host::createFromIp` | `Host::fromIp` |
+| `HierarchicalPath::createFromString` | `HierarchicalPath::new` |
+| `HierarchicalPath::createFromUri` | `HierarchicalPath::new` |
+| `HierarchicalPath::createFromPath` | `HierarchicalPath::new` |
+| `HierarchicalPath::createRelativeFromSegments` | `HierarchicalPath::fromRelative` |
+| `HierarchicalPath::createAbsoluteFromSegments` | `HierarchicalPath::fromAbsolute` |
+| `Query::createFromParams` | `Query::fromParameters` |
+| `Query::createFromPairs` | `Query::fromPairs` |
+| `Query::createFromUri` | `Query::fromUri()` |
+| `Query::createFromRFC3986` | `Query::fromRFC3986` |
+| `Query::createFromRFC1738` | `Query::fromRFC1738` |
+| `Query::params` | `Query::parameter` |
+| `Query::params` | `Query::parameters` |
+| `Query::withoutParams` | `Query::withoutParameters` |
+| `Query::toRFC3986` | `Query::value` |
 
 For the `Domain`, the `createFromLabels` named constructor is being replaced by `fromLabels`.
 The signature is also updated from `iterable` to `string` as variadic to allow easier validation of input.
@@ -192,7 +191,7 @@ All remaining named constructors which starts with `createFrom*` are replaced by
 Removed
 ----------
 
-###  UserInfo modifier method removed
+### UserInfo modifier method removed
 
 The `UserInfo::withUserInfo` modifier method is removed and can be replaced by combining the two
 new modifier methods introduced `UserInfo::withUser` and/or `UserInfo::withUPass`.
@@ -202,7 +201,7 @@ new modifier methods introduced `UserInfo::withUser` and/or `UserInfo::withUPass
 + (new UserInfo('user', 'pass'))->withPass('newPass')->value(); // returns 'user:newPass'
 ````
 
-###  `withContent` and `getContent` methods
+### `withContent` and `getContent` methods
 
 The two methods were already deprecated in version 2. And they are now removed in version 7.
 Of note, it means that the `Scheme` and `Fragment` objects no longer contain methods to change

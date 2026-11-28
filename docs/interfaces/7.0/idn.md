@@ -33,7 +33,7 @@ $result['isTransitionalDifferent'];  // returns false
 which means remembering:
 
 - the flags value,
-- the parameters position, 
+- the parameters position,
 - the return value can be the converted domain or `false` in case of error
 - that the result is filled by reference so if not provided you won't know the reason for failure or success.
 - the `errors` keys represents a bitset of the error constants `IDNA_ERROR_*`
@@ -87,7 +87,7 @@ The `League\Uri\Idna\Error` enum provides the official name of the error as well
 the `Error::description` method.
 
 Both static methods `Converter::toAscii` and `Converter::toUnicode` expect a host string
-and some IDN related options. 
+and some IDN related options.
 
 <p class="message-info">since version <code>7.2.0</code> The <code>Converter</code> methods also accept <code>Stringable</code>
 object as domain input.</p>
@@ -151,12 +151,12 @@ Last but not least if you prefer methods that throw exceptions instead of having
 method for error you can use the following related methods:
 
 - `Converter::toAsciiOrFail` instead of `Converter::toAscii`;
-- `Converter::toUnicodeOrFail` instead of `Converter::toUnicode`; 
+- `Converter::toUnicodeOrFail` instead of `Converter::toUnicode`;
 
 Both methods will directly return the converted domain string or throw a `League\Uri\Exceptions\ConversionFailed` exception
 on error. You can still access:
 
-- the result by calling the `ConversionFailed::getResult` method. 
+- the result by calling the `ConversionFailed::getResult` method.
 - the original submitted host string using the `ConversionFailed::getHost` method.
 
 The exception message will contain a concatenation of all the error descriptions available for the conversion.

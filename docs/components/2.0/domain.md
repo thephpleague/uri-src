@@ -11,8 +11,8 @@ The library provides a `Domain` class to ease domain host creation and manipulat
 The class validates domain names according to [RFC952](https://tools.ietf.org/html/rfc952) and [RFC1123](https://tools.ietf.org/html/rfc1123#page-13)
 
 In addition it exposes:
- 
-- the [package common API](/components/2.0/api/), 
+
+- the [package common API](/components/2.0/api/),
 - the [Host common API](/components/2.0/host/),
 
 but also provide specific methods to work with a URI domain host component.
@@ -75,7 +75,7 @@ $domain = Domain::createFromUri($psr7Uri);
 $domain->getContent(); //return 'www.example.com';
 ~~~
 
-### Using a collection of domain labels.
+### Using a collection of domain labels
 
 A host is a collection of labels delimited by the host separator `.`. So it is possible to create a `Host` object using a collection of labels with the `Domain::createFromLabels` method.
 The method expects a single arguments, a collection of label. **The labels must be ordered hierarchically, this mean that the array should have the top-level domain in its first entry**.

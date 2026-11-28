@@ -22,7 +22,7 @@ It includes classes for [URI](/uri/7.0/rfc3986/), [URN](/uri/7.0/urn/) and [UriT
 - The **UriTemplate class** implements RFC 6570 for expanding and resolving URI templates.
 
 For interoperability, the package also provides [PSR-7 and PSR-17](/uri/7.0/psr-compliance/) compliant implementations
-around URI access and creation. 
+around URI access and creation.
 
 System Requirements
 -------
@@ -53,7 +53,7 @@ Installation
 --------
 
 ~~~
-$ composer require league/uri:^7.0
+composer require league/uri:^7.0
 ~~~
 
 Dependencies

@@ -18,9 +18,7 @@ public UriParser::parse(string $uri): string
 public UriParser::__invoke(string $uri): string
 ~~~
 
-
 <p class="message-notice">Since <code>version 4.1</code>: <code>UriParser::__invoke</code> is an alias of <code>UriParser::parse</code>.</p>
-
 
 The methods parse an URI according to RFC3986 and expect a `string`. They return a hash representation of the URI similar to `parse_url` results.
 

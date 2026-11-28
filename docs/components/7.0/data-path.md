@@ -7,7 +7,7 @@ description: The DataPath class handles the Path URI component associated with a
 # Data URI Path
 
 The `DataPath` class represents a data path component. Apart from the [package common API](/components/7.0/)
-and the [path common API](/components/7.0/path), the class exposes specific properties and methods to 
+and the [path common API](/components/7.0/path), the class exposes specific properties and methods to
 work with Data URI paths.
 
 ## Instantiation

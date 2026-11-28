@@ -10,7 +10,7 @@ The library provides a `User` class to ease user creation and manipulation.
 
 ## Instantiation
 
-### Using the default constructor.
+### Using the default constructor
 
 ~~~php
 <?php

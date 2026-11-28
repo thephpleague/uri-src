@@ -11,7 +11,7 @@ The library provides a `Fragment` class to ease fragment creation and manipulati
 
 ## Instantiation
 
-### Using the default constructor.
+### Using the default constructor
 
 ~~~php
 <?php

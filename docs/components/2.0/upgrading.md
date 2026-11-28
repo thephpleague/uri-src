@@ -45,8 +45,8 @@ To use them you can either typehint against their interfaces or against a specif
 ### UriComponentInterface
 
 Because this new package targets PHP7.2+ the:
- 
-- `UriComponentInterface::isEmpty`; 
+
+- `UriComponentInterface::isEmpty`;
 - `UriComponentInterface::isNull`;
 
 methods are removed in favor of `UriComponentInterface::getContent()` method.

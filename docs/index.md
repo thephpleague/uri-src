@@ -6,10 +6,10 @@ title: The URI toolkit For PHP Developers
 The URI toolkit For PHP Developers
 ---
 
-A complete PHP toolkit for working with URIs. Parse, validate, format, and manipulate 
+A complete PHP toolkit for working with URIs. Parse, validate, format, and manipulate
 any [RFC 3986](https://tools.ietf.org/html/rfc3986) or
 r [RFC 8141](https://tools.ietf.org/html/rfc8141)–compliant identifier in a consistent,
-standards-based way. Aligned with the [WHATWG URL Living Standard](https://url.spec.whatwg.org/). Includes polyfills, 
+standards-based way. Aligned with the [WHATWG URL Living Standard](https://url.spec.whatwg.org/). Includes polyfills,
 [PSR-7](https://www.php-fig.org/psr/psr-7/) and [PSR-17](https://www.php-fig.org/psr/psr-17/) adapters, and modern replacements for PHP’s legacy URL functions.
 
 ```php

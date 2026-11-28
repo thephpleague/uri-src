@@ -42,7 +42,7 @@ $path = HierarchicalPath::createFromString('path/to/the/sky');
 $path->getContent(); //returns 'path/to/the/sky'
 ~~~
 
-### Using a collection of path segments.
+### Using a collection of path segments
 
 A path is a collection of segment delimited by the path delimiter `/`. So it is possible to create a `HierarchicalPath` object using a collection of segments with the `HierarchicalPath::createFromSegments` method.
 
@@ -50,8 +50,8 @@ The method expects at most 2 arguments:
 
 - The first required argument must be a collection of segments (an `array` or a `Traversable` object)
 - The second optional argument, a `HierarchicalPath` constant, tells whether this is a rootless path or not:
-    - `HierarchicalPath::IS_ABSOLUTE`: the created object will represent an absolute path;
-    - `HierarchicalPath::IS_RELATIVE`: the created object will represent a rootless path;
+  - `HierarchicalPath::IS_ABSOLUTE`: the created object will represent an absolute path;
+  - `HierarchicalPath::IS_RELATIVE`: the created object will represent a rootless path;
 
 ~~~php
 <?php

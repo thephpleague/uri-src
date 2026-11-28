@@ -39,7 +39,7 @@ $pqdn->isAbsolute(); // return false
 
 A domain is an ordered list of labels delimited by the host separator `.`. So it is possible to create a `Domain`
 object using a collection of labels with the `Domain::fromLabels` method.
-The method expects variadic of string or stringable objects representing the domain labels. 
+The method expects variadic of string or stringable objects representing the domain labels.
 
 <p class="message-warning">The labels must be ordered, this means that the top-level domain is the first entry</p>.
 <p class="message-warning">Since an IP is not a domain name, the class will throw an
@@ -97,7 +97,7 @@ echo Domain::new('example.com')->prepend('toto'); //return toto.example.com
 
 ### Replace and Remove Labels
 
-Replacing or removing labels is done on the basis of the label offsets by using 
+Replacing or removing labels is done on the basis of the label offsets by using
 
 - the `Domain::replaceLabel`
 - the `Domain::withoutLabels`

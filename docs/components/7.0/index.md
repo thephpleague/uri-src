@@ -19,7 +19,7 @@ Introduction
 While working with URI, you may stumble on some tasks, such as parsing its query string or updating its host,
 that are not covered by the [URI package](/uri/7.0/).
 Thankfully, the URI component package allows you to easily parse, create, manipulate URI components as well as partially
-update URIs. By using the package, your application can safely perform tasks around your URIs and provide a better 
+update URIs. By using the package, your application can safely perform tasks around your URIs and provide a better
 user experience to your developers.
 
 ~~~php
@@ -66,7 +66,7 @@ Installation
 --------
 
 ~~~
-$ composer require league/uri-components:^7.0
+composer require league/uri-components:^7.0
 ~~~
 
 Dependencies

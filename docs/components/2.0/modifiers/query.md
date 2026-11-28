@@ -6,10 +6,10 @@ title: URI partial modifiers
 Query modifiers
 =====
 
-The following modifiers update and normalize the URI query component. 
+The following modifiers update and normalize the URI query component.
 
-<p class="message-notice">Because each modification is done after parsing and building, the 
-resulting query string may update the component character encoding. These changes are expected because of 
+<p class="message-notice">Because each modification is done after parsing and building, the
+resulting query string may update the component character encoding. These changes are expected because of
 the rules governing parsing and building query string.</p>
 
 ## UriModifier::sortQuery

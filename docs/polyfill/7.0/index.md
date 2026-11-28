@@ -24,9 +24,8 @@ To use the package, you require:
 - [league/uri-interfaces](https://github.com/thephpleague/uri-interfaces)
 - [rowbot/url](https://github.com/TRowbotham/URL-Parser)
 
-
-<p class="message-notice">If you are using  <code>PHP 8.1</code>, 
-you <strong>SHOULD</strong> install <code>symfony/polyfill-php82</code> to use 
+<p class="message-notice">If you are using  <code>PHP 8.1</code>,
+you <strong>SHOULD</strong> install <code>symfony/polyfill-php82</code> to use
 its <code>SensitiveParameter</code> polyfill</p>
 
 ## Install

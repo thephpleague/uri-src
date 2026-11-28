@@ -35,7 +35,7 @@ public Host::toUnicode(): ?string
 ~~~
 
 Hosts can be:
- 
+
 - a registered name;
 - a domain name;
 - an IP address;
@@ -114,7 +114,7 @@ Host::createFromIp('uri.thephpleague.com');
 //throws League\Uri\Exceptions\SyntaxError
 ~~~
 
-The method can also infer the IPv4 from its hexadecimal or octal representation. 
+The method can also infer the IPv4 from its hexadecimal or octal representation.
 
 ~~~php
 use League\Uri\Components\Host;
@@ -125,7 +125,7 @@ echo $ipv4; //display '59.154.201.255'
 ~~~
 
 This normalization works using:
- 
+
 - a `League\Uri\Maths\Math` implementing object to calculate the IP address like shown below;
 - WHATWG IPv4 host parsing rules;
 

@@ -40,7 +40,7 @@ Installation
 --------
 
 ```bash
-$ composer require league/uri-query-parser
+composer require league/uri-query-parser
 ```
 
 Usage
@@ -80,8 +80,8 @@ The `QueryString::parse` method parameters are
 - `$query` can be the `null` value, any scalar or object which is stringable;
 - `$separator` is a string; by default it is the `&` character;
 - `$enc_type` is one of PHP's constant `PHP_QUERY_RFC3968` or `PHP_QUERY_RFC1738` which represented the supported encoding algoritm
-    - If you specify `PHP_QUERY_RFC3968` decoding will be done using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) rules;
-    - If you specify `PHP_QUERY_RFC1738` decoding will be done using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
+  - If you specify `PHP_QUERY_RFC3968` decoding will be done using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) rules;
+  - If you specify `PHP_QUERY_RFC1738` decoding will be done using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
 
 Here's a simple example showing how to use all the given parameters:
 

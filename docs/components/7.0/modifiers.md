@@ -91,7 +91,7 @@ with the same instance as the one that was provided to the `wrap` method.
 If you are not interested in the returned URI but only on its underlying string representation, you can instead use
 the following methods:
 
-- `Modifier::toString` : returns the URI object underlying string representation. 
+- `Modifier::toString` : returns the URI object underlying string representation.
 - `Modifier::toDisplayString` : returns an RFC3987 like string representation (this **MAY** not be a valid URL as all the components are decoded)
 - `Modifier::toMarkdownAnchor` : returns a Markdown representation of the URI, you can optionally set the anchor text.
 - `Modifier::toHtmlAnchor` : returns an HTML anchor tag `<a>` with its `href` pre-filled; you can optionally set the anchor text and attributes.
@@ -181,7 +181,7 @@ echo Modifier::wrap(new Uri('http://example.com/foo/bar'))
 
 <p class="message-notice">Available since version <code>7.6.0</code></p>
 
-The `Modifier` can normalize or resolve URI. Resolving and Normalizing URI is 
+The `Modifier` can normalize or resolve URI. Resolving and Normalizing URI is
 supported by `League\Uri\Uri`, and PHP's native URI object **but** not by PSR-7
 `UriInterface` and the public API diverge. Using the `Modifier` class you get
 a single method for all the URI objects and add the missing support for any
@@ -196,6 +196,7 @@ echo new Url('http://example.com/foo/bar')
 // returns http://example.com/bar
 // there is no equivalent in PSR-7
 ```
+
 using the `Modifier` you can do the following:
 
 ```php
@@ -357,8 +358,8 @@ to apply the following changes to the submitted URI.
 
 Following modifiers update and normalize the URI query component.
 
-<p class="message-notice">Because each modification is done after parsing and building, the 
-resulting query string may update the component character encoding. These changes are expected because of 
+<p class="message-notice">Because each modification is done after parsing and building, the
+resulting query string may update the component character encoding. These changes are expected because of
 the rules governing parsing and building query string.</p>
 
 ### Modifier::withQuery
@@ -527,7 +528,6 @@ $newUri = $modifier->removeQueryParameters('fo.o');
 echo $modifier->unwrap()->getQuery(); //display "kingkong=toto&fo.o=bar&fo_o=bar
 echo $newUri->unwrap()->getQuery();   //display "kingkong=toto&fo_o=bar"
 ~~~
-
 
 ### Modifier::removeQueryParameterIndices
 
@@ -910,8 +910,8 @@ echo Modifier::wrap($uri)->sliceLabels(1, 1)->toString();
 
 ## Path modifiers
 
-<p class="message-notice">Because each modification is done after parsing and building, 
-the resulting path may update the component character encoding. These changes are 
+<p class="message-notice">Because each modification is done after parsing and building,
+the resulting path may update the component character encoding. These changes are
 expected because of the rules governing parsing and building path string.</p>
 
 ### Modifier::withPath
@@ -1053,7 +1053,6 @@ echo Modifier::wrap($uri)
 
 <p class="message-notice">since version <code>7.7.0</code></p>
 <p class="message-info">replaces and deprecates <code>Modifier::appendSegment</code> since <code>7.7.0</code></p>
-
 
 Appends a path to the current URI path.
 

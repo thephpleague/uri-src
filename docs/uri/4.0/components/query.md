@@ -63,7 +63,7 @@ Returns a new `Query` object from an `array` or a `Traversable` object.
 public static function Query::createFromPairs(array $pairs): Query
 ~~~
 
-* `$pairs` : The submitted data must be an `array` or a `Traversable` key/value structure similar to the result of [QueryParser::parse](/services/parser-query/#parsing-the-query-string-into-an-array).
+- `$pairs` : The submitted data must be an `array` or a `Traversable` key/value structure similar to the result of [QueryParser::parse](/services/parser-query/#parsing-the-query-string-into-an-array).
 
 #### Examples
 

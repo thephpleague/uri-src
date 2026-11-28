@@ -36,6 +36,7 @@ echo $fragment->toString();
 echo $fragment->getUriComponent();
 // returns "#:~:text=Deprecated-,attributes,attribute&foo=bar&unknownDirective"
 ```
+
 As you can see with the example the `FragmentDirectives` acts as a container for distinct directives.
 
 Directives can be provided either as a specialized`Directive` object or as simple **encoded** directive string.
@@ -58,7 +59,7 @@ The `fromUri()` method extracts the fragment component from the given URI and in
 
 <p class="message-info">The fragment directive does not need to represent the entire fragment value.
 As shown in the example above, the directive’s delimiter (<code>:~:</code>) does not need to appear
-at the start of the fragment.</p> 
+at the start of the fragment.</p>
 
 Both `fromUri()` and `fromFragment()` allow the delimiter to appear anywhere in the input string.
 In contrast, the `new()` constructor expects a string **without any delimiter**; providing an

@@ -19,19 +19,19 @@ the following PHP interfaces:
 - `Countable`,
 - `IteratorAggregate`,
 - `Stringable`,
-- and `JsonSerializable` 
+- and `JsonSerializable`
 
-To get the full information on the class behaviour and feature you can go to the 
+To get the full information on the class behaviour and feature you can go to the
 [MDN page](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams). But since we are in a PHP context the class differs
 in the following aspects:
 
-| WHATWG group Specification       | PHP implementation              |
-|----------------------------------|---------------------------------|
+| WHATWG group Specification | PHP implementation |
+| ---------------------------------- | --------------------------------- |
 | `URLSearchParams::size` property | `URLSearchParams::size()`method |
-| `URLSearchParams::forEach()`     | `URLSearchParams::each()`       |
+| `URLSearchParams::forEach()` | `URLSearchParams::each()` |
 
 <p class="message-notice">As per the specification, the class is mutable.</p>
-<p class="message-notice">As per the specification, encoding is done following the <code>application/x-www-form-urlencoded</code> rules</p> 
+<p class="message-notice">As per the specification, encoding is done following the <code>application/x-www-form-urlencoded</code> rules</p>
 
 ## Instantiation
 
@@ -67,7 +67,7 @@ echo URLSearchParams::fromAssociative($interval)->toString();
 <p class="message-warning"> To adhere to the specification, if a string starts with the character <code>?</code>;
 <code>URLSearchParams::new</code> will ignore it before parsing the string.</p>
 
-<p class="message-info"><code>URLSearchParams::fromVariable</code> replaced the deprecated 
+<p class="message-info"><code>URLSearchParams::fromVariable</code> replaced the deprecated
 <code>URLSearchParams::fromParameters</code> named constructor which was
 not inconsistent against <code>http_build_query</code> algorithm.</p>
 

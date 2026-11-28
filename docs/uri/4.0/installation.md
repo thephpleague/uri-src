@@ -9,16 +9,16 @@ redirect_from:
 
 ## System Requirements
 
-* **PHP >= 5.5.9** but the latest stable version of PHP is recommended;
-* `mbstring` extension;
-* `intl` extension;
+- **PHP >= 5.5.9** but the latest stable version of PHP is recommended;
+- `mbstring` extension;
+- `intl` extension;
 
 ## Install
 
 The library is available on [Packagist][] and should be installed using [Composer][]. This can be done by running the following command on a composer installed box:
 
 ~~~
-$ composer require league/uri
+composer require league/uri
 ~~~
 
 Most modern frameworks will include Composer out of the box, but ensure the following file is included:

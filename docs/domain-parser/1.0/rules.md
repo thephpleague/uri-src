@@ -10,7 +10,6 @@ Public Suffix Resolver
 
 ## Rules and Domain
 
-
 The `Rules` constructor expects a `array` representation of the Public Suffix List. This `array` representation is constructed by the `ICANNSectionManager` and stored using a PSR-16 compliant cache.
 
 The `Rules` class resolves the submitted domain against the parsed rules from the PSL. This is done using the `Rules::resolve` method which returns a `League\Uri\PublicSuffix\Domain` object.

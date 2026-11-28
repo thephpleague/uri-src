@@ -95,9 +95,9 @@ UriInfo::getOrigin(Http::createFromString('/path/to/endpoint')); //returns null
 
 ## UriInfo::isCrossOrigin
 
-This public static method tells whether the given URI object represents different origins. 
-According to [RFC9110](https://www.rfc-editor.org/rfc/rfc9110#section-4.3.1) The "origin" for a given URI is the triple of scheme, host, and port 
-after normalizing the scheme and host to lowercase and normalizing the port to remove any leading 
+This public static method tells whether the given URI object represents different origins.
+According to [RFC9110](https://www.rfc-editor.org/rfc/rfc9110#section-4.3.1) The "origin" for a given URI is the triple of scheme, host, and port
+after normalizing the scheme and host to lowercase and normalizing the port to remove any leading
 zeros.
 
 ~~~php
@@ -120,5 +120,5 @@ UriInfo::isCrossOrigin(
 ); // returns true
 ~~~
 
-The method expects URI objects (implementing the League or PSR-7  `UriInterface`). 
+The method expects URI objects (implementing the League or PSR-7  `UriInterface`).
 The method takes into account i18n while comparing both URI id the `intl-extension` is installed.

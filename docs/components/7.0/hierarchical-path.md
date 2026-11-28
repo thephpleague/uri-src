@@ -42,7 +42,7 @@ A hierarchical path can be represented as an ordered list of segments.
 
 ### Instantiation
 
-A path is a ordered list of segment delimited by the path delimiter `/`. So it is possible to 
+A path is a ordered list of segment delimited by the path delimiter `/`. So it is possible to
 create a `HierarchicalPath` object using a collection of segments with two specific named constructors
 `HierarchicalPath::fromRelative` and `HierarchicalPath::fromAbsolute`, the methods expect variadic
 of string or stringable objects representing the path segments.
@@ -78,7 +78,7 @@ foreach ($path as $offset => $segment) {
 
 ### Accessing the Segments
 
-Since we are manipulating the path as an ordered list we can use known methods to acces the path segments and keys 
+Since we are manipulating the path as an ordered list we can use known methods to acces the path segments and keys
 as with normal lists.
 
 ~~~php
@@ -152,4 +152,3 @@ $newPath = $path->withoutEmptySegments();
 echo $path;    //displays 'path////to/the/sky//'
 echo $newPath; //displays 'path/to/the/sky/'
 ~~~
-

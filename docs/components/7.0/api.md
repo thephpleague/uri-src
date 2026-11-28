@@ -31,7 +31,7 @@ Query::new('q=value')->value();              // displays 'q=value'
 Host::fromUri($uri)->value();                // displays 'example.com'
 Port::fromAuthority('example.com')->value(); // displays null
 Path::new()->value();                        // displays ''
-~~~ 
+~~~
 
 ## String Representations
 

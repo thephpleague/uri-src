@@ -153,7 +153,7 @@ Before:
 use League\Uri\Modifiers\Pipeline;
 
 $callable = function ($uri) {
-	return $uri->withHost('thephpleague.com');
+    return $uri->withHost('thephpleague.com');
 };
 
 $pipeline = (new Pipeline())->pipe($callable);
@@ -169,7 +169,7 @@ use League\Uri\Modifiers\CallableAdapter;
 use League\Uri\Modifiers\Pipeline;
 
 $callable = function ($uri) {
-	return $uri->withHost('thephpleague.com');
+    return $uri->withHost('thephpleague.com');
 };
 
 $pipeline = (new Pipeline())->pipe(new CallableAdapter($callable));
@@ -186,7 +186,7 @@ Before:
 use League\Uri\Modifiers\Pipeline;
 
 $pipeline = new Pipeline([function ($uri) {
-	return $uri->withHost('thephpleague.com');
+    return $uri->withHost('thephpleague.com');
 })];
 ...
 ~~~
@@ -199,7 +199,7 @@ After:
 use League\Uri\Modifiers\Pipeline;
 
 $pipeline = new Pipeline([new CallableAdapter(function ($uri) {
-	return $uri->withHost('thephpleague.com');
+    return $uri->withHost('thephpleague.com');
 }))];
 ...
 ~~~
@@ -241,7 +241,6 @@ use League\Uri\Components\Host;
 $host = new Host('::1'); //triggers an Exception
 echo Host::createFromIp('::1'); //display '[::1]'
 ~~~
-
 
 The following methods have been removed:
 
@@ -343,8 +342,8 @@ Before:
 use League\Uri\Components\HierarchicalPath;
 
 $path = HierarchicalPath::createFromSegments(
-	['', 'path', 'to', 'here'],
-	HierarchicalPath::IS_RELATIVE
+    ['', 'path', 'to', 'here'],
+    HierarchicalPath::IS_RELATIVE
 );
 $path->isAbsolute(); //return true;
 echo $path; //display '/path/to/here';
@@ -358,8 +357,8 @@ After:
 use League\Uri\Components\HierarchicalPath;
 
 $path = HierarchicalPath::createFromSegments(
-	['', 'path', 'to', 'here'],
-	HierarchicalPath::IS_RELATIVE
+    ['', 'path', 'to', 'here'],
+    HierarchicalPath::IS_RELATIVE
 );
 $path->isAbsolute(); //return false;
 echo $path; //display 'path/to/here';

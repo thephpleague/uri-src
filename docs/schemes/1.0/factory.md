@@ -118,11 +118,11 @@ use Zend\Diactoros\Uri as DiactorosUri;
 
 $uri = Uri\create('./p#~toto', 'http://thephpleague.com/uri/5.0/uri/');
 echo $uri; //returns 'http://thephpleague.com/uri/5.0/uri/p#~toto'
-		   // which is a Uri\Http object
+           // which is a Uri\Http object
 
 $zendUri = new Diactoros('http://thephpleague.com/uri/5.0/uri/');
 
 $uri = Uri\create('./p#~toto', $zendUri);
 echo $uri; //returns 'http://thephpleague.com/uri/5.0/uri/p#~toto'
-		   // which is a Zend\Diactoros\Uri object
+           // which is a Zend\Diactoros\Uri object
 ~~~

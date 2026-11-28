@@ -45,5 +45,5 @@ Installation
 --------
 
 ~~~bash
-$ composer require league/uri-hostname-parser
+composer require league/uri-hostname-parser
 ~~~

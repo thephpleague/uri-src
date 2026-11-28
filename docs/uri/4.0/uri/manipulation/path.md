@@ -466,13 +466,11 @@ $newUri = $modifier($uri);
 echo $newUri; //display 'ftp://thephpleague.com/path/to/image.png'
 ~~~
 
-
 Just like others modifier it is possible to update the modifier typecode settings using the `Typecode::withType` method.
 
 <p class="message-warning">The <code>withType</code> method is deprecated since <code>version 4.1</code>and will be removed in the next major release</p>
 
 <p class="message-warning">When modifying the typecode the class only validate the return string. Additional check should be done to ensure that the path is valid for a given typecode.</p>
-
 
 ## Update Data URI parameters
 

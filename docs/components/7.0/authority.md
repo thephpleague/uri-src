@@ -33,7 +33,7 @@ Authority::new('user:pass@example.com:42')->value(); //returns 'user:pass@exampl
 Authority::fromUri("http://www.example.com/path/to/the/sky")->getPort(); //return null;
 Authority::new()->value(); //return null;
 Authority::fromComponents(
-	UriString::parse("http://user:pass@example.com:42/5.0/uri/api")
+    UriString::parse("http://user:pass@example.com:42/5.0/uri/api")
 )->value(); //returns 'user:pass@example.com:42'
 ~~~
 

@@ -89,6 +89,8 @@
         "phpunit:no-polyfill": "XDEBUG_MODE=coverage phpunit --coverage-text --exclude-group=uri-polyfill",
         "phpunit:no-coverage": "phpunit --no-coverage",
         "update-test-fixtures": "@php scripts/update-test-fixtures.php",
+        "docs:lint": "npx --yes markdownlint-cli2 --config docs/.markdownlint.yml \"docs/**/*.md\"",
+        "docs:fix": "npx --yes markdownlint-cli2 --fix --config docs/.markdownlint.yml \"docs/**/*.md\"",
         "test": [
             "@phpunit",
             "@phpstan",

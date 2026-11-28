@@ -33,7 +33,7 @@ $port = Port::createFromUri($uri)->getContent();   //displays null
 $path = Path::createFromUri($uri)->getContent();   //displays ''
 ~~~
 
-<p class="message-info">Depending on the URI component the default constructor and other named constructors can be use for instantiation.</p> 
+<p class="message-info">Depending on the URI component the default constructor and other named constructors can be use for instantiation.</p>
 
 ## Accessing URI component representation
 
@@ -78,7 +78,6 @@ echo $port->getContent(); //displays '23';
 <p class="message-notice">Normalization and encoding are component specific.</p>
 
 ## Modifying URI component object
-
 
 All URI component objects can be modified with the `withContent` method. This method returns a new instance with the modified content.
 

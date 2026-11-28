@@ -8,8 +8,8 @@ Path modifiers
 
 The following modifiers update and normalize the path component.
 
-<p class="message-notice">Because each modification is done after parsing and building, the 
-resulting path may update the component character encoding. These changes are expected because of 
+<p class="message-notice">Because each modification is done after parsing and building, the
+resulting path may update the component character encoding. These changes are expected because of
 the rules governing parsing and building path string.</p>
 
 ## UriModifier::removeDotSegments

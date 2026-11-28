@@ -129,9 +129,9 @@ public UriPart::getContent(void): mixed
 
 This method return type is:
 
-* `null` : If the URI part is not defined;
-* `string` : When the part is defined. This string is normalized and encoded according to the URI part rules;
-* `int` : When the defined Uri component is the Uri port;
+- `null` : If the URI part is not defined;
+- `string` : When the part is defined. This string is normalized and encoded according to the URI part rules;
+- `int` : When the defined Uri component is the Uri port;
 
 #### Example
 
@@ -215,7 +215,7 @@ $host->sameValueAs($uri);
 
 ### UriPart implementing classes
 
-* The `League\Uri\Components\UserInfo` handles [the user information part](/4.0/components/userinfo/);
+- The `League\Uri\Components\UserInfo` handles [the user information part](/4.0/components/userinfo/);
 
 ## URI component interface
 
@@ -296,13 +296,13 @@ $host->__toString() == $newHost->__toString();
 
 ### Component implementing classes
 
-* The `League\Uri\Components\Scheme` handles [the scheme component](/uri/4.0/components/scheme/);
-* The `League\Uri\Components\User` handles [the user component](/uri/4.0/components/user/);
-* The `League\Uri\Components\Pass` handles [the pass component](/uri/4.0/components/pass/);
-* The `League\Uri\Components\Host` handles [the host component](/uri/4.0/components/host/);
-* The `League\Uri\Components\Port` handles [the port component](/uri/4.0/components/port/);
-* The `League\Uri\Components\Path` handles [the generic path component](/uri/4.0/components/path/);
-* The `League\Uri\Components\HierarchicalPath` handles [the hierarchical path component](/uri/4.0/components/hierarchical-path/);
-* The `League\Uri\Components\DataPath` handles [the data path component](/uri/4.0/components/datauri-path/);
-* The `League\Uri\Components\Query` handles [the query component](/uri/4.0/components/query/);
-* The `League\Uri\Components\Fragment` handles [the fragment component](/uri/4.0/components/fragment/);
+- The `League\Uri\Components\Scheme` handles [the scheme component](/uri/4.0/components/scheme/);
+- The `League\Uri\Components\User` handles [the user component](/uri/4.0/components/user/);
+- The `League\Uri\Components\Pass` handles [the pass component](/uri/4.0/components/pass/);
+- The `League\Uri\Components\Host` handles [the host component](/uri/4.0/components/host/);
+- The `League\Uri\Components\Port` handles [the port component](/uri/4.0/components/port/);
+- The `League\Uri\Components\Path` handles [the generic path component](/uri/4.0/components/path/);
+- The `League\Uri\Components\HierarchicalPath` handles [the hierarchical path component](/uri/4.0/components/hierarchical-path/);
+- The `League\Uri\Components\DataPath` handles [the data path component](/uri/4.0/components/datauri-path/);
+- The `League\Uri\Components\Query` handles [the query component](/uri/4.0/components/query/);
+- The `League\Uri\Components\Fragment` handles [the fragment component](/uri/4.0/components/fragment/);

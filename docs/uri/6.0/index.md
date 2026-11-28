@@ -13,7 +13,7 @@ Overview
 [![Build](https://github.com/thephpleague/uri/workflows/build/badge.svg)](https://github.com/thephpleague/uri/actions?query=workflow%3A%22build%22)
 [![Total Downloads](//img.shields.io/packagist/dt/league/uri.svg?style=flat-square)](https://packagist.org/packages/league/uri)
 
-This package contains concrete objects to ease creating and manipulating URI objects represented as immutable value objects. 
+This package contains concrete objects to ease creating and manipulating URI objects represented as immutable value objects.
 
 The following URI objects are defined (order alphabetically):
 
@@ -40,7 +40,7 @@ Installation
 --------
 
 ~~~
-$ composer require league/uri:^6.0
+composer require league/uri:^6.0
 ~~~
 
 Dependencies

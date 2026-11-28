@@ -26,7 +26,7 @@ The `Converter::toDecimal` method tries to convert a host into a valid IPv4 deci
 representation based on the algorithm used by the [WHATWG rules](https://url.spec.whatwg.org/#concept-ipv4-parser).
 The method only parameter should represent a host value.
 
-To work as intended the class requires a `League\Uri\IPv4\Calculator` implementing class 
+To work as intended the class requires a `League\Uri\IPv4\Calculator` implementing class
 responsible for making all the calculations needed to perform the conversion between
 IPv4 representations.
 
@@ -36,8 +36,8 @@ The package comes bundled with three implementations:
 - `League\Uri\IPv4\BCMathCalculator` which relies on BCMath extension;
 - `League\Uri\IPv4\NativeCalculator` which relies on PHP build against the x.64 architecture;
 
-For ease of usage the class exposes a `fromEnvironment` named constructor which 
-will pick the correct implementation based on the available extensions. 
+For ease of usage the class exposes a `fromEnvironment` named constructor which
+will pick the correct implementation based on the available extensions.
 
 If no calculator is provided a `League\Uri\Exceptions\MissingFeature` exception will be thrown. likewise,
 if no convertion is possible `null` is returned.
@@ -72,7 +72,6 @@ $converter->toDecimal('[2002:0000:0000::]') // returns 0.0.0.0
 $converter->toIPv6UsingMapping('0xc0a821'); // returns "[::ffff:192.168.2.1]"
 $converter->toIPv6Using6to4('0xc0a821');    // returns "[2002:00c0:a821::]"
 ```
-
 
 <p class="message-notice">since version <code>7.2.0</code></p>
 

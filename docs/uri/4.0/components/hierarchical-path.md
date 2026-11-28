@@ -53,8 +53,8 @@ The method expects at most 2 arguments:
 
 - The first required argument must be a collection of segments (an `array` or a `Traversable` object)
 - The second optional argument, a `Uri\Path` constant, tells whether this is a rootless path or not:
-    - `HierarchicalPath::IS_ABSOLUTE`: the created object will represent an absolute path;
-    - `HierarchicalPath::IS_RELATIVE`: the created object will represent a rootless path;
+  - `HierarchicalPath::IS_ABSOLUTE`: the created object will represent an absolute path;
+  - `HierarchicalPath::IS_RELATIVE`: the created object will represent a rootless path;
 
 ~~~php
 <?php
@@ -337,7 +337,6 @@ $path = new Path('/path/to/the/sky');
 $newPath = $path->without([0, 1]);
 $newPath->__toString(); //return '/the/sky'
 ~~~
-
 
 <p class="message-notice">if the specified offset does not exists, no modification is performed and the current object is returned.</p>
 

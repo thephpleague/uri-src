@@ -38,21 +38,22 @@ If you want to handle:
 - IDN host you are **required** to install the `intl` extension;
 - IPv4 host in octal or hexadecimal form, out of the box, you **need** at least one of the following extension:
 
-    - install the `GMP` extension **or**
-    - install the `BCMath` extension
-    
+  - install the `GMP` extension **or**
+  - install the `BCMath` extension
+
    or you should be using
-   
-    - a `64-bits` PHP version
+
+  - a `64-bits` PHP version
 
 Trying to process such hosts without meeting those minimal requirements will trigger a `RuntimeException`.
+
 - Data URI creation from a filepath, Since version `2.2.0`, the `fileinfo` extension is **required**.
 
 Installation
 --------
 
 ~~~
-$ composer require league/uri-components
+composer require league/uri-components
 ~~~
 
 Dependencies

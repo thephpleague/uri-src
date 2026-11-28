@@ -108,7 +108,6 @@ echo $uri->withScheme('')->withHost(''); //displays "/"
 
 <p class="message-notice">When an invalid URI object is created an <code>UriException</code> exception is thrown</p>
 
-
 ### Path validity
 
 According to RFC3986, if an HTTP URI contains a non empty authority part, the URI path must be the empty string or absolute. Thus, some modification may trigger an <code>UriException</code>.

@@ -112,7 +112,7 @@ $manager->refreshRules('https://publicsuffix.org/list/public_suffix_list.dat');
 It is important to always have an up to date PSL ICANN Section. In order to do so the library comes bundle with an auto-update script located in the `bin` directory.
 
 ~~~bash
-$ php ./bin/update-psl-icann-section
+php ./bin/update-psl-icann-section
 ~~~
 
 This script requires that:
@@ -124,7 +124,6 @@ If you prefer using your own implementations you should:
 
 1. Copy the `League\Uri\Installer\ICANNSection` class
 2. Adapt its code to reflect your requirements.
-
 
 In any cases your are required to register a cron with your chosen script to keep your data up to date
 

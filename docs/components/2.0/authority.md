@@ -7,8 +7,8 @@ The Authority part
 =======
 
 The `League\Uri\Components\Authority` class ease URI authority part creation and manipulation. This object exposes:
-                                       
-- the [package common API](/components/2.0/api/), 
+
+- the [package common API](/components/2.0/api/),
 
 but also provide specific methods to work with a URI authority part.
 
@@ -43,7 +43,7 @@ $authority->getContent(); //returns 'user:pass@example.com:42'
 <p class="message-notice">if no string is given a instance is returns using the empty string.</p>
 
 ### Using Uri components
- 
+
 ~~~php
 <?php
 
@@ -51,7 +51,7 @@ use League\Uri\Components\Authority;
 use League\Uri\UriString;
 
 $authority = Authority::createFromComponents(
-	UriString::parse("http://user:pass@example.com:42/5.0/uri/api")
+    UriString::parse("http://user:pass@example.com:42/5.0/uri/api")
 );
 $authority->getContent(); //returns 'user:pass@example.com:42'
 ~~~

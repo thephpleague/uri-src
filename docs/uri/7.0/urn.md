@@ -30,7 +30,7 @@ $urnRfc2141 = Urn::fromRfc2141(nid: 'example', nss: 'animal:nose');
 Urn::parse('invalid uri'); // returns null on failure
 ```
 
-The `new()` method allows creating a new instance from an encoded string. The method is an alias of 
+The `new()` method allows creating a new instance from an encoded string. The method is an alias of
 the `fromString()` method. By default, the submitted URNs will be validated against RFC8141.
 While both methods support strings, you can also use the new native URI classes as input, as well as
 `PSR-7` UriInterface implementing objects.
@@ -58,6 +58,7 @@ JSON supporting languages.
 $urn = Urn::fromString('urn:example:animal:nose?+foo=bar&fo%26o=b%3Far');
 json_encode($urn); //returns "urn:example:animal:nose?+foo=bar&fo%26o=b%3Far"
 ```
+
 The `toDisplayString()` method returns a human-readable representation of the URN,
 corresponding to its IRI form as defined in RFC 3987. Although the resulting
 value may not constitute a syntactically valid URN, it is intended for
@@ -92,6 +93,7 @@ echo $urn->getRComponent(); // displays 'weight=2.3;length=5.1'
 echo $urn->getQComponent(); // displays 'profile=standard'
 echo $urn->getFComponent(); // displays 'section2'
 ```
+
 <p class="message-notice">The returned value of each component is kept encoded.</p>
 
 ## URN Information

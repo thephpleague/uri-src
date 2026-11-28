@@ -8,7 +8,7 @@ URI Template
 
 <p class="message-notice"><code>League\Uri\UriTemplate</code> is available since version <code>6.1.0</code></p>
 
-The `League\Uri\UriTemplate` class enables expanding a URI object based on a URI template and its submitted parameters 
+The `League\Uri\UriTemplate` class enables expanding a URI object based on a URI template and its submitted parameters
 following [RFC 6570 URI Template](http://tools.ietf.org/html/rfc6570).
 
 ## The parser is RFC6570 compliant
@@ -39,9 +39,9 @@ echo $uri, PHP_EOL;
 
 ## Variables
 
-<p class="message-notice">For maximum interoperability you should make sure your variables are strings or objects that expose 
-the <code>__toString</code> method otherwise the value will be cast to string following PHP rules except 
-for boolean values <code>true</code> and <code>false</code> which will be converted to <code>1</code> and 
+<p class="message-notice">For maximum interoperability you should make sure your variables are strings or objects that expose
+the <code>__toString</code> method otherwise the value will be cast to string following PHP rules except
+for boolean values <code>true</code> and <code>false</code> which will be converted to <code>1</code> and
 <code>0</code> respectively.</p>
 
 ### Default variables can be set using the constructor
@@ -136,11 +136,11 @@ $uriTemplate->expand($params);
 // will throw a League\Uri\Exceptions\TemplateCanNotBeExpanded when trying to expand the `period` value.
 ~~~
 
-### Using the prefix modifier on a list will trigger an exception.
+### Using the prefix modifier on a list will trigger an exception
 
-While this is not forbidden by the RFC, the `UriTemplate` class will throw an exception 
+While this is not forbidden by the RFC, the `UriTemplate` class will throw an exception
 if an attempt is made to use the prefix modifier with a list of value. Other implementations
-will silently ignore the modifier **but** this package will trigger the exception to alert 
+will silently ignore the modifier **but** this package will trigger the exception to alert
 the user that something might be wrong and that the generated URI might not be the one expected.
 
 ~~~php
@@ -166,7 +166,7 @@ echo $uriTemplate->expand($params), PHP_EOL;
 ### Using braces in your template
 
 The following implementation disallow the use of braces `{` or  `}` outside of being URI template expression delimiters.
-If found outside of an expression an exception will be triggered. 
+If found outside of an expression an exception will be triggered.
 
 ~~~php
 <?php

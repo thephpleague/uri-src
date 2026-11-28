@@ -47,7 +47,6 @@ public Query::__construct(?string $content = null, string $separator = '&'): voi
 
 The `League\Uri\Components\Exception` extends PHP's SPL `InvalidArgumentException`.
 
-
 ### Query::getSeparator and Query::withSeparator
 
 <p class="message-info"><code>Query::getSeparator</code> and <code>Query::withSeparator</code> are available since version <code>1.3.0</code></p>
@@ -121,7 +120,6 @@ public Query::append(string $query): Query
 ~~~
 
 This method expects a single argument which is a string
-
 
 ~~~php
 <?php
@@ -229,7 +227,6 @@ $query->getParam('gweta', 'now'); //return 'now'
 
 The method returns the value of a specific argument. If the argument does not exist it will return the value specified by the second argument which defaults to `null`.
 
-
 ### Query::withoutParams
 
 <p class="message-info"><code>Query::withoutParams</code> is available since version <code>1.3.0</code></p>
@@ -287,9 +284,9 @@ This class mainly represents the query string as a collection of key/value pairs
 
 Returns a new `Query` object from an `array` or a `Traversable` object.
 
-* `$pairs` : The submitted data must be an `array` or a `Traversable` key/value structure similar to the result of [Query::parse](#parsing-the-query-string-into-an-array).
+- `$pairs` : The submitted data must be an `array` or a `Traversable` key/value structure similar to the result of [Query::parse](#parsing-the-query-string-into-an-array).
 
-* `$separator` : The query string separator used for string representation. By default equals to `&`;
+- `$separator` : The query string separator used for string representation. By default equals to `&`;
 
 <p class="message-info"><code>$separator</code> is availiabe since version <code>1.3.0</code>.</p>
 

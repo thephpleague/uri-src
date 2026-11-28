@@ -30,7 +30,7 @@ $str = QueryString::build($pairs, '|');
 
 ## Query String Parsing
 
-To parse a query string use the ` QueryString::parse` method as shown below:
+To parse a query string use the `QueryString::parse` method as shown below:
 
 ```php
 $pairs = QueryString::parse('module=home&action=show&page=😓');
@@ -51,8 +51,8 @@ The `QueryString::parse` method parameters are:
 - `$query` can be the `null` value, any scalar or object which is stringable;
 - `$separator` is a string; by default it is the `&` character;
 - `$enc_type` is one of PHP's constant `PHP_QUERY_RFC3968` or `PHP_QUERY_RFC1738` which represented the supported encoding algoritm
-    - If you specify `PHP_QUERY_RFC3968` decoding will be done using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) rules;
-    - If you specify `PHP_QUERY_RFC1738` decoding will be done using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
+  - If you specify `PHP_QUERY_RFC3968` decoding will be done using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) rules;
+  - If you specify `PHP_QUERY_RFC1738` decoding will be done using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
 
 Here's a simple example showing how to use all the given parameters:
 
@@ -93,8 +93,8 @@ The static public `QueryString::build` method parameters are:
 - `$pairs` an iterable structure containing a collection of key/pair pairs as describe in the returned array of the `QueryString::parse` method.
 - `$separator` is a string; by default, it is the `&` character;
 - `$enc_type` is one of PHP's constant `PHP_QUERY_RFC3968` or `PHP_QUERY_RFC1738` which represented the supported encoding algoritm
-    - If you specify `PHP_QUERY_RFC3968` encoding will be done using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) rules;
-    - If you specify `PHP_QUERY_RFC1738` encoding will be done using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
+  - If you specify `PHP_QUERY_RFC3968` encoding will be done using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) rules;
+  - If you specify `PHP_QUERY_RFC1738` encoding will be done using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
 - `$coercionMode` takes one of the value of the `StringCoercionMode` Enum introduced in version **7.8.0**
 Depending on the coercionMode selected `Native` (for PHP coercion to string) or `EcmaScript` (for JavaScript coercion), the type of parameter accepted and the coercion rules used to convert the value to a string are different.
 
@@ -111,7 +111,6 @@ echo QueryString::build($pairs, coercionMode: StringCoercionMode::EcmaScript);
 ```
 
 **For the same input the generated query string is different.**
-
 
 The function returns the `null` value if the submitted collection is empty.
 
@@ -215,6 +214,7 @@ echo QueryString::compose([
 
 // display 'module=home|action=show|page=toto%20bar';
 ```
+
 The `QueryString::compose` method is a userland implementation of the `http_build_query`
 functions with some differences. The function does not handle any prefixing or the variable
 and allow for a range of algorithm compositions:
@@ -224,8 +224,8 @@ The method parameters are:
 - `$data` an `array` or an `object` as describe in the `http_build_query` functions.
 - `$separator` is a string; by default, it is the `&` character;
 - `$encType` is one of PHP's constant `PHP_QUERY_RFC3968` or `PHP_QUERY_RFC1738` which represented the supported encoding algoritm
-    - If you specify `PHP_QUERY_RFC3986` encoding will be done using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) rules;
-    - If you specify `PHP_QUERY_RFC1738` encoding will be done using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
+  - If you specify `PHP_QUERY_RFC3986` encoding will be done using [RFC3986](https://tools.ietf.org/html/rfc3986#section-3.4) rules;
+  - If you specify `PHP_QUERY_RFC1738` encoding will be done using [application/x-www-form-urlencoded](https://url.spec.whatwg.org/#urlencoded-parsing) rules;
 - `$composeMode` a Enum to describe how query serialization will be performed.
 
 The `$composeMode` parameter dictates how the `$data` argument will be converted into a URI query string.
@@ -263,7 +263,7 @@ echo http_build_query($data);
 
 Starting with version <code>7.1</code> you can have an improved control over the characters conversion
 by using the `League\Uri\KeyValuePair\Converter` class. The class is responsible for parsing the string into key/value
-pair and for converting key/value pairs into string adding an extra string replacement before parsing and 
+pair and for converting key/value pairs into string adding an extra string replacement before parsing and
 after building the string.
 
 ```php

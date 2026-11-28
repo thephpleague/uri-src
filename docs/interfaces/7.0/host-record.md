@@ -77,7 +77,7 @@ within the `HostType::RegisteredName` type.
 
 ### Caching
 
-Because computing these information can be time-consuming, a in-memory cache has been put in place to reduce 
+Because computing these information can be time-consuming, a in-memory cache has been put in place to reduce
 the calculation load. Whenever you can the `validate` or `from` method the instantiated class
 is cached for the duration of the script which ensure that calling multiple time both method with the same
 input is not being recalculated each time.

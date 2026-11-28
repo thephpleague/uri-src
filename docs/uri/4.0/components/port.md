@@ -10,7 +10,7 @@ The library provides a `Port` class to ease port manipulation.
 
 ## Instantiation
 
-### Using the default constructor.
+### Using the default constructor
 
 ~~~php
 <?php

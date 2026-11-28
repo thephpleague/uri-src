@@ -38,7 +38,7 @@ echo Encoder::encodeQueryKeyValue($queryKey);   // returns "k%C3%A9%23"
 echo Encoder::encodeQueryKeyValue($queryValue); // returns "%26foobar"
 ````
 
-Each static encoding method is component-aware and will prevent encoding component special characters that must or 
+Each static encoding method is component-aware and will prevent encoding component special characters that must or
 must not be encoded in the context of a full URI.
 
 To complete the encoding methods, the class also exposes static decoding methods to safely decode URI components:
